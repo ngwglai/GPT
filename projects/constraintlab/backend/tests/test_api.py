@@ -6,7 +6,7 @@ from unittest.mock import patch
 from fastapi.testclient import TestClient
 from constraintlab.api import app, job
 from constraintlab.problems import builtin
-from constraintlab.benchmarks import experiment, to_csv
+from constraintlab.benchmarks import experiment
 
 
 class ApiTests(unittest.TestCase):
