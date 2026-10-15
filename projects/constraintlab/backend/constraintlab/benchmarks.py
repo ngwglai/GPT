@@ -25,20 +25,22 @@ def experiment(problems, configs, repeats=3, seed=0, cancelled=lambda: False):
     if type(seed) != int or not 0 <= seed <= 2**32 - 11:
         raise ValueError("Invalid experiment seed")
     rows = []
+    problem_index = {}
     for p in parsed:
+        document = p.json()
         digest = hashlib.sha256(
-            json.dumps(p.json(), sort_keys=True).encode()
+            json.dumps(document, sort_keys=True).encode()
         ).hexdigest()
+        problem_index[digest] = document
         for c in validated:
             for rep in range(repeats):
                 if cancelled():
-                    return {"rows": rows, "cancelled": True}
+                    return {"problems": problem_index, "rows": rows, "cancelled": True}
                 cfg = Config(**{**asdict(c), "seed": seed + rep, "trace_limit": 0})
                 result = solve(p, cfg, cancelled)
                 rows.append(
                     dict(
                         problem_id=digest,
-                        problem=p.json(),
                         config=asdict(cfg),
                         repeat=rep,
                         status=result["status"],
@@ -54,7 +56,7 @@ def experiment(problems, configs, repeats=3, seed=0, cancelled=lambda: False):
                         },
                     )
                 )
-    return {"rows": rows, "cancelled": False}
+    return {"problems": problem_index, "rows": rows, "cancelled": False}
 
 
 def to_csv(report):
@@ -80,9 +82,18 @@ def to_csv(report):
     ]
     writer = csv.DictWriter(output, fieldnames=fields)
     writer.writeheader()
+    seen = set()
     for row in report["rows"]:
         flat = {**{k: v for k, v in row.items() if k != "stats"}, **row["stats"]}
-        for k in ("problem", "config", "environment"):
+        problem_id = row["problem_id"]
+        # Include each full problem only once even in the flat CSV export.
+        flat["problem"] = (
+            json.dumps(report["problems"][problem_id], ensure_ascii=True, sort_keys=True)
+            if problem_id not in seen
+            else ""
+        )
+        seen.add(problem_id)
+        for k in ("config", "environment"):
             flat[k] = json.dumps(flat[k], ensure_ascii=True, sort_keys=True)
         writer.writerow(flat)
     return output.getvalue()
