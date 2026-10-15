@@ -37,7 +37,6 @@ type Result = {
 };
 type Row = {
   problem_id: string;
-  problem: Problem;
   config: Config;
   repeat: number;
   status: string;
@@ -203,6 +202,7 @@ function App() {
     [repeats, setRepeats] = useState(3),
     [instances, setInstances] = useState<Problem[]>([]),
     [rows, setRows] = useState<Row[]>([]),
+    [problemIndex, setProblemIndex] = useState<Record<string, Problem>>({}),
     [experimentId, setExperimentId] = useState("");
   const fail = (e: unknown) =>
     setError(String(e instanceof Error ? e.message : e));
@@ -251,6 +251,7 @@ function App() {
   async function run(experiment = false) {
     try {
       const p = await validated();
+      setJob("");
       setBusy(true);
       setPlaying(false);
       setMessage("正在计算…");
@@ -284,6 +285,7 @@ function App() {
           }
           if (experiment) {
             setRows(j.result.rows);
+            setProblemIndex(j.result.problems);
             setMessage(
               j.result.cancelled ? "实验已取消，保留已完成记录" : "实验完成",
             );
@@ -386,7 +388,7 @@ function App() {
         )}
         <div role="status" className="message">
           {message || "准备就绪"}
-          {busy && (
+          {busy && job !== "" && (
             <button
               onClick={() =>
                 api(`jobs/${job}/cancel`, {})
@@ -866,8 +868,8 @@ function App() {
                       {rows.map((r, i) => (
                         <div className="bar-row" key={i}>
                           <span>
-                            {r.problem.name}{" "}
-                            {Object.keys(r.problem.variables).length} /{" "}
+                            {(problemIndex[r.problem_id]?.name ?? "未知问题")}{" "}
+                            {Object.keys(problemIndex[r.problem_id]?.variables ?? {}).length} /{" "}
                             {r.config.algorithm} #{r.repeat + 1}
                           </span>
                           <div>
@@ -911,8 +913,8 @@ function App() {
                         {rows.map((r, i) => (
                           <tr key={i}>
                             <td>
-                              {r.problem.name} /{" "}
-                              {Object.keys(r.problem.variables).length}
+                              {(problemIndex[r.problem_id]?.name ?? "未知问题")} /{" "}
+                              {Object.keys(problemIndex[r.problem_id]?.variables ?? {}).length}
                             </td>
                             <td>{r.config.algorithm}</td>
                             <td>{r.repeat + 1}</td>
@@ -942,7 +944,7 @@ function App() {
                   </div>
                   <details>
                     <summary>完整配置、环境与结果</summary>
-                    <pre>{JSON.stringify(rows, null, 2)}</pre>
+                    <pre>{JSON.stringify({ problems: problemIndex, rows }, null, 2)}</pre>
                   </details>
                 </section>
               </>
