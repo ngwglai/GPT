@@ -89,6 +89,17 @@ class RepoScopeTests(unittest.TestCase):
         self.assertEqual(js["metrics"]["branch_markers"], 1)
         self.assertEqual(result["languages"]["TypeScript"]["code"], 1)
 
+    def test_html_markup_is_not_ranked_as_source(self):
+        self.write("index.html", "<main>Hello</main>\n<!-- comment -->\n")
+        self.write("app.py", "print('hello')\n")
+        result = scan(self.root)
+        html = next(f for f in result["files"] if f["path"] == "index.html")
+        self.assertEqual(html["language"], "HTML")
+        self.assertEqual(html["method"], "unclassified")
+        self.assertEqual(result["primary_languages"], ["Python"])
+        self.assertNotIn("index.html", {f["path"] for f in result["top_files"]})
+        self.assertEqual(result["directories"]["."]["code"], 1)
+
     def test_mixed_languages_and_recursive_sizes(self):
         self.write("src/a.py", "print(1)\n")
         self.write("src/lib/a.rs", "// hello\nfn main() {}\n")

@@ -1,6 +1,6 @@
 # v0.1.0 测试与性能验证
 
-日期：2026-10-15。状态：Testing，等待用户审查与 Windows 原生验收。
+日期：2026-10-15。前半部分保留初始版本的测量记录；最新修复与 Windows 原生自动验收见末尾章节。
 
 ## 执行环境与结果
 
@@ -66,3 +66,11 @@ MAC 减少分支，但本实现的 AC-3 重新建队列和多次支持检查有�
 Windows 原生结果须以 CI 的 windows-latest 作业实际结果为准；配置完成不代表验收通过。该作业运行原生 Python 测试、构建，并在含空格及中文的临时路径执行 start-windows.cmd 和完整 E2E。
 
 首次 CI 的 Linux 服务检查失败：CI 使用普通 wheel 安装，API 无法定位源码目录下的前端构建。按 README 与启动脚本改为 editable 安装后复验；wheel 仍单独构建检查。未绕过页面就绪检查。
+
+## Windows 原生验收（PR #4，2026-10-15）
+
+CI：[38710374741](https://github.com/ngwglai/GPT/actions/runs/38710374741)，全部任务成功。Windows Server 2025：Python 3.11 后端 15 项通过；原生 start-windows.cmd 在含空格及中文的临时路径重新安装、构建并启动服务，启动器实际选择 Python 3.14.7，4 项 Playwright Chromium E2E 通过。Linux 对应 15 项测试与 4 项 E2E、两平台 wheel、静态检查、前端构建与实验脚本均通过。
+
+这是 Windows 原生 runner 上的自动验收，未执行用户电脑上的人工双击验收，不用 Linux 结果代替 Windows。PR #4 合并后，PR #2 整合 main 的完整 CI 仍须单独通过。
+
+补充本地验收：九个示例分别执行并独立验证全部返回解；普通示例 SAT，高难数独在 2 秒预算下 UNKNOWN/timeout，符合已知资源限制。4 皇后 CLI 完整枚举得到 2 解；wheel 在独立虚拟环境无依赖离线安装后核心求解通过。

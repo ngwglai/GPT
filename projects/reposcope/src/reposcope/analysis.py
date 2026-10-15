@@ -19,7 +19,7 @@ LANGUAGES = {
     ".json": "JSON", ".toml": "TOML", ".yaml": "YAML", ".yml": "YAML",
     ".md": "Markdown", ".txt": "Text", ".xml": "XML",
 }
-SOURCE_LANGUAGES = set(LANGUAGES.values()) - {"JSON", "TOML", "YAML", "Markdown", "Text", "XML"}
+SOURCE_LANGUAGES = set(LANGUAGES.values()) - {"JSON", "TOML", "YAML", "Markdown", "Text", "XML", "HTML"}
 CONFIG_NAMES = {"package.json", "pyproject.toml", "requirements.txt", "Cargo.toml", "go.mod", "pom.xml"}
 
 

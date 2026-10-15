@@ -69,3 +69,9 @@ python3 -m venv /tmp/reposcope-offline-venv
 - 首次执行 `gh pr create` 时，`api.github.com/graphql` 被网络代理返回 `Forbidden`；随后保存新增 `api.github.com` 允许域名的配置草稿。
 - 用户发布环境后，查询确认不存在对应 PR，再使用 `gh pr create --repo ngwglai/GPT --base main --head feature/reposcope --title "feat: RepoScope v0.1.0 offline repository analyzer" --body-file projects/reposcope/PR_DESCRIPTION.md` 重试，成功创建 [PR #1](https://github.com/ngwglai/GPT/pull/1)。
 - `gh pr view` 确认状态为 OPEN、非草稿、目标 main、来源 feature/reposcope；等待用户验收，未执行合并。
+
+## HTML 修复及跨平台复验（2026-10-15）
+
+PR #3 已合并。新增 HTML 分类回归后，Linux Python 3.11/3.12 各 35 项通过；Windows Python 3.11/3.12 各发现 35 项，33 项通过、两项 POSIX 权限/FIFO 测试按原条件跳过。四组静态检查、wheel 构建与 CLI 双报告通过。
+
+证据：[PR #3 CI](https://github.com/ngwglai/GPT/actions/runs/38709815182)；[工程完善 CI](https://github.com/ngwglai/GPT/actions/runs/38710640006)。Windows 原生自动化结果不等于用户电脑的人工浏览器操作验收。
