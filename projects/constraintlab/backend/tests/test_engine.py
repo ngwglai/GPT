@@ -143,6 +143,23 @@ class EngineTests(unittest.TestCase):
         ]:
             self.compare(parse({"variables": ds, "constraints": cs}))
 
+    def test_all_different_budget_blocks_amplification(self):
+        names = [f"v{i}" for i in range(150)]
+        group = {"type": "all_different", "vars": names}
+        problem = {
+            "variables": {name: [0, 1] for name in names},
+            "constraints": [{"type": "and", "constraints": [group, group]}],
+        }
+        result = solve(problem, Config(trace_limit=0))
+        self.assertEqual(result["status"], "ERROR")
+        self.assertIn("Expanded constraint budget exceeded", result["reason"])
+        # Keep ordinary small AllDifferent constraints functional.
+        small = parse({
+            "variables": {"a": [1, 2], "b": [1, 2]},
+            "constraints": [{"type": "all_different", "vars": ["a", "b"]}],
+        })
+        self.compare(small)
+
     def test_invalid(self):
         for data in [
             None,
