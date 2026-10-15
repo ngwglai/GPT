@@ -74,3 +74,9 @@ CI：[38710374741](https://github.com/ngwglai/GPT/actions/runs/38710374741)，�
 这是 Windows 原生 runner 上的自动验收，未执行用户电脑上的人工双击验收，不用 Linux 结果代替 Windows。PR #4 合并后，PR #2 整合 main 的完整 CI 仍须单独通过。
 
 补充本地验收：九个示例分别执行并独立验证全部返回解；普通示例 SAT，高难数独在 2 秒预算下 UNKNOWN/timeout，符合已知资源限制。4 皇后 CLI 完整枚举得到 2 解；wheel 在独立虚拟环境无依赖离线安装后核心求解通过。
+
+## PR #4 合并后的完整复验
+
+已将最新 main（含 RepoScope 修复和工程配置）合入 feature/constraintlab。整合提交 1115944 的 [PR #2 CI](https://github.com/ngwglai/GPT/actions/runs/38711545297) 全部成功：Linux/Windows 各 15 项后端测试与 4 项 E2E、原生 Windows 启动器及中文/空格路径、两项目 wheel、TypeScript/Vite、ruff、实验脚本、隐私及 CI required 门禁。RepoScope 四组测试亦通过，Windows 每组按原条件跳过两项 POSIX 专属用例。
+
+本地在合并 PR #4、整合 main 后再次执行 18 项隐私回归、35 项 RepoScope、15 项 ConstraintLab、前端构建、4 项 E2E、27 条实验记录，全部符合预期。最终收尾提交只更新验收文档及项目状态，仍须其 CI 通过后合并。
