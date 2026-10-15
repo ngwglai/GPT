@@ -36,7 +36,7 @@
 
 - **分支**：`fix/reposcope-html-20261015`，尚未合并。
 - **变更**：排除 HTML 在源代码排行、代码集中度与目录代码行统计中的误计；新增 HTML 分类回归测试。
-- **验收状态**：本分支新增测试尚未在执行环境运行；旧版 34 项通过结果不自动代表修复分支已验证。需运行 `python -m unittest discover -s tests`（在项目目录按 README 配置环境）并检查报告输出。
+- **验收状态**：Linux Python 3.11：35 项 unittest 全部通过（含 HTML 回归），ruff F 类检查、wheel 构建、CLI 双报告检查通过；Windows 结果单独以 CI 运行记录为准。补充 PR 自动测试与隐私检查，ConstraintLab 检查仅在该项目存在的分支运行。
 
 ## 仓库隐私治理（2026-10-15）
 
