@@ -16,14 +16,15 @@ concurrency:
 jobs:
   privacy:
     name: Privacy and identity
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
       - name: Configure verified public identity policy
@@ -37,6 +38,7 @@ jobs:
 
   reposcope:
     name: RepoScope (${{ matrix.os }}, Python ${{ matrix.python }})
+    timeout-minutes: 20
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -44,10 +46,10 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         python: ['3.11', '3.12']
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python }}
       - run: python -m pip install ./projects/reposcope build==1.6.1 ruff==0.17.0
@@ -57,11 +59,12 @@ jobs:
       - run: reposcope projects/reposcope --output smoke-report
 
   layout:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     outputs:
       constraintlab: ${{ steps.project.outputs.constraintlab }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - id: project
@@ -77,6 +80,7 @@ jobs:
     name: ConstraintLab (${{ matrix.os }})
     needs: layout
     if: needs.layout.outputs.constraintlab == 'true'
+    timeout-minutes: 20
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -86,18 +90,18 @@ jobs:
       run:
         working-directory: projects/constraintlab
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.11'
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22'
           cache: npm
           cache-dependency-path: projects/constraintlab/frontend/package-lock.json
-      - run: python -m pip install '.[test]' build==1.6.1 ruff==0.17.0
+      - run: python -m pip install -e '.[test]' build==1.6.1 ruff==0.17.0
       - run: ruff check --select F backend docs/benchmark.py
       - run: python -m pytest backend/tests -q
       - run: python -m build --wheel --outdir wheelhouse
@@ -105,12 +109,40 @@ jobs:
       - run: npm --prefix frontend run build
       - run: npx --prefix frontend playwright install --with-deps chromium
       - name: Browser acceptance
+        if: runner.os != 'Windows'
         run: python ../../scripts/ci_constraintlab_e2e.py
+      - name: Native Windows launcher and browser acceptance
+        if: runner.os == 'Windows'
+        run: python ../../scripts/ci_constraintlab_e2e.py --windows-launcher
       - run: python docs/benchmark.py
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
           name: constraintlab-failure-${{ matrix.os }}
           path: |
             projects/constraintlab/frontend/test-results
             projects/constraintlab/server.log
+
+  required:
+    name: CI required
+    if: always()
+    needs: [privacy, reposcope, layout, constraintlab]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require all applicable checks
+        env:
+          PRIVACY_RESULT: ${{ needs.privacy.result }}
+          REPOSCOPE_RESULT: ${{ needs.reposcope.result }}
+          LAYOUT_RESULT: ${{ needs.layout.result }}
+          HAS_CONSTRAINTLAB: ${{ needs.layout.outputs.constraintlab }}
+          CONSTRAINTLAB_RESULT: ${{ needs.constraintlab.result }}
+        run: |
+          test "$PRIVACY_RESULT" = success
+          test "$REPOSCOPE_RESULT" = success
+          test "$LAYOUT_RESULT" = success
+          if test "$HAS_CONSTRAINTLAB" = true; then
+            test "$CONSTRAINTLAB_RESULT" = success
+          else
+            test "$CONSTRAINTLAB_RESULT" = skipped
+          fi
