@@ -71,7 +71,7 @@
 - **与现有项目差异**：独立算法实验平台，与 RepoScope 的仓库分析用途不同；未修改 RepoScope。
 - **交付范围**：BT/FC/MAC、四种变量启发式、三种取值顺序、严格 JSON 模型、五类内置问题、独立验证/穷举、浏览器编辑与回放、重复/多规模实验及 JSON/CSV 导出、Windows/Linux 启动脚本。
 - **验收标准**：浏览器完整求解与导出流程、完整解独立验证、随机 CSP 解集合差分一致、正确报告资源终止与枚举状态。
-- **目录 / 分支**：`projects/constraintlab/`；`feature/constraintlab`。PR 审查入口见本次交付链接。
+- **目录 / 分支**：`projects/constraintlab/`；`feature/constraintlab`。审查入口：[PR #2](https://github.com/ngwglai/GPT/pull/2)（未合并）。
 - **实际验证**：Linux / Python 3.12，11 项后端测试（含 120 个随机 CSP 与 N=1–8 皇后计数）、3 项 Chromium 端到端测试、TypeScript/Vite 构建；详见 [测试报告](projects/constraintlab/docs/VALIDATION.md)。
 - **已知限制**：Windows 原生未验证；MAC 是二元弧一致性，高元约束传播较弱；轨迹为有界计算后回放；峰值内存不测量。
 - **下一步**：用户审查 PR，按 README 在 Windows 启动并验收；未经确认不合并。

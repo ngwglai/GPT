@@ -18,7 +18,7 @@ Linux x86_64，Python 3.12.14，Node.js 24.19.0；系统 Chromium、Playwright 1
 | API | 验证、任务生命周期、JSON/CSV、非法 JSON/图输入、Host/Origin、请求大小上限 |
 | 前端 TypeScript / Vite | 构建成功，28 模块，主 JS 约 203 kB / gzip 65 kB |
 | Chromium E2E | 3 passed：创建→求解→验证→回放→实验→导出；错误导入/有效导入/数独编辑；超时 UNKNOWN/轨迹截断提示 |
-| 视觉检查 | 1440px 桌面完整页面截图人工检查；另捕获 390px 窄屏截图 |
+| 视觉检查 | 1440px 桌面完整页面截图人工检查；390px 窄屏截图亦检查通过 |
 | Python wheel | 构建成功；仅包含 constraintlab 核心/API 包，不包含测试或前端构建产物 |
 | 静态检查 | ruff F 类检查通过；源码完成格式整理 |
 | 依赖 | npm audit 零已知漏洞；pip-audit 零已知漏洞（本地 ConstraintLab 非公开包跳过），pip check 通过 |
@@ -41,7 +41,7 @@ Linux x86_64，Python 3.12.14，Node.js 24.19.0；系统 Chromium、Playwright 1
 | 10 | FC | 3.560 | 35 |
 | 10 | MAC | 26.498 | 16 |
 
-MAC 减少分支，但本实现的 AC-3 重新建队列和多次支持检查有额外代价；FC 在这些首解实例上更快。首解搜索难度不随 N 单调增加，不能以此推导最坏复杂度或跨硬件结论。附带的高难度 9×9 数独在默认 MAC/MRV、10 秒限制下返回 UNKNOWN / timeout（1,064 节点）；这是诚实的资源终止，不是无解。主要瓶颈是 Python 约束检查、分支域复制、MAC 重建弧队列；可进一步用可逆 trail 和支持缓存优化，但需保留差分测试。峰值内存未可靠测量，保持 null。
+MAC 减少分支，但本实现的 AC-3 重新建队列和多次支持检查有额外代价；FC 在这些首解实例上更快。首解搜索难度不随 N 单调增加，不能以此推导最坏复杂度或跨硬件结论。附带的高难度 9×9 数独在默认 MAC/MRV、10 秒限制下返回 UNKNOWN / timeout（1,064 节点）；另用 Dom/Ddeg、关闭轨迹、30 秒限制补测，仍为 UNKNOWN / timeout（2,643 节点）。这是诚实的资源终止，不是无解。主要瓶颈是 Python 约束检查、分支域复制、MAC 重建弧队列；可进一步用可逆 trail 和支持缓存优化，但需保留差分测试。峰值内存未可靠测量，保持 null。
 
 ## 验收建议与未验证项
 
