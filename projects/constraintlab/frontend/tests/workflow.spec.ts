@@ -92,3 +92,53 @@ test("cancel button waits for the current job ID", async ({ page }) => {
   await expect(page.locator(".badge")).toHaveText("SAT");
 });
 
+test("late initial preset cannot overwrite a newer selection", async ({ page }) => {
+  let releaseInitial!: () => void;
+  let releaseSelected!: () => void;
+  let initialRequested!: () => void;
+  let selectedRequested!: () => void;
+  const initialHeld = new Promise<void>((resolve) => { releaseInitial = resolve; });
+  const selectedHeld = new Promise<void>((resolve) => { releaseSelected = resolve; });
+  const initialSeen = new Promise<void>((resolve) => { initialRequested = resolve; });
+  const selectedSeen = new Promise<void>((resolve) => { selectedRequested = resolve; });
+  await page.route("**/api/builtin", async (route) => {
+    const response = await route.fetch();
+    if (route.request().postDataJSON().size === 8) {
+      initialRequested();
+      await initialHeld;
+    } else {
+      selectedRequested();
+      await selectedHeld;
+    }
+    await route.fulfill({ response });
+  });
+  try {
+    await page.goto("/");
+    await initialSeen;
+    await page.getByLabel("规模 N", { exact: true }).fill("4");
+    await page.getByRole("button", { name: "载入预设" }).click();
+    await selectedSeen;
+    await expect(page.getByRole("button", { name: "开始求解" })).toBeDisabled();
+    releaseSelected();
+    const json = page.getByLabel("问题 JSON", { exact: true });
+    await expect.poll(async () => JSON.parse((await json.inputValue()) || "{}").metadata?.size).toBe(4);
+    const initialResponse = page.waitForResponse((response) =>
+      response.url().endsWith("/api/builtin") && response.request().postDataJSON().size === 8,
+    );
+    releaseInitial();
+    await initialResponse;
+    // Let response handlers and React rendering finish before inspecting the document.
+    await page.evaluate(() => new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+    ));
+    expect(JSON.parse(await json.inputValue()).metadata.size).toBe(4);
+    await page.getByLabel("最大解数", { exact: true }).fill("10");
+    await page.getByRole("button", { name: "开始求解" }).click();
+    await expect(page.getByText("枚举已完成")).toBeVisible();
+    await expect(page.locator(".badge")).toHaveText("SAT");
+  } finally {
+    releaseInitial();
+    releaseSelected();
+  }
+});
+

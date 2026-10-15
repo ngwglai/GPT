@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./style.css";
 
@@ -188,6 +188,7 @@ function App() {
     [message, setMessage] = useState(""),
     [error, setError] = useState(""),
     [job, setJob] = useState(""),
+    [loading, setLoading] = useState(false),
     [busy, setBusy] = useState(false),
     [result, setResult] = useState<Result | null>(null),
     [resultProblem, setResultProblem] = useState<Problem | null>(null);
@@ -204,9 +205,12 @@ function App() {
     [rows, setRows] = useState<Row[]>([]),
     [problemIndex, setProblemIndex] = useState<Record<string, Problem>>({}),
     [experimentId, setExperimentId] = useState("");
+  const problemRequest = useRef(0);
   const fail = (e: unknown) =>
     setError(String(e instanceof Error ? e.message : e));
   async function load() {
+    const request = ++problemRequest.current;
+    setLoading(true);
     try {
       setError("");
       const p = await api("builtin", {
@@ -216,11 +220,14 @@ function App() {
         ...(kind === "sudoku" && puzzle ? { puzzle } : {}),
         ...(kind === "graph" && edges ? { edges: JSON.parse(edges) } : {}),
       });
+      if (request !== problemRequest.current) return;
       setProblem(p);
       setText(JSON.stringify(p, null, 2));
       setMessage("已载入问题，可编辑 JSON 或网格。");
     } catch (e) {
-      fail(e);
+      if (request === problemRequest.current) fail(e);
+    } finally {
+      if (request === problemRequest.current) setLoading(false);
     }
   }
   useEffect(() => {
@@ -387,7 +394,7 @@ function App() {
           </div>
         )}
         <div role="status" className="message">
-          {message || "准备就绪"}
+          {loading ? "正在载入问题…" : message || "准备就绪"}
           {busy && job !== "" && (
             <button
               onClick={() =>
@@ -529,18 +536,23 @@ function App() {
                     type="file"
                     accept=".json"
                     onChange={async (e) => {
+                      const request = ++problemRequest.current;
+                      setLoading(true);
                       try {
                         const f = e.target.files?.[0];
                         if (!f) return;
                         if (f.size > 1000000) throw Error("文件超过 1 MB");
                         const p = JSON.parse(await f.text());
                         await api("validate", { problem: p });
+                        if (request !== problemRequest.current) return;
                         setText(JSON.stringify(p, null, 2));
                         setProblem(p);
                         setMessage("导入成功");
                         setError("");
                       } catch (e) {
-                        fail(e);
+                        if (request === problemRequest.current) fail(e);
+                      } finally {
+                        if (request === problemRequest.current) setLoading(false);
                       }
                     }}
                   />
@@ -566,7 +578,7 @@ function App() {
                 {field("max_solutions", "最大解数")}
                 {field("trace_limit", "轨迹事件上限")}
               </div>
-              <button className="primary" disabled={busy} onClick={() => run()}>
+              <button className="primary" disabled={busy || loading || !problem} onClick={() => run()}>
                 ▶ 开始求解
               </button>
             </section>
@@ -819,7 +831,7 @@ function App() {
                   </label>
                   <button
                     className="primary"
-                    disabled={busy || !configs.length}
+                    disabled={busy || loading || !problem || !configs.length}
                     onClick={() => run(true)}
                   >
                     运行对比实验

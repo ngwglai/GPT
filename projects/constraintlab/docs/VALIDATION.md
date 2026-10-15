@@ -80,3 +80,9 @@ CI：[38710374741](https://github.com/ngwglai/GPT/actions/runs/38710374741)，�
 已将最新 main（含 RepoScope 修复和工程配置）合入 feature/constraintlab。整合提交 1115944 的 [PR #2 CI](https://github.com/ngwglai/GPT/actions/runs/38711545297) 全部成功：Linux/Windows 各 15 项后端测试与 4 项 E2E、原生 Windows 启动器及中文/空格路径、两项目 wheel、TypeScript/Vite、ruff、实验脚本、隐私及 CI required 门禁。RepoScope 四组测试亦通过，Windows 每组按原条件跳过两项 POSIX 专属用例。
 
 本地在合并 PR #4、整合 main 后再次执行 18 项隐私回归、35 项 RepoScope、15 项 ConstraintLab、前端构建、4 项 E2E、27 条实验记录，全部符合预期。最终收尾提交只更新验收文档及项目状态，仍须其 CI 通过后合并。
+
+## 最终 CI 发现的预设加载竞态
+
+最终文档提交 c35b6f7 的 PR CI（38712453623）失败于 4 皇后枚举完成断言，而同一提交的 push CI 通过；未用通过的重复运行掩盖失败。页面在预设请求未完成时仍允许求解，且初始 8 皇后的较迟响应可能覆盖手动选择的 4 皇后。
+
+已用受控延迟的真实 API 响应增加回归，在旧界面稳定失败。修复为加载期间禁止求解/实验，以请求序号仅接受最新预设或导入响应。未删除枚举断言、增加重试或放宽超时。修复后 TypeScript/Vite 和本地 5 项 E2E 通过；跨平台最终结果以本 PR 最新 CI 为准，仍须全部通过才合并。

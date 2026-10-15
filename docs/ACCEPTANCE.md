@@ -11,7 +11,7 @@
 
 - 隐私脚本：18 项回归；当前分支及新增提交的作者、提交者、内容、尾注检查通过。
 - RepoScope：Linux Python 3.11/3.12 各 35 项；Windows 两版本各 33 项通过、2 项 POSIX 专属按原规则跳过；wheel、ruff、CLI 双报告通过。
-- ConstraintLab：Linux/Windows 各 15 项后端测试，包含 120 个随机差分和 N=1..8 三算法完整计数；TypeScript/Vite、4 项 E2E、wheel、ruff 通过。
+- ConstraintLab：Linux/Windows 各 15 项后端测试，包含 120 个随机差分和 N=1..8 三算法完整计数；TypeScript/Vite、wheel、ruff 通过。浏览器基线 4 项跨平台通过；新增预设加载回归后共 5 项，本地已通过，最终 Windows 结果以最新 CI 为准。
 - 实验：3 个问题、27 条记录 SAT；CSV/JSON 去重与重放测试通过。九个示例返回解均独立验证，困难数独在资源限额下如实 UNKNOWN/timeout；4 皇后 CLI 完整枚举 2 解；wheel 在独立环境离线安装后核心求解通过。
 - Windows Server 2025：在含中文及空格的临时路径执行真实 start-windows.cmd 并完成浏览器流程，启动器选择 Python 3.14.7。没有以 Linux 结果替代 Windows，没有执行用户电脑上的人工验收。
 - npm audit 零已知漏洞，pip check 通过。一条 httpx 上游弃用警告保留；无失败被屏蔽。首次发现的准备阶段取消错误已修复；首次 CI 的非 editable 安装导致页面 404 已修正，后续对应完整 CI 通过。
@@ -36,3 +36,7 @@ CI 对两个项目分别测试和构建，使用只读权限、固定 Actions �
 - [整合 main 后 PR #2](https://github.com/ngwglai/GPT/actions/runs/38711545297)：全部成功，含两项目和 Windows 原生验收。
 
 最终文档提交及 main 合并后运行，可由 [Actions 列表](https://github.com/ngwglai/GPT/actions) 按对应提交核对。
+
+## 最终预设加载修复
+
+文档提交 c35b6f7 的 PR CI 38712453623 曾失败，同提交 push CI 通过；未将其视为最终通过。实测定位为加载期间可误用旧问题以及旧响应覆盖新选择。新增可控延迟回归在旧界面失败，修复请求顺序与加载状态后本地 5 项 E2E 通过。保留全部原断言，不添加重试或降低标准；合并以最新完整跨平台 CI 为准。
