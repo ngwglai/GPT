@@ -123,21 +123,49 @@ jobs:
             projects/constraintlab/frontend/test-results
             projects/constraintlab/server.log
 
+  qq-mail-mcp:
+    name: QQ Mail MCP
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: projects/qq-mail-mcp
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: projects/qq-mail-mcp/package-lock.json
+      - run: npm ci
+      - name: Install browser for OAuth consent regression
+        run: npx playwright-core install --with-deps chromium
+      - name: Resolve installed Chromium path
+        run: node --input-type=module -e "import {chromium} from 'playwright-core'; import {appendFileSync} from 'node:fs'; appendFileSync(process.env.GITHUB_ENV, 'CHROMIUM_PATH=' + chromium.executablePath() + '\n')"
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run privacy
+
   required:
     name: CI required
     if: always()
-    needs: [privacy, reposcope, layout, constraintlab]
+    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require all applicable checks
         env:
+          QQ_MAIL_MCP_RESULT: ${{ needs.qq-mail-mcp.result }}
           PRIVACY_RESULT: ${{ needs.privacy.result }}
           REPOSCOPE_RESULT: ${{ needs.reposcope.result }}
           LAYOUT_RESULT: ${{ needs.layout.result }}
           HAS_CONSTRAINTLAB: ${{ needs.layout.outputs.constraintlab }}
           CONSTRAINTLAB_RESULT: ${{ needs.constraintlab.result }}
         run: |
+          test "$QQ_MAIL_MCP_RESULT" = success
           test "$PRIVACY_RESULT" = success
           test "$REPOSCOPE_RESULT" = success
           test "$LAYOUT_RESULT" = success

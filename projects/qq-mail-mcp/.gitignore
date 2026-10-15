@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+.env
+.env.*
+!.env.example
+coverage/
+backups/
+*.log
+
+# Account-specific deployment configuration stays local.
+wrangler.local.jsonc
