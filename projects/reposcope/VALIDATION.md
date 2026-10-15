@@ -62,3 +62,10 @@ python3 -m venv /tmp/reposcope-offline-venv
 
 - Windows 原生 Python、Windows ACL、长路径/UNC 与实际 junction 创建测试。
 - 超过 100,000 文件仓库的压力测试；已验证小规模文件数截断和 1,500 文件清单，未作百万文件性能承诺。
+
+## GitHub 交付状态
+
+- 从最新 `origin/main` 创建 `feature/reposcope`，代码与文档已提交并成功推送；未合并到 main。
+- 实际运行 `gh pr create --repo ngwglai/GPT --base main --head feature/reposcope --title "feat: RepoScope v0.1.0 offline repository analyzer" --body-file projects/reposcope/PR_DESCRIPTION.md`，返回 `Post "https://api.github.com/graphql": Forbidden`。代理的独立连接检查也返回 CONNECT 403，因此未声称 PR 创建成功。
+- 已保存新增 `api.github.com` 允许域名的环境配置草稿；保存不代表已应用或发布。需要在环境设置审核保存并发布后才能重试相应操作；不要求用户在聊天中提供令牌。
+- 现可使用 GitHub 提供的[创建 PR 链接](https://github.com/ngwglai/GPT/pull/new/feature/reposcope)，描述内容已保存在 `PR_DESCRIPTION.md`。
