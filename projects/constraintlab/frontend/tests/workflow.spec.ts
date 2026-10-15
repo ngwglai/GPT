@@ -72,3 +72,23 @@ test("resource status and trace truncation are visible", async ({ page }) => {
   await expect(page.locator(".badge")).toHaveText("SAT");
   await expect(page.locator(".warning")).toContainText("轨迹已截断");
 });
+
+test("cancel button waits for the current job ID", async ({ page }) => {
+  let signalRequest!: () => void;
+  let releaseRequest!: () => void;
+  const requested = new Promise<void>((resolve) => { signalRequest = resolve; });
+  const hold = new Promise<void>((resolve) => { releaseRequest = resolve; });
+  await page.route("**/api/jobs", async (route) => {
+    signalRequest();
+    await hold;
+    await route.continue();
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "开始求解" }).click();
+  await requested;
+  await expect(page.getByRole("status")).toContainText("正在计算");
+  await expect(page.getByRole("button", { name: "取消后端计算" })).toHaveCount(0);
+  releaseRequest();
+  await expect(page.locator(".badge")).toHaveText("SAT");
+});
+
