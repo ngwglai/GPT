@@ -16,7 +16,21 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| 暂无 | — | — | 等待第一次手动选题 | 发送「启动 GPT 项目开发流程」 |
+| RepoScope | [projects/reposcope](projects/reposcope/) | Testing | 面向 Windows 用户的离线仓库规模、技术栈与维护风险分析；HTML / Markdown 报告 | v0.1.0 已实现并在 Linux 验证，等待用户验收及 Windows 原生回归 |
+
+## RepoScope v0.1.0（2026-10-15）
+
+- **状态**：Testing；尚未由用户验收，不自动合并。
+- **目标与用户价值**：快速了解陌生本地代码库，生成可离线浏览及交给 AI 阅读的摘要；不上传扫描数据，无 API Key。
+- **与现有项目的差异**：本仓库首个独立项目，目前不存在重复项目。
+- **范围与已实现功能**：递归扫描、嵌套 `.gitignore` 与额外排除、敏感文件保护、二进制/编码识别、权限容错、链接循环规避；语言/行数/递归目录规模；六种清单的技术栈推断；Python AST 和 JS/TS 启发式指标；单文件响应式明暗主题 HTML 与 Markdown 阅读建议。
+- **技术方案**：Python 3.11+，标准库为主；唯一运行依赖 `pathspec==0.12.1` 保证 Git 通配符语义，目标项目代码不执行。
+- **验收标准**：安装后通过 CLI 扫描真实仓库，生成两种无外部资源的报告；敏感文件不读取内容，报告正确转义；临时数据测试全部通过，统计算法及局限明确说明。
+- **目录 / 分支**：`projects/reposcope/` / `feature/reposcope`。
+- **审查入口**：[Pull Request #1](https://github.com/ngwglai/GPT/pull/1)（`feature/reposcope` → `main`，等待验收）；完整描述位于 `projects/reposcope/PR_DESCRIPTION.md`。
+- **实际验证**：34 项 unittest 分别在 Linux / Python 3.12.14 与 3.11.17 全部通过、无跳过；覆盖权限、Unicode、注入、1,500 个小文件及链接循环等；真实仓库扫描、wheel 构建、无网络源安装、离线报告浏览器内容测试均通过。详见 [VALIDATION.md](projects/reposcope/VALIDATION.md)。
+- **已知限制**：Windows 原生尚未实测；其他语言行数与 JS/TS 指标为估算，不是准确圈复杂度。云浏览器策略阻止 `file://` 导航，已用同一 HTML 内容离线验证渲染及主题。
+- **后续事项**：PR 审查、用户验收、Windows 原生测试；扩展编码/语言支持、入口识别和可选 JSON。环境发布后 GitHub API 访问已恢复，PR 已自动创建。
 
 ## 候选想法
 
