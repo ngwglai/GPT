@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+privacy_root=$(git rev-parse --show-toplevel)
+if command -v python3 >/dev/null 2>&1; then
+    exec python3 "$privacy_root/scripts/privacy_check.py" --message-file "$1"
+elif command -v python >/dev/null 2>&1; then
+    exec python "$privacy_root/scripts/privacy_check.py" --message-file "$1"
+else
+    exec py -3 "$privacy_root/scripts/privacy_check.py" --message-file "$1"
+fi
