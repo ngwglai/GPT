@@ -41,6 +41,10 @@ class Stop(Exception):
     pass
 
 
+# Bound expansion before allocating O(n^2) pairwise constraints.
+MAX_EXPANDED_CONSTRAINTS = 20_000
+
+
 def solve(problem, config=None, cancelled=lambda: False):
     started = time.perf_counter()
     stats = dict(
@@ -61,14 +65,41 @@ def solve(problem, config=None, cancelled=lambda: False):
         cfg = config or Config()
         cfg.validate()
         rng = random.Random(cfg.seed)
+
+        def guard():
+            if cancelled():
+                raise Stop("cancelled")
+            if time.perf_counter() - started >= cfg.timeout:
+                raise Stop("timeout")
+
+        def expanded_size(c):
+            guard()
+            if c["type"] == "and":
+                return sum(expanded_size(child) for child in c["constraints"])
+            if c["type"] == "all_different":
+                n = len(c["vars"])
+                return n * (n - 1) // 2
+            return 1
+
+        # Reject amplification before materializing any pairwise dictionaries.
+        expanded = 0
+        for c in p.constraints:
+            expanded += expanded_size(c)
+            if expanded > MAX_EXPANDED_CONSTRAINTS:
+                raise ValueError(
+                    f"Expanded constraint budget exceeded ({MAX_EXPANDED_CONSTRAINTS})"
+                )
+
         constraints = []
 
         def expand(c):
+            guard()
             if c["type"] == "and":
                 for x in c["constraints"]:
                     expand(x)
             elif c["type"] == "all_different":
                 for i, v in enumerate(c["vars"]):
+                    guard()
                     for w in c["vars"][i + 1 :]:
                         constraints.append(
                             {"type": "compare", "vars": [v, w], "op": "ne"}
@@ -79,16 +110,13 @@ def solve(problem, config=None, cancelled=lambda: False):
         for c in p.constraints:
             expand(c)
         scopes = [scope(c) for c in constraints]
-        byvar = {v: [i for i, s in enumerate(scopes) if v in s] for v in p.domains}
+        byvar = {}
+        for v in p.domains:
+            guard()
+            byvar[v] = [i for i, s in enumerate(scopes) if v in s]
         neighbors = {
             v: set(w for i in byvar[v] for w in scopes[i] if w != v) for v in p.domains
         }
-
-        def guard():
-            if cancelled():
-                raise Stop("cancelled")
-            if time.perf_counter() - started >= cfg.timeout:
-                raise Stop("timeout")
 
         def emit(kind, a, d, depth, **extra):
             nonlocal truncated, trace_bytes
