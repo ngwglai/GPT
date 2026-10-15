@@ -133,6 +133,21 @@ class EngineTests(unittest.TestCase):
                 self.assertEqual(a["events"], b["events"])
                 self.assertEqual(len(a["solutions"]), 2)
 
+    def test_preparation_cancellation_returns_completed_trace(self):
+        for stop_at in (1, 5, 50):
+            calls = 0
+
+            def cancelled():
+                nonlocal calls
+                calls += 1
+                return calls >= stop_at
+
+            result = solve(builtin(size=8), cancelled=cancelled)
+            self.assertEqual((result["status"], result["reason"]), ("UNKNOWN", "cancelled"))
+            self.assertFalse(result["complete"])
+            self.assertEqual(result["stats"]["nodes"], 0)
+            self.assertEqual(result["events"][-1]["type"], "SEARCH_COMPLETED")
+
     def test_edge_cases(self):
         for ds, cs in [
             ({}, []),

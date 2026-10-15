@@ -1,12 +1,15 @@
 import csv
 import io
+import hashlib
+import json
 import time
 import unittest
 from unittest.mock import patch
 from fastapi.testclient import TestClient
 from constraintlab.api import app, job
 from constraintlab.problems import builtin
-from constraintlab.benchmarks import experiment
+from constraintlab.benchmarks import experiment, to_csv
+from constraintlab import solve, Config
 
 
 class ApiTests(unittest.TestCase):
@@ -128,3 +131,21 @@ class ApiTests(unittest.TestCase):
             x["stats"].pop("seconds")
             y["stats"].pop("seconds")
             self.assertEqual(x, y)
+
+    def test_multi_problem_exports_replay_without_duplicate_documents(self):
+        p = builtin(size=4).json()
+        q = builtin(size=3).json()
+        report = experiment([p, q, p], [{"algorithm": "MAC", "max_solutions": 100}], 2, 17)
+        self.assertEqual(len(report["problems"]), 2)
+        documents = {}
+        for row in csv.DictReader(io.StringIO(to_csv(report))):
+            key = row["problem_id"]
+            if row["problem"]:
+                self.assertNotIn(key, documents)
+                documents[key] = json.loads(row["problem"])
+                self.assertEqual(hashlib.sha256(json.dumps(documents[key], sort_keys=True).encode()).hexdigest(), key)
+            result = solve(documents[key], Config(**json.loads(row["config"])))
+            self.assertEqual(result["status"], row["status"])
+            self.assertEqual(len(result["solutions"]), int(row["solutions"]))
+            self.assertEqual(result["stats"]["nodes"], int(row["nodes"]))
+        self.assertEqual(documents, report["problems"])

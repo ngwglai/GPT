@@ -82,3 +82,9 @@
 - **实际验证**：Linux / Python 3.12，11 项后端测试（含 120 个随机 CSP 与 N=1–8 皇后计数）、3 项 Chromium 端到端测试、TypeScript/Vite 构建；详见 [测试报告](projects/constraintlab/docs/VALIDATION.md)。
 - **已知限制**：Windows 原生未验证；MAC 是二元弧一致性，高元约束传播较弱；轨迹为有界计算后回放；峰值内存不测量。
 - **下一步**：用户审查 PR，按 README 在 Windows 启动并验收；未经确认不合并。
+
+## 工程复验进度（2026-10-15）
+
+- RepoScope：35 项 Linux unittest、静态检查、wheel 与 CLI 报告检查通过；PR #3 CI 在 Linux/Windows、Python 3.11/3.12 通过。
+- ConstraintLab 审查修复：15 项后端测试、TypeScript/Vite 构建、4 项 Linux Chromium E2E、wheel、静态检查及实验重放通过；补充准备阶段取消初始化修复。PR #4 仍待本次 CI，PR #2 待合并修复后的复验与 Windows 原生结果。
+- CI：两个项目独立检查，隐私脚本回归与提交历史检查自动运行。分支保护接口当前返回权限错误，尚未配置，不能视为已启用。

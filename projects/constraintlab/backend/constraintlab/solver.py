@@ -66,6 +66,31 @@ def solve(problem, config=None, cancelled=lambda: False):
         cfg.validate()
         rng = random.Random(cfg.seed)
 
+        domains = {v: list(d) for v, d in p.domains.items()}
+
+        def emit(kind, a, d, depth, **extra):
+            nonlocal truncated, trace_bytes
+            if cfg.trace_limit == 0:
+                return
+            size = (
+                100
+                + sum(len(v) + len(values) * 12 for v, values in d.items())
+                + len(a) * 100
+            )
+            if len(events) >= cfg.trace_limit or trace_bytes + size > 8_000_000:
+                truncated = True
+                return
+            trace_bytes += size
+            events.append(
+                dict(
+                    type=kind,
+                    assignment=dict(a),
+                    domains={v: list(x) for v, x in d.items()},
+                    depth=depth,
+                    **extra,
+                )
+            )
+
         def guard():
             if cancelled():
                 raise Stop("cancelled")
@@ -117,29 +142,6 @@ def solve(problem, config=None, cancelled=lambda: False):
         neighbors = {
             v: set(w for i in byvar[v] for w in scopes[i] if w != v) for v in p.domains
         }
-
-        def emit(kind, a, d, depth, **extra):
-            nonlocal truncated, trace_bytes
-            if cfg.trace_limit == 0:
-                return
-            size = (
-                100
-                + sum(len(v) + len(values) * 12 for v, values in d.items())
-                + len(a) * 100
-            )
-            if len(events) >= cfg.trace_limit or trace_bytes + size > 8_000_000:
-                truncated = True
-                return
-            trace_bytes += size
-            events.append(
-                dict(
-                    type=kind,
-                    assignment=dict(a),
-                    domains={v: list(x) for v, x in d.items()},
-                    depth=depth,
-                    **extra,
-                )
-            )
 
         def test(i, a):
             guard()
@@ -308,7 +310,6 @@ def solve(problem, config=None, cancelled=lambda: False):
                 stats["backtracks"] += 1
                 emit("BACKTRACK", a, d, depth)
 
-        domains = {v: list(d) for v, d in p.domains.items()}
         guard()
         if not any(not d for d in domains.values()):
             # Unary filtering for all algorithms, including the BT baseline.
