@@ -1,0 +1,83 @@
+{
+  "name": "Queens",
+  "variables": {
+    "Q0": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "Q1": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "Q2": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "Q3": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "constraints": [
+    {
+      "type": "queens",
+      "vars": [
+        "Q0",
+        "Q1"
+      ],
+      "distance": 1
+    },
+    {
+      "type": "queens",
+      "vars": [
+        "Q0",
+        "Q2"
+      ],
+      "distance": 2
+    },
+    {
+      "type": "queens",
+      "vars": [
+        "Q0",
+        "Q3"
+      ],
+      "distance": 3
+    },
+    {
+      "type": "queens",
+      "vars": [
+        "Q1",
+        "Q2"
+      ],
+      "distance": 1
+    },
+    {
+      "type": "queens",
+      "vars": [
+        "Q1",
+        "Q3"
+      ],
+      "distance": 2
+    },
+    {
+      "type": "queens",
+      "vars": [
+        "Q2",
+        "Q3"
+      ],
+      "distance": 1
+    }
+  ],
+  "metadata": {
+    "kind": "queens",
+    "size": 4
+  }
+}

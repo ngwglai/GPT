@@ -1,0 +1,56 @@
+{
+  "name": "Sum and choice",
+  "variables": {
+    "x": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "y": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "z": [
+      0,
+      1,
+      2,
+      3
+    ]
+  },
+  "constraints": [
+    {
+      "type": "sum",
+      "vars": [
+        "x",
+        "y",
+        "z"
+      ],
+      "op": "eq",
+      "value": 5
+    },
+    {
+      "type": "or",
+      "constraints": [
+        {
+          "type": "compare",
+          "vars": [
+            "x"
+          ],
+          "op": "eq",
+          "value": 1
+        },
+        {
+          "type": "compare",
+          "vars": [
+            "y",
+            "z"
+          ],
+          "op": "lt"
+        }
+      ]
+    }
+  ]
+}

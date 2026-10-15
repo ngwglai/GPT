@@ -16,6 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
+| ConstraintLab | [projects/constraintlab](projects/constraintlab/) | Testing | 本地 CSP 求解与算法实验平台 | v0.1.0 实现与 Linux 验证完成，等待 PR 审查和 Windows 原生验收 |
 | RepoScope | [projects/reposcope](projects/reposcope/) | Completed | 面向 Windows 用户的离线仓库规模、技术栈与维护风险分析；HTML / Markdown 报告 | v0.1.0 已实现并在 Linux 验证，等待用户验收及 Windows 原生回归 |
 
 ## RepoScope v0.1.0（2026-10-15）
@@ -62,3 +63,15 @@
 优先考虑真实可用性、独特性、开发可行性、低维护成本；如果旧项目更值得完善，可以选择迭代而不是强行新建项目。
 
 > 本仓库采用手动触发流程；此文件不表示任何后台任务已经启动。
+
+## ConstraintLab v0.1.0（2026-10-15）
+
+- **状态**：Testing，等待用户验收。
+- **目标与用户价值**：面向 CSP 学习者与算法研究者，在本机编辑问题、观察约束传播并比较搜索算法。
+- **与现有项目差异**：独立算法实验平台，与 RepoScope 的仓库分析用途不同；未修改 RepoScope。
+- **交付范围**：BT/FC/MAC、四种变量启发式、三种取值顺序、严格 JSON 模型、五类内置问题、独立验证/穷举、浏览器编辑与回放、重复/多规模实验及 JSON/CSV 导出、Windows/Linux 启动脚本。
+- **验收标准**：浏览器完整求解与导出流程、完整解独立验证、随机 CSP 解集合差分一致、正确报告资源终止与枚举状态。
+- **目录 / 分支**：`projects/constraintlab/`；`feature/constraintlab`。PR 审查入口见本次交付链接。
+- **实际验证**：Linux / Python 3.12，11 项后端测试（含 120 个随机 CSP 与 N=1–8 皇后计数）、3 项 Chromium 端到端测试、TypeScript/Vite 构建；详见 [测试报告](projects/constraintlab/docs/VALIDATION.md)。
+- **已知限制**：Windows 原生未验证；MAC 是二元弧一致性，高元约束传播较弱；轨迹为有界计算后回放；峰值内存不测量。
+- **下一步**：用户审查 PR，按 README 在 Windows 启动并验收；未经确认不合并。

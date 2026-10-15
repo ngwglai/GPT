@@ -1,0 +1,116 @@
+{
+  "name": "Schedule",
+  "variables": {
+    "Math": [
+      0,
+      1,
+      2
+    ],
+    "Physics": [
+      0,
+      1,
+      2
+    ],
+    "Art": [
+      0,
+      1,
+      2
+    ],
+    "Music": [
+      0,
+      1,
+      2
+    ],
+    "History": [
+      0,
+      1,
+      2
+    ]
+  },
+  "constraints": [
+    {
+      "type": "compare",
+      "vars": [
+        "Math",
+        "Physics"
+      ],
+      "op": "ne"
+    },
+    {
+      "type": "compare",
+      "vars": [
+        "Math",
+        "Art"
+      ],
+      "op": "ne"
+    },
+    {
+      "type": "compare",
+      "vars": [
+        "Physics",
+        "Music"
+      ],
+      "op": "ne"
+    },
+    {
+      "type": "compare",
+      "vars": [
+        "Physics",
+        "History"
+      ],
+      "op": "ne"
+    },
+    {
+      "type": "compare",
+      "vars": [
+        "Art",
+        "History"
+      ],
+      "op": "ne"
+    },
+    {
+      "type": "compare",
+      "vars": [
+        "Music",
+        "History"
+      ],
+      "op": "ne"
+    }
+  ],
+  "metadata": {
+    "kind": "schedule",
+    "size": 5,
+    "courses": [
+      [
+        "Math",
+        "Teacher A",
+        "Room 1"
+      ],
+      [
+        "Physics",
+        "Teacher A",
+        "Room 2"
+      ],
+      [
+        "Art",
+        "Teacher B",
+        "Room 1"
+      ],
+      [
+        "Music",
+        "Teacher C",
+        "Room 2"
+      ],
+      [
+        "History",
+        "Teacher B",
+        "Room 2"
+      ]
+    ],
+    "slots": [
+      "09:00",
+      "10:00",
+      "11:00"
+    ]
+  }
+}

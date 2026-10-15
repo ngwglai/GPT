@@ -1,0 +1,156 @@
+{
+  "name": "Map",
+  "variables": {
+    "WA": [
+      0,
+      1,
+      2
+    ],
+    "NT": [
+      0,
+      1,
+      2
+    ],
+    "SA": [
+      0,
+      1,
+      2
+    ],
+    "Q": [
+      0,
+      1,
+      2
+    ],
+    "NSW": [
+      0,
+      1,
+      2
+    ],
+    "V": [
+      0,
+      1,
+      2
+    ],
+    "T": [
+      0,
+      1,
+      2
+    ]
+  },
+  "constraints": [
+    {
+      "type": "compare",
+      "vars": [
+        "WA",
+        "NT"
+      ],
+      "op": "ne"
+    },
+    {
+      "type": "compare",
+      "vars": [
+        "WA",
+        "SA"
+      ],
+      "op": "ne"
+    },
+    {
+      "type": "compare",
+      "vars": [
+        "NT",
+        "SA"
+      ],
+      "op": "ne"
+    },
+    {
+      "type": "compare",
+      "vars": [
+        "NT",
+        "Q"
+      ],
+      "op": "ne"
+    },
+    {
+      "type": "compare",
+      "vars": [
+        "SA",
+        "Q"
+      ],
+      "op": "ne"
+    },
+    {
+      "type": "compare",
+      "vars": [
+        "SA",
+        "NSW"
+      ],
+      "op": "ne"
+    },
+    {
+      "type": "compare",
+      "vars": [
+        "SA",
+        "V"
+      ],
+      "op": "ne"
+    },
+    {
+      "type": "compare",
+      "vars": [
+        "Q",
+        "NSW"
+      ],
+      "op": "ne"
+    },
+    {
+      "type": "compare",
+      "vars": [
+        "NSW",
+        "V"
+      ],
+      "op": "ne"
+    }
+  ],
+  "metadata": {
+    "kind": "map",
+    "size": 7,
+    "edges": [
+      [
+        "WA",
+        "NT"
+      ],
+      [
+        "WA",
+        "SA"
+      ],
+      [
+        "NT",
+        "SA"
+      ],
+      [
+        "NT",
+        "Q"
+      ],
+      [
+        "SA",
+        "Q"
+      ],
+      [
+        "SA",
+        "NSW"
+      ],
+      [
+        "SA",
+        "V"
+      ],
+      [
+        "Q",
+        "NSW"
+      ],
+      [
+        "NSW",
+        "V"
+      ]
+    ]
+  }
+}
