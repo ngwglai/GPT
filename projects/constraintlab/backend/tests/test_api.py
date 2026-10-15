@@ -1,9 +1,12 @@
+import csv
+import io
 import time
 import unittest
+from unittest.mock import patch
 from fastapi.testclient import TestClient
-from constraintlab.api import app
+from constraintlab.api import app, job
 from constraintlab.problems import builtin
-from constraintlab.benchmarks import experiment
+from constraintlab.benchmarks import experiment, to_csv
 
 
 class ApiTests(unittest.TestCase):
@@ -40,10 +43,29 @@ class ApiTests(unittest.TestCase):
                 "repeats": 2,
             },
         ).json()["id"]
-        self.assertEqual(len(self.wait(key)["rows"]), 4)
-        csv = self.client.get("/api/jobs/" + key + "/export?format=csv").text
-        self.assertIn("environment", csv)
-        self.assertIn("problem_id", csv)
+        report = self.wait(key)
+        self.assertEqual(len(report["rows"]), 4)
+        self.assertEqual(len(report["problems"]), 1)
+        self.assertNotIn("problem", report["rows"][0])
+        self.assertIn(report["rows"][0]["problem_id"], report["problems"])
+        exported_csv = self.client.get("/api/jobs/" + key + "/export?format=csv").text
+        records = list(csv.DictReader(io.StringIO(exported_csv)))
+        self.assertEqual(len(records), 4)
+        self.assertTrue(records[0]["problem"])
+        self.assertTrue(all(not row["problem"] for row in records[1:]))
+        self.assertIn("environment", exported_csv)
+        self.assertIn("problem_id", exported_csv)
+        exported_json = self.client.get("/api/jobs/" + key + "/export?format=json").json()
+        self.assertEqual(exported_json["problems"], report["problems"])
+
+    def test_atomic_lookup_avoids_check_then_index_race(self):
+        class RetainedJobs(dict):
+            def __getitem__(self, key):
+                # Simulate an entry disappearing between membership and indexing.
+                raise KeyError(key)
+
+        with patch("constraintlab.api.jobs", RetainedJobs({"known": {"state": "done"}})):
+            self.assertEqual(job("known")["state"], "done")
 
     def test_cancel(self):
         key = self.client.post(
