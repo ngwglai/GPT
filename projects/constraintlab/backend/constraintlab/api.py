@@ -134,9 +134,12 @@ def start(data: dict):
 
 
 def job(key):
-    if key not in jobs:
+    # Retention eviction uses the same lock: lookup cannot race with removal.
+    with lock:
+        entry = jobs.get(key)
+    if entry is None:
         raise HTTPException(404, "Job expired or unknown")
-    return jobs[key]
+    return entry
 
 
 @app.get("/api/jobs/{key}")
