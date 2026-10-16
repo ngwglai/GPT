@@ -192,7 +192,6 @@ class PrivacyTests(unittest.TestCase):
     def test_pre_push_new_branch_excludes_remote_history(self):
         self.write("base.txt", "safe")
         self.command("git", "commit", "--quiet", "-m", "Base")
-        self.command("git", "rev-parse", "HEAD")
 
         # Simulate an old main commit with a noncanonical committer that is already remote.
         self.write("legacy.txt", "safe")
