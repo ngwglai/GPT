@@ -115,6 +115,113 @@ class PrivacyTests(unittest.TestCase):
         result = self.check("--commits", merge_sha)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_only_exact_public_system_email_is_exempt(self):
+        self.write("file.txt", privacy.GITHUB_SYSTEM_EMAIL)
+        self.assertEqual(self.check("--staged").returncode, 0)
+        for address in ("fictional.person" + "@github.com",
+                        "noreply" + "@github.example",
+                        "noreply" + "@sub.github.com",
+                        "NOREPLY" + "@github.com"):
+            self.write("file.txt", address)
+            result = self.check("--staged")
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("nonanonymous-email", result.stdout)
+            self.assertNotIn(address, result.stdout + result.stderr)
+
+    def test_system_email_does_not_bypass_explicit_private_denylist(self):
+        deny = Path(self.temp.name) / "terms.json"
+        deny.write_text(json.dumps({"terms": [privacy.GITHUB_SYSTEM_EMAIL]}), encoding="utf-8")
+        self.write("file.txt", privacy.GITHUB_SYSTEM_EMAIL)
+        result = self.check("--staged", "--denylist", str(deny))
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("known-private-identity", result.stdout)
+
+    def test_platform_committer_exception_requires_all_merge_conditions(self):
+        self.write("base.txt", "safe")
+        self.command("git", "commit", "--quiet", "-m", "Base")
+        base = self.command("git", "rev-parse", "HEAD")
+        self.write("side.txt", "safe")
+        self.command("git", "commit", "--quiet", "-m", "Side")
+        side = self.command("git", "rev-parse", "HEAD")
+        tree = self.command("git", "rev-parse", "HEAD^{tree}")
+        system_env = dict(self.env, GIT_COMMITTER_NAME="GitHub",
+                          GIT_COMMITTER_EMAIL=privacy.GITHUB_SYSTEM_EMAIL)
+        cases = [
+            ([base], "Merge pull request #1 from ngwglai/side", system_env),
+            ([base, side], "Ordinary commit", system_env),
+            ([base, side], "Merge pull request #1 from another-owner/side", system_env),
+            ([base, side], "Merge pull request #1 from ngwglai/side",
+             dict(system_env, GIT_AUTHOR_EMAIL=SAMPLE_PRIVATE)),
+            ([base, side], "Merge pull request #1 from ngwglai/side",
+             dict(system_env, GIT_COMMITTER_NAME="Fictional Person")),
+            ([base, side], "Merge pull request #1 from ngwglai/side",
+             dict(system_env, GIT_COMMITTER_EMAIL=SAMPLE_PRIVATE)),
+        ]
+        for parents, message, env in cases:
+            with self.subTest(parent_count=len(parents), message=message):
+                args = ["git", "commit-tree", tree]
+                for parent in parents:
+                    args.extend(["-p", parent])
+                sha = self.command(*args, env=env, input=message + "\n")
+                result = self.check("--commits", sha)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("noncanonical-committer", result.stdout)
+                self.assertNotIn(SAMPLE_PRIVATE, result.stdout + result.stderr)
+
+    def test_actual_pre_push_hook_forwards_remote_and_rejects_new_private_data(self):
+        shutil.copytree(ROOT / "scripts", self.repo / "scripts", ignore=shutil.ignore_patterns("__pycache__"))
+        shutil.copytree(ROOT / ".githooks", self.repo / ".githooks")
+        self.write("base.txt", "safe")
+        self.command("git", "commit", "--quiet", "-m", "Base")
+        self.write("legacy.txt", "safe")
+        bad_env = dict(self.env, GIT_COMMITTER_EMAIL=SAMPLE_PRIVATE)
+        self.command("git", "commit", "--quiet", "-m", "Legacy", env=bad_env)
+        legacy = self.command("git", "rev-parse", "HEAD")
+        self.command("git", "update-ref", "refs/remotes/origin/main", legacy)
+        self.write("new.txt", "safe")
+        self.command("git", "commit", "--quiet", "-m", "Safe new work")
+        sha = self.command("git", "rev-parse", "HEAD")
+        hook = str(self.repo / ".githooks" / "pre-push")
+        data = f"refs/heads/new {sha} refs/heads/new {'0' * 40}\n"
+        result = subprocess.run(["sh", hook, "origin", "example.invalid"], cwd=self.repo,
+                                env=self.env, input=data, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.write("bad.txt", SAMPLE_PRIVATE)
+        self.command("git", "commit", "--quiet", "-m", "Synthetic private data")
+        sha = self.command("git", "rev-parse", "HEAD")
+        data = f"refs/heads/new {sha} refs/heads/new {'0' * 40}\n"
+        result = subprocess.run(["sh", hook, "origin", "example.invalid"], cwd=self.repo,
+                                env=self.env, input=data, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("nonanonymous-email", result.stdout)
+        self.assertNotIn(SAMPLE_PRIVATE, result.stdout + result.stderr)
+
+    def test_legacy_fixture_exception_is_bound_to_exact_blob_and_path(self):
+        address = "synthetic" + "@" + "github.com"
+        content = f'expected_rejection = "{address}"\n'
+        self.write("fixture.py", content)
+        oid = self.command("git", "rev-parse", ":fixture.py")
+        def fixture_git(*args):
+            return subprocess.run(["git", *args], cwd=self.repo, env=self.env,
+                                  check=True, capture_output=True).stdout
+        with patch.object(privacy, "git", side_effect=fixture_git), patch.dict(
+            privacy.LEGACY_SYNTHETIC_EMAIL_FIXTURES, {oid: ("fixture.py", {address})}, clear=True,
+        ):
+            check = privacy.Check(SAMPLE_NOREPLY)
+            check.blob(oid, "fixture.py")
+            self.assertEqual(check.issues, [])
+            # The same blob must be scanned again when its exemption context changes.
+            check.blob(oid, "another.py")
+            self.assertIn("nonanonymous-email", [issue["kind"] for issue in check.issues])
+            self.write("fixture.py", content + "# newly edited\n")
+            edited = self.command("git", "rev-parse", ":fixture.py")
+            check = privacy.Check(SAMPLE_NOREPLY)
+            check.blob(edited, "fixture.py")
+            self.assertIn("nonanonymous-email", [issue["kind"] for issue in check.issues])
+            check = privacy.Check(SAMPLE_NOREPLY, terms=[address])
+            check.blob(oid, "fixture.py")
+            self.assertIn("known-private-identity", [issue["kind"] for issue in check.issues])
+
     def test_identity_trailers(self):
         msg = Path(self.temp.name) / "message"
         msg.write_text("Sample\n\nCo-authored-by: Fictional Person <" + SAMPLE_PRIVATE + ">\nSigned-off-by: Fictional Person <" + SAMPLE_NOREPLY + ">\n", encoding="utf-8")

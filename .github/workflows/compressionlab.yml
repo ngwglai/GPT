@@ -1,11 +1,7 @@
 name: CompressionLab
 
 on:
-  pull_request:
-    paths: ['projects/compressionlab/**', '.github/workflows/compressionlab.yml']
-  push:
-    branches: [main, feature/compressionlab]
-    paths: ['projects/compressionlab/**', '.github/workflows/compressionlab.yml']
+  workflow_call:
   workflow_dispatch:
 
 permissions:
@@ -37,6 +33,7 @@ jobs:
           cache: npm
           cache-dependency-path: projects/compressionlab/package-lock.json
       - run: npm ci
+      - run: npm audit --audit-level=moderate
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test

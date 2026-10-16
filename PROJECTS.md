@@ -16,11 +16,13 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| CompressionLab | [projects/compressionlab](projects/compressionlab/) | Testing | 纯本地字符压缩算法交互实验室；真实 trace 与编解码回环 | 本地功能验收通过；main 既有提交身份检查失败，pre-push 阻止推送，PR/合并待解除阻塞 |
-| EntropyLab | [projects/entropylab](projects/entropylab/) | Testing | 浏览器内的计算物理与复杂系统交互实验室 | v1.1 已合并；下一步为用户电脑人工验收与按需部署 |
+| CompressionLab | [projects/compressionlab](projects/compressionlab/) | Completed | 纯本地字符压缩算法交互实验室；真实 trace 与编解码回环 | 旧推送阻塞已解除；完整本地复验通过，纳入维护 PR 自动验收 |
+| EntropyLab | [projects/entropylab](projects/entropylab/) | Completed | 浏览器内的计算物理与复杂系统交互实验室 | v1.1 已合并；依赖审计清零、完整复验通过，按需手动部署 |
 | ConstraintLab | [projects/constraintlab](projects/constraintlab/) | Completed | 本地 CSP 求解与算法实验平台 | 修复及整合 main 后 Linux/Windows 完整验收通过；按需扩展 |
 | RepoScope | [projects/reposcope](projects/reposcope/) | Completed | 面向 Windows 用户的离线仓库规模、技术栈与维护风险分析；HTML / Markdown 报告 | HTML 修复与 Linux/Windows CI 通过；按需扩展功能 |
-| QQ Mail MCP | [projects/qq-mail-mcp](projects/qq-mail-mcp/) | Testing | Cloudflare Workers 上的私人 QQ 邮箱只读 MCP，OAuth/DCR 与六个工具 | 迁移 PR 审查；保持现有服务，后续按本地配置手动部署并完成真实邮箱验收 |
+| QQ Mail MCP | [projects/qq-mail-mcp](projects/qq-mail-mcp/) | Testing | Cloudflare Workers 上的私人 QQ 邮箱只读 MCP，OAuth/DCR 与六个工具 | PR #6 已合并，62 项本地回归通过；真实邮箱验收和部署仍待安全本地配置 |
+
+> 下方按日期保留历史开发快照；当前状态以总览和末尾最新维护复验为准。旧记录中的人工合并约束已由当前 AGENTS.md 的自动验收规则替代。
 
 ## RepoScope v0.1.0（2026-10-15）
 
@@ -143,3 +145,11 @@
 - **目录/分支**：[projects/compressionlab](projects/compressionlab/)；本地 `feature/compressionlab`，基于最新 main；已配置独立 Linux/Windows CI，但尚未远程执行。
 - **实际验证**：本地 Linux 的 106 项 Vitest、13 项生产 Chromium E2E、TypeScript、ESLint、production build，根目录 18 项隐私回归通过；250 组 Unicode 样本回环包含在一项单元测试内。细节见 [验证记录](projects/compressionlab/VALIDATION.md)；远程 CI 尚未执行。main 既有历史身份规则问题需要独立处理后才能继续推送与合并。
 - **限制/下一步**：主线程有界预计算，UI 512 符号、BWT 96；Unicode code point 而非 grapheme cluster；JSON token / 逻辑 Huffman bit 并非工业容器；Firefox/WebKit/真实手机与用户电脑人工验收未执行。按需加入二进制成本对照及 Worker，不扩张为 ZIP 等格式。
+
+## 仓库维护复核（2026-10-16）
+
+- **范围/分支**：基于最新 main `b5563dd` 创建 `fix/repository-maintenance-20261016`，保留正常历史并整合 CompressionLab 本地交付，不部署、不读取真实邮件。
+- **修复**：隐私系统邮箱豁免收窄、增加拒绝/真实 hook 测试、纠正仓库外公开系统词条误报；两个实验项目接入 CI required；Vitest/TypeScript ESLint 开发依赖漏洞清零；Python pip 升级和持续审计；QQ 授权按钮文档纠正；Pages 发布改为手动触发、保留 push 构建。
+- **实际本地验证**：26 隐私、35 RepoScope、15 ConstraintLab、90 EntropyLab、106 CompressionLab、62 QQ Mail MCP 测试全部通过；独立 E2E 5+8+13=26 项、计算基准 1 项及所有静态/构建检查通过；npm 四项目与 Python 审计 0 已知漏洞。跨平台最终结果以本维护 PR 最新 SHA 的 CI 为准。
+- **仍需平台处理**：PR #1 旧引用的 6 项身份元数据残留、分支保护接口 403。未降低新提交隐私标准、未删除私人词条、未强推或改写共享历史；不将这些平台风险伪称已修复。
+- **详细记录**：[REPOSITORY_REVIEW.md](docs/REPOSITORY_REVIEW.md)。

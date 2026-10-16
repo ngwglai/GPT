@@ -68,6 +68,7 @@ assert all(verify(p, a) for a in r['solutions'])
 ## 测试
 
 ```sh
+python -m pip install --upgrade pip==26.2.1
 python -m pip install -e ".[test]"
 python -m pytest backend/tests -q
 npm --prefix frontend ci
@@ -90,3 +91,5 @@ npm test
 所有值目前仅支持有界整数；最多 150 个变量、每域 150 个值。AllDifferent 使用两两不等，**不是 Régin 全局传播**；MAC 对二元约束维护弧一致性，非二元 Sum 只做安全边界推理，其他组合/高元约束仅在全部或只剩一个变量未赋值时检查，**不是广义弧一致性**。大问题可能 UNKNOWN；附带的高难度数独在默认 10 秒限制下可能超时，可提高限额或改变启发式。
 
 单服务串行运行一个任务，最多保留八个任务结果，重启丢失；可通过导出持久保存。轨迹仅在计算结束后回放，不是实时调试器，不支持暂停实际搜索或续算。无可靠隔离内存测量，因此峰值内存字段为 null。单机耗时不用于跨硬件排行；Windows 原生自动验收结果见测试报告；用户电脑上的交互与实际性能仍以本机运行结果为准。
+
+2026-10-16 维护：Windows 启动器先升级到已修复的 pip 26.2.1，失败即停止。CI 增加 pip 依赖一致性/漏洞审计和前端完整 npm 审计；未改变求解器或资源终止语义。

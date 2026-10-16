@@ -103,3 +103,7 @@ Vite `base` 为 `/GPT/entropylab/`。预期 URL：
 v1.0 检查时未发现既有 Pages 工作流或静态站点目录，因此建立了 `.github/workflows/pages.yml`，将 EntropyLab 的 `dist/` 放入同一 Pages artifact 的 `entropylab/`，根目录仅提供项目链接；没有把其他项目部署到静态站点，也未修改其代码。未来有新静态项目，应扩展此聚合工作流，把各项目放到 `_site/<slug>/`，不要用第二个 Pages 部署覆盖整站。
 
 首次启用由仓库管理员操作：Settings → Pages → Build and deployment → Source 选择 **GitHub Actions**；检查 `github-pages` 环境允许 `main` 部署。PR 合并后检查 `GitHub Pages` 工作流；需要重试时在 `main` 上手动 Run workflow。无需密钥、付费服务或新增 PAT。本任务不修改仓库设置，不自动合并。
+
+## 2026-10-16 维护
+
+开发依赖升级到 Vitest 5.0.5 / typescript-eslint 8.71.2，保留全部数值容差和测试断言。根 CI 通过可复用工作流在 Linux/Windows 验证本项目，并纳入 CI required；完整 npm 审计为 0 已知漏洞。Pages 的主分支更新仅构建，发布必须手动触发。新一轮验证见 VALIDATION.md。

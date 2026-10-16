@@ -1,6 +1,6 @@
 # EntropyLab v1.1 验证记录
 
-日期：2026-10-16。继续 `feature/entropylab` 与 [PR #7](https://github.com/ngwglai/GPT/pull/7)；不创建新 PR，不合并、不部署。
+以下为 PR #7 开发时的历史快照（2026-10-16），该 PR 已合并。最新维护结果见文末；不再要求等待人工验收。
 
 ## 本地执行
 
@@ -52,3 +52,7 @@ v1.0 的测试覆盖保留：将原扩散“点粒子、每粒子速率相等”
 EntropyLab CI 另增加 Linux 计算基准（含守恒和无重叠检查，无 FPS 门槛）；原仓库 CI 和其他项目业务代码未修改。Pages 仍只在 main 部署，不在本分支发布。README 保留启用说明；预期 URL 不表示已上线。
 
 已通过账号邮箱 API 重新核验 noreply 身份并保留仓库 hooks。提交前检查暂存区与拟提交说明，提交后与推送前检查新增提交，不跳过扫描或改写历史。扫描结果以实际执行与 PR 记录为准。
+
+## 2026-10-16 仓库维护复验
+
+Vitest 5.0.5 / typescript-eslint 8.71.2，Linux Node.js 24.19.0 / Chromium 156：90/90 单元、8/8 生产浏览器流程、计算基准 1 项（含 12 场景组）、lint、typecheck、build 全部通过；完整 npm 审计 0 已知漏洞。没有修改模拟算法、物理容差、种子或原断言。Linux/Windows CI 已接入根 CI required，远程执行结果以维护 PR 最新提交为准；本地不冒充 Windows 实测。
