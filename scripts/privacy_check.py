@@ -109,10 +109,15 @@ class Check:
             oid = git("rev-parse", ":" + name).decode().strip()
             self.blob(oid, name)
 
-    def commits(self, revisions):
+    def commits(self, revisions, exclude_remote=None):
         if any(value.startswith("-") for value in revisions):
             raise ValueError("revision cannot be an option")
-        for sha in git("rev-list", *revisions, "--").decode().splitlines():
+        rev_args = list(revisions)
+        if exclude_remote is not None:
+            if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", exclude_remote):
+                raise ValueError("invalid remote name")
+            rev_args.extend(["--not", f"--remotes={exclude_remote}"])
+        for sha in git("rev-list", *rev_args, "--").decode().splitlines():
             if sha in self.seen_commits:
                 continue
             self.seen_commits.add(sha)
@@ -151,6 +156,7 @@ def main(argv=None):
     parser.add_argument("--commits", action="append", default=[], metavar="REVISION_RANGE")
     parser.add_argument("--message-file", type=Path)
     parser.add_argument("--pre-push", action="store_true", help="consume Git pre-push stdin and check outgoing ancestry")
+    parser.add_argument("--remote-name", help="named remote passed by the pre-push hook; used to exclude existing remote-tracking history when creating a new ref")
     parser.add_argument("--denylist", type=Path, help="private JSON file with a terms list; never commit this file")
     parser.add_argument("--max-bytes", type=int, default=5 * 1024 * 1024, help="larger blobs fail as unscanned")
     parser.add_argument("--json", action="store_true")
@@ -200,7 +206,16 @@ def main(argv=None):
                 if set(local_sha) == {"0"}:
                     continue
                 known = subprocess.run(["git", "cat-file", "-e", remote_sha + "^{commit}"], capture_output=True).returncode == 0
-                check.commits([remote_sha + ".." + local_sha if known else local_sha])
+                if known:
+                    check.commits([remote_sha + ".." + local_sha])
+                elif args.remote_name:
+                    # A newly created remote branch has no remote SHA. Exclude every
+                    # commit already reachable from this remote's local tracking refs,
+                    # so old main history is not re-audited while new commits are still checked.
+                    check.commits([local_sha], exclude_remote=args.remote_name)
+                else:
+                    # Manual invocations without the hook-provided remote remain conservative.
+                    check.commits([local_sha])
             check.tags()
         summary = {"ok": not check.issues, "commits_checked": len(check.seen_commits), "blobs_checked": len(check.seen_blobs),
                    "counts": dict(Counter(issue["kind"] for issue in check.issues)), "findings": check.issues}
