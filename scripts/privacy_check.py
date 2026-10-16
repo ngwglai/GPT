@@ -121,12 +121,20 @@ class Check:
             if sha in self.seen_commits:
                 continue
             self.seen_commits.add(sha)
-            fields = git("show", "-s", "--format=%an%x00%ae%x00%cn%x00%ce%x00%B", sha).decode("utf-8", "replace").split("\0", 4)
-            author, ae, committer, ce, message = fields
+            fields = git("show", "-s", "--format=%an%x00%ae%x00%cn%x00%ce%x00%P%x00%B", sha).decode("utf-8", "replace").split("\0", 5)
+            author, ae, committer, ce, parents, message = fields
             where = "commit:" + sha[:12]
             if author != "ngwglai" or ae != self.email:
                 self.add("noncanonical-author", where)
-            if committer != "ngwglai" or ce != self.email:
+            platform_merge = (
+                len(parents.split()) >= 2
+                and author == "ngwglai"
+                and ae == self.email
+                and committer == "GitHub"
+                and ce == "noreply@github.com"
+                and re.match(r"^Merge pull request #[0-9]+ from ngwglai/", message)
+            )
+            if (committer != "ngwglai" or ce != self.email) and not platform_merge:
                 self.add("noncanonical-committer", where)
             self.text(message, where, message=True)
             for entry in git("ls-tree", "-r", "-z", sha).split(b"\0"):
