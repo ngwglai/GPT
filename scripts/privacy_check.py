@@ -13,7 +13,7 @@ EMAIL = re.compile(r"(?<![\w.+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
 TRAILER = re.compile(r"^(?:Co-authored-by|Signed-off-by|Reviewed-by|Acked-by|Tested-by|Reported-by|Suggested-by|Helped-by):\s*(.*)$", re.I | re.M)
 PATH = re.compile(r"(?:[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/]([^\\/\s<>\"']+)|/(?:Users|home)/([^/\s<>\"']+))")
 SAMPLE_DOMAINS = {"example.com", "example.org", "example.net", "example.test", "example.invalid", "localhost.invalid"}
-SAFE_EMAILS = {"noreply@github.com"}
+SAFE_SYSTEM_EMAIL_DOMAINS = {"github.com"}
 SAMPLE_USERS = {"alice", "bob", "user", "username", "example", "exampleuser", "public", "default", "runner", "agent"}
 PATTERNS = {
     "github-credential": re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{50,})\b"),
@@ -40,7 +40,7 @@ def findings(text, email, terms=()):
     hits = []
     for match in EMAIL.finditer(text):
         domain = match[0].lower().rsplit("@", 1)[-1]
-        if match[0].lower() not in SAFE_EMAILS and match[0] != email and domain not in SAMPLE_DOMAINS:
+        if match[0] != email and domain not in SAMPLE_DOMAINS and domain not in SAFE_SYSTEM_EMAIL_DOMAINS:
             hits.append(("nonanonymous-email", text.count("\n", 0, match.start()) + 1))
     for term in terms:
         if not term:
