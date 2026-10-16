@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: compressionlab-ci-${{ github.ref }}
+  group: compressionlab-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
