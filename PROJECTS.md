@@ -16,7 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| CompressionLab | [projects/compressionlab](projects/compressionlab/) | Completed | 纯本地字符压缩算法交互实验室；真实 trace 与编解码回环 | v0.1 自动验收通过；按需扩展二进制表示对照 |
+| CompressionLab | [projects/compressionlab](projects/compressionlab/) | Testing | 纯本地字符压缩算法交互实验室；真实 trace 与编解码回环 | 本地功能验收通过；main 既有提交身份检查失败，pre-push 阻止推送，PR/合并待解除阻塞 |
 | EntropyLab | [projects/entropylab](projects/entropylab/) | Testing | 浏览器内的计算物理与复杂系统交互实验室 | v1.1 已合并；下一步为用户电脑人工验收与按需部署 |
 | ConstraintLab | [projects/constraintlab](projects/constraintlab/) | Completed | 本地 CSP 求解与算法实验平台 | 修复及整合 main 后 Linux/Windows 完整验收通过；按需扩展 |
 | RepoScope | [projects/reposcope](projects/reposcope/) | Completed | 面向 Windows 用户的离线仓库规模、技术栈与维护风险分析；HTML / Markdown 报告 | HTML 修复与 Linux/Windows CI 通过；按需扩展功能 |
@@ -135,11 +135,11 @@
 
 ## CompressionLab v0.1（2026-10-16）
 
-- **状态**：Completed；本地自动化验收通过，通过独立功能 PR 交付；按本次任务授权，最新 PR 检查通过后直接合并，无需人工验收，不部署。
+- **状态**：Testing；本地功能验收通过，但 pre-push 隐私 hook 因 main 既有两项 noncanonical-committer 拒绝首次推送。新增提交检查通过；未绕过 hook、未改写共享历史；PR 未创建、未合并、未部署。
 - **目的/目标用户**：面向学生、自学者和算法实验者，直接观察数据冗余、信息熵、编码树、滑动窗口及可逆变换，无上传、账号或 API。
 - **与现有项目差异**：研究文本与压缩编码；EntropyLab 研究计算物理，ConstraintLab 研究 CSP，RepoScope 分析仓库，QQ Mail MCP 连接邮箱。本次不修改这些项目业务代码。
 - **MVP/交付**：四实验（Information Entropy、Huffman、RLE+LZ77、BWT+MTF）；六种纯 TypeScript 算法；真实 trace 单步/自动运行/暂停恢复/重置；五类通用数据集；深浅主题、窄屏、reduced-motion；UTF-8、元数据及逻辑载荷的明确统计口径。
 - **验收标准**：前缀无歧义、所有编解码回环、BWT inverse、边界测试和生产浏览器交互均通过；typecheck/lint/build/隐私检查与 PR 最新 CI 通过才合并。
-- **目录/分支**：[projects/compressionlab](projects/compressionlab/)；`feature/compressionlab`，基于最新 main；独立 Linux/Windows CI。
-- **实际验证**：本地 Linux 的 106 项 Vitest、13 项生产 Chromium E2E、TypeScript、ESLint、production build，根目录 18 项隐私回归通过；250 组 Unicode 样本回环包含在一项单元测试内。细节见 [验证记录](projects/compressionlab/VALIDATION.md)，远程跨平台结果以 PR 为准。
+- **目录/分支**：[projects/compressionlab](projects/compressionlab/)；本地 `feature/compressionlab`，基于最新 main；已配置独立 Linux/Windows CI，但尚未远程执行。
+- **实际验证**：本地 Linux 的 106 项 Vitest、13 项生产 Chromium E2E、TypeScript、ESLint、production build，根目录 18 项隐私回归通过；250 组 Unicode 样本回环包含在一项单元测试内。细节见 [验证记录](projects/compressionlab/VALIDATION.md)；远程 CI 尚未执行。main 既有历史身份规则问题需要独立处理后才能继续推送与合并。
 - **限制/下一步**：主线程有界预计算，UI 512 符号、BWT 96；Unicode code point 而非 grapheme cluster；JSON token / 逻辑 Huffman bit 并非工业容器；Firefox/WebKit/真实手机与用户电脑人工验收未执行。按需加入二进制成本对照及 Worker，不扩张为 ZIP 等格式。

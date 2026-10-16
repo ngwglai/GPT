@@ -1,6 +1,6 @@
 # CompressionLab v0.1 验证记录
 
-日期：2026-10-16。以下为实际执行的本地 Linux / Node.js 24.19.0 验证，不以配置存在代替执行结果。远程 Linux/Windows CI 结果以对应 PR 最新提交的 CompressionLab 检查为准。
+日期：2026-10-16。以下为实际执行的本地 Linux / Node.js 24.19.0 验证，不以配置存在代替执行结果。远程 Linux/Windows CI 尚未执行：首次推送被 pre-push 隐私 hook 阻止，PR 未创建。
 
 | 检查 | 实际结果 |
 | --- | --- |
@@ -10,6 +10,8 @@
 | `npm run build` | 通过；Vite production build，运行时只有 React/ReactDOM 两个直接依赖 |
 | `npm run test:e2e` | **13/13 通过**，Chromium 156，针对生产构建，无跳过 |
 | 根 `python -m unittest discover -s tests -v` | **18/18 隐私脚本回归通过** |
+| 新增暂存区、提交说明、作者/提交者与新增提交扫描 | PASS，0 findings |
+| 首次推送的完整祖先扫描 / `--commits origin/main` | **FAIL：main 既有 2 项 noncanonical-committer**；不是新增代码的问题，但阻止交付 |
 
 ## 核心正确性证据
 
@@ -49,4 +51,5 @@
 - Firefox、WebKit、真实手机和用户电脑人工操作未执行；不承诺所有浏览器兼容。
 - 未部署网站、未做工业压缩格式兼容测试；这些不属于 v0.1。
 - 有界主线程轨迹，512 符号 / BWT 96 符号；JSON token 大小和逻辑 Huffman bit 有明确计量差异，详见 README。
-- 隐私暂存区、提交说明、实际作者/提交者与待推送历史按根目录规范逐次检查；最终执行结果在 PR 描述中记录，不能以此文档代替检查。
+- 已执行暂存区、拟提交说明、有效身份与新增提交扫描，均通过。首次推送 hook 扫描完整祖先时发现 main 既有两项 noncanonical-committer；对 origin/main 单独扫描可复现。没有回显身份原值，没有绕过 hook，也未改写历史。
+- 因完整祖先检查失败，PR 未创建、CI 未运行、未合并。按 AGENTS.md，共享历史治理需要具体授权，应单独处理；本地源码和验证结果可供审查，不声称 v0.1 全部交付条件已满足。
