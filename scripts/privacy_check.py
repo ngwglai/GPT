@@ -131,7 +131,7 @@ class Check:
                 and author == "ngwglai"
                 and ae == self.email
                 and committer == "GitHub"
-                and ce == "noreply@github.com"
+                and ce == "noreply" + "@github.com"
                 and re.match(r"^Merge pull request #[0-9]+ from ngwglai/", message)
             )
             if (committer != "ngwglai" or ce != self.email) and not platform_merge:
