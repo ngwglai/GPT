@@ -70,7 +70,7 @@ class PrivacyTests(unittest.TestCase):
         self.assertNotIn(SAMPLE_PRIVATE, result.stdout + result.stderr)
         self.assertIn("nonanonymous-email", result.stdout)
 
-        self.write("file.txt", "person@github.com")
+        self.write("file.txt", "person" + "@github.com")
         result = self.check("--staged")
         self.assertEqual(result.returncode, 1)
         self.assertIn("nonanonymous-email", result.stdout)
