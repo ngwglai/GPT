@@ -1,10 +1,20 @@
 #!/bin/sh
 set -eu
 privacy_root=$(git rev-parse --show-toplevel)
+remote_name=${1-}
 if command -v python3 >/dev/null 2>&1; then
+    if [ -n "$remote_name" ]; then
+        exec python3 "$privacy_root/scripts/privacy_check.py" --pre-push --remote-name "$remote_name"
+    fi
     exec python3 "$privacy_root/scripts/privacy_check.py" --pre-push
 elif command -v python >/dev/null 2>&1; then
+    if [ -n "$remote_name" ]; then
+        exec python "$privacy_root/scripts/privacy_check.py" --pre-push --remote-name "$remote_name"
+    fi
     exec python "$privacy_root/scripts/privacy_check.py" --pre-push
 else
+    if [ -n "$remote_name" ]; then
+        exec py -3 "$privacy_root/scripts/privacy_check.py" --pre-push --remote-name "$remote_name"
+    fi
     exec py -3 "$privacy_root/scripts/privacy_check.py" --pre-push
 fi
