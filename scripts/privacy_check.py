@@ -13,6 +13,7 @@ EMAIL = re.compile(r"(?<![\w.+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
 TRAILER = re.compile(r"^(?:Co-authored-by|Signed-off-by|Reviewed-by|Acked-by|Tested-by|Reported-by|Suggested-by|Helped-by):\s*(.*)$", re.I | re.M)
 PATH = re.compile(r"(?:[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/]([^\\/\s<>\"']+)|/(?:Users|home)/([^/\s<>\"']+))")
 SAMPLE_DOMAINS = {"example.com", "example.org", "example.net", "example.test", "example.invalid", "localhost.invalid"}
+SAFE_SYSTEM_EMAIL_DOMAINS = {"github.com"}
 SAMPLE_USERS = {"alice", "bob", "user", "username", "example", "exampleuser", "public", "default", "runner", "agent"}
 PATTERNS = {
     "github-credential": re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{50,})\b"),
@@ -39,7 +40,7 @@ def findings(text, email, terms=()):
     hits = []
     for match in EMAIL.finditer(text):
         domain = match[0].lower().rsplit("@", 1)[-1]
-        if match[0] != email and domain not in SAMPLE_DOMAINS:
+        if match[0] != email and domain not in SAMPLE_DOMAINS and domain not in SAFE_SYSTEM_EMAIL_DOMAINS:
             hits.append(("nonanonymous-email", text.count("\n", 0, match.start()) + 1))
     for term in terms:
         if not term:
@@ -109,19 +110,32 @@ class Check:
             oid = git("rev-parse", ":" + name).decode().strip()
             self.blob(oid, name)
 
-    def commits(self, revisions):
+    def commits(self, revisions, exclude_remote=None):
         if any(value.startswith("-") for value in revisions):
             raise ValueError("revision cannot be an option")
-        for sha in git("rev-list", *revisions, "--").decode().splitlines():
+        rev_args = list(revisions)
+        if exclude_remote is not None:
+            if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", exclude_remote):
+                raise ValueError("invalid remote name")
+            rev_args.extend(["--not", f"--remotes={exclude_remote}"])
+        for sha in git("rev-list", *rev_args, "--").decode().splitlines():
             if sha in self.seen_commits:
                 continue
             self.seen_commits.add(sha)
-            fields = git("show", "-s", "--format=%an%x00%ae%x00%cn%x00%ce%x00%B", sha).decode("utf-8", "replace").split("\0", 4)
-            author, ae, committer, ce, message = fields
+            fields = git("show", "-s", "--format=%an%x00%ae%x00%cn%x00%ce%x00%P%x00%B", sha).decode("utf-8", "replace").split("\0", 5)
+            author, ae, committer, ce, parents, message = fields
             where = "commit:" + sha[:12]
             if author != "ngwglai" or ae != self.email:
                 self.add("noncanonical-author", where)
-            if committer != "ngwglai" or ce != self.email:
+            platform_merge = (
+                len(parents.split()) >= 2
+                and author == "ngwglai"
+                and ae == self.email
+                and committer == "GitHub"
+                and ce == "noreply@github.com"
+                and re.match(r"^Merge pull request #[0-9]+ from ngwglai/", message)
+            )
+            if (committer != "ngwglai" or ce != self.email) and not platform_merge:
                 self.add("noncanonical-committer", where)
             self.text(message, where, message=True)
             for entry in git("ls-tree", "-r", "-z", sha).split(b"\0"):
@@ -151,6 +165,7 @@ def main(argv=None):
     parser.add_argument("--commits", action="append", default=[], metavar="REVISION_RANGE")
     parser.add_argument("--message-file", type=Path)
     parser.add_argument("--pre-push", action="store_true", help="consume Git pre-push stdin and check outgoing ancestry")
+    parser.add_argument("--remote-name", help="named remote passed by the pre-push hook; used to exclude existing remote-tracking history when creating a new ref")
     parser.add_argument("--denylist", type=Path, help="private JSON file with a terms list; never commit this file")
     parser.add_argument("--max-bytes", type=int, default=5 * 1024 * 1024, help="larger blobs fail as unscanned")
     parser.add_argument("--json", action="store_true")
@@ -200,7 +215,16 @@ def main(argv=None):
                 if set(local_sha) == {"0"}:
                     continue
                 known = subprocess.run(["git", "cat-file", "-e", remote_sha + "^{commit}"], capture_output=True).returncode == 0
-                check.commits([remote_sha + ".." + local_sha if known else local_sha])
+                if known:
+                    check.commits([remote_sha + ".." + local_sha])
+                elif args.remote_name:
+                    # A newly created remote branch has no remote SHA. Exclude every
+                    # commit already reachable from this remote's local tracking refs,
+                    # so old main history is not re-audited while new commits are still checked.
+                    check.commits([local_sha], exclude_remote=args.remote_name)
+                else:
+                    # Manual invocations without the hook-provided remote remain conservative.
+                    check.commits([local_sha])
             check.tags()
         summary = {"ok": not check.issues, "commits_checked": len(check.seen_commits), "blobs_checked": len(check.seen_blobs),
                    "counts": dict(Counter(issue["kind"] for issue in check.issues)), "findings": check.issues}

@@ -29,13 +29,13 @@ python scripts/privacy_check.py --commits HEAD^..HEAD
 python scripts/privacy_check.py --all-history --json
 ```
 
-Windows 可使用原生临时目录替代 `/tmp/commit-message.txt`，路径含空格时加引号。Python 可使用 `python`、`python3` 或 `py -3`，取决于本机安装。pre-push hook 从 Git 提供的标准输入中检查待推送提交；它不发送网络请求。
+Windows 可使用原生临时目录替代 `/tmp/commit-message.txt`，路径含空格时加引号。Python 可使用 `python`、`python3` 或 `py -3`，取决于本机安装。pre-push hook 从 Git 提供的标准输入中检查待推送提交；它不发送网络请求。对于已存在的远程引用，检查 `remote-oid..local-oid`；对于首次创建的远程分支，使用 hook 提供的远程名称，通过 `git rev-list <local> --not --remotes=<remote>` 排除该远程已有的本地跟踪历史，只检查可能随本次 push 新增的提交。若没有远程名称（例如手工调用），保持保守行为并检查完整祖先。
 
 退出码：0 为指定范围通过；1 为发现问题；2 为缺少确认身份、Git 操作失败、输入不可读取等导致未能完成。未扫描不能视为通过。默认每个 blob 上限 5 MiB，超过上限会报错项，不会静默忽略；确需检查大文件可提高 `--max-bytes`。
 
 检查内容：
 
-- 作者、提交者（以及 `--all-history` 下的附注标签 tagger）必须精确匹配已确认的身份；检查前瞻身份时也考虑 Git 环境变量覆盖。
+- 普通提交的作者、提交者（以及 `--all-history` 下的附注标签 tagger）必须精确匹配已确认的身份；检查前瞻身份时也考虑 Git 环境变量覆盖。GitHub 网页生成的合并提交可以使用 GitHub 的系统提交身份；仅当作者仍为已确认身份、提交具有至少两个父提交且提交说明匹配 `Merge pull request #... from ngwglai/...` 时允许。GitHub 自有系统邮箱域名仅用于公开平台元数据，不视为私人邮箱。首次创建远程分支时只排除远程跟踪引用已知的祖先，不降低对本次新增提交的身份与内容检查标准。
 - 提交说明中的共同作者、签署、评审等身份尾注只能使用该匿名身份。不要自动添加不必要尾注。
 - 暂存文件/历史 blob、文件名、提交说明中的非批准邮箱、常见服务令牌、私钥、疑似硬编码密码、个人绝对路径与 ChatGPT 会话/分享链接。
 - 真实姓名无法靠通用正则可靠判断。支持仓库外 JSON 私有词表 `{"terms": ["Example Person", "person@example.invalid"]}`；示例只是虚构格式，实际词表**不得提交**。可以通过 `--denylist` 指定，或以 `git config --local privacy.denylist <private-path>` 固定在当前 checkout。
