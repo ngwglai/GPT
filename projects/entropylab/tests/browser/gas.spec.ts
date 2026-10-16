@@ -56,7 +56,7 @@ test('mode, radius and initial speed reset; zero speed and collision-free contro
 }) => {
   await page.goto('./');
   await page.getByRole('button', { name: '开始模拟', exact: true }).click();
-  await expect.poll(async () => Number(await gasMetric(page, '累计粒子间碰撞'))).toBeGreaterThan(0);
+  await expect.poll(async () => Number((await gasMetric(page, '累计粒子间碰撞')).replaceAll(',', ''))).toBeGreaterThan(0);
   await page.getByRole('switch', { name: '粒子间碰撞' }).click();
   await paused(page);
   expect(await gasMetric(page, '累计粒子间碰撞')).toBe('0');
