@@ -5,7 +5,7 @@ where py >nul 2>nul || (echo Install Python 3.11+ first. & exit /b 1)
 where npm >nul 2>nul || (echo Install Node.js 20.19+ first. & exit /b 1)
 if not exist .venv\Scripts\python.exe py -3 -m venv .venv
 if errorlevel 1 exit /b 1
-.venv\Scripts\python.exe -m pip install --upgrade pip==26.2.1
+.venv\Scripts\python.exe -m pip install --upgrade pip==26.2.1 setuptools==84.0.0
 if errorlevel 1 exit /b 1
 .venv\Scripts\python.exe -m pip install -e .
 if errorlevel 1 exit /b 1

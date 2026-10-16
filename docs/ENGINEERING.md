@@ -10,7 +10,7 @@
 - Windows 浏览器验收：复制项目到含空格及中文的临时路径，执行原生 `start-windows.cmd`，等待真实页面可用，再运行完整 E2E。结束时清理整个服务进程树。此项是 Windows 原生自动验收，不等同于在用户电脑上人工双击验收。
 - QQ Mail MCP：Node.js 24、npm ci、Playwright Chromium 安装、类型检查、OAuth/IMAP/MIME 测试、Workers dry-run 构建与项目隐私基线。使用项目工作目录与锁文件缓存，不访问 Cloudflare Secrets，不部署；项目测试需 Chromium，缺失即失败。
 - EntropyLab / CompressionLab：通过可复用工作流分别运行 Linux/Windows 的 npm 锁文件安装、完整依赖审计、lint、typecheck/build、Vitest 和生产 Chromium E2E；EntropyLab 另保留 Linux 计算基准。两个工作流可手动运行，所有 PR 与 main 推送由根 CI 调用，避免路径过滤漏检和重复执行。
-- 依赖：四个 Node 项目都执行包含开发依赖的 `npm audit --audit-level=moderate`；Python 项目先固定升级 pip 26.2.1，再执行 `pip check` 和 `pip-audit`，检查失败不会忽略。审计器对 editable 项目本身不查公共漏洞库，其已安装第三方依赖仍逐项检查；项目源码由测试和审查覆盖。
+- 依赖：四个 Node 项目都执行包含开发依赖的 `npm audit --audit-level=moderate`；Python 项目先固定升级 pip 26.2.1 / setuptools 84.0.0，再执行 `pip check` 和 `pip-audit`，检查失败不会忽略。审计器对 editable 项目本身不查公共漏洞库，其已安装第三方依赖仍逐项检查；项目源码由测试和审查覆盖。
 - `CI required` 汇总全部适用任务；任一必需任务失败或取消均失败。只有项目确实不存在时，允许跳过其独立任务。失败时保留服务日志与浏览器失败信息供排查。
 
 配置存在不代表运行成功，验收应引用对应提交的 Actions 运行链接。不得用旧提交结果代替新提交验证。

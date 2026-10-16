@@ -68,7 +68,7 @@ assert all(verify(p, a) for a in r['solutions'])
 ## 测试
 
 ```sh
-python -m pip install --upgrade pip==26.2.1
+python -m pip install --upgrade pip==26.2.1 setuptools==84.0.0
 python -m pip install -e ".[test]"
 python -m pytest backend/tests -q
 npm --prefix frontend ci

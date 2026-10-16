@@ -12,7 +12,7 @@
 | 收窄后旧历史合成测试源触发误报 | 仅固定既有 blob 哈希、精确路径和单一虚构值保留原行为；不跳过扫描，新编辑/其他邮箱/私人词条均拒绝，回归覆盖；不改写历史 |
 | 两个实验项目未纳入 CI required，独立路径过滤可能漏检 | 根 CI 调用 EntropyLab / CompressionLab 的可复用 Linux/Windows 工作流并汇总，失败/取消仍失败；保留原检查和基准，增加 EntropyLab Windows E2E |
 | CompressionLab / EntropyLab 各 12 项 npm 已知告警（含开发依赖） | 固定升级 Vitest 5.0.5、typescript-eslint 8.71.2 与锁文件，移除受影响的旧依赖树；两者完整 npm 审计均降到 0 |
-| 新建 Python venv 的旧 pip 有已知漏洞 | 本地、Python 项目 CI 与 Windows 启动器先升级 pip 26.2.1；CI 增加 pip check / pip-audit，失败停止 |
+| 新建 Python venv 的旧 pip 有已知漏洞 | 本地、Python 项目 CI 与 Windows 启动器先升级 pip 26.2.1 / setuptools 84.0.0；build-system 的 setuptools 下限改为修复版 83.0.0；CI 增加 pip check / pip-audit，失败停止 |
 | 依赖审计仅为历史一次性结果，不能防止再次引入 | 四个 Node 项目均增加完整 npm 审计门禁；Python 两项目增加安装环境审计，无 ignore-vuln 或只查生产依赖的缩减 |
 | QQ Mail MCP 文档称按钮仍为“一小时”，源码已是“授权一年” | 核对源码和 365 天实际存储期限；更正文档，在原 Chromium 授权流程中断言按钮文字，不修改令牌策略 |
 | 维护合并可能触发隐式 Pages 发布；多处文档仍等待人工合并 | Pages push 保留构建/测试，发布 job 限定显式手动触发；同步当前索引、维护规则和历史快照说明 |
@@ -46,3 +46,7 @@ Linux / Python 3.12.14 / Node.js 24.19.0 / Chromium 156；所有以下测试均�
 - npm/pip 审计是当日漏洞库结果，不是不存在未知漏洞的证明；未知私人姓名、编码图片、GitHub 隐藏引用和外部克隆仍在扫描能力边界外。
 
 只有当前 PR 最新完整 CI 成功后才合并；本文件不把工作流配置存在当成已运行，也不把历史 CI 成功代替当前提交。
+
+## 远程 CI 首轮发现与修复
+
+首轮 PR CI 的 Python 3.11 runner 预装 setuptools 79.0.1，被新增 pip-audit 拒绝（PYSEC-2026-3447）。本地 Python 3.12 的新 venv 不自带该旧包，不能用本地结果覆盖远程失败。CI 与 Windows 启动器显式升级到 setuptools 84.0.0，两个 Python 项目的 build-system 下限设为已修复的 83.0.0，保留审计门禁后重新执行完整 CI。另将可复用工作流并发组绑定调用者，避免手动运行取消根 CI 的必需子任务。
