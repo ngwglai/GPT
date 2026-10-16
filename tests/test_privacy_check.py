@@ -167,6 +167,53 @@ class PrivacyTests(unittest.TestCase):
         self.assertEqual(self.check("--pre-push", input=data).returncode, 0)
         self.assertEqual(self.check("--pre-push", input="bad input\n").returncode, 2)
 
+    def test_pre_push_new_branch_excludes_remote_history(self):
+        self.write("base.txt", "safe")
+        self.command("git", "commit", "--quiet", "-m", "Base")
+        base = self.command("git", "rev-parse", "HEAD")
+
+        # Simulate an old main commit with a noncanonical committer that is already remote.
+        self.write("legacy.txt", "safe")
+        bad_env = dict(self.env, GIT_COMMITTER_NAME="Fictional Person", GIT_COMMITTER_EMAIL=SAMPLE_PRIVATE)
+        self.command("git", "commit", "--quiet", "-m", "Legacy history", env=bad_env)
+        legacy = self.command("git", "rev-parse", "HEAD")
+        self.command("git", "update-ref", "refs/remotes/origin/main", legacy)
+        self.command("git", "symbolic-ref", "refs/remotes/origin/HEAD", "refs/remotes/origin/main")
+
+        self.write("new.txt", "safe")
+        self.command("git", "commit", "--quiet", "-m", "New branch work")
+        sha = self.command("git", "rev-parse", "HEAD")
+        data = f"refs/heads/feature/new refs/heads/feature/new {sha} refs/heads/compressionlab {'0' * 40}\n"
+        result = self.check("--pre-push", "--remote-name", "origin", input=data)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+        # A bad commit added after the remote baseline must still be rejected.
+        bad_env = dict(self.env, GIT_AUTHOR_NAME="Fictional Person", GIT_AUTHOR_EMAIL=SAMPLE_PRIVATE,
+                       GIT_COMMITTER_NAME="Fictional Person", GIT_COMMITTER_EMAIL=SAMPLE_PRIVATE)
+        self.write("bad.txt", "safe")
+        self.command("git", "commit", "--quiet", "-m", "Bad new commit", env=bad_env)
+        sha = self.command("git", "rev-parse", "HEAD")
+        data = f"refs/heads/feature/new {sha} refs/heads/compressionlab {'0' * 40}\n"
+        result = self.check("--pre-push", "--remote-name", "origin", input=data)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("noncanonical-author", result.stdout)
+        self.assertIn("noncanonical-committer", result.stdout)
+        self.assertNotIn(SAMPLE_PRIVATE, result.stdout + result.stderr)
+
+    def test_pre_push_new_branch_requires_remote_name_for_scoped_mode(self):
+        self.write("base.txt", "safe")
+        self.command("git", "commit", "--quiet", "-m", "Base")
+        self.write("legacy.txt", "safe")
+        bad_env = dict(self.env, GIT_COMMITTER_NAME="Fictional Person", GIT_COMMITTER_EMAIL=SAMPLE_PRIVATE)
+        self.command("git", "commit", "--quiet", "-m", "Legacy history", env=bad_env)
+        self.write("new.txt", "safe")
+        self.command("git", "commit", "--quiet", "-m", "New work")
+        sha = self.command("git", "rev-parse", "HEAD")
+        data = f"refs/heads/new {sha} refs/heads/new {'0' * 40}\n"
+        result = self.check("--pre-push", input=data)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("noncanonical-committer", result.stdout)
+
     def test_actual_hooks_reject_message(self):
         shutil.copytree(ROOT / "scripts", self.repo / "scripts", ignore=shutil.ignore_patterns("__pycache__"))
         shutil.copytree(ROOT / ".githooks", self.repo / ".githooks")
