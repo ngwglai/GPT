@@ -35,7 +35,7 @@ Windows 可使用原生临时目录替代 `/tmp/commit-message.txt`，路径含�
 
 检查内容：
 
-- 普通提交的作者、提交者（以及 `--all-history` 下的附注标签 tagger）必须精确匹配已确认的身份；检查前瞻身份时也考虑 Git 环境变量覆盖。唯一的提交者例外是 GitHub 网页生成的合并提交：仅当作者仍为已确认身份、提交者精确为 `GitHub <noreply@github.com>`、提交具有至少两个父提交且提交说明匹配 `Merge pull request #... from ngwglai/...` 时允许。首次创建远程分支时只排除远程跟踪引用已知的祖先，不降低对本次新增提交的身份与内容检查标准。
+- 普通提交的作者、提交者（以及 `--all-history` 下的附注标签 tagger）必须精确匹配已确认的身份；检查前瞻身份时也考虑 Git 环境变量覆盖。唯一的提交者例外是 GitHub 网页生成的合并提交：仅当作者仍为已确认身份、提交者为 GitHub 的系统提交身份、提交具有至少两个父提交且提交说明匹配 `Merge pull request #... from ngwglai/...` 时允许。首次创建远程分支时只排除远程跟踪引用已知的祖先，不降低对本次新增提交的身份与内容检查标准。
 - 提交说明中的共同作者、签署、评审等身份尾注只能使用该匿名身份。不要自动添加不必要尾注。
 - 暂存文件/历史 blob、文件名、提交说明中的非批准邮箱、常见服务令牌、私钥、疑似硬编码密码、个人绝对路径与 ChatGPT 会话/分享链接。
 - 真实姓名无法靠通用正则可靠判断。支持仓库外 JSON 私有词表 `{"terms": ["Example Person", "person@example.invalid"]}`；示例只是虚构格式，实际词表**不得提交**。可以通过 `--denylist` 指定，或以 `git config --local privacy.denylist <private-path>` 固定在当前 checkout。
