@@ -71,8 +71,10 @@ describe('application interaction', () => {
     expect((screen.getByLabelText('粒子数量') as HTMLInputElement).value).toBe('2000');
     expect(metric('左半区 / 右半区')).toBe('2000 / 0');
     fireEvent.click(screen.getByRole('button', { name: '恢复默认参数' }));
-    expect((screen.getByLabelText('粒子数量') as HTMLInputElement).value).toBe('600');
-    expect(screen.getByRole('switch').getAttribute('aria-checked')).toBe('true');
+    expect((screen.getByLabelText('粒子数量') as HTMLInputElement).value).toBe('500');
+    expect(screen.getByRole('switch', { name: '中央隔板' }).getAttribute('aria-checked')).toBe(
+      'true',
+    );
   });
   it('advances a walk by 100 steps and resets statistics after changing step length', () => {
     render(<App />);

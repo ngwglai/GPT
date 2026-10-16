@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { bounded, seededRandom, shannonEntropy } from '../src/utils/numbers';
-import { createDiffusion, diffusionStats, stepDiffusion } from '../src/experiments/diffusion/model';
+import {
+  createDiffusion,
+  diffusionStats,
+  stepDiffusion,
+  HardDiskGas,
+} from '../src/experiments/diffusion/model';
 import { createWalk, stepWalk, TRAIL_LIMIT, walkStats } from '../src/experiments/random-walk/model';
 import {
   createLife,
@@ -47,34 +52,35 @@ describe('diffusion', () => {
     expect(s.entropy).toBeLessThanOrEqual(Math.log2(50));
   });
   it('reflects at walls and divider without changing velocity magnitude', () => {
-    const state = { time: 0, particles: [{ x: 0.49, y: 0.99, vx: 1, vy: 1 }] };
-    stepDiffusion(state, 0.1, 1, true);
-    expect(state.particles[0].x).toBeCloseTo(0.41);
-    expect(state.particles[0].y).toBeCloseTo(0.91);
+    const state = new HardDiskGas([{ x: 0.49, y: 0.99, vx: 1, vy: 1, r: 0.005, m: 1 }]);
+    stepDiffusion(state, 0.1, true);
+    expect(state.particles[0].x).toBeCloseTo(0.4);
+    expect(state.particles[0].y).toBeCloseTo(0.9);
     expect(state.particles[0].vx).toBe(-1);
     expect(state.particles[0].vy).toBe(-1);
   });
   it('opening crosses the middle; closing retains particles on both sides', () => {
-    const state = { time: 0, particles: [{ x: 0.49, y: 0.5, vx: 1, vy: 0 }] };
-    stepDiffusion(state, 0.1, 1, false);
+    const state = new HardDiskGas([{ x: 0.49, y: 0.5, vx: 1, vy: 0, r: 0.005, m: 1 }], false);
+    stepDiffusion(state, 0.1, false);
     expect(state.particles[0].x).toBeCloseTo(0.59);
     state.particles[0].vx = -1;
-    stepDiffusion(state, 0.2, 1, true);
-    expect(state.particles[0].x).toBeCloseTo(0.61);
+    stepDiffusion(state, 0.2, true);
+    expect(state.particles[0].x).toBeCloseTo(0.62);
   });
-  it('preserves containment and equal speeds over long runs at maximum settings', () => {
+  it('preserves containment and energy over long runs at maximum count', () => {
     const state = createDiffusion(2000, seededRandom(7));
-    for (let i = 0; i < 180; i++) stepDiffusion(state, 1, 1, i < 90);
+    for (let i = 0; i < 180; i++) stepDiffusion(state, 1 / 60, i < 90);
     expect(state.particles.every((p) => p.x >= 0 && p.x <= 1 && p.y >= 0 && p.y <= 1)).toBe(true);
-    for (const p of state.particles) expect(Math.hypot(p.vx, p.vy)).toBeCloseTo(1, 12);
+    expect(state.fault).toBeNull();
+    expect(diffusionStats(state).energy).toBeCloseTo(state.initialEnergy, 10);
   });
   it('zero velocity freezes positions while time advances; invalid dt is ignored', () => {
-    const state = createDiffusion(10, seededRandom(1));
+    const state = createDiffusion(10, seededRandom(1), { velocity: 0 });
     const before = structuredClone(state.particles);
-    stepDiffusion(state, 1, 0, false);
+    stepDiffusion(state, 1, false);
     expect(state.particles).toEqual(before);
     expect(state.time).toBe(1);
-    stepDiffusion(state, NaN, 0, false);
+    stepDiffusion(state, NaN, false);
     expect(state.time).toBe(1);
   });
 });
@@ -336,7 +342,9 @@ describe('session and input bounds', () => {
   );
   it('distinguishes live and structural parameters', () => {
     const diffusion = new Session('diffusion');
-    expect(diffusion.updateConfig({ divider: false, velocity: 1 })).toBe(false);
+    expect(diffusion.updateConfig({ divider: false, gasDisplay: 'speed' })).toBe(false);
+    expect(diffusion.updateConfig({ velocity: 1 })).toBe(true);
+    expect(diffusion.updateConfig({ interactions: false })).toBe(true);
     expect(diffusion.updateConfig({ count: 1000 })).toBe(true);
     const walk = new Session('walk');
     expect(walk.updateConfig({ stepLength: 3 })).toBe(true);
@@ -362,7 +370,7 @@ describe('session and input bounds', () => {
     expect(c.size).toBe(64);
     expect(c.temperature).toBe(0);
     expect(sanitizeConfig('walk', { ...defaults.walk, count: -10, stepLength: NaN }).count).toBe(1);
-    expect(createDiffusion(NaN, seededRandom(1)).particles.length).toBe(600);
+    expect(createDiffusion(NaN, seededRandom(1)).particles.length).toBe(500);
     expect(createIsing(NaN, false, seededRandom(1)).size).toBe(64);
     expect(createLife(-10, 'empty', seededRandom(1)).size).toBe(40);
     expect(bounded(5.5, 1, 10, 2, true)).toBe(6);

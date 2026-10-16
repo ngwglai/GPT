@@ -1126,3 +1126,52 @@ footer i {
     transition: none !important;
   }
 }
+
+.gas-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--border);
+  row-gap: 20px;
+  padding: 19px 0;
+}
+.gas-metrics .metric:nth-child(3n + 1) {
+  border-left: 0;
+}
+.gas-metrics .metric strong {
+  font-size: clamp(17px, 1.4vw, 23px);
+}
+.gas-metrics .metric-unit {
+  font-size: 8px;
+}
+.gas-computation {
+  border-top: 1px solid var(--border);
+  padding: 10px 18px;
+  font-size: 9px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.gas-computation span {
+  color: var(--faint);
+}
+.gas-notice {
+  margin: 0;
+  padding: 10px 18px;
+  font-size: 11px;
+  background: var(--accent-dim);
+  color: var(--text);
+  border-top: 1px solid var(--border);
+}
+.density-note {
+  margin: -10px 0 20px;
+}
+@media (max-width: 390px) {
+  .gas-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gas-metrics .metric {
+    border-left: 0;
+  }
+}

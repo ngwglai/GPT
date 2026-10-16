@@ -32,6 +32,7 @@ test('four real canvas simulations, transport and parameter controls', async ({ 
     .poll(() => canvas.evaluate((node: HTMLCanvasElement) => node.toDataURL()))
     .not.toBe(before);
   await page.getByRole('button', { name: '暂停', exact: true }).click();
+  await expect(page.getByRole('status', { name: '模拟状态' })).toHaveText('已暂停');
   const paused = await metric(page, '模拟时间');
   await page.waitForTimeout(250);
   expect(await metric(page, '模拟时间')).toBe(paused);
@@ -119,7 +120,9 @@ test('desktop, tablet and phone layouts remain within viewport', async ({ page }
   }
 });
 
-test('maximum parameters still advance all four simulations without page errors', async ({ page }) => {
+test('maximum parameters still advance all four simulations without page errors', async ({
+  page,
+}) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('./');
@@ -133,8 +136,8 @@ test('maximum parameters still advance all four simulations without page errors'
     await choose(page, experiment.name);
     if (experiment.name === '粒子扩散与熵增') {
       await page.getByLabel('粒子数量').fill('2000');
-      await page.getByLabel('运动速度').fill('1');
-      await page.getByRole('switch').click();
+      await page.getByLabel('初始速度尺度').fill('1');
+      await page.getByRole('switch', { name: '中央隔板' }).click();
     } else if (experiment.name === '二维随机游走') {
       await page.getByLabel('粒子数量').fill('512');
       await page.getByLabel('步长 ℓ').fill('5');
@@ -151,18 +154,25 @@ test('maximum parameters still advance all four simulations without page errors'
       }
     }
     await page.getByLabel('播放倍率').selectOption('4');
-    const before = await page.locator('canvas').evaluate((node: HTMLCanvasElement) => node.toDataURL());
+    const before = await page
+      .locator('canvas')
+      .evaluate((node: HTMLCanvasElement) => node.toDataURL());
     const initialTime = await metric(page, experiment.metric);
     await page.getByRole('button', { name: '开始模拟', exact: true }).click();
     await expect.poll(() => metric(page, experiment.metric)).not.toBe(initialTime);
-    await expect.poll(() => page.locator('canvas').evaluate((node: HTMLCanvasElement) => node.toDataURL())).not.toBe(before);
+    await expect
+      .poll(() => page.locator('canvas').evaluate((node: HTMLCanvasElement) => node.toDataURL()))
+      .not.toBe(before);
     await page.getByRole('button', { name: '暂停', exact: true }).click();
   }
   expect(errors).toEqual([]);
 });
 
 test('touch users can paint and erase on the mobile lattice', async ({ browser }) => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
+  const context = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+  });
   const page = await context.newPage();
   await page.goto('http://127.0.0.1:4173/GPT/entropylab/');
   await choose(page, '康威生命游戏');

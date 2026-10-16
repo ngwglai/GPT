@@ -27,17 +27,26 @@ export function drawSimulation(
     ctx.stroke();
   }
   if (session.diffusion) {
+    const colorScale = Math.max(
+      0.01,
+      3 * Math.sqrt((2 * session.diffusion.initialEnergy) / session.diffusion.particles.length),
+    );
     ctx.strokeStyle = light ? '#a0b3c9' : '#46556c';
     ctx.strokeRect(left, top, size, size);
     for (const p of session.diffusion.particles) {
-      ctx.fillStyle = p.x < 0.5 ? (light ? '#148565' : '#8ce5bd') : light ? '#7950bc' : '#b8a0f0';
+      ctx.fillStyle =
+        session.config.gasDisplay === 'speed'
+          ? `hsl(${220 - 210 * Math.min(1, Math.hypot(p.vx, p.vy) / colorScale)} 72% ${light ? 42 : 67}%)`
+          : light
+            ? '#148565'
+            : '#8ce5bd';
       ctx.beginPath();
-      ctx.arc(left + p.x * size, top + p.y * size, size > 340 ? 2 : 1.6, 0, Math.PI * 2);
+      ctx.arc(left + p.x * size, top + p.y * size, p.r * size, 0, Math.PI * 2);
       ctx.fill();
     }
-    ctx.setLineDash(session.config.divider ? [] : [5, 6]);
-    ctx.lineWidth = session.config.divider ? 3 : 1;
-    ctx.strokeStyle = session.config.divider
+    ctx.setLineDash(session.diffusion.divider ? [] : [5, 6]);
+    ctx.lineWidth = session.diffusion.divider ? 1.5 : 1;
+    ctx.strokeStyle = session.diffusion.divider
       ? light
         ? '#6c7a8f'
         : '#8796ab'

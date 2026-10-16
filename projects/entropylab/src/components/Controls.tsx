@@ -2,6 +2,7 @@ import { useId } from 'react';
 import type { Config, ExperimentId } from '../experiments/session';
 import type { Boundary, Preset } from '../experiments/game-of-life/model';
 import { Icon } from './Icon';
+import { maximumRadius, MAX_PARTICLES } from '../experiments/diffusion/model';
 
 function Range({
   label,
@@ -26,7 +27,7 @@ function Range({
       <div className="field-label">
         <label htmlFor={id}>{label}</label>
         <output htmlFor={id}>
-          {value}
+          {Number(value.toFixed(5))}
           {unit}
         </output>
       </div>
@@ -46,7 +47,7 @@ function Range({
           {unit}
         </span>
         <span>
-          {max}
+          {Number(max.toFixed(5))}
           {unit}
         </span>
       </div>
@@ -80,14 +81,14 @@ export function Controls({
             label="粒子数量"
             value={c.count}
             min={id === 'diffusion' ? 10 : 1}
-            max={id === 'diffusion' ? 2000 : 512}
+            max={id === 'diffusion' ? MAX_PARTICLES : 512}
             onChange={(count) => update({ count })}
           />
         )}
         {id === 'diffusion' && (
           <>
             <Range
-              label="运动速度"
+              label="初始速度尺度"
               value={c.velocity}
               min={0}
               max={1}
@@ -95,6 +96,45 @@ export function Controls({
               unit=" L/s"
               onChange={(velocity) => update({ velocity })}
             />
+            <Range
+              label="粒子半径"
+              value={c.radius}
+              min={0.002}
+              max={maximumRadius(c.count)}
+              step={0.0001}
+              unit=" L"
+              onChange={(radius) => update({ radius })}
+            />
+            <p className="field-help density-note">
+              半径上限随数量调整，左半区初始面积占比最多 30%。初始速度为 RMS 尺度。
+            </p>
+            <div className="field">
+              <div className="field-label">
+                <span id="collisions-label">粒子间碰撞</span>
+                <span className="state-label">{c.interactions ? '弹性碰撞' : '无碰撞对照'}</span>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={c.interactions}
+                aria-labelledby="collisions-label"
+                className={`switch ${c.interactions ? 'on' : ''}`}
+                onClick={() => update({ interactions: !c.interactions })}
+              >
+                <span />
+              </button>
+              <p className="field-help">切换碰撞模式会重置并暂停，墙壁反射始终保留。</p>
+            </div>
+            <label className="select-field">
+              粒子显示模式
+              <select
+                value={c.gasDisplay}
+                onChange={(e) => update({ gasDisplay: e.target.value as Config['gasDisplay'] })}
+              >
+                <option value="uniform">普通模式 · 统一颜色</option>
+                <option value="speed">速度模式 · 按速率着色</option>
+              </select>
+            </label>
             <div className="field">
               <div className="field-label">
                 <span id="divider-label">中央隔板</span>
@@ -110,7 +150,9 @@ export function Controls({
               >
                 <span />
               </button>
-              <p className="field-help">开启隔板，让粒子扩散至整个容器。</p>
+              <p className="field-help">
+                开启后自由扩散；重新关闭时局部修正位置，保留粒子和动能，拥挤时安全回退。
+              </p>
             </div>
           </>
         )}
@@ -228,13 +270,17 @@ export function Controls({
             ))}
           </select>
         </label>
-        <p className="field-help">倍率仅改变推进速率，不改变模型规则。后台标签页暂停计时。</p>
+        <p className="field-help">
+          倍率仅改变推进速率，不改变模型规则。后台标签页暂停计时。
+          {id === 'diffusion' && '计算繁忙时放慢模拟，不扩大物理步长或跳过碰撞。'}
+        </p>
         <button className="restore-button" onClick={restore}>
           <Icon name="reset" size={15} />
           恢复默认参数
         </button>
         <p className="reset-note">
-          粒子数、步长、网格或初态变更会重置并暂停。重置使用相同种子 42，便于复现实验。
+          粒子数、半径、初始速度、碰撞模式、步长、网格或初态变更会重置并暂停。重置使用相同种子
+          42，便于复现实验。
         </p>
       </div>
     </aside>

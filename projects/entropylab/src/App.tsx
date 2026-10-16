@@ -35,6 +35,41 @@ function Laboratory({ id, light }: { id: ExperimentId; light: boolean }) {
   const historyX = s.history.map((v) => v.x);
   const a = s.history.map((v) => v.a),
     b = s.history.map((v) => v.b);
+  const gasMetrics = s.gas
+    ? [
+        {
+          label: '累计粒子间碰撞',
+          value: fmt(s.gas.collisions, 0),
+          unit: '次',
+          hint: '仅计实际成对弹性冲量',
+        },
+        {
+          label: '碰撞频率',
+          value: fmt(s.gas.collisionFrequency, 1),
+          unit: '次/s',
+          hint: '累计次数 / 模拟时间',
+        },
+        {
+          label: '平均粒子速度',
+          value: fmt(s.gas.meanSpeed, 4),
+          unit: 'L/s',
+          hint: '速率大小的样本均值',
+        },
+        { label: '总动能', value: fmt(s.gas.energy, 6), unit: 'm₀L²/s²', hint: 'K = Σ mᵢvᵢ²/2' },
+        {
+          label: '总动量大小',
+          value: fmt(s.gas.momentum, 5),
+          unit: 'm₀L/s',
+          hint: '受墙壁与隔板外部冲量影响',
+        },
+        {
+          label: '相对动能偏差',
+          value: s.gas.energyError.toExponential(2),
+          unit: '',
+          hint: '(K − K₀) / K₀；K₀=0 时记为 0',
+        },
+      ]
+    : [];
   const metrics =
     id === 'diffusion'
       ? [
@@ -150,7 +185,7 @@ function Laboratory({ id, light }: { id: ExperimentId; light: boolean }) {
               <span className="simulation-subtitle">{meta.english}</span>
             </div>
             <span className="status-text" role="status" aria-label="模拟状态">
-              {sim.running ? '运行中' : '已暂停'}
+              {sim.pausing ? '暂停中' : sim.running ? '运行中' : '已暂停'}
             </span>
           </div>
           <div className="canvas-shell">
@@ -181,14 +216,17 @@ function Laboratory({ id, light }: { id: ExperimentId; light: boolean }) {
               {id === 'diffusion' ? (
                 <>
                   <span>
-                    <i />
-                    左半区粒子
+                    <i style={c.gasDisplay === 'speed' ? { background: '#639fe6' } : undefined} />
+                    {c.gasDisplay === 'speed' ? '慢速 · 蓝色' : '统一颜色 · 真实半径'}
                   </span>
                   <span>
-                    <i className="purple" />
-                    右半区粒子
+                    {c.gasDisplay === 'speed' && <i style={{ background: '#e68d62' }} />}
+                    {c.gasDisplay === 'speed' ? '快速 · 橙红色' : '二维硬盘气体'}
                   </span>
-                  <span className="divider-state">隔板{c.divider ? '关闭' : '开启'}</span>
+                  <span className="divider-state">
+                    {c.interactions ? '弹性碰撞' : '无碰撞对照'} · 隔板
+                    {session.diffusion!.divider ? '关闭' : '开启'}
+                  </span>
                 </>
               ) : id === 'walk' ? (
                 <>
@@ -226,9 +264,13 @@ function Laboratory({ id, light }: { id: ExperimentId; light: boolean }) {
           </div>
           <div className="transport">
             <div className="transport-buttons">
-              <button className="primary-button" onClick={sim.toggle}>
+              <button
+                className="primary-button"
+                onClick={sim.toggle}
+                disabled={sim.pausing || !!s.gas?.fault}
+              >
                 <Icon name={sim.running ? 'pause' : 'play'} size={17} />
-                {sim.running ? '暂停' : '开始模拟'}
+                {sim.pausing ? '暂停中' : sim.running ? '暂停' : '开始模拟'}
               </button>
               <button
                 className="icon-button"
@@ -240,7 +282,7 @@ function Laboratory({ id, light }: { id: ExperimentId; light: boolean }) {
                       ? '推进 1/60 s'
                       : '单步执行'
                 }
-                disabled={sim.running}
+                disabled={sim.running || !!s.gas?.fault}
                 onClick={() => sim.step()}
               >
                 <Icon name="step" size={18} />
@@ -298,6 +340,35 @@ function Laboratory({ id, light }: { id: ExperimentId; light: boolean }) {
               </div>
             ))}
           </div>
+          {s.gas && (
+            <>
+              <div className="gas-metrics" aria-label="气体碰撞统计">
+                {gasMetrics.map((m) => (
+                  <div className="metric" key={m.label}>
+                    <span className="metric-label">{m.label}</span>
+                    <div>
+                      <strong>{m.value}</strong>
+                      <span className="metric-unit">{m.unit}</span>
+                    </div>
+                    <span className="metric-hint">{m.hint}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="gas-computation">
+                固定步长 CCD · {typeof Worker === 'undefined' ? '主线程回退' : 'Worker 计算'}
+                <span>
+                  {s.computeMs === undefined
+                    ? '等待首个计算批次'
+                    : `最近计算批次 ${fmt(s.computeMs, 2)} ms（非帧率）`}
+                </span>
+              </div>
+              {(s.gas.fault || s.gas.notice) && (
+                <p className="gas-notice" role="alert">
+                  {s.gas.fault ?? s.gas.notice}
+                </p>
+              )}
+            </>
+          )}
         </section>
         <Controls id={id} config={c} update={sim.update} restore={sim.restore} />
         <div className="charts-grid">
@@ -317,6 +388,26 @@ function Laboratory({ id, light }: { id: ExperimentId; light: boolean }) {
                 xLabel="水平位置 x / L"
                 endLabel="1"
                 expected={c.count / 10}
+              />
+              <Histogram
+                title="粒子速率分布"
+                values={s.gas?.speedHistogram ?? []}
+                xLabel="速率 |v| / (L/s)"
+                endLabel={fmt(s.gas?.speedMax ?? 1, 3)}
+                subtitle="固定速度区间 · 末箱包含溢出尾部"
+              />
+              <LineChart
+                title="累计碰撞演化"
+                x={historyX}
+                series={[
+                  {
+                    label: '粒子间弹性碰撞',
+                    values: s.history.map((v) => v.collisions ?? 0),
+                    color: 'var(--purple)',
+                  },
+                ]}
+                xLabel={meta.unit}
+                yLabel="碰撞次数 / 次"
               />
             </>
           )}
@@ -395,7 +486,7 @@ function Laboratory({ id, light }: { id: ExperimentId; light: boolean }) {
       </div>
       <footer>
         <span>
-          EntropyLab 1.0 <i /> 从简单规则，发现复杂世界。
+          EntropyLab 1.1 <i /> 从简单规则，发现复杂世界。
         </span>
         <span>数值模型 · 交互探索 · 可复现实验</span>
       </footer>
@@ -465,7 +556,7 @@ export default function App() {
             <span />
             完全本地 · 无需网络
           </div>
-          <span className="version">ENTROPYLAB / V1.0.0</span>
+          <span className="version">ENTROPYLAB / V1.1.0</span>
         </div>
       </aside>
       <div className="workspace">
@@ -484,7 +575,7 @@ export default function App() {
             >
               <Icon name={light ? 'moon' : 'sun'} size={18} />
             </button>
-            <span className="version-pill">v1.0</span>
+            <span className="version-pill">v1.1</span>
           </div>
         </header>
         <main id="main">

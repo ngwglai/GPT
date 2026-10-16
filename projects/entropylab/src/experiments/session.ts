@@ -1,5 +1,13 @@
 import { bounded, seededRandom, type Random } from '../utils/numbers';
-import { createDiffusion, diffusionStats, stepDiffusion, type Diffusion } from './diffusion/model';
+import {
+  createDiffusion,
+  diffusionStats,
+  stepDiffusion,
+  maximumRadius,
+  DEFAULT_PARTICLES,
+  type Diffusion,
+  type GasStats,
+} from './diffusion/model';
 import { createWalk, stepWalk, walkStats, type Walk } from './random-walk/model';
 import {
   createLife,
@@ -25,10 +33,13 @@ export interface Config {
   rate: number;
   speed: number;
   trailLength: number;
+  radius: number;
+  interactions: boolean;
+  gasDisplay: 'uniform' | 'speed';
 }
 export const defaults: Record<ExperimentId, Config> = {
   diffusion: {
-    count: 600,
+    count: DEFAULT_PARTICLES,
     velocity: 0.25,
     divider: true,
     stepLength: 1,
@@ -40,6 +51,9 @@ export const defaults: Record<ExperimentId, Config> = {
     rate: 10,
     speed: 1,
     trailLength: 64,
+    radius: 0.004,
+    interactions: true,
+    gasDisplay: 'uniform',
   },
   walk: {
     count: 200,
@@ -54,6 +68,9 @@ export const defaults: Record<ExperimentId, Config> = {
     rate: 10,
     speed: 1,
     trailLength: 64,
+    radius: 0.004,
+    interactions: true,
+    gasDisplay: 'uniform',
   },
   life: {
     count: 200,
@@ -68,6 +85,9 @@ export const defaults: Record<ExperimentId, Config> = {
     rate: 10,
     speed: 1,
     trailLength: 64,
+    radius: 0.004,
+    interactions: true,
+    gasDisplay: 'uniform',
   },
   ising: {
     count: 200,
@@ -82,20 +102,24 @@ export const defaults: Record<ExperimentId, Config> = {
     rate: 10,
     speed: 1,
     trailLength: 64,
+    radius: 0.004,
+    interactions: true,
+    gasDisplay: 'uniform',
   },
 };
 const presets: Preset[] = ['glider', 'blinker', 'pulsar', 'gosper', 'random', 'empty'];
 
 export function sanitizeConfig(id: ExperimentId, config: Config): Config {
   const d = defaults[id];
+  const count = bounded(
+    config.count,
+    id === 'diffusion' ? 10 : 1,
+    id === 'diffusion' ? 2000 : 512,
+    d.count,
+    true,
+  );
   return {
-    count: bounded(
-      config.count,
-      id === 'diffusion' ? 10 : 1,
-      id === 'diffusion' ? 2000 : 512,
-      d.count,
-      true,
-    ),
+    count,
     velocity: bounded(config.velocity, 0, 1, d.velocity),
     divider: typeof config.divider === 'boolean' ? config.divider : d.divider,
     stepLength: bounded(config.stepLength, 0.5, 5, d.stepLength),
@@ -107,6 +131,9 @@ export function sanitizeConfig(id: ExperimentId, config: Config): Config {
     rate: bounded(config.rate, 1, 30, d.rate, true),
     speed: bounded(config.speed, 0.25, 4, d.speed),
     trailLength: bounded(config.trailLength, 16, 128, d.trailLength, true),
+    radius: bounded(config.radius, 0.002, maximumRadius(count), d.radius),
+    interactions: typeof config.interactions === 'boolean' ? config.interactions : d.interactions,
+    gasDisplay: config.gasDisplay === 'speed' ? 'speed' : 'uniform',
   };
 }
 
@@ -114,6 +141,7 @@ export interface Sample {
   x: number;
   a: number;
   b: number;
+  collisions?: number;
 }
 export interface Snapshot {
   x: number;
@@ -122,6 +150,8 @@ export interface Snapshot {
   c: number;
   bars: number[];
   history: Sample[];
+  gas?: GasStats;
+  computeMs?: number;
 }
 export const HISTORY_LIMIT = 360;
 
@@ -142,18 +172,24 @@ export class Session {
     this.config = sanitizeConfig(id, config);
     this.rng = seededRandom(seed);
     const c = this.config;
-    if (id === 'diffusion') this.diffusion = createDiffusion(c.count, this.rng);
+    if (id === 'diffusion')
+      this.diffusion = createDiffusion(c.count, this.rng, {
+        radius: c.radius,
+        velocity: c.velocity,
+        interactions: c.interactions,
+        divider: c.divider,
+      });
     if (id === 'walk') this.walk = createWalk(c.count, c.stepLength);
     if (id === 'life') this.life = createLife(c.size, c.preset, this.rng);
     if (id === 'ising') this.ising = createIsing(c.size, c.ordered, this.rng);
     this.record();
   }
 
-  updateConfig(patch: Partial<Config>): boolean {
+  updateConfig(patch: Partial<Config>, applyPhysics = true): boolean {
     const next = sanitizeConfig(this.id, { ...this.config, ...patch });
     const structural: (keyof Config)[] =
       this.id === 'diffusion'
-        ? ['count']
+        ? ['count', 'radius', 'velocity', 'interactions']
         : this.id === 'walk'
           ? ['count', 'stepLength']
           : this.id === 'life'
@@ -161,12 +197,16 @@ export class Session {
             : ['size', 'ordered'];
     const restart = structural.some((k) => next[k] !== this.config[k]);
     this.config = next;
+    if (applyPhysics && this.diffusion && !restart && next.divider !== this.diffusion.divider) {
+      this.diffusion.setDivider(next.divider);
+      this.config.divider = this.diffusion.divider;
+    }
     return restart;
   }
 
   tick(): void {
     const c = this.config;
-    if (this.diffusion) stepDiffusion(this.diffusion, 1 / 60, c.velocity, c.divider);
+    if (this.diffusion) stepDiffusion(this.diffusion, 1 / 60, c.divider);
     if (this.walk) stepWalk(this.walk, this.rng);
     if (this.life) stepLife(this.life, c.boundary);
     if (this.ising) stepIsing(this.ising, c.temperature, this.rng);
@@ -184,6 +224,7 @@ export class Session {
         c: stats.right,
         bars: stats.histogram,
         history: this.history.slice(),
+        gas: stats,
       };
     }
     if (this.walk) {
@@ -232,10 +273,11 @@ export class Session {
   }
 
   record(): void {
-    const { x, a, b } = this.snapshot();
+    const { x, a, b, gas } = this.snapshot();
+    const sample: Sample = gas ? { x, a, b, collisions: gas.collisions } : { x, a, b };
     const previous = this.history[this.history.length - 1];
-    if (previous?.x === x) this.history[this.history.length - 1] = { x, a, b };
-    else this.history.push({ x, a, b });
+    if (previous?.x === x) this.history[this.history.length - 1] = sample;
+    else this.history.push(sample);
     if (this.history.length > HISTORY_LIMIT) this.history.shift();
   }
 }

@@ -112,12 +112,14 @@ export function Histogram({
   xLabel,
   endLabel,
   expected,
+  subtitle,
 }: {
   title: string;
   values: number[];
   xLabel: string;
   endLabel: string;
   expected?: number;
+  subtitle?: string;
 }) {
   const id = useId();
   const max = Math.max(1, ...values, expected ?? 0) * 1.15;
@@ -127,7 +129,7 @@ export function Histogram({
       <div className="chart-heading">
         <div>
           <h3>{title}</h3>
-          <span>当前快照 · {values.length} 个区间</span>
+          <span>{subtitle ?? `当前快照 · ${values.length} 个区间`}</span>
         </div>
         <span className="tiny-label">DISTRIBUTION</span>
       </div>

@@ -1,6 +1,6 @@
 {
   "name": "entropylab",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,7 +11,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint . --max-warnings 0",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "bench": "vitest run --config benchmark.config.ts",
+    "bench:browser": "node bench/browser.mjs"
   },
   "dependencies": {
     "react": "19.1.0",
