@@ -183,7 +183,7 @@ class PrivacyTests(unittest.TestCase):
         self.write("new.txt", "safe")
         self.command("git", "commit", "--quiet", "-m", "New branch work")
         sha = self.command("git", "rev-parse", "HEAD")
-        data = f"refs/heads/feature/new refs/heads/feature/new {sha} refs/heads/compressionlab {'0' * 40}\n"
+        data = f"refs/heads/feature/new {sha} refs/heads/compressionlab {'0' * 40}\n"
         result = self.check("--pre-push", "--remote-name", "origin", input=data)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
