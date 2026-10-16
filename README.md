@@ -38,4 +38,4 @@ GPT/
 
 首次开发请按 [隐私保护指南](docs/PRIVACY.md) 确认本仓库匿名 Git 身份并启用检查。每次提交前主动运行 `python scripts/privacy_check.py --staged`，同时检查提交说明与有效作者/提交者；hooks 不能替代主动检查。原始审计数据、私人身份词表和旧历史备份不得提交或上传。
 
-PR 自动测试、跨平台验收及分支限制说明见 [工程维护指南](docs/ENGINEERING.md)。两个项目分别构建和测试，保持功能独立。
+PR 自动测试、跨平台验收及分支限制说明见 [工程维护指南](docs/ENGINEERING.md)。五个项目分别构建和测试，并统一纳入 `CI required`。详见 [项目索引](PROJECTS.md)；静态站点发布需手动触发 Pages 工作流，主分支更新只执行构建检查。

@@ -117,6 +117,7 @@ describe('real Chromium OAuth consent navigation',()=>{
      });
      const p=new URLSearchParams({client_id:id,redirect_uri:redirect,response_type:'code',scope:'mail:read',resource:base+'/mcp',code_challenge:await hash(verifier),code_challenge_method:'S256',state:'browser-test'});
      await page.goto(base+'/authorize?'+p);
+     expect(await page.locator('button[value=allow]').textContent()).toBe('授权一年');
      const cookie=(await context.cookies()).find(c=>c.name==='__Host-qq-consent');
      expect(cookie).toMatchObject({httpOnly:true,secure:true,sameSite:'Lax',path:'/'});
      await page.locator('input[name=password]').fill(env.OWNER_PASSWORD);

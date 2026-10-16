@@ -52,7 +52,10 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python }}
-      - run: python -m pip install ./projects/reposcope build==1.6.1 ruff==0.17.0
+      - run: python -m pip install --upgrade pip==26.2.1 setuptools==84.0.0
+      - run: python -m pip install ./projects/reposcope build==1.6.1 ruff==0.17.0 pip-audit==2.10.1
+      - run: python -m pip check
+      - run: python -m pip_audit --local --skip-editable
       - run: ruff check --select F projects/reposcope scripts tests
       - run: python -m unittest discover -s projects/reposcope/tests -v
       - run: python -m build --wheel --outdir wheelhouse projects/reposcope
@@ -101,11 +104,15 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: projects/constraintlab/frontend/package-lock.json
-      - run: python -m pip install -e '.[test]' build==1.6.1 ruff==0.17.0
+      - run: python -m pip install --upgrade pip==26.2.1 setuptools==84.0.0
+      - run: python -m pip install -e '.[test]' build==1.6.1 ruff==0.17.0 pip-audit==2.10.1
+      - run: python -m pip check
+      - run: python -m pip_audit --local --skip-editable
       - run: ruff check --select F backend docs/benchmark.py
       - run: python -m pytest backend/tests -q
       - run: python -m build --wheel --outdir wheelhouse
       - run: npm --prefix frontend ci
+      - run: npm --prefix frontend audit --audit-level=moderate
       - run: npm --prefix frontend run build
       - run: npx --prefix frontend playwright install --with-deps chromium
       - name: Browser acceptance
@@ -140,6 +147,7 @@ jobs:
           cache: npm
           cache-dependency-path: projects/qq-mail-mcp/package-lock.json
       - run: npm ci
+      - run: npm audit --audit-level=moderate
       - name: Install browser for OAuth consent regression
         run: npx playwright-core install --with-deps chromium
       - name: Resolve installed Chromium path
@@ -149,15 +157,25 @@ jobs:
       - run: npm run build
       - run: npm run privacy
 
+  entropylab:
+    name: EntropyLab
+    uses: ./.github/workflows/entropylab.yml
+
+  compressionlab:
+    name: CompressionLab
+    uses: ./.github/workflows/compressionlab.yml
+
   required:
     name: CI required
     if: always()
-    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp]
+    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require all applicable checks
         env:
+          ENTROPYLAB_RESULT: ${{ needs.entropylab.result }}
+          COMPRESSIONLAB_RESULT: ${{ needs.compressionlab.result }}
           QQ_MAIL_MCP_RESULT: ${{ needs.qq-mail-mcp.result }}
           PRIVACY_RESULT: ${{ needs.privacy.result }}
           REPOSCOPE_RESULT: ${{ needs.reposcope.result }}
@@ -165,6 +183,8 @@ jobs:
           HAS_CONSTRAINTLAB: ${{ needs.layout.outputs.constraintlab }}
           CONSTRAINTLAB_RESULT: ${{ needs.constraintlab.result }}
         run: |
+          test "$ENTROPYLAB_RESULT" = success
+          test "$COMPRESSIONLAB_RESULT" = success
           test "$QQ_MAIL_MCP_RESULT" = success
           test "$PRIVACY_RESULT" = success
           test "$REPOSCOPE_RESULT" = success
