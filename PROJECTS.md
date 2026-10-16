@@ -16,6 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
+| EntropyLab | [projects/entropylab](projects/entropylab/) | Testing | 浏览器内的计算物理与复杂系统交互实验室 | v1.1 硬盘气体碰撞升级；PR #7 等待用户验收，未合并或部署 |
 | ConstraintLab | [projects/constraintlab](projects/constraintlab/) | Completed | 本地 CSP 求解与算法实验平台 | 修复及整合 main 后 Linux/Windows 完整验收通过；按需扩展 |
 | RepoScope | [projects/reposcope](projects/reposcope/) | Completed | 面向 Windows 用户的离线仓库规模、技术栈与维护风险分析；HTML / Markdown 报告 | HTML 修复与 Linux/Windows CI 通过；按需扩展功能 |
 | QQ Mail MCP | [projects/qq-mail-mcp](projects/qq-mail-mcp/) | Testing | Cloudflare Workers 上的私人 QQ 邮箱只读 MCP，OAuth/DCR 与六个工具 | 迁移 PR 审查；保持现有服务，后续按本地配置手动部署并完成真实邮箱验收 |
@@ -100,6 +101,28 @@
 
 - **预设加载竞态修复**：最终 CI 发现异步预设可能覆盖用户选择或在尚未载入时求解。已增加受控延迟回归、仅接受最新请求，并在加载时禁止求解/实验。E2E 总数增至 5 项；本地 5 项及 TypeScript 构建通过，合并门槛仍为最新完整跨平台 CI。
 
+## EntropyLab v1.0（2026-10-15）
+
+- **状态**：Testing；功能与本地自动验证完成，通过独立功能分支等待用户验收，不自动合并。
+- **目标与用户价值**：面向学生、自学者和复杂系统爱好者，在浏览器调整参数、观察微观演化与实时统计，无需后端或付费 API。
+- **与现有项目差异**：研究扩散、随机过程、细胞自动机和相变，与 RepoScope 的仓库分析及 ConstraintLab 的 CSP 求解用途不同；未修改其业务代码。
+- **交付范围**：粒子扩散与空间 Shannon 熵、二维随机游走与 MSD 理论对照、可绘制/擦除且支持经典预设的生命游戏、Metropolis 二维伊辛模型；实时 Canvas、图表、数学原理与模型限制、深浅主题、响应式布局、暂停/恢复/单步/重置、参数与倍率。
+- **技术方案**：独立 React + TypeScript + Vite；Vitest/ESLint/Playwright；纯数值算法与 UI 分离、固定步进、有界轨迹和历史，无后端、数据库或外部 API。
+- **验收标准**：四实验实际运行且可操作；算法/边界/极值与控制逻辑测试通过；组件渲染、生产构建、真实浏览器交互及手机布局通过；PR 等待用户决定是否合并。
+- **目录 / 分支**：`projects/entropylab/`；`feature/entropylab`，基于最新 `main` 创建。运行与 Pages 启用方法见 [README](projects/entropylab/README.md)。
+- **实际验证**：60 项 Vitest、5 项生产页面 Chromium E2E、ESLint、TypeScript/Vite 构建及根目录 18 项隐私回归通过。详见 [验证记录](projects/entropylab/VALIDATION.md)。远程 CI 状态以 PR 检查页为准。
+- **部署**：配置 `/GPT/entropylab/` base 与聚合 Pages 工作流；未部署，预期地址不代表已上线；Pages API 读取 404，管理员需检查/启用 GitHub Actions Pages 源。
+- **已知限制及后续**：有限样本和有限尺寸、无热平衡时间平均、主线程按设备能力推进、图表保留 360 点、轨迹 128 点；用户验收前不合并。其他浏览器及用户电脑人工验收未执行。
+
+
+## EntropyLab v1.1 硬盘气体（2026-10-16）
+
+- **状态**：Testing；继续使用 `feature/entropylab` 和 [PR #7](https://github.com/ngwglai/GPT/pull/7)，不另建 PR，不合并。
+- **变更**：粒子扩散升级为二维硬盘气体；真实 e=1 弹性冲量、首次接触 CCD、跨网格事件与版本失效预测、有界事件堆。碰撞计算独立 Worker，忙碌时放慢推进，保留固定物理步长。
+- **交互**：默认 500、上限 2,000 粒子；无重叠初态、半径与密度联动、初始 RMS 速度、碰撞开关和普通/速度显示模式；保留空间熵和直方图，新增速度分布、碰撞次数/频率、平均速率、总动能、总动量和能量偏差。
+- **正确性与限制**：成对碰撞守恒向量动量/动能；壁面外部冲量单独累计。关闭隔板做有界位置投影，失败完整回退；多体同时接触为确定顺序近似，超事件预算暂停，不跳过碰撞。
+- **本地验证**：90 项 Vitest（保留原 60 项覆盖并按新物理模型调整旧扩散断言，新增 30 项）、8 项生产 Chromium E2E、lint、typecheck、build、根目录 18 项隐私回归通过。计算和浏览器性能均已测量，详见 [PERFORMANCE.md](projects/entropylab/PERFORMANCE.md) 与 [VALIDATION.md](projects/entropylab/VALIDATION.md)。
+- **后续**：以最新提交的 PR CI 为远程验证依据；用户验收前不合并、不部署。极端高密度高速组合可能慢于 1× 实际推进，不承诺全设备 60 FPS；其余三个实验及 RepoScope/ConstraintLab 业务代码保持原状。
 
 ## QQ Mail MCP 仓库迁移（2026-10-15）
 
