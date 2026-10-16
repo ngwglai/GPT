@@ -99,7 +99,7 @@ class PrivacyTests(unittest.TestCase):
         side = self.command("git", "rev-parse", "HEAD")
         tree = self.command("git", "rev-parse", "HEAD^{tree}")
         env = dict(self.env, GIT_AUTHOR_NAME="ngwglai", GIT_AUTHOR_EMAIL=SAMPLE_NOREPLY,
-                   GIT_COMMITTER_NAME="GitHub", GIT_COMMITTER_EMAIL="noreply" + "@github.com")
+                   GIT_COMMITTER_NAME="GitHub", GIT_COMMITTER_EMAIL="noreply@github.com")
         result = subprocess.run(
             ["git", "commit-tree", tree, "-p", base, "-p", side],
             cwd=self.repo, env=env, input="Merge pull request #123 from ngwglai/side\n\nSynthetic merge\n",
