@@ -88,6 +88,28 @@ class PrivacyTests(unittest.TestCase):
         self.assertIn("noncanonical-committer", result.stdout)
         self.assertNotIn(SAMPLE_PRIVATE, result.stdout + result.stderr)
 
+    def test_github_generated_merge_commit_is_allowed(self):
+        self.write("base.txt", "safe")
+        self.command("git", "commit", "--quiet", "-m", "Base")
+        base = self.command("git", "rev-parse", "HEAD")
+
+        self.command("git", "checkout", "--quiet", "-b", "side")
+        self.write("side.txt", "safe")
+        self.command("git", "commit", "--quiet", "-m", "Side")
+        side = self.command("git", "rev-parse", "HEAD")
+        tree = self.command("git", "rev-parse", "HEAD^{tree}")
+        env = dict(self.env, GIT_AUTHOR_NAME="ngwglai", GIT_AUTHOR_EMAIL=SAMPLE_NOREPLY,
+                   GIT_COMMITTER_NAME="GitHub", GIT_COMMITTER_EMAIL="noreply@github.com")
+        result = subprocess.run(
+            ["git", "commit-tree", tree, "-p", base, "-p", side],
+            cwd=self.repo, env=env, input="Merge pull request #123 from ngwglai/side\n\nSynthetic merge\n",
+            capture_output=True, text=True,
+        )
+        self.assertEqual(result.returncode, 0)
+        merge_sha = result.stdout.strip()
+        result = self.check("--commits", merge_sha)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_identity_trailers(self):
         msg = Path(self.temp.name) / "message"
         msg.write_text("Sample\n\nCo-authored-by: Fictional Person <" + SAMPLE_PRIVATE + ">\nSigned-off-by: Fictional Person <" + SAMPLE_NOREPLY + ">\n", encoding="utf-8")
@@ -170,7 +192,7 @@ class PrivacyTests(unittest.TestCase):
     def test_pre_push_new_branch_excludes_remote_history(self):
         self.write("base.txt", "safe")
         self.command("git", "commit", "--quiet", "-m", "Base")
-        base = self.command("git", "rev-parse", "HEAD")
+        self.command("git", "rev-parse", "HEAD")
 
         # Simulate an old main commit with a noncanonical committer that is already remote.
         self.write("legacy.txt", "safe")
