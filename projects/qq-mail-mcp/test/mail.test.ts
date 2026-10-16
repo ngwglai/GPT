@@ -1,0 +1,43 @@
+import { describe,it,expect } from 'vitest';
+import { ImapClient,field } from '../src/imap';
+import { MailService,searchSchema,readSchema,batchSchema,searchCriteria } from '../src/mail';
+import { parseResponse,quote,encodeFolder,decodeFolder,text,list } from '../src/imap-parser';
+import { bodyParts,parseHeaders,parseTextPart,htmlText } from '../src/mime';
+import { fakeSocket,header,structure,literal } from './fixture';
+const credentials={QQ_MAIL_ADDRESS:'mail@example.com',QQ_MAIL_AUTH_CODE:'test-only-fake-password'};
+const input={folder:'INBOX',uid:1,uidvalidity:77};
+const encoder=new TextEncoder();
+describe('byte-level IMAP parser',()=>{
+ it('keeps UTF-8 literal bytes, CRLF and fake tags opaque',()=>{const s='中文\r\nA1 OK\r\n)';const row=parseResponse(encoder.encode(`* 1 FETCH (UID 3 BODY[] ${literal(s)})\r\n`));expect(text(field(list(row[3]),'BODY[]'))).toBe(s);});
+ it('handles quoted escapes, nesting and NIL',()=>{expect(parseResponse(encoder.encode('* LIST (\\HasNoChildren) NIL "a\\"b\\\\c"\r\n'))).toEqual(['*','LIST',['\\HasNoChildren'],null,'a"b\\c']);});
+ it.each(['* (x','* )','* "unterminated','* {4}\r\nabc'])('rejects malformed response %s',s=>expect(()=>parseResponse(encoder.encode(s))).toThrow('IMAP_PROTOCOL'));
+ it('roundtrips Chinese and ampersand folders',()=>{for(const s of ['已发送','收件箱','A & B','📨'])expect(decodeFolder(encodeFolder(s))).toBe(s);});
+ it('rejects injection and safely escapes quotes',()=>{expect(()=>quote('x\r\nA2 STORE 1 +FLAGS \\Deleted')).toThrow();expect(quote('a"\\b')).toBe('"a\\"\\\\b"');});
+});
+describe('read-only mail operations',()=>{
+ it('authenticates and always closes on status',async()=>{const f=fakeSocket();expect(await new MailService(credentials,()=>f.socket).status()).toEqual({connected:true,authenticated:true});expect(f.closed).toBe(true);});
+ it('redacts login rejection',async()=>{const f=fakeSocket({loginFail:true});expect(await new MailService(credentials,()=>f.socket).status()).toEqual({connected:true,authenticated:false,error:'AUTH_FAILED'});expect(f.closed).toBe(true);});
+ it('does not dial when credentials missing',async()=>{expect(await new MailService({},()=>{throw Error('dialed');}).status()).toMatchObject({error:'MAIL_NOT_CONFIGURED'});});
+ it('redacts TCP/TLS handshake failure and closes the socket',async()=>{const f=fakeSocket();f.socket.opened=Promise.reject(new Error('certificate failed: private diagnostics'));const result=await new MailService(credentials,()=>f.socket).status();expect(result).toEqual({connected:false,authenticated:false,error:'CONNECTION_FAILED'});expect(f.closed).toBe(true);});
+ it('rejects disconnects and closes',async()=>{const f=fakeSocket({disconnect:true});expect(await new MailService(credentials,()=>f.socket).status()).toMatchObject({error:'SERVER_DISCONNECTED'});expect(f.closed).toBe(true);});
+ it('times out and actively closes',async()=>{const f=fakeSocket({hang:true});const c=new ImapClient(f.socket,25);await expect(c.login('a','b')).rejects.toThrow('TIMEOUT');expect(f.closed).toBe(true);});
+ it('lists selectable Chinese folders',async()=>{const f=fakeSocket();const result=await new MailService(credentials,()=>f.socket).folders();expect(result.map(x=>x.name)).toEqual(['INBOX','已发送']);});
+ it('searches dates, unread and paginates newest UIDs',async()=>{const f=fakeSocket();const s=searchSchema.parse({page:2,limit:20,since:'2026-01-01',before:'2026-02-01',unread:true,subject:'中文'});const result=await new MailService(credentials,()=>f.socket).search(s);expect(result.messages.map(m=>m.uid)).toEqual(Array.from({length:20},(_,i)=>25-i));expect(result.total).toBe(45);expect(result.hasMore).toBe(true);expect(result.messages[0].subject).toBe('中文主题');expect(f.commands.some(c=>c.includes('SINCE 1-Jan-2026 BEFORE 1-Feb-2026 UNSEEN'))).toBe(true);});
+ it('returns an empty page beyond results',async()=>{const f=fakeSocket();expect((await new MailService(credentials,()=>f.socket).search(searchSchema.parse({page:10}))).messages).toEqual([]);});
+ it('reads body and metadata but never downloads attachment or sets seen',async()=>{const f=fakeSocket();const result=await new MailService(credentials,()=>f.socket).read(input);expect(result).toMatchObject({body:'你好，世界',subject:'中文主题',messageId:'<test@example.com>',attachments:[{filename:'file.pdf',size:999999}]});expect(f.seen).toBe(false);expect(f.commands.some(c=>c.includes('EXAMINE'))).toBe(true);expect(f.commands.every(c=>!/(SELECT|STORE|EXPUNGE|APPEND|MOVE|COPY|BODY\[)/.test(c))).toBe(true);expect(f.commands.some(c=>c.includes('BODY.PEEK[2]'))).toBe(false);expect(f.closed).toBe(true);});
+ it('compares actual mock FLAGS before/after read on same mailbox',async()=>{const f=fakeSocket();const c=new ImapClient(f.socket);await c.login('a','b');await c.examine('INBOX');const before=field(await c.fetch(1,'UID FLAGS'),'FLAGS');await c.fetch(1,'UID BODY.PEEK[1]');const after=field(await c.fetch(1,'UID FLAGS'),'FLAGS');expect(after).toEqual(before);await c.close();});
+ it('rejects changed UIDVALIDITY before fetching',async()=>{const f=fakeSocket({uidvalidity:78});await expect(new MailService(credentials,()=>f.socket).read(input)).rejects.toThrow('UIDVALIDITY_CHANGED');expect(f.commands.some(c=>c.includes('FETCH'))).toBe(false);expect(f.closed).toBe(true);});
+ it('attachment-info fetches BODYSTRUCTURE only',async()=>{const f=fakeSocket();await new MailService(credentials,()=>f.socket).read(input,true);expect(f.commands.some(c=>c.includes('BODY.PEEK'))).toBe(false);});
+ it('rejects large text before fetching body',async()=>{const f=fakeSocket({large:true});await expect(new MailService(credentials,()=>f.socket).read(input)).rejects.toThrow('MAIL_TOO_LARGE');expect(f.commands.some(c=>c.includes('BODY.PEEK'))).toBe(false);});
+ it('enforces aggregate batch output bytes with multibyte body text',async()=>{const f=fakeSocket({body:Buffer.from('中'.repeat(30000)).toString('base64'),chunkSize:8192});const result=await new MailService(credentials,()=>f.socket).batch({...input,uids:[1,2,3]});expect(result.results.map(r=>r.success)).toEqual([true,true,false]);expect(result.results[2]).toMatchObject({error:'BATCH_LIMIT'});});
+ it('batch supports partial success',async()=>{const f=fakeSocket({missing:2});const result=await new MailService(credentials,()=>f.socket).batch({...input,uids:[1,2,3]});expect(result.results.map(r=>r.success)).toEqual([true,false,true]);expect(result.results[1]).toMatchObject({error:'MAIL_NOT_FOUND'});});
+});
+describe('MIME and validation',()=>{
+ it('decodes MIME headers',async()=>expect(await parseHeaders(encoder.encode(header))).toMatchObject({subject:'中文主题',from:{name:'测试'}}));
+ it('decodes quoted-printable and GB18030',async()=>{const part={section:'1',type:'text/plain',charset:'gb18030',encoding:'QUOTED-PRINTABLE',bytes:12,filename:null,attachment:false};expect((await parseTextPart(part,encoder.encode('=D6=D0=CE=C4'))).trim()).toBe('中文');});
+ it('converts HTML without scripts, images or link destinations',()=>{const result=htmlText('<p>Hello &amp; 中文</p><script>alert(1)</script><img src="https://private.invalid"><a href="https://private.invalid">link</a>');expect(result).toContain('Hello & 中文');expect(result).not.toMatch(/alert|private\.invalid|<p>/);});
+ it('parses BODYSTRUCTURE and RFC2231 filename',()=>{const value=parseResponse(encoder.encode(structure))[0];expect(bodyParts(value)).toHaveLength(2);const v=parseResponse(encoder.encode('("APPLICATION" "PDF" NIL NIL NIL "BASE64" 20 NIL ("ATTACHMENT" ("FILENAME*" "utf-8\'\'%E4%B8%AD.pdf")))'))[0];expect(bodyParts(v)[0].filename).toBe('中.pdf');});
+ it.each([{uid:0},{uid:1.5},{uid:4294967296},{uidvalidity:0},{folder:'INBOX\nA1 DELETE'}])('rejects invalid read params %j',p=>expect(readSchema.safeParse({...input,...p}).success).toBe(false));
+ it('validates dates, page limits and batch count',()=>{for(const v of [{since:'2026-02-30'},{since:'2026-02-01',before:'2026-01-01'},{limit:21},{page:0},{subject:'x\r\nLOGOUT'},{host:'evil.invalid'}])expect(searchSchema.safeParse(v).success).toBe(false);expect(batchSchema.safeParse({...input,uids:[1,2,3,4]}).success).toBe(false);});
+ it('escapes search quotes',()=>expect(searchCriteria(searchSchema.parse({from:'" OR ALL'}))).toContain('FROM "\\" OR ALL"'));
+});

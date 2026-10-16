@@ -1,0 +1,49 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "qq-mail-mcp",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-15",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": true,
+  "vars": {
+    "PUBLIC_ORIGIN": "https://mail-mcp.example.com",
+    "OAUTH_REDIRECT_URIS": "https://chatgpt.com/connector_platform_oauth_redirect"
+  },
+  "d1_databases": [
+    {
+      "binding": "AUTH_DB",
+      "database_name": "qq-mail-mcp-auth",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 30,
+        "period": 60
+      }
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "redact_query_string": true,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": false
+    }
+  },
+  "upload_source_maps": false,
+  "secrets": {
+    "required": [
+      "QQ_MAIL_ADDRESS",
+      "QQ_MAIL_AUTH_CODE",
+      "OWNER_PASSWORD"
+    ]
+  },
+  "minify": true
+}

@@ -1,0 +1,7 @@
+{
+  "$schema":"https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name":"qq-mail-reader",
+  "version":"1.0.0",
+  "description":"Private read-only access to a single QQ mailbox through OAuth.",
+  "extensions":{"com.openai":{"interface":{"displayName":"私人 QQ 邮箱","shortDescription":"只读搜索与总结 QQ 邮件","longDescription":"按需搜索和读取已授权的私人 QQ 邮箱，支持中文邮件与附件元数据；不会发送、删除或改变已读状态。","capabilities":[],"defaultPrompt":"帮我查看今天的未读邮件并总结重点。"}}}
+}

@@ -1,0 +1,36 @@
+{
+  "name": "qq-mail-mcp",
+  "version": "1.0.0",
+  "description": "Private read-only QQ Mail MCP server",
+  "scripts": {
+    "dev": "wrangler dev",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "deploy": "wrangler deploy --config wrangler.local.jsonc",
+    "types": "wrangler types --include-runtime false",
+    "smoke": "node scripts/smoke.mjs",
+    "privacy": "node scripts/privacy-check.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "type": "module",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "html-to-text": "10.0.1",
+    "postal-mime": "4.0.7",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261015.1",
+    "@types/html-to-text": "9.0.4",
+    "@types/node": "26.6.5",
+    "miniflare": "5.20261012.0-beta",
+    "playwright-core": "1.64.1",
+    "typescript": "7.0.2",
+    "vitest": "5.0.4",
+    "wrangler": "4.151.0"
+  },
+  "private": true
+}
