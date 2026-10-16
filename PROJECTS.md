@@ -19,6 +19,7 @@
 | EntropyLab | [projects/entropylab](projects/entropylab/) | Testing | 浏览器内的计算物理与复杂系统交互实验室 | v1.1 硬盘气体碰撞升级；PR #7 等待用户验收，未合并或部署 |
 | ConstraintLab | [projects/constraintlab](projects/constraintlab/) | Completed | 本地 CSP 求解与算法实验平台 | 修复及整合 main 后 Linux/Windows 完整验收通过；按需扩展 |
 | RepoScope | [projects/reposcope](projects/reposcope/) | Completed | 面向 Windows 用户的离线仓库规模、技术栈与维护风险分析；HTML / Markdown 报告 | HTML 修复与 Linux/Windows CI 通过；按需扩展功能 |
+| QQ Mail MCP | [projects/qq-mail-mcp](projects/qq-mail-mcp/) | Testing | Cloudflare Workers 上的私人 QQ 邮箱只读 MCP，OAuth/DCR 与六个工具 | 迁移 PR 审查；保持现有服务，后续按本地配置手动部署并完成真实邮箱验收 |
 
 ## RepoScope v0.1.0（2026-10-15）
 
@@ -122,3 +123,11 @@
 - **正确性与限制**：成对碰撞守恒向量动量/动能；壁面外部冲量单独累计。关闭隔板做有界位置投影，失败完整回退；多体同时接触为确定顺序近似，超事件预算暂停，不跳过碰撞。
 - **本地验证**：90 项 Vitest（保留原 60 项覆盖并按新物理模型调整旧扩散断言，新增 30 项）、8 项生产 Chromium E2E、lint、typecheck、build、根目录 18 项隐私回归通过。计算和浏览器性能均已测量，详见 [PERFORMANCE.md](projects/entropylab/PERFORMANCE.md) 与 [VALIDATION.md](projects/entropylab/VALIDATION.md)。
 - **后续**：以最新提交的 PR CI 为远程验证依据；用户验收前不合并、不部署。极端高密度高速组合可能慢于 1× 实际推进，不承诺全设备 60 FPS；其余三个实验及 RepoScope/ConstraintLab 业务代码保持原状。
+
+## QQ Mail MCP 仓库迁移（2026-10-15）
+
+- **状态**：Testing；迁入既有项目，不新建重复服务。
+- **范围/验收**：完整源码、锁定依赖、IMAP/MIME/OAuth 测试、插件元数据、D1 迁移与 Workers 配置；公开内容无凭据及部署账号关联信息；线上模块与构建规范化比较一致，现有服务不改动。
+- **目录/分支**：`projects/qq-mail-mcp/`，`feature/qq-mail-mcp-migration`；PR 地址见该分支的 GitHub PR。
+- **测试/证据**：详见项目 [迁移记录](projects/qq-mail-mcp/docs/MIGRATION.md)。根 CI 增加独立 Node.js 24 / Chromium 检查，并接入 CI required；没有部署任务。
+- **后续**：审查后由用户决定合并；后续部署使用私有本地配置和现有 Cloudflare Secrets。真实邮箱内容与未读状态验收仍需用户操作；当前线上令牌 365 天与按钮文案“一小时”不一致，迁移保留运行模块，后续应独立修正。
