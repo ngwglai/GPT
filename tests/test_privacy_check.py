@@ -70,6 +70,11 @@ class PrivacyTests(unittest.TestCase):
         self.assertNotIn(SAMPLE_PRIVATE, result.stdout + result.stderr)
         self.assertIn("nonanonymous-email", result.stdout)
 
+        self.write("file.txt", "person@github.com")
+        result = self.check("--staged")
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("nonanonymous-email", result.stdout)
+
     def test_effective_identity_override(self):
         env = dict(self.env, GIT_AUTHOR_NAME="Fictional Person", GIT_AUTHOR_EMAIL=SAMPLE_PRIVATE)
         result = self.check("--staged", env=env)
