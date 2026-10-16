@@ -52,7 +52,7 @@
 ## 身份与隐私
 
 - 普通提交作者、提交者必须使用已验证的 `ngwglai` noreply 身份；不得使用 `--no-verify` 绕过隐私检查。
-- GitHub 网页创建的合并提交可以由平台使用 `GitHub <noreply@github.com>` 作为 committer；隐私检查仅在作者仍为 `ngwglai`、提交具有多个父提交且消息匹配本仓库 PR 合并格式时允许这一平台元数据。其他非规范 committer 仍必须失败。
+- GitHub 网页创建的合并提交可以由平台使用 GitHub 系统身份作为 committer；隐私检查仅在作者仍为 `ngwglai`、提交具有多个父提交且消息匹配本仓库 PR 合并格式时允许这一平台元数据。其他非规范 committer 仍必须失败。
 - PR 合并优先使用不会产生非预期平台身份残留的正常仓库流程；无论采用何种合并方式，合并后的 `main` 必须通过隐私检查。
 
 最小化
