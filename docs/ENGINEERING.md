@@ -4,7 +4,7 @@
 
 `.github/workflows/ci.yml` 在所有 PR、`main` / `feature/constraintlab` 推送及手动触发时运行。仅使用读取仓库权限，不向测试进程保存 checkout 凭据；Actions 固定到核实过的发布版本提交，任务有超时限制。
 
-- 隐私：运行根目录 26 项标准库回归测试，以及 `privacy_check.py --all-history`。CI 的公开 noreply 策略来自仓库身份脚本对账号邮箱接口的实际核验，不需要给 PR 提供私人邮箱接口权限。每个开发 checkout 仍须独立运行 `configure_git_identity.py --install-hooks`。
+- 隐私：运行根目录 28 项标准库回归测试，以及 `privacy_check.py --all-history`。CI 的公开 noreply 策略来自仓库身份脚本对账号邮箱接口的实际核验，不需要给 PR 提供私人邮箱接口权限。每个开发 checkout 仍须独立运行 `configure_git_identity.py --install-hooks`。
 - RepoScope：Linux / Windows × Python 3.11 / 3.12；unittest、ruff F 类检查、wheel 构建、真实 CLI 双报告。Windows 按原测试条件跳过 POSIX 权限与 FIFO 两项，不能将跳过项算作通过。
 - ConstraintLab：仅在 checkout 中存在该独立项目时运行；Linux / Windows 的 Python 测试、ruff、wheel、锁文件安装、TypeScript/Vite 构建、Playwright 浏览器流程和多规模实验。服务采用源码 editable 安装，与 README 和启动脚本一致；wheel 只提供 Python 核心/API，不带前端。
 - Windows 浏览器验收：复制项目到含空格及中文的临时路径，执行原生 `start-windows.cmd`，等待真实页面可用，再运行完整 E2E。结束时清理整个服务进程树。此项是 Windows 原生自动验收，不等同于在用户电脑上人工双击验收。
