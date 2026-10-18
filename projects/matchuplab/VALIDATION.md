@@ -51,4 +51,10 @@
 
 原先暂存的项目索引和本报告应纳入交付，但须将“仍被阻塞、未改词表”更新为上述实际诊断和批准后的精确纠正，不能原样提交过时状态。代码提交 `978f464` 保留，通过后续正常文档提交补充验收记录。远程 PR、Windows CI 及合并状态以 GitHub 对应提交的实际检查和最终记录为准；不把本地通过当作远程交付完成。
 
+### 远程验收
+
+[PR #10](https://github.com/ngwglai/GPT/pull/10) 首轮验证针对远程提交 `3f2b2235408791808a61b3784fb1338fb1cf4e83`：[CI 运行 39107193164](https://github.com/ngwglai/GPT/actions/runs/39107193164) 的 16 个作业全部成功，包含 `Privacy and identity`、MatchupLab Linux / Windows、其余既有项目及 `CI required`。两个 MatchupLab 平台日志分别确认 92 项 Vitest 与 8 项生产 Playwright 通过；这是实际远程 Windows 执行。
+
+项目状态据此更新为 Completed。本次后续提交仅补充文档，不重新开发业务；合并前仍必须确认最终 PR head 的全部 CI 与隐私检查通过，不依赖上一提交的绿色状态。原实现提交保留在正常分支历史中，不强推、不改写。
+
 未执行真实用户电脑人工验收、Firefox/WebKit 或长期后台性能测试；未部署、未改仓库权限或账号设置。冻结策略评估与短时模拟不构成全部对手上的最优性保证。
