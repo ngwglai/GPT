@@ -16,6 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
+| CausalLab | [projects/causallab](projects/causallab/) | Testing | 可复现 SCM、混杂/碰撞/辛普森、观察估计与 do 干预 | 本地验证通过；既有 main 全历史隐私 12 项命中阻塞推送，PR/远程 CI/合并未执行 |
 | MatchupLab | [projects/matchuplab](projects/matchuplab/) | Completed | 本地对抗决策、探索利用与策略迁移实验；两博弈 / 四算法 / 多种子 | PR #10；Linux / Windows 全部验收通过，隐私阻塞已解除；按需本机验收，不部署 |
 | CompressionLab | [projects/compressionlab](projects/compressionlab/) | Completed | 纯本地字符压缩算法交互实验室；真实 trace 与编解码回环 | 旧推送阻塞已解除；完整本地复验通过，纳入维护 PR 自动验收 |
 | EntropyLab | [projects/entropylab](projects/entropylab/) | Completed | 浏览器内的计算物理与复杂系统交互实验室 | v1.1 已合并；依赖审计清零、完整复验通过，按需手动部署 |
@@ -174,3 +175,14 @@
 - **问题**：PR #10 的 Codex 审查发现，验证器会检查所有对手参数，导致已隐藏的非活动字段为无效值时仍阻止实验启动；关闭迁移后也会检查未使用的目标对手。
 - **修复**：按策略类型仅校验实际使用的字段；仅在启用迁移时校验目标对手。新增回归测试覆盖五种策略的活动/非活动字段，以及迁移开关。
 - **验收**：通过修复 PR 的 Linux / Windows 自动检查后合并；不修改其他项目或依赖。
+
+
+## CausalLab v0.1（2026-10-18）
+
+- **目的 / 目标用户**：面向学生、自学者与算法实验者，用合成结构因果模型区分相关、混杂、选择偏差与因果效应；不输出现实因果结论。
+- **差异 / MVP**：独立因果实验教学工具，不重复既有博弈、压缩、计算物理或约束项目。支持小型 DAG 编辑、连续线性与二元仿射概率、固定种子、统计/观察估计/后门调整、do 配对干预、解析真实 ATE、三个案例和模型/实验/结果 JSON/CSV。
+- **目录 / 分支**：[projects/causallab](projects/causallab/)；基于最新 main `db02a968002d` 创建 `feature/causallab`。
+- **验收标准**：实际数学算法、非法输入、精确复现、三案例、多种子及生产浏览器流程通过；类型/lint/build/隐私检查与最新 PR Linux/Windows CI、CI required 全通过后按规范合并。
+- **本地实际验证**：95 项 Vitest、10 项生产 Chromium E2E、类型/lint/build、依赖审计 0 漏洞、根 26 项隐私回归通过；远程 CI 未执行（既有隐私检查阻塞），详见 [VALIDATION.md](projects/causallab/VALIDATION.md)。
+- **环境记录**：执行环境曾 `pending/offline`，命令返回 `No usable execution environment is available`；之后恢复正常。平台信息不足，未确认根因；未为此修改仓库配置或历史。
+- **限制 / 后续**：12 节点、20000 行、64 KiB 导入；仅仿射连续/二元机制、完全观测独立噪声；OLS 非稳健标准误；主线程有界批量计算。本地 feature 分支保留；既有 main 的 12 项 known-private-identity 命中阻塞推送，未创建 PR、未合并，故无合并 SHA；未改词表/规则/历史。需先按独立隐私流程解决，再执行 PR/CI/合并；按需本机试用、稳健标准误或 Worker，不部署。

@@ -169,15 +169,20 @@ jobs:
     name: MatchupLab
     uses: ./.github/workflows/matchuplab.yml
 
+  causallab:
+    name: CausalLab
+    uses: ./.github/workflows/causallab.yml
+
   required:
     name: CI required
     if: always()
-    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab]
+    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require all applicable checks
         env:
+          CAUSALLAB_RESULT: ${{ needs.causallab.result }}
           MATCHUPLAB_RESULT: ${{ needs.matchuplab.result }}
           ENTROPYLAB_RESULT: ${{ needs.entropylab.result }}
           COMPRESSIONLAB_RESULT: ${{ needs.compressionlab.result }}
@@ -188,6 +193,7 @@ jobs:
           HAS_CONSTRAINTLAB: ${{ needs.layout.outputs.constraintlab }}
           CONSTRAINTLAB_RESULT: ${{ needs.constraintlab.result }}
         run: |
+          test "$CAUSALLAB_RESULT" = success
           test "$MATCHUPLAB_RESULT" = success
           test "$ENTROPYLAB_RESULT" = success
           test "$COMPRESSIONLAB_RESULT" = success
