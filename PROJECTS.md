@@ -16,6 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
+| MatchupLab | [projects/matchuplab](projects/matchuplab/) | Testing | 本地对抗决策、探索利用与策略迁移实验；两博弈 / 四算法 / 多种子 | 本地 92 单元、8 生产 E2E 通过；待远程 CI 及既有历史隐私阻塞处理，不部署 |
 | CompressionLab | [projects/compressionlab](projects/compressionlab/) | Completed | 纯本地字符压缩算法交互实验室；真实 trace 与编解码回环 | 旧推送阻塞已解除；完整本地复验通过，纳入维护 PR 自动验收 |
 | EntropyLab | [projects/entropylab](projects/entropylab/) | Completed | 浏览器内的计算物理与复杂系统交互实验室 | v1.1 已合并；依赖审计清零、完整复验通过，按需手动部署 |
 | ConstraintLab | [projects/constraintlab](projects/constraintlab/) | Completed | 本地 CSP 求解与算法实验平台 | 修复及整合 main 后 Linux/Windows 完整验收通过；按需扩展 |
@@ -153,3 +154,16 @@
 - **实际本地验证**：26 隐私、35 RepoScope、15 ConstraintLab、90 EntropyLab、106 CompressionLab、62 QQ Mail MCP 测试全部通过；独立 E2E 5+8+13=26 项、计算基准 1 项及所有静态/构建检查通过；npm 四项目与 Python 审计 0 已知漏洞。跨平台最终结果以本维护 PR 最新 SHA 的 CI 为准。
 - **仍需平台处理**：PR #1 旧引用的 6 项身份元数据残留、分支保护接口 403。未降低新提交隐私标准、未删除私人词条、未强推或改写共享历史；不将这些平台风险伪称已修复。
 - **详细记录**：[REPOSITORY_REVIEW.md](docs/REPOSITORY_REVIEW.md)。
+
+
+## MatchupLab v0.1（2026-10-18）
+
+- **状态**：Testing；可运行软件与本地验收完成，独立 `feature/matchuplab` 分支交付，必要 CI / 隐私条件满足前不合并、不部署。
+- **目的 / 目标用户**：面向学生、自学者和算法实验者，研究陌生对手下探索与利用、行为变化和冻结策略的迁移表现。
+- **差异**：重复零和博弈与在线策略学习，不重复已有计算物理、压缩、约束求解、仓库分析或邮箱项目业务。
+- **目录 / MVP**：[projects/matchuplab](projects/matchuplab/)；标准石头剪刀布、非对称幅度战术收益矩阵；均匀/固定/偏好/响应/切换对手；随机、ε-greedy、UCB1、EXP3；注入式 PRNG、统一 Agent、冻结独立测试与迁移、多种子比较、曲线/动作分布/胜率/收益、CSV / JSON、三个实验模板。
+- **工程**：React / TypeScript / Vite；规则、Agent、对手、模拟、统计和导出独立；Web Worker、200 万对局 / 32 种子上限、30 秒计算预算、暂停/恢复/单步/取消；Linux/Windows 工作流接入 `CI required`，不升级其他项目依赖。
+- **验收标准**：收益与算法更新可验证、同 seed 可复现、训练/测试隔离、全部模板比较与导出可用、静态/单元/生产浏览器与隐私检查通过后按规范 PR 合并。
+- **实际验证**：本地 Linux 类型、lint、构建、92 项 Vitest、8 项生产 Chromium E2E、根 26 项隐私回归通过，依赖审计 0 已知漏洞；随机化覆盖 30 种子×两环境×四算法，详见 [VALIDATION.md](projects/matchuplab/VALIDATION.md)。Windows 自动验收以 PR CI 为准，未冒充本地执行。
+- **当前阻塞**：开发基线祖先扫描存在 12 项既有 known-private-identity 命中；不回显原值、不修改词表、不绕过钩子或改写历史；新增范围另行检查。全历史检查未通过不能称为完整验收。
+- **后续 / 限制**：跟进 PR CI 与既有隐私阻塞；用户电脑人工验收按 README 启动；少种子、非平稳收益、相关对局和冻结策略可能误导比较，无任何算法对所有对手最优的保证；按需增加遗忘算法与配对差异统计。
