@@ -165,15 +165,20 @@ jobs:
     name: CompressionLab
     uses: ./.github/workflows/compressionlab.yml
 
+  matchuplab:
+    name: MatchupLab
+    uses: ./.github/workflows/matchuplab.yml
+
   required:
     name: CI required
     if: always()
-    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab]
+    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require all applicable checks
         env:
+          MATCHUPLAB_RESULT: ${{ needs.matchuplab.result }}
           ENTROPYLAB_RESULT: ${{ needs.entropylab.result }}
           COMPRESSIONLAB_RESULT: ${{ needs.compressionlab.result }}
           QQ_MAIL_MCP_RESULT: ${{ needs.qq-mail-mcp.result }}
@@ -183,6 +188,7 @@ jobs:
           HAS_CONSTRAINTLAB: ${{ needs.layout.outputs.constraintlab }}
           CONSTRAINTLAB_RESULT: ${{ needs.constraintlab.result }}
         run: |
+          test "$MATCHUPLAB_RESULT" = success
           test "$ENTROPYLAB_RESULT" = success
           test "$COMPRESSIONLAB_RESULT" = success
           test "$QQ_MAIL_MCP_RESULT" = success
