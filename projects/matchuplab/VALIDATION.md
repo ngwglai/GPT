@@ -53,7 +53,7 @@
 
 ### 远程验收
 
-[PR #10](https://github.com/ngwglai/GPT/pull/10) 首轮验证针对远程提交 `3f2b2235408791808a61b3784fb1338fb1cf4e83`：[CI 运行 39107193164](https://github.com/ngwglai/GPT/actions/runs/39107193164) 的 16 个作业全部成功，包含 `Privacy and identity`、MatchupLab Linux / Windows、其余既有项目及 `CI required`。两个 MatchupLab 平台日志分别确认 92 项 Vitest 与 8 项生产 Playwright 通过；这是实际远程 Windows 执行。
+[PR #10](https://github.com/ngwglai/GPT/pull/10) 首轮验证针对远程提交 `3f2b2235408791808a61b3784fb1338fb1cf4e83`：[CI 运行 39107193164](https://github.com/ngwglai/GPT/actions/runs/39107193164) 的 16 个作业全部成功，包含 `Privacy and identity`、MatchupLab Linux / Windows、其余既有项目及 `CI required`。两个 MatchupLab 平台的单元测试与生产浏览器测试步骤均为 success，这是实际远程 Windows 执行。当前 CLI 未返回日志正文，因此不将本地 92 / 8 数量另称为远程日志统计；本地数量与远程步骤状态分开记录。
 
 项目状态据此更新为 Completed。本次后续提交仅补充文档，不重新开发业务；合并前仍必须确认最终 PR head 的全部 CI 与隐私检查通过，不依赖上一提交的绿色状态。原实现提交保留在正常分支历史中，不强推、不改写。
 
