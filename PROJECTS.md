@@ -16,7 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| CausalLab | [projects/causallab](projects/causallab/) | Testing | 可复现 SCM、混杂/碰撞/辛普森、观察估计与 do 干预 | 私有词表误列已精确纠正，原提交及全历史扫描通过；等待最新 PR 的 Linux/Windows CI 后合并 |
+| CausalLab | [projects/causallab](projects/causallab/) | Completed | 可复现 SCM、混杂/碰撞/辛普森、观察估计与 do 干预 | PR #12 已合并（1c66bb6）；Linux/Windows 与 CI required 全通过，隐私阻塞已解除；按需本机试用，不部署 |
 | MatchupLab | [projects/matchuplab](projects/matchuplab/) | Completed | 本地对抗决策、探索利用与策略迁移实验；两博弈 / 四算法 / 多种子 | PR #10；Linux / Windows 全部验收通过，隐私阻塞已解除；按需本机验收，不部署 |
 | CompressionLab | [projects/compressionlab](projects/compressionlab/) | Completed | 纯本地字符压缩算法交互实验室；真实 trace 与编解码回环 | 旧推送阻塞已解除；完整本地复验通过，纳入维护 PR 自动验收 |
 | EntropyLab | [projects/entropylab](projects/entropylab/) | Completed | 浏览器内的计算物理与复杂系统交互实验室 | v1.1 已合并；依赖审计清零、完整复验通过，按需手动部署 |
@@ -194,3 +194,12 @@
 - **实际修复**：按用户授权及现有 PRIVACY.md 流程，在仓库外建立 0700 目录/0600 备份并逐字节核验；仅移除这个精确公共条目，其他词条和字段保持一致。未提交词表/备份，未更改检查器、豁免、hooks、扫描范围或 Git 历史。
 - **隐私复验**：修正后全历史 84 提交/384 唯一 blob/0 命中，原功能提交 4cfc707 整树 1 提交/229 blob/0 命中；28 项根隐私回归通过，新增配置纠正仍保留其他检测能力、提交范围仍扫描未修改文件的两项测试，原 26 项保留。
 - **项目状态**：保留 CausalLab 全部实现及之前暂存的诊断记录。Linux 95 项单元、10 项生产浏览器与静态/构建/审计复验结果见最新 VALIDATION.md；PR/Windows/汇总 CI 运行后再记录真实状态及合并 SHA。
+
+
+## CausalLab v0.1 交付验收（2026-10-18）
+
+- **结果**：通过 [PR #12](https://github.com/ngwglai/GPT/pull/12) 合并至 main，功能合并 SHA `1c66bb64f9814abcfa13edbdf47cdf5c166b5c62`；保留正常历史，没有强推、改写或外部部署。
+- **远程验收**：PR 最新功能头 `11b210d001f566096d35215e26d483990a3cfd04` 的 [CI 39116012295](https://github.com/ngwglai/GPT/actions/runs/39116012295) 全部 18 项作业成功，包含 CausalLab Linux/Windows、根隐私检查及 CI required。Windows 是 GitHub Actions 原生执行，不是本地测试或用户电脑人工验收。
+- **本地验收**：恢复后重新安装并运行 95 项 Vitest、10 项生产 Chromium E2E、ESLint、TypeScript、生产构建、0 已知漏洞审计；根 28 项隐私回归通过。原提交、恢复提交、全部待推送范围及全历史检查通过；合并后再次核验隐私。完整记录见 [VALIDATION.md](projects/causallab/VALIDATION.md)。
+- **隐私修复范围**：受限备份并核验后，仅纠正仓库外一个精确公共系统条目的误列；其余私有词条和检查规则不变。旧阻塞记录保留为历史快照，当前已解除。
+- **后续 / 限制**：用户电脑人工试用、Firefox/WebKit 与真实手机未验证；12 节点/20000 行/64 KiB、仿射连续/二元、完全观测独立噪声及标准误假设不变。按需扩展稳健标准误或 Worker，不输出现实因果结论。功能合并后的 [main CI 39116453472](https://github.com/ngwglai/GPT/actions/runs/39116453472) 亦已 18 项全通过；本验收记录以独立文档 PR 入库，仍要求其最新完整 CI 通过后合并。

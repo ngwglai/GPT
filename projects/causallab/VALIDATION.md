@@ -64,3 +64,14 @@
 本地项目复验及远程 PR/CI/合并状态将在实际执行后追加；以上扫描计数对应修复后的当次执行，不代表后续提交树没有新增文件。
 
 恢复后的 Linux 项目完整复验已实际通过：npm ci、ESLint、TypeScript、95 项 Vitest（0 跳过）、Vite 生产构建、10 项生产 Chromium E2E（0 跳过）、npm audit 全依赖 0 已知漏洞。未改动 CausalLab 计算或 UI 代码；保留初始实现。Windows 和远程 CI 待 PR 执行，不能用本地结果代替。
+
+## PR #12 与功能合并结果
+
+- [PR #12](https://github.com/ngwglai/GPT/pull/12) 已确认 MERGED；功能合并 SHA：`1c66bb64f9814abcfa13edbdf47cdf5c166b5c62`。
+- PR 最新头 `11b210d001f566096d35215e26d483990a3cfd04` 的 [CI 39116012295](https://github.com/ngwglai/GPT/actions/runs/39116012295) 已完成，18 项作业全部成功、无失败或取消，CI required 成功。CausalLab 的 Linux/Windows 作业均实际执行 npm ci、完整审计、lint、typecheck、test、build、Chromium 安装和生产 E2E 后成功；不存在以本地 Linux 冒充 Windows 的情况。
+- 恢复提交 `11b210d` 的实际整树检查：1 提交/230 唯一 blob/0 命中；推送前两个新增提交：2 提交/234 唯一 blob/0 命中；当次全历史：85 提交/389 唯一 blob/0 命中。真实 pre-push hook 同样通过。
+- 此次 GitHub 合并使用正常 PR merge 流程。随后 fetch 合并提交并重新运行实际提交与全历史隐私检查：合并范围 3 提交/234 唯一 blob/0 命中，全历史 86 提交/389 唯一 blob/0 命中，均通过。不改写历史，不更改规则以接受合并元数据。
+- 合并后的 [main CI 39116453472](https://github.com/ngwglai/GPT/actions/runs/39116453472) 已完成，18 项作业全部成功，包含根隐私、CausalLab Linux/Windows 与 CI required。本验收记录通过独立文档 PR 入库，并要求该 PR 最新完整 CI 通过后才合并。
+- 远程日志下载曾因访问限制无法完成；验收引用 GitHub 返回的完整作业结论、全部步骤状态和运行链接。未把未读取的日志写作已阅读，不修改访问策略绕过限制。
+
+功能已验收，隐私交付阻塞已解除。仍未验证：用户电脑人工试用、Firefox/WebKit、真实手机；无外部部署。此前环境 pending/offline 的历史事件与未确认根因记录保留，未将词表误列当作环境启动故障的根因。
