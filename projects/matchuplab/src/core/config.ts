@@ -26,10 +26,12 @@ export function validateConfig(config: Config, algorithms: Algorithm[], seeds: n
   if (!integer(config.seed, 0, 0xffffffff) || !integer(seeds, 1, MAX_SEEDS) || !integer(config.seeds, 1, MAX_SEEDS)) throw new Error('种子须为 32 位无符号整数；种子数量须为 1–32');
   if (!Number.isFinite(config.epsilon) || config.epsilon < 0 || config.epsilon > 1 ||
     !Number.isFinite(config.gamma) || config.gamma <= 0 || config.gamma > 1 || typeof config.transfer !== 'boolean') throw new Error('ε 须为 [0,1]，γ 须为 (0,1]');
-  for (const spec of [config.opponent, config.target]) {
-    if (!['uniform', 'fixed', 'biased', 'reactive', 'switching'].includes(spec.kind) ||
-      !integer(spec.action, 0, 2) || !integer(spec.nextAction, 0, 2) ||
-      !Number.isFinite(spec.bias) || spec.bias < 0 || spec.bias > 1 || !integer(spec.switchRound, 0, MAX_ROUNDS)) throw new Error('对手参数无效');
+  const opponentSpecs = config.transfer ? [config.opponent, config.target] : [config.opponent];
+  for (const spec of opponentSpecs) {
+    if (!['uniform', 'fixed', 'biased', 'reactive', 'switching'].includes(spec.kind)) throw new Error('对手参数无效');
+    if (spec.kind === 'fixed' && !integer(spec.action, 0, 2)) throw new Error('对手参数无效');
+    if (spec.kind === 'biased' && (!integer(spec.action, 0, 2) || !Number.isFinite(spec.bias) || spec.bias < 0 || spec.bias > 1)) throw new Error('对手参数无效');
+    if (spec.kind === 'switching' && (!integer(spec.action, 0, 2) || !integer(spec.nextAction, 0, 2) || !integer(spec.switchRound, 0, MAX_ROUNDS))) throw new Error('对手参数无效');
   }
   const steps = (config.trainRounds + config.testRounds * (config.transfer ? 2 : 1)) * algorithms.length * seeds;
   if (steps > MAX_STEPS) throw new Error(`实验超出 ${MAX_STEPS.toLocaleString()} 回合预算，请减少回合或种子`);
