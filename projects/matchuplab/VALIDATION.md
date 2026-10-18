@@ -17,8 +17,14 @@
 | 项目 | `npm audit --audit-level=moderate` | 0 个已知漏洞 |
 | 仓库根目录 | `python scripts/configure_git_identity.py --install-hooks` | 通过 GitHub 邮箱接口确认规范身份，仅配置当前 checkout；保留隐私钩子 |
 | 仓库根目录 | `python -m unittest discover -s tests -v` | 26 项隐私回归全部通过 |
-| 仓库根目录 | `python scripts/privacy_check.py --all-history` | 未通过：既有历史 12 项 `known-private-identity` 命中；未回显命中值 |
-| 仓库根目录 | `python scripts/privacy_check.py --commits origin/main` | 同样 12 项既有命中，确认来自开发基线祖先；并非本项目新增文件 |
+| 仓库根目录 | 首次 `python scripts/privacy_check.py --all-history` | 初次失败：12 项 `known-private-identity`；后经下述诊断确认均为同一公共系统项误列，获准纠正后复查通过 |
+| 仓库根目录 | 首次 `python scripts/privacy_check.py --commits origin/main` | 同样 12 项命中，来自基线祖先；并非 MatchupLab 新增变化 |
+| 仓库根目录 | `python scripts/privacy_check.py --staged` | 33 个新增/修改 blob 通过，0 命中；包括规范前瞻身份 |
+| 仓库根目录 | `python scripts/privacy_check.py --message-file ...` | 提交说明及拟 PR 正文均通过，0 命中 |
+| 仓库根目录 | 纠正后 `python scripts/privacy_check.py --commits 978f464^..978f464` | 通过：1 提交、202 个 blob、0 命中；原提交未改写 |
+| 仓库根目录 | 纠正后 `python scripts/privacy_check.py --pre-push --remote-name origin` | 使用本次新分支更新作为标准输入，通过：1 提交、202 个 blob、0 命中 |
+| 仓库根目录 | 纠正后 `python scripts/privacy_check.py --all-history` | 通过：77 提交、347 个 blob、0 命中；包含所有现有本地引用 |
+| 仓库根目录 | `git diff --check`、工作流 YAML 解析 | 通过 |
 
 ## 覆盖的行为
 
@@ -39,6 +45,10 @@
 
 新增 `.github/workflows/matchuplab.yml`，Linux / Windows、Node 22 上安装锁定依赖、审计、lint、类型、92 项单元测试、生产构建和 8 项 Playwright 验证，并接入根 `CI required`。本地没有冒充 Windows 原生执行；远程 CI 结果以 PR 对应 SHA 的检查为准。
 
-既有全历史命中保留原样，未删除或更改私有词表、未降低扫描标准、未关闭钩子、未改写共享历史。新增暂存内容、提交说明、实际提交及待推送范围仍需分别通过检查。即使项目本地验证通过，也不将既有全历史隐私失败视为通过；必要条件未全部满足前不合并。最终 PR / 合并状态以交付说明和 GitHub 实际结果为准。
+初次交付因实际提交整树扫描和待推送检查命中既有测试文件而停止，随后完成只读归因并按用户明确批准修复。规则 ID 为 `known-private-identity`（检查器没有独立数字编号），实现位于 `scripts/privacy_check.py:53–57`：私有词表逐条、不区分大小写、词边界字面匹配。目标为 `tests/test_privacy_check.py:107` 的合成平台合并提交 fixture；该文件在远程 main 与 `978f464` 中 blob 完全相同。词表命中项经程序化比较，精确等于检查器既有公共系统地址常量。全部 12 项历史命中都来自这一项，其他三个私人词条无命中。报告不展示词条原值。
+
+`LEGACY_SYNTHETIC_EMAIL_FIXTURES` 只对精确 blob、路径及一个合成邮箱生效；本次目标 blob 不在该表中，且私有词表始终优先。无需新增或扩大任何豁免，也无需修改规则、fixture 或共享历史。按 `docs/PRIVACY.md` 已有“公开系统词条若被误列，应在仓库外备份并核实后纠正”的流程，并取得本次精确纠正的明确批准后，保存仓库外受限备份，仅移除这一个公共系统误列项；其余三个私人词条、检查规则与钩子全部保留。复查全历史、原始项目提交及待推送检查均为 0 命中。
+
+原先暂存的项目索引和本报告应纳入交付，但须将“仍被阻塞、未改词表”更新为上述实际诊断和批准后的精确纠正，不能原样提交过时状态。代码提交 `978f464` 保留，通过后续正常文档提交补充验收记录。远程 PR、Windows CI 及合并状态以 GitHub 对应提交的实际检查和最终记录为准；不把本地通过当作远程交付完成。
 
 未执行真实用户电脑人工验收、Firefox/WebKit 或长期后台性能测试；未部署、未改仓库权限或账号设置。冻结策略评估与短时模拟不构成全部对手上的最优性保证。

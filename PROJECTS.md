@@ -16,7 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| MatchupLab | [projects/matchuplab](projects/matchuplab/) | Testing | 本地对抗决策、探索利用与策略迁移实验；两博弈 / 四算法 / 多种子 | 本地 92 单元、8 生产 E2E 通过；待远程 CI 及既有历史隐私阻塞处理，不部署 |
+| MatchupLab | [projects/matchuplab](projects/matchuplab/) | Testing | 本地对抗决策、探索利用与策略迁移实验；两博弈 / 四算法 / 多种子 | 本地 92 单元、8 生产 E2E 通过；隐私误列项经明确批准精确纠正，待 PR 全部 CI 验收 |
 | CompressionLab | [projects/compressionlab](projects/compressionlab/) | Completed | 纯本地字符压缩算法交互实验室；真实 trace 与编解码回环 | 旧推送阻塞已解除；完整本地复验通过，纳入维护 PR 自动验收 |
 | EntropyLab | [projects/entropylab](projects/entropylab/) | Completed | 浏览器内的计算物理与复杂系统交互实验室 | v1.1 已合并；依赖审计清零、完整复验通过，按需手动部署 |
 | ConstraintLab | [projects/constraintlab](projects/constraintlab/) | Completed | 本地 CSP 求解与算法实验平台 | 修复及整合 main 后 Linux/Windows 完整验收通过；按需扩展 |
@@ -165,5 +165,5 @@
 - **工程**：React / TypeScript / Vite；规则、Agent、对手、模拟、统计和导出独立；Web Worker、200 万对局 / 32 种子上限、30 秒计算预算、暂停/恢复/单步/取消；Linux/Windows 工作流接入 `CI required`，不升级其他项目依赖。
 - **验收标准**：收益与算法更新可验证、同 seed 可复现、训练/测试隔离、全部模板比较与导出可用、静态/单元/生产浏览器与隐私检查通过后按规范 PR 合并。
 - **实际验证**：本地 Linux 类型、lint、构建、92 项 Vitest、8 项生产 Chromium E2E、根 26 项隐私回归通过，依赖审计 0 已知漏洞；随机化覆盖 30 种子×两环境×四算法，详见 [VALIDATION.md](projects/matchuplab/VALIDATION.md)。Windows 自动验收以 PR CI 为准，未冒充本地执行。
-- **当前阻塞**：开发基线祖先扫描存在 12 项既有 known-private-identity 命中；不回显原值、不修改词表、不绕过钩子或改写历史；新增范围另行检查。全历史检查未通过不能称为完整验收。
-- **后续 / 限制**：跟进 PR CI 与既有隐私阻塞；用户电脑人工验收按 README 启动；少种子、非平稳收益、相关对局和冻结策略可能误导比较，无任何算法对所有对手最优的保证；按需增加遗忘算法与配对差异统计。
+- **隐私阻塞处理**：原提交 `978f464` 的既有测试 fixture 命中 `known-private-identity`，文件与远程 main 相同。确认全部 12 项历史命中来自一个精确公共系统项误列，经用户明确批准、仓库外受限备份后仅纠正该项；其余私人词条、规则与钩子保留。全历史及原项目提交 / 待推送检查通过，未改写共享历史。
+- **后续 / 限制**：跟进 PR 全部 CI 与合并结果；用户电脑人工验收按 README 启动；少种子、非平稳收益、相关对局和冻结策略可能误导比较，无任何算法对所有对手最优的保证；按需增加遗忘算法与配对差异统计。
