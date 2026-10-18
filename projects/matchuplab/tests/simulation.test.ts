@@ -106,6 +106,40 @@ it('rejects step budget overflow before starting', () => {
 it.each([{ trainRounds: 0 }, { testRounds: 20001 }, { seed: -1 }, { seed: NaN }, { seeds: 33 }, { epsilon: 1.1 }, { gamma: 0 }, { trainRounds: 1.2 }, { opponent: { ...DEFAULT_CONFIG.opponent, action: 3 } }])('invalid config %j fails clearly', patch => {
   expect(() => validateConfig(small(patch), ['random'], 1)).toThrow();
 });
+describe('opponent config validation', () => {
+  it('ignores parameters unused by each strategy', () => {
+    const specs: Config['opponent'][] = [
+      { ...DEFAULT_CONFIG.opponent, kind: 'uniform', action: NaN, nextAction: NaN, bias: NaN, switchRound: NaN },
+      { ...DEFAULT_CONFIG.opponent, kind: 'fixed', action: 1, nextAction: NaN, bias: NaN, switchRound: NaN },
+      { ...DEFAULT_CONFIG.opponent, kind: 'biased', action: 1, nextAction: NaN, bias: 0.8, switchRound: NaN },
+      { ...DEFAULT_CONFIG.opponent, kind: 'reactive', action: NaN, nextAction: NaN, bias: NaN, switchRound: NaN },
+      { ...DEFAULT_CONFIG.opponent, kind: 'switching', action: 0, nextAction: 2, bias: NaN, switchRound: 5 },
+    ];
+    for (const opponent of specs) {
+      expect(() => validateConfig(small({ opponent }), ['random'], 1)).not.toThrow();
+    }
+  });
+
+  it('still rejects invalid parameters used by the selected strategy', () => {
+    const specs: Config['opponent'][] = [
+      { ...DEFAULT_CONFIG.opponent, kind: 'fixed', action: NaN },
+      { ...DEFAULT_CONFIG.opponent, kind: 'biased', action: NaN },
+      { ...DEFAULT_CONFIG.opponent, kind: 'biased', bias: NaN },
+      { ...DEFAULT_CONFIG.opponent, kind: 'switching', nextAction: NaN },
+      { ...DEFAULT_CONFIG.opponent, kind: 'switching', switchRound: NaN },
+    ];
+    for (const opponent of specs) {
+      expect(() => validateConfig(small({ opponent }), ['random'], 1)).toThrow('对手参数无效');
+    }
+  });
+
+  it('validates the target only when transfer is enabled', () => {
+    const target = { ...DEFAULT_CONFIG.target, action: NaN };
+    expect(() => validateConfig(small({ target, transfer: false }), ['random'], 1)).not.toThrow();
+    expect(() => validateConfig(small({ target, transfer: true }), ['random'], 1)).toThrow('对手参数无效');
+  });
+});
+
 it('seeds wrap at uint32 boundary', () => {
   const result = finish(new ExperimentTask(small({ seed: 4294967295 }), ['random'], 2));
   expect(result.seedValues).toEqual([4294967295, 0]); expect(result.runs.map(r => r.seed)).toEqual(result.seedValues);
