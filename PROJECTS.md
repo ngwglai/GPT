@@ -16,7 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| ModelCheckLab | [projects/modelchecklab](projects/modelchecklab/) | Testing | 有限状态 BFS、不变量/死锁/目标可达性与最短反例 | PR #14；本地167单元/15生产E2E通过，待最新Linux/Windows及CI required后合并；不部署 |
+| ModelCheckLab | [projects/modelchecklab](projects/modelchecklab/) | Completed | 有限状态 BFS、不变量/死锁/目标可达性与最短反例 | PR #14 已合并（1355655）；167单元/15生产E2E、Linux/Windows及CI required全通过；不部署 |
 | CausalLab | [projects/causallab](projects/causallab/) | Completed | 可复现 SCM、混杂/碰撞/辛普森、观察估计与 do 干预 | PR #12 已合并（1c66bb6）；Linux/Windows 与 CI required 全通过，隐私阻塞已解除；按需本机试用，不部署 |
 | MatchupLab | [projects/matchuplab](projects/matchuplab/) | Completed | 本地对抗决策、探索利用与策略迁移实验；两博弈 / 四算法 / 多种子 | PR #10；Linux / Windows 全部验收通过，隐私阻塞已解除；按需本机验收，不部署 |
 | CompressionLab | [projects/compressionlab](projects/compressionlab/) | Completed | 纯本地字符压缩算法交互实验室；真实 trace 与编解码回环 | 旧推送阻塞已解除；完整本地复验通过，纳入维护 PR 自动验收 |
@@ -213,6 +213,15 @@
 - **案例**：互斥、双锁、银行守恒、生产者消费者，各有正确/错误版，均为普通模型数据，无结果硬编码。
 - **目录 / 分支**：[projects/modelchecklab](projects/modelchecklab/)；从最新 main `9089c8b` 建立 `feature/modelchecklab`；[PR #14](https://github.com/ngwglai/GPT/pull/14)，不修改其他项目业务代码。
 - **验收标准**：独立100种子参考枚举比较状态集合、错误与最短轨迹；单元、静态、生产浏览器、隐私和最新 Linux/Windows CI、CI required 全通过后按规范直接合并。
-- **实际验证 / 状态**：本地实现完成，详细测试与环境见 [VALIDATION.md](projects/modelchecklab/VALIDATION.md)；PR/Windows 仅在真实执行后记录。当前为 Testing。
+- **实际验证 / 状态**：本地167单元、100种子独立差分、15生产E2E、类型/lint/构建、0漏洞审计与根28隐私回归通过。PR #14 最终头 d19f8f0 的Linux/Windows及CI required全通过；当前为Completed。详细测试与环境见 [VALIDATION.md](projects/modelchecklab/VALIDATION.md)。
 - **环境 / 隐私**：初次命令未启动，等待环境恢复后验证 Shell、文件系统与工具，未为环境故障修改代码。Git 身份经邮箱接口核验；既有12项历史命中脱敏归因于一个精确公共系统条目，按本次用户授权在仓库外受限备份并核验，仅纠正该项，其他词条、规则、hooks 和历史不变；全历史88提交/391唯一blob/0命中。
 - **边界 / 后续**：50,000状态/200,000转移/15秒/12变量/64 KiB；图500节点、2,000边；不支持时序逻辑、公平性或活性，无任意代码执行。结论仅适用给定有限模型与性质，不证明实际程序绝对正确；按需本机试用，不部署。
+
+
+## ModelCheckLab v0.1 交付验收（2026-10-19）
+
+- **合并**：[PR #14](https://github.com/ngwglai/GPT/pull/14)，合并SHA `135565574b9e2456661e9151954e4329318b751e`；功能头 `d19f8f09ade9caf1ebebf0a8ea57285ebd4c30b6`。
+- **远程证据**：[CI 39183207787](https://github.com/ngwglai/GPT/actions/runs/39183207787) 20/20作业成功，含ModelCheckLab原生Linux/Windows的167单元、15生产Chromium E2E及全仓库CI required。旧头的取消运行不代替最终验收。
+- **正确性与审查**：100固定种子参考图DFS/边松弛，不复用内核，比较状态集、目标、错误及真实最短路径；真实默认状态/转移预算返回inconclusive。只将已定义语义错误归类反例，内部异常返回未确定；预算变化与超限导入清除旧证据。审查中误指非PR提交的身份问题经实际提交扫描排除，未改写历史。
+- **合并后复核**：main干净并同步origin/main；合并范围4提交/269唯一blob/0隐私命中，全历史92提交/433唯一blob/0命中。项目状态Completed，未部署。验收记录作为独立文档PR入库，仍需最新完整CI通过后合并。
+- **运行 / 边界**：Windows/Linux进入 `projects/modelchecklab` 后 `npm ci`、`npm run dev`，按终端URL访问。用户电脑人工验收、Firefox/WebKit和真实手机未验证；无时序逻辑、公平性或活性证明。详见独立README与VALIDATION。
