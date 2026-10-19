@@ -39,11 +39,15 @@
 
 ## 远程 CI 与交付
 
-独立 `.github/workflows/modelchecklab.yml` 已接入根 `CI required`。Linux / Windows 原生 Runner 执行 Node.js22锁定安装、审计、lint、类型、167单元、生产构建和15项Chromium E2E。[PR #14](https://github.com/ngwglai/GPT/pull/14) 已创建，远程 CI 正在运行；仅当最新提交全部必需检查通过后才合并，不能用较旧功能头的结果代替最新提交。真实验收链接及合并 SHA 会在完成后追加。
+独立 `.github/workflows/modelchecklab.yml` 已接入根 `CI required`。Linux / Windows 原生 Runner 执行 Node.js22锁定安装、审计、lint、类型、167单元、生产构建和15项Chromium E2E。[PR #14](https://github.com/ngwglai/GPT/pull/14) 的最终功能头 `d19f8f09ade9caf1ebebf0a8ea57285ebd4c30b6` 通过 [CI 39183207787](https://github.com/ngwglai/GPT/actions/runs/39183207787) 全部20项作业，包括原生 Linux/Windows、隐私及 `CI required`。核验运行头与PR头完全一致、main基线未变化后，按任务授权直接合并，合并 SHA `135565574b9e2456661e9151954e4329318b751e`。Windows为GitHub Actions原生自动执行，不是本地或用户电脑人工验收。
+
+合并后已同步main，合并范围4提交/269唯一blob/0命中，全历史92提交/433唯一blob/0命中；工作树干净且与origin/main一致。保留正常历史，没有强推或部署。之前两个较旧功能头的CI因更新自动取消，未作为最终验收依据。
+
+本验收记录以独立文档PR提交，仍要求其最新完整Linux/Windows及CI required成功后合并；不以文档中的配置替代实际运行。
 
 ## 未验证与功能边界
 
-- 用户电脑人工试用、真实Windows桌面双击操作、Firefox/WebKit、真实移动设备未验证；Windows原生自动验证以Actions真实结果为准。
+- 用户电脑人工试用、真实Windows桌面双击操作、Firefox/WebKit、真实移动设备未验证；Windows原生自动验证已通过，详见上面的Actions结果。
 - 没有外部部署、TLC对照运行、形式化证明、活性/公平性检查或性能/内存的跨设备保证。
 - 有限域抽象与指定性质限制结论；预算耗尽不等于通过，目标 unknown 不等于不可达。
 - 图是有上限的探索快照；找到反例即停止，其余目标可保持unknown。
