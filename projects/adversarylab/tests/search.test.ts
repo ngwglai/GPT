@@ -222,3 +222,20 @@ it("rejects wrong metric, graph bounds, invalid seeds and non-permutation exact"
     }),
   ).toThrow();
 });
+
+it("snapshots and freezes constraints and budget so caller edits cannot alter a running experiment", () => {
+  const c = { ...config(), budget: 4 };
+  const search = new Search(c);
+  const original = structuredClone(c);
+  c.budget = 10000;
+  if (c.space.kind === "sort") c.space.size = 64;
+  for (let i = 0; i < 10; i++) search.step();
+  expect(search.result.config).toEqual(original);
+  expect(search.result.evaluations).toBe(4);
+  expect(
+    search.result.best?.kind === "sort" && search.result.best.values.length,
+  ).toBe(8);
+  expect(search.result.termination).toBe("budget");
+  expect(Object.isFrozen(search.config)).toBe(true);
+  expect(Object.isFrozen(search.config.space)).toBe(true);
+});

@@ -44,16 +44,20 @@ export interface SearchDependencies {
 }
 export class Search {
   readonly result: SearchResult;
+  readonly config: Config;
   private rng: Random;
   private current: Candidate | null = null;
   private currentCost = 0;
   private seen = new Set<string>();
   constructor(
-    readonly config: Config,
+    config: Config,
     private dependencies: SearchDependencies = {},
   ) {
     validateConfig(config);
-    this.rng = new Random(config.seed);
+    this.config = structuredClone(config);
+    Object.freeze(this.config.space);
+    Object.freeze(this.config);
+    this.rng = new Random(this.config.seed);
     this.result = {
       config: structuredClone(config),
       generated: 0,

@@ -16,7 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| AdversaryLab | [projects/adversarylab](projects/adversarylab/) | Testing | 固定输入空间中的算法性能对抗搜索；真实计数与独立精确排序对照 | 本地117单元/16生产E2E通过；PR/Linux/Windows CI待运行，不部署 |
+| AdversaryLab | [projects/adversarylab](projects/adversarylab/) | Testing | 固定输入空间中的算法性能对抗搜索；真实计数与独立精确排序对照 | 本地118单元/16生产E2E通过；PR #17 Linux/Windows CI运行中，不部署 |
 | SynthLab | [projects/synthlab](projects/synthlab/) | Completed | 本地类型引导枚举、观察等价剪枝与真实 CEGIS 程序合成 | PR #16；105单元/13生产E2E、Linux/Windows与CI required通过；按需本机试用，不部署 |
 | ModelCheckLab | [projects/modelchecklab](projects/modelchecklab/) | Completed | 有限状态 BFS、不变量/死锁/目标可达性与最短反例 | PR #14 已合并（1355655）；167单元/15生产E2E、Linux/Windows及CI required全通过；不部署 |
 | CausalLab | [projects/causallab](projects/causallab/) | Completed | 可复现 SCM、混杂/碰撞/辛普森、观察估计与 do 干预 | PR #12 已合并（1c66bb6）；Linux/Windows 与 CI required 全通过，隐私阻塞已解除；按需本机试用，不部署 |
@@ -245,8 +245,8 @@
 
 - **目的 / 用户**：面向算法学习者与实验者，寻找使具体算法真实操作成本增加的困难输入，比较同一空间与评价预算下三种搜索策略。
 - **差异 / 范围**：独立于 SynthLab 的程序合成、ModelCheckLab 的有限状态性质验证与 MatchupLab 的决策博弈；不是随机数据生成器或任意代码执行平台。三排序、BFS/DFS/Dijkstra、三搜索策略、独立排序小规模精确枚举、种子复现、真实计数、Worker暂停/恢复/取消/超时、中文响应式明暗主题、数组/图/曲线、多种子与JSON/CSV导出。
-- **目录 / 分支**：[projects/adversarylab](projects/adversarylab/)；从最新 main a205347 建立 feature/adversarylab，未修改其他项目业务代码或依赖；PR待创建。
+- **目录 / 分支**：[projects/adversarylab](projects/adversarylab/)；从最新 main a205347 建立 feature/adversarylab，未修改其他项目业务代码或依赖；[PR #17](https://github.com/ngwglai/GPT/pull/17)。
 - **验收标准**：独立算法参考与穷举最优对照、合法固定输入、统一预算、确定随机序列、真实终止及生产浏览器交互/导出；类型/lint/build/审计/隐私及最新PR原生Linux/Windows CI、CI required均通过后直接合并。
-- **当前实际验证 / 状态**：Testing；本地117单元、16生产Chromium E2E、类型/lint/构建、0漏洞审计与根28隐私回归通过；含独立CSV回读，远程CI待实际执行。详见 [VALIDATION.md](projects/adversarylab/VALIDATION.md)。
+- **当前实际验证 / 状态**：Testing；本地118单元、16生产Chromium E2E、类型/lint/构建、0漏洞审计与根28隐私回归通过；含独立CSV回读，PR #17 的远程 CI 运行中。详见 [VALIDATION.md](projects/adversarylab/VALIDATION.md)。
 - **隐私**：初始99提交/473blob有12项命中，脱敏定位为一个公共系统条目误列；本次用户明确授权后，在仓库外受限备份并逐字节核验，仅纠正该项，其他词条/规则/hooks/历史保留；全历史复验0命中。
 - **资源 / 限制 / 后续**：排序长度≤64，图≤20节点/100固定边/权重0–20；每策略每种子≤20000评价、≤8种子、批次活动墙钟≤30秒；精确仅互异排列n≤8，最多40320次真实执行。部分运行不进入完整预算均值统计；无图全局证明。Windows本地人工试用、Firefox/WebKit、真实手机与浏览器峰值内存未验证。后续按需扩展图小空间精确验证与结果导入，不部署。
