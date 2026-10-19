@@ -13,6 +13,7 @@ import unittest
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
+os.sys.path.insert(0, str(ROOT / "scripts"))
 SPEC = importlib.util.spec_from_file_location("privacy_check", ROOT / "scripts/privacy_check.py")
 privacy = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(privacy)
@@ -30,7 +31,8 @@ class PrivacyTests(unittest.TestCase):
         self.repo = Path(self.temp.name) / "repo"
         self.repo.mkdir()
         self.env = {key: value for key, value in os.environ.items()
-                    if key not in {"GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL", "GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL", "EMAIL"}}
+                    if key not in {"GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL", "GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL", "EMAIL", "PRIVACY_DENYLIST"}}
+        self.env.update(GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_NOSYSTEM="1")
         self.command("git", "init", "--quiet")
         for key, value in {"user.name": "ngwglai", "user.email": SAMPLE_NOREPLY,
                            "author.name": "ngwglai", "author.email": SAMPLE_NOREPLY,
@@ -131,6 +133,7 @@ class PrivacyTests(unittest.TestCase):
     def test_system_email_does_not_bypass_explicit_private_denylist(self):
         deny = Path(self.temp.name) / "terms.json"
         deny.write_text(json.dumps({"terms": [privacy.GITHUB_SYSTEM_EMAIL]}), encoding="utf-8")
+        deny.chmod(0o600)
         self.write("file.txt", privacy.GITHUB_SYSTEM_EMAIL)
         result = self.check("--staged", "--denylist", str(deny))
         self.assertEqual(result.returncode, 1)
@@ -261,6 +264,7 @@ class PrivacyTests(unittest.TestCase):
         term = "Fictional" + "-Identity"
         deny = Path(self.temp.name) / "terms.json"
         deny.write_text(json.dumps({"terms": [term]}), encoding="utf-8")
+        deny.chmod(0o600)
         self.write(term + ".txt", "safe")
         result = self.check("--staged", "--denylist", str(deny))
         self.assertEqual(result.returncode, 1)
@@ -361,7 +365,7 @@ class PrivacyTests(unittest.TestCase):
     def test_initializer_uses_api_address_and_local_config_only(self):
         writes = []
         def fake_run(args):
-            if args[:3] == ["git", "rev-parse", "--show-toplevel"]:
+            if args[:2] == ["git", "rev-parse"]:
                 return str(Path.cwd())
             if args == ["gh", "api", "user"]:
                 return json.dumps({"login": "ngwglai"})
@@ -371,8 +375,11 @@ class PrivacyTests(unittest.TestCase):
                 return f"ngwglai <{SAMPLE_NOREPLY}> 1 +0000"
             writes.append(args)
             return ""
+        deny = Path(self.temp.name) / "init-terms.json"
+        deny.write_text('{"terms": ["Fictional Person"]}', encoding="utf-8")
+        deny.chmod(0o600)
         with patch.object(identity, "run", side_effect=fake_run), contextlib.redirect_stdout(io.StringIO()):
-            self.assertEqual(identity.main([]), 0)
+            self.assertEqual(identity.main(["--denylist", str(deny)]), 0)
         self.assertTrue(all(args[:3] == ["git", "config", "--local"] for args in writes))
         self.assertTrue(any(args[-1] == SAMPLE_NOREPLY for args in writes))
 
@@ -393,6 +400,7 @@ class PrivacyTests(unittest.TestCase):
             subprocess.run(["git", "config", "--local", key, value], cwd=bare, check=True, capture_output=True)
         deny = Path(self.temp.name) / "terms.json"
         deny.write_text('{"terms": ["Fictional Person"]}', encoding="utf-8")
+        deny.chmod(0o600)
         result = subprocess.run([os.sys.executable, str(ROOT / "scripts/privacy_check.py"), "--all-history", "--denylist", str(deny)],
                                 cwd=bare, env=self.env, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0)

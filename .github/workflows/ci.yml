@@ -15,9 +15,14 @@ concurrency:
 
 jobs:
   privacy:
-    name: Privacy and identity
+    name: Privacy and identity (${{ matrix.os }}, Python ${{ matrix.python }})
     timeout-minutes: 10
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.11', '3.12']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -26,9 +31,10 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.python }}
       - name: Configure verified public identity policy
         # Confirmed using configure_git_identity.py and the owner's email API.
+        # Public rules only: never inject the owner's private list into PR jobs.
         run: |
           git config --local privacy.name ngwglai
           git config --local privacy.email 232161468+ngwglai@users.noreply.github.com

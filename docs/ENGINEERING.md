@@ -4,7 +4,7 @@
 
 `.github/workflows/ci.yml` 在所有 PR、`main` / `feature/constraintlab` 推送及手动触发时运行。仅使用读取仓库权限，不向测试进程保存 checkout 凭据；Actions 固定到核实过的发布版本提交，任务有超时限制。
 
-- 隐私：运行根目录 28 项标准库回归测试，以及 `privacy_check.py --all-history`。CI 的公开 noreply 策略来自仓库身份脚本对账号邮箱接口的实际核验，不需要给 PR 提供私人邮箱接口权限。每个开发 checkout 仍须独立运行 `configure_git_identity.py --install-hooks`。
+- 隐私：在 Linux / Windows × Python 3.11 / 3.12 运行根目录标准库回归（含新 checkout、旧快照重迁移、真实 hooks、detached HEAD、嵌套标签及失败关闭），以及 `privacy_check.py --all-history`。CI 的公开 noreply 策略来自仓库身份脚本对账号邮箱接口的实际核验，不需要给 PR 提供私人邮箱接口权限。隐私任务明确报告无私人词表，不能代替开发环境的私有检查。每个开发 checkout（包括旧快照恢复）仍须独立运行 `configure_git_identity.py --install-hooks`。
 - RepoScope：Linux / Windows × Python 3.11 / 3.12；unittest、ruff F 类检查、wheel 构建、真实 CLI 双报告。Windows 按原测试条件跳过 POSIX 权限与 FIFO 两项，不能将跳过项算作通过。
 - ConstraintLab：仅在 checkout 中存在该独立项目时运行；Linux / Windows 的 Python 测试、ruff、wheel、锁文件安装、TypeScript/Vite 构建、Playwright 浏览器流程和多规模实验。服务采用源码 editable 安装，与 README 和启动脚本一致；wheel 只提供 Python 核心/API，不带前端。
 - Windows 浏览器验收：复制项目到含空格及中文的临时路径，执行原生 `start-windows.cmd`，等待真实页面可用，再运行完整 E2E。结束时清理整个服务进程树。此项是 Windows 原生自动验收，不等同于在用户电脑上人工双击验收。
@@ -37,7 +37,7 @@ python scripts/ci_constraintlab_e2e.py --windows-launcher
 
 ## 身份与隐私
 
-遵守 [PRIVACY.md](PRIVACY.md)：每次提交主动检查暂存区、拟提交说明、实际新增提交，推送前检查所有待推送提交。使用经 API 验证的当前账号 noreply 身份，不修改全局配置，不重写已有历史。合并后的 main 再扫描；GitHub PR 生成的系统 committer 仅在 AGENTS.md 的严格条件内允许，普通提交仍须是经核实的仓库 noreply 身份。GitHub 的 PR 合并状态需另行核实。
+遵守 [PRIVACY.md](PRIVACY.md)：每次提交主动检查暂存区、拟提交说明、实际新增提交，推送前检查所有待推送提交。使用经 API 验证的当前账号 noreply 身份，不修改全局配置，不重写已有历史。全历史扫描必须包含 PR 的 detached HEAD，拒绝浅克隆；pre-push 检查推送对象，不因无关标签误阻断，也不能用未知远程基线排除历史。合并后的 main 再扫描；GitHub PR 生成的系统 committer 仅在 AGENTS.md 的严格条件内允许，普通提交仍须是经核实的仓库 noreply 身份。GitHub 的 PR 合并状态需另行核实。
 
 自动扫描不是秘密不存在的证明：未知真实姓名、图片或编码内容、远程隐藏引用和外部克隆仍在能力边界之外。不得把私人词表、原始审计或历史备份放入公开仓库。
 
@@ -54,3 +54,9 @@ python scripts/ci_constraintlab_e2e.py --windows-launcher
 Pages 在 main 的相关变更后继续构建并测试，只有显式 `workflow_dispatch` 才运行发布 job，避免常规维护合并隐式发布。没有运行真实邮箱验收或修改线上 Secrets。
 
 2026-10-16 的完整本地复验和已知平台侧限制见 [REPOSITORY_REVIEW.md](REPOSITORY_REVIEW.md)。旧文档中的测试计数及“用户验收前不合并”属于当时快照；当前工作流以根 AGENTS.md 和该文档的最新自动验收记录为准。分支保护接口仍返回 403，不能声称已经配置保护。
+
+## 私有环境维护（2026-10-19）
+
+环境创建者应通过私有持久存储/挂载恢复词表，并注入 `PRIVACY_DENYLIST` 路径，然后执行 `python scripts/configure_git_identity.py --install-hooks`。重建 checkout、恢复旧快照及更换容器都重复此步骤；幂等迁移负责纠正已审定的公共系统误列，不能仅依赖上一轮对话中手工修改过的私有文件。来源优先级、权限、备份及故障处理见 [PRIVACY.md](PRIVACY.md)。不要把私人数据写入启动脚本、工作流、Actions artifacts、缓存或公开日志。
+
+本次可验证的边界：仓库已提供持久的初始化逻辑和合成重建回归，当前环境实际迁移并通过完整扫描；环境平台模板未开放配置接口，无法从仓库内证明或修改它的存储持久化机制。没有私有来源的新环境须报错并恢复来源，不可自动生成或缩减词表。

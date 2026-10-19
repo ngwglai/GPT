@@ -10,6 +10,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
+os.sys.path.insert(0, str(ROOT / "scripts"))
 SPEC = importlib.util.spec_from_file_location("privacy_configuration_guard", ROOT / "scripts/privacy_check.py")
 privacy = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(privacy)
@@ -66,6 +67,7 @@ class PrivacyConfigurationRegression(unittest.TestCase):
             git("commit", "--quiet", "-m", "Synthetic new work")
             denylist = Path(temp) / "private-terms.json"
             denylist.write_text(json.dumps({"terms": [SAMPLE_MARKER]}), encoding="utf-8")
+            denylist.chmod(0o600)
             result = subprocess.run(
                 [sys.executable, str(ROOT / "scripts/privacy_check.py"), "--commits",
                  base + "..HEAD", "--denylist", str(denylist), "--json"],
