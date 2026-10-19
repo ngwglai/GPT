@@ -177,15 +177,20 @@ jobs:
     name: ModelCheckLab
     uses: ./.github/workflows/modelchecklab.yml
 
+  synthlab:
+    name: SynthLab
+    uses: ./.github/workflows/synthlab.yml
+
   required:
     name: CI required
     if: always()
-    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab]
+    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require all applicable checks
         env:
+          SYNTHLAB_RESULT: ${{ needs.synthlab.result }}
           MODELCHECKLAB_RESULT: ${{ needs.modelchecklab.result }}
           CAUSALLAB_RESULT: ${{ needs.causallab.result }}
           MATCHUPLAB_RESULT: ${{ needs.matchuplab.result }}
@@ -198,6 +203,7 @@ jobs:
           HAS_CONSTRAINTLAB: ${{ needs.layout.outputs.constraintlab }}
           CONSTRAINTLAB_RESULT: ${{ needs.constraintlab.result }}
         run: |
+          test "$SYNTHLAB_RESULT" = success
           test "$MODELCHECKLAB_RESULT" = success
           test "$CAUSALLAB_RESULT" = success
           test "$MATCHUPLAB_RESULT" = success
