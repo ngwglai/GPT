@@ -419,7 +419,7 @@ progress::-webkit-progress-value {
 .array {
   display: flex;
   gap: 4px;
-  justify-content: center;
+  justify-content: safe center;
   align-items: flex-end;
   height: 192px;
   overflow-x: auto;

@@ -234,4 +234,27 @@ test("mobile layout and persistent light theme run real experiment", async ({
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+  await page.getByLabel("数组长度", { exact: true }).fill("64");
+  await page.getByLabel("每次评价预算", { exact: true }).fill("1");
+  await start(page);
+  await complete(page);
+  const array = page.locator(".array");
+  await expect(array.locator(".bar-column")).toHaveCount(64);
+  expect(
+    await array.evaluate(
+      (e) =>
+        e.firstElementChild!.getBoundingClientRect().left >=
+        e.getBoundingClientRect().left,
+    ),
+  ).toBe(true);
+  await array.evaluate((e) => {
+    e.scrollLeft = e.scrollWidth;
+  });
+  expect(
+    await array.evaluate(
+      (e) =>
+        e.lastElementChild!.getBoundingClientRect().right <=
+        e.getBoundingClientRect().right + 1,
+    ),
+  ).toBe(true);
 });
