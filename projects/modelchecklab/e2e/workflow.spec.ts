@@ -99,14 +99,28 @@ test("非法JSON和表达式、超限输入有中文反馈", async ({ page }) =>
   });
   await expect(page.getByRole("status")).toContainText("64 KiB");
   await expect(page.getByTestId("result")).toContainText("inconclusive");
+  await expect(page.getByTestId("statistics")).toHaveCount(0);
 });
 
-test("预算耗尽与目标 unknown，编辑后清除旧结果", async ({ page }) => {
+test("预算变化清除旧结果与统计，超限目标保持unknown", async ({ page }) => {
   await page.goto("/");
-  await page.getByLabel("状态上限", { exact: true }).fill("1");
+  for (const [label, lower, original] of [
+    ["状态上限", "1", "50000"],
+    ["转移上限", "1", "200000"],
+    ["时间上限（毫秒）", "0", "15000"],
+  ]) {
+    await page.getByRole("button", { name: "运行检验", exact: true }).click();
+    await expect(page.getByTestId("result")).toContainText("verified");
+    await page.getByLabel(label, { exact: true }).fill(lower);
+    await expect(page.getByTestId("result")).toHaveCount(0);
+    await expect(page.getByTestId("statistics")).toHaveCount(0);
+    await page.getByRole("button", { name: "运行检验", exact: true }).click();
+    await expect(page.getByTestId("result")).toContainText("inconclusive");
+    await expect(page.getByText("unknown", { exact: true })).toBeVisible();
+    await page.getByLabel(label, { exact: true }).fill(original);
+  }
   await page.getByRole("button", { name: "运行检验", exact: true }).click();
-  await expect(page.getByTestId("result")).toContainText("inconclusive");
-  await expect(page.getByText("unknown", { exact: true })).toBeVisible();
+  await expect(page.getByTestId("result")).toContainText("verified");
   await page.getByLabel("JSON 模型编辑器").fill("{}");
   await expect(page.getByTestId("result")).toHaveCount(0);
 });

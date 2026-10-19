@@ -90,14 +90,17 @@ export default function App() {
     );
     return () => clearInterval(t);
   }, [playing, trace.length]);
-  function edit(next: string) {
-    importVersion.current++;
-    setText(next);
+  function clearEvidence() {
     setResult(null);
     setStep(0);
     setPlaying(false);
     setShowGraph(false);
     setProgress(null);
+  }
+  function edit(next: string) {
+    importVersion.current++;
+    setText(next);
+    clearEvidence();
   }
   function complete(r: Result) {
     stop();
@@ -193,6 +196,7 @@ export default function App() {
     if (!file) return;
     const version = ++importVersion.current;
     if (file.size > INPUT_BYTES) {
+      clearEvidence();
       setFeedback("导入未完成：文件超过 64 KiB 资源上限，结果未确定");
       setResult(
         interruptedResult("输入文件超过 64 KiB 资源上限", undefined, limits),
@@ -360,15 +364,16 @@ export default function App() {
                       max={DEFAULT_LIMITS[key]}
                       disabled={running}
                       value={Number.isNaN(limits[key]) ? "" : limits[key]}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        clearEvidence();
                         setLimits({
                           ...limits,
                           [key]:
                             e.target.value === ""
                               ? NaN
                               : Number(e.target.value),
-                        })
-                      }
+                        });
+                      }}
                     />
                   </label>
                 ))}
@@ -401,7 +406,7 @@ export default function App() {
                 <p role="status">正在探索可达状态，主界面仍可响应…</p>
               )}
               {progress && (
-                <div className="stats">
+                <div className="stats" data-testid="statistics">
                   <div>
                     <b>{progress.states.toLocaleString()}</b>
                     <span>已发现状态</span>
