@@ -16,6 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
+| ModelCheckLab | [projects/modelchecklab](projects/modelchecklab/) | Testing | 有限状态 BFS、不变量/死锁/目标可达性与最短反例 | 本地实现和生产浏览器验证完成，待最新 PR Linux/Windows CI 与隐私检查通过后合并；不部署 |
 | CausalLab | [projects/causallab](projects/causallab/) | Completed | 可复现 SCM、混杂/碰撞/辛普森、观察估计与 do 干预 | PR #12 已合并（1c66bb6）；Linux/Windows 与 CI required 全通过，隐私阻塞已解除；按需本机试用，不部署 |
 | MatchupLab | [projects/matchuplab](projects/matchuplab/) | Completed | 本地对抗决策、探索利用与策略迁移实验；两博弈 / 四算法 / 多种子 | PR #10；Linux / Windows 全部验收通过，隐私阻塞已解除；按需本机验收，不部署 |
 | CompressionLab | [projects/compressionlab](projects/compressionlab/) | Completed | 纯本地字符压缩算法交互实验室；真实 trace 与编解码回环 | 旧推送阻塞已解除；完整本地复验通过，纳入维护 PR 自动验收 |
@@ -203,3 +204,15 @@
 - **本地验收**：恢复后重新安装并运行 95 项 Vitest、10 项生产 Chromium E2E、ESLint、TypeScript、生产构建、0 已知漏洞审计；根 28 项隐私回归通过。原提交、恢复提交、全部待推送范围及全历史检查通过；合并后再次核验隐私。完整记录见 [VALIDATION.md](projects/causallab/VALIDATION.md)。
 - **隐私修复范围**：受限备份并核验后，仅纠正仓库外一个精确公共系统条目的误列；其余私有词条和检查规则不变。旧阻塞记录保留为历史快照，当前已解除。
 - **后续 / 限制**：用户电脑人工试用、Firefox/WebKit 与真实手机未验证；12 节点/20000 行/64 KiB、仿射连续/二元、完全观测独立噪声及标准误假设不变。按需扩展稳健标准误或 Worker，不输出现实因果结论。功能合并后的 [main CI 39116453472](https://github.com/ngwglai/GPT/actions/runs/39116453472) 亦已 18 项全通过；本验收记录以独立文档 PR 入库，仍要求其最新完整 CI 通过后合并。
+
+
+## ModelCheckLab v0.1（2026-10-19）
+
+- **目的 / 用户**：面向学习者与开发者，穷举有限状态系统，用真实可达状态及最短轨迹验证指定安全性质。
+- **差异 / 范围**：独立模型检验教学工具，不重复已有因果、博弈、压缩、物理或 CSP 项目。安全 JSON AST、有限整数/布尔/枚举、多初态、原子动作、BFS 去重、不变量、终止/死锁区分、独立目标三态、Worker 预算/取消、中文编辑器、反例回放/变化高亮、有界状态图和 JSON 导出。
+- **案例**：互斥、双锁、银行守恒、生产者消费者，各有正确/错误版，均为普通模型数据，无结果硬编码。
+- **目录 / 分支**：[projects/modelchecklab](projects/modelchecklab/)；从最新 main `9089c8b` 建立 `feature/modelchecklab`，不修改其他项目业务代码。
+- **验收标准**：独立100种子参考枚举比较状态集合、错误与最短轨迹；单元、静态、生产浏览器、隐私和最新 Linux/Windows CI、CI required 全通过后按规范直接合并。
+- **实际验证 / 状态**：本地实现完成，详细测试与环境见 [VALIDATION.md](projects/modelchecklab/VALIDATION.md)；PR/Windows 仅在真实执行后记录。当前为 Testing。
+- **环境 / 隐私**：初次命令未启动，等待环境恢复后验证 Shell、文件系统与工具，未为环境故障修改代码。Git 身份经邮箱接口核验；既有12项历史命中脱敏归因于一个精确公共系统条目，按本次用户授权在仓库外受限备份并核验，仅纠正该项，其他词条、规则、hooks 和历史不变；全历史88提交/391唯一blob/0命中。
+- **边界 / 后续**：50,000状态/200,000转移/15秒/12变量/64 KiB；图500节点、2,000边；不支持时序逻辑、公平性或活性，无任意代码执行。结论仅适用给定有限模型与性质，不证明实际程序绝对正确；按需本机试用，不部署。
