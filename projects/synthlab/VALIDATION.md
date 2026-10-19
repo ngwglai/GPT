@@ -45,7 +45,14 @@
 
 独立工作流 `.github/workflows/synthlab.yml` 已接入根 `CI required`，保留其他项目所有检查。矩阵使用原生 ubuntu-latest / windows-latest、Node 22，执行锁文件安装、完整依赖审计、lint、typecheck、Vitest、build、生产 Chromium E2E。不部署。
 
-[PR #16](https://github.com/ngwglai/GPT/pull/16) 已创建；首头 a6e1687 的 [CI 39190366369](https://github.com/ngwglai/GPT/actions/runs/39190366369) 中 SynthLab Linux/Windows 作业已成功（各104单元/13生产E2E），全仓库汇总尚在运行。随后本地发现合法多轮历史可能超过128 KiB导入限制，已将上限调整为2 MiB并增加大记录往返回归；105单元及13生产E2E重新全部通过。更新提交须重新通过完整CI；不能以旧头证据替代最新头。
+功能实现头 `93d9b3ee7cfb5c365ec7f31e64c7e651c0bbd2ba` 的 [CI 39190553784](https://github.com/ngwglai/GPT/actions/runs/39190553784) 已实际完成，**22/22 作业全部成功**，包括原生 SynthLab Linux/Windows、根隐私检查和 CI required。两个平台的 npm ci、完整审计、lint、typecheck、npm test、build 与生产 E2E 步骤均成功，运行的是本提交的105单元/13浏览器完整测试配置，无测试筛选或跳过。Actions作业与步骤状态已逐项核验；当前接口返回空日志内容，未伪造远程控制台日志或将空日志当作额外证据。
+
+[PR #16](https://github.com/ngwglai/GPT/pull/16) 为交付入口，最终合并 SHA、最新记录提交的检查与合并状态以 PR 时间线及 Checks 为准。本验收记录只补充文档与索引，仍要求其最新完整 CI 全部成功后按任务授权合并；不使用旧头结果替代合并门槛。
+
+首头 a6e1687（104单元）的旧运行因后续更新被替代，不作为最终验收。交付自检发现合法多轮历史可能超过原128 KiB导入限制，已调整到2 MiB并加入大记录往返测试；本地105单元和13生产E2E完整复跑通过后再验证上述功能头。
+
+合并前全历史隐私复验：96提交 / 470唯一blob / 0命中；每次提交主动扫描暂存区、提交说明、实际新增提交和全部待推送范围，hooks额外执行。合并后的main仍需扫描实际合并范围与全历史；最终结果将在交付报告中确认。
+
 
 ## 未验证与限制
 

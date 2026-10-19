@@ -16,7 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| SynthLab | [projects/synthlab](projects/synthlab/) | Testing | 本地类型引导枚举、观察等价剪枝与真实 CEGIS 程序合成 | 本地105单元/13生产E2E通过；最新Linux/Windows CI验收中，不部署 |
+| SynthLab | [projects/synthlab](projects/synthlab/) | Completed | 本地类型引导枚举、观察等价剪枝与真实 CEGIS 程序合成 | PR #16；105单元/13生产E2E、Linux/Windows与CI required通过；按需本机试用，不部署 |
 | ModelCheckLab | [projects/modelchecklab](projects/modelchecklab/) | Completed | 有限状态 BFS、不变量/死锁/目标可达性与最短反例 | PR #14 已合并（1355655）；167单元/15生产E2E、Linux/Windows及CI required全通过；不部署 |
 | CausalLab | [projects/causallab](projects/causallab/) | Completed | 可复现 SCM、混杂/碰撞/辛普森、观察估计与 do 干预 | PR #12 已合并（1c66bb6）；Linux/Windows 与 CI required 全通过，隐私阻塞已解除；按需本机试用，不部署 |
 | MatchupLab | [projects/matchuplab](projects/matchuplab/) | Completed | 本地对抗决策、探索利用与策略迁移实验；两博弈 / 四算法 / 多种子 | PR #10；Linux / Windows 全部验收通过，隐私阻塞已解除；按需本机验收，不部署 |
@@ -233,8 +233,8 @@
 - **目的 / 用户**：面向程序合成学习者与开发者，从输入输出样例真实搜索小型程序，并用有限域反例修正过拟合候选。
 - **差异 / 范围**：独立于 CSP、因果和状态图验证；纯 TypeScript 类型安全整数/布尔 AST、按节点分层枚举、精确含错误值的观察等价剪枝、每轮重建 CEGIS、独立安全规格、Worker 预算/取消/故障、中文响应式深浅主题、真实统计/轨迹、JSON 导入导出。
 - **案例**：Max2、Abs、Clamp [-2,2]、Sign 均用通用合成器；常量与 6/8/11 节点预算下可合成，无答案硬编码。
-- **目录 / 分支**：[projects/synthlab](projects/synthlab/)；从最新 main 2fa563e 建立 feature/synthlab；不改其他项目业务代码。
+- **目录 / 分支**：[projects/synthlab](projects/synthlab/)；从最新 main 2fa563e 建立 feature/synthlab；交付入口 [PR #16](https://github.com/ngwglai/GPT/pull/16)；不改其他项目业务代码。
 - **验收标准**：独立小语法完整穷举及最小成本对照、50固定种子规格、溢出屏蔽剪枝、真实反例及每轮重搜、四案例、生产浏览器、静态/构建/审计/隐私、最新原生 Linux/Windows CI 与 CI required 均通过后直接合并。
-- **当前验证 / 状态**：Testing；本地105单元、13生产E2E、类型/lint/build、0漏洞审计与根28隐私回归通过；PR/远程CI继续验收。详情见 [VALIDATION.md](projects/synthlab/VALIDATION.md)。
+- **当前验证 / 状态**：Completed（功能验收完成，合并状态以PR为准）；本地105单元、13生产E2E、类型/lint/build、0漏洞审计与根28隐私回归通过；功能头93d9b3e的 [CI 39190553784](https://github.com/ngwglai/GPT/actions/runs/39190553784) 22/22作业全部成功，含原生Linux/Windows和CI required。本记录提交仍需最新完整CI通过后按授权合并。详情见 [VALIDATION.md](projects/synthlab/VALIDATION.md)。
 - **隐私**：按本次用户授权，在仓库外受限备份并核验后仅修正一个精确公共系统标识的词表误列，另外三项、规则、hooks和Git历史保持不变；基线94提交/435唯一blob/0命中。
 - **限制 / 后续**：最多2变量、15搜索节点、4096域输入、500万候选、30秒；结论只对指定有限域成立，不是无限域证明。Windows用户电脑人工试用、Firefox/WebKit未验证；按需扩展纯DSL及独立验证，不部署。
