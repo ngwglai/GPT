@@ -258,3 +258,28 @@ test("mobile layout and persistent light theme run real experiment", async ({
     ),
   ).toBe(true);
 });
+
+test("cancel before exact starts preserves zero-count interrupted exact status", async ({
+  page,
+}) => {
+  await setup(page);
+  await page.getByLabel("每次评价预算", { exact: true }).fill("20000");
+  await start(page);
+  await page.getByRole("button", { name: "暂停", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("已暂停");
+  await expect(
+    page.getByText("0 / 120 个排列 · 等待搜索阶段", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "取消", exact: true }).click();
+  await expect(page.getByRole("status")).toHaveText("已取消");
+  const data = await exportJSON(page);
+  expect(data.config.exact).toBe(true);
+  expect(data.exact.reason).toBe("cancelled");
+  expect(data.exact.evaluated).toBe(0);
+  expect(data.exact.total).toBe(120);
+  expect(data.exact.complete).toBe(false);
+  expect(data.exact.optimum).toBeNull();
+  await expect(
+    page.getByText("0 / 120 个排列 · 已取消", { exact: true }),
+  ).toBeVisible();
+});

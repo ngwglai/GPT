@@ -67,6 +67,16 @@ export class Runner {
       };
       try {
         validateBatch(this.config);
+        if (this.config.exact && this.config.experiment.space.kind === "sort") {
+          // Prepare metadata without evaluating any permutation before searches end.
+          this.exact = new Exact(
+            this.config.experiment.space.size,
+            this.config.experiment.algorithm as SortAlgorithm,
+            this.config.experiment.metric,
+            40320,
+            true,
+          );
+        }
         for (const strategy of this.config.compare
           ? strategies
           : [this.config.experiment.strategy])
@@ -74,6 +84,7 @@ export class Runner {
             this.queue.push({ ...this.config.experiment, strategy, seed });
         this.search = new Search(this.queue.shift()!);
       } catch {
+        this.exact?.stop("error");
         this.snapshot.status = "error";
         this.snapshot.error = "实验配置无效；未启动计算";
         this.publish();
@@ -111,8 +122,7 @@ export class Runner {
       this.snapshot.results.push(this.search.result);
       this.search = null;
     }
-    if (reason === "timeout" || reason === "cancelled" || reason === "error")
-      this.exact?.stop(reason);
+    if (reason !== "budget") this.exact?.stop(reason);
     this.snapshot.status = reason;
     this.publish();
   }
@@ -138,15 +148,7 @@ export class Runner {
           this.snapshot.results.push(this.search.result);
           this.search = null;
           if (this.queue.length) this.search = new Search(this.queue.shift()!);
-          else if (
-            this.config.exact &&
-            this.config.experiment.space.kind === "sort"
-          )
-            this.exact = new Exact(
-              this.config.experiment.space.size,
-              this.config.experiment.algorithm as SortAlgorithm,
-              this.config.experiment.metric,
-            );
+          else this.exact?.begin();
         }
       } else if (this.exact?.result.reason === "running") {
         for (let i = 0; i < 64 && this.exact.result.reason === "running"; i++)

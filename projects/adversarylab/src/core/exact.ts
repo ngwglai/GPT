@@ -23,6 +23,7 @@ export class Exact {
     readonly algorithm: SortAlgorithm,
     readonly metric: Metric,
     readonly limit = 40320,
+    deferred = false,
   ) {
     if (
       !Number.isInteger(size) ||
@@ -43,11 +44,15 @@ export class Exact {
       total,
       optimum: null,
       best: null,
-      reason: "running",
+      reason: deferred ? "pending" : "running",
     };
   }
-  stop(reason: "cancelled" | "timeout" | "error"): void {
-    if (this.result.reason === "running") this.result.reason = reason;
+  begin(): void {
+    if (this.result.reason === "pending") this.result.reason = "running";
+  }
+  stop(reason: "cancelled" | "timeout" | "error" | "proposal-limit"): void {
+    if (this.result.reason === "running" || this.result.reason === "pending")
+      this.result.reason = reason;
   }
   step(): void {
     const r = this.result;

@@ -130,3 +130,27 @@ it("rejects unsupported exact size and metric", () => {
   expect(() => new Exact(9, "merge", "comparisons")).toThrow();
   expect(() => new Exact(3, "merge", "expanded")).toThrow();
 });
+
+it("deferred exact task performs no algorithm work until explicitly begun", () => {
+  const exact = new Exact(3, "insertion", "comparisons", 40320, true);
+  exact.step();
+  expect(exact.result.reason).toBe("pending");
+  expect(exact.result.evaluated).toBe(0);
+  exact.begin();
+  while (exact.result.reason === "running") exact.step();
+  expect(exact.result.complete).toBe(true);
+  expect(exact.result.evaluated).toBe(6);
+});
+it.each(["cancelled", "timeout", "error", "proposal-limit"] as const)(
+  "deferred exact interruption records zero evaluations and reason %s",
+  (reason) => {
+    const exact = new Exact(8, "merge", "comparisons", 40320, true);
+    exact.stop(reason);
+    exact.begin();
+    exact.step();
+    expect(exact.result.reason).toBe(reason);
+    expect(exact.result.evaluated).toBe(0);
+    expect(exact.result.complete).toBe(false);
+    expect(exact.result.optimum).toBeNull();
+  },
+);

@@ -145,3 +145,23 @@ it("cancel after budget completion does not rewrite the termination", () => {
   expect(runner.snapshot.status).toBe("budget");
   expect(runner.snapshot.results[0].termination).toBe("budget");
 });
+
+it.each(["cancelled", "timeout"] as const)(
+  "interrupting search before exact phase records explicit %s exact state",
+  (reason) => {
+    const { clock, runner } = setup();
+    expect(runner.snapshot.exact?.reason).toBe("pending");
+    expect(runner.snapshot.exact?.evaluated).toBe(0);
+    if (reason === "cancelled") runner.command({ type: "cancel", id: "job-1" });
+    else {
+      clock.time = 15000;
+      clock.tick();
+    }
+    expect(runner.snapshot.status).toBe(reason);
+    expect(runner.snapshot.exact?.reason).toBe(reason);
+    expect(runner.snapshot.exact?.evaluated).toBe(0);
+    expect(runner.snapshot.exact?.total).toBe(40320);
+    expect(runner.snapshot.exact?.complete).toBe(false);
+    expect(runner.snapshot.exact?.optimum).toBeNull();
+  },
+);

@@ -98,7 +98,15 @@ export interface ExactResult {
   total: number;
   optimum: number | null;
   best: SortInput | null;
-  reason: "running" | "complete" | "cancelled" | "timeout" | "limit" | "error";
+  reason:
+    | "pending"
+    | "running"
+    | "complete"
+    | "cancelled"
+    | "timeout"
+    | "limit"
+    | "error"
+    | "proposal-limit";
   error?: string;
 }
 export type Status =

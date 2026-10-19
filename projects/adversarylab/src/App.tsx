@@ -3,6 +3,7 @@ import type {
   Algorithm,
   BatchConfig,
   Config,
+  ExactResult,
   Metric,
   Snapshot,
   Status,
@@ -29,6 +30,16 @@ const statusLabels: Record<Status, string> = {
   budget: "评价预算耗尽",
   cancelled: "已取消",
   timeout: "时间预算耗尽",
+  error: "执行异常",
+  "proposal-limit": "候选生成上限",
+};
+const exactLabels: Record<ExactResult["reason"], string> = {
+  pending: "等待搜索阶段",
+  running: "枚举中",
+  complete: "完整遍历",
+  cancelled: "已取消",
+  timeout: "时间耗尽",
+  limit: "枚举上限",
   error: "执行异常",
   "proposal-limit": "候选生成上限",
 };
@@ -581,7 +592,7 @@ export default function App() {
                   评价 {evaluations.toLocaleString()} / {total.toLocaleString()}
                 </span>
                 <span>
-                已记录 {records.length} 次 ·{" "}
+                  已记录 {records.length} 次 ·{" "}
                   {usedConfig && usedConfig.seeds.length > 1
                     ? "多种子实验"
                     : "单种子实验"}
@@ -610,8 +621,12 @@ export default function App() {
                 </strong>
                 <small>
                   {snapshot.exact
-                    ? `${snapshot.exact.evaluated} / ${snapshot.exact.total} 个排列 · ${snapshot.exact.reason}`
-                    : "需启用完整穷举"}
+                    ? `${snapshot.exact.evaluated} / ${snapshot.exact.total} 个排列 · ${exactLabels[snapshot.exact.reason]}`
+                    : usedConfig?.exact
+                      ? "精确验证状态未确认"
+                      : !usedConfig && config.exact
+                        ? "开始后执行独立穷举"
+                        : "未启用精确验证"}
                 </small>
               </div>
               <div className="stat">
