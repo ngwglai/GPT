@@ -181,15 +181,20 @@ jobs:
     name: SynthLab
     uses: ./.github/workflows/synthlab.yml
 
+  adversarylab:
+    name: AdversaryLab
+    uses: ./.github/workflows/adversarylab.yml
+
   required:
     name: CI required
     if: always()
-    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab]
+    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab, adversarylab]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require all applicable checks
         env:
+          ADVERSARYLAB_RESULT: ${{ needs.adversarylab.result }}
           SYNTHLAB_RESULT: ${{ needs.synthlab.result }}
           MODELCHECKLAB_RESULT: ${{ needs.modelchecklab.result }}
           CAUSALLAB_RESULT: ${{ needs.causallab.result }}
@@ -203,6 +208,7 @@ jobs:
           HAS_CONSTRAINTLAB: ${{ needs.layout.outputs.constraintlab }}
           CONSTRAINTLAB_RESULT: ${{ needs.constraintlab.result }}
         run: |
+          test "$ADVERSARYLAB_RESULT" = success
           test "$SYNTHLAB_RESULT" = success
           test "$MODELCHECKLAB_RESULT" = success
           test "$CAUSALLAB_RESULT" = success

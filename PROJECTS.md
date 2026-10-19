@@ -16,6 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
+| AdversaryLab | [projects/adversarylab](projects/adversarylab/) | Completed | 固定输入空间中的算法性能对抗搜索；真实计数与独立精确排序对照 | PR #17；本地125单元/17生产E2E；旧功能头跨平台CI通过，修复后最新CI通过即合并，不部署 |
 | SynthLab | [projects/synthlab](projects/synthlab/) | Completed | 本地类型引导枚举、观察等价剪枝与真实 CEGIS 程序合成 | PR #16；105单元/13生产E2E、Linux/Windows与CI required通过；按需本机试用，不部署 |
 | ModelCheckLab | [projects/modelchecklab](projects/modelchecklab/) | Completed | 有限状态 BFS、不变量/死锁/目标可达性与最短反例 | PR #14 已合并（1355655）；167单元/15生产E2E、Linux/Windows及CI required全通过；不部署 |
 | CausalLab | [projects/causallab](projects/causallab/) | Completed | 可复现 SCM、混杂/碰撞/辛普森、观察估计与 do 干预 | PR #12 已合并（1c66bb6）；Linux/Windows 与 CI required 全通过，隐私阻塞已解除；按需本机试用，不部署 |
@@ -238,3 +239,14 @@
 - **当前验证 / 状态**：Completed（功能验收完成，合并状态以PR为准）；本地105单元、13生产E2E、类型/lint/build、0漏洞审计与根28隐私回归通过；功能头93d9b3e的 [CI 39190553784](https://github.com/ngwglai/GPT/actions/runs/39190553784) 22/22作业全部成功，含原生Linux/Windows和CI required。本记录提交仍需最新完整CI通过后按授权合并。详情见 [VALIDATION.md](projects/synthlab/VALIDATION.md)。
 - **隐私**：按本次用户授权，在仓库外受限备份并核验后仅修正一个精确公共系统标识的词表误列，另外三项、规则、hooks和Git历史保持不变；基线94提交/435唯一blob/0命中。
 - **限制 / 后续**：最多2变量、15搜索节点、4096域输入、500万候选、30秒；结论只对指定有限域成立，不是无限域证明。Windows用户电脑人工试用、Firefox/WebKit未验证；按需扩展纯DSL及独立验证，不部署。
+
+
+## AdversaryLab v0.1（2026-10-19）
+
+- **目的 / 用户**：面向算法学习者与实验者，寻找使具体算法真实操作成本增加的困难输入，比较同一空间与评价预算下三种搜索策略。
+- **差异 / 范围**：独立于 SynthLab 的程序合成、ModelCheckLab 的有限状态性质验证与 MatchupLab 的决策博弈；不是随机数据生成器或任意代码执行平台。三排序、BFS/DFS/Dijkstra、三搜索策略、独立排序小规模精确枚举、种子复现、真实计数、Worker暂停/恢复/取消/超时、中文响应式明暗主题、数组/图/曲线、多种子与JSON/CSV导出。
+- **目录 / 分支**：[projects/adversarylab](projects/adversarylab/)；从最新 main a205347 建立 feature/adversarylab，未修改其他项目业务代码或依赖；[PR #17](https://github.com/ngwglai/GPT/pull/17)。
+- **验收标准**：独立算法参考与穷举最优对照、合法固定输入、统一预算、确定随机序列、真实终止及生产浏览器交互/导出；类型/lint/build/审计/隐私及最新PR原生Linux/Windows CI、CI required均通过后直接合并。
+- **当前实际验证 / 状态**：Completed（功能验收完成，合并状态以PR为准）；本地125单元、17生产Chromium E2E、类型/lint/构建、0漏洞审计与根28隐私回归通过；含独立CSV回读；功能头8e38fca的 [CI 39211870981](https://github.com/ngwglai/GPT/actions/runs/39211870981) 24/24作业成功，含原生Linux/Windows与CI required。最大数组窄屏首尾滚动及精确阶段开始前中断的审查修复已完成，本修复提交仍需最新完整CI通过后按授权合并。详见 [VALIDATION.md](projects/adversarylab/VALIDATION.md)。
+- **隐私**：初始99提交/473blob有12项命中，脱敏定位为一个公共系统条目误列；本次用户明确授权后，在仓库外受限备份并逐字节核验，仅纠正该项，其他词条/规则/hooks/历史保留；全历史复验0命中。
+- **资源 / 限制 / 后续**：排序长度≤64，图≤20节点/100固定边/权重0–20；每策略每种子≤20000评价、≤8种子、批次活动墙钟≤30秒；精确仅互异排列n≤8，最多40320次真实执行。部分运行不进入完整预算均值统计；无图全局证明。Windows本地人工试用、Firefox/WebKit、真实手机与浏览器峰值内存未验证。后续按需扩展图小空间精确验证与结果导入，不部署。
