@@ -50,6 +50,8 @@
 
 ## PR、CI 与未验证事项
 
-[PR #17](https://github.com/ngwglai/GPT/pull/17) 已创建。功能提交 da9a1b2 的 [CI 39211621147](https://github.com/ngwglai/GPT/actions/runs/39211621147) 正在运行，其中 AdversaryLab Linux 已通过；Windows 与 CI required 尚未最终完成。本次配置冻结修复提交需以更新后的最新头完整 CI 为准，不能把旧头或已添加的工作流当作最终通过证据。独立工作流使用 Node.js 22、原生 ubuntu-latest/windows-latest，锁文件安装、完整审计、lint、typecheck、Vitest、生产构建和 Chromium E2E，接入根 CI required，不部署。
+交付入口：[PR #17](https://github.com/ngwglai/GPT/pull/17)。功能头 `8e38fca781b207b733b6d06728e8b866b89a5071` 的 [CI 39211870981](https://github.com/ngwglai/GPT/actions/runs/39211870981) **24/24 作业全部成功**，包含 AdversaryLab 原生 Linux / Windows、根隐私及 `CI required`。两个平台均执行锁文件安装、完整依赖审计、ESLint、类型、118 项单元测试、生产构建和 16 项生产 Chromium E2E；Windows 是 Actions 原生执行，不是本地模拟或用户电脑人工试用。未修改其他项目业务或依赖，不部署。
+
+本验收记录为后续文档提交；合并门槛仍是 PR 最新头的完整 CI 全通过，不能仅依赖上述功能头的旧结果。最终合并状态与 SHA 以 PR 页面为准，合并后还需复核 main 隐私与工作区状态。
 
 Firefox/WebKit、真实手机、用户 Windows 电脑人工试用、浏览器峰值内存尚未验证。图/重复数组/n>8 无全局最优证明；超时部分结果不保证跨机器一致；没有自动保存或导入。已知限制详见 README。
