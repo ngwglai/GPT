@@ -9,6 +9,8 @@ import re
 import subprocess
 import sys
 
+from privacy_config import read_denylist
+
 EMAIL = re.compile(r"(?<![\w.+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 TRAILER = re.compile(r"^(?:Co-authored-by|Signed-off-by|Reviewed-by|Acked-by|Tested-by|Reported-by|Suggested-by|Helped-by):\s*(.*)$", re.I | re.M)
 PATH = re.compile(r"(?:[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/]([^\\/\s<>\"']+)|/(?:Users|home)/([^/\s<>\"']+))")
@@ -33,7 +35,7 @@ ASSIGNMENT = re.compile(r"\b(?:password|passwd|api[_-]?key|access[_-]?token|clie
 
 
 def git(*args):
-    result = subprocess.run(["git", *args], capture_output=True)
+    result = subprocess.run(["git", "--no-replace-objects", *args], capture_output=True)
     if result.returncode:
         raise ValueError("Git operation failed")
     return result.stdout
@@ -79,7 +81,7 @@ class Check:
 
     def location(self, value):
         if findings(value, self.email, self.terms):
-            return "redacted-path-" + hashlib.sha256(value.encode()).hexdigest()[:12]
+            return "redacted-path-" + hashlib.sha256(value.encode("utf-8", "surrogateescape")).hexdigest()[:12]
         return re.sub(r"[\x00-\x1f\x7f]", "?", value)
 
     def add(self, kind, location, line=None):
@@ -121,16 +123,27 @@ class Check:
                 continue
             name = path.decode("utf-8", "surrogateescape")
             oid = git("rev-parse", ":" + name).decode().strip()
-            self.blob(oid, name)
+            mode = git("--literal-pathspecs", "ls-files", "--stage", "-z", "--", name).split(b" ", 1)[0]
+            if mode == b"160000":
+                self.text(name, "tracked-path:" + name)
+            else:
+                self.blob(oid, name)
 
     def commits(self, revisions, exclude_remote=None):
+        if git("rev-parse", "--is-shallow-repository").strip() == b"true":
+            raise ValueError("commit scans require complete ancestry")
+        grafts = Path(git("rev-parse", "--git-path", "info/grafts").decode().strip())
+        if grafts.exists() and grafts.stat().st_size:
+            raise ValueError("grafted history cannot establish complete ancestry")
         if any(value.startswith("-") for value in revisions):
             raise ValueError("revision cannot be an option")
         rev_args = list(revisions)
         if exclude_remote is not None:
             if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", exclude_remote):
-                raise ValueError("invalid remote name")
-            rev_args.extend(["--not", f"--remotes={exclude_remote}"])
+                # URL/path pushes have no reliable tracking namespace. Scan fully.
+                exclude_remote = None
+            if exclude_remote is not None:
+                rev_args.extend(["--not", f"--remotes={exclude_remote}"])
         for sha in git("rev-list", *rev_args, "--").decode().splitlines():
             if sha in self.seen_commits:
                 continue
@@ -150,25 +163,83 @@ class Check:
             )
             if (committer != "ngwglai" or ce != self.email) and not platform_merge:
                 self.add("noncanonical-committer", where)
+            self.text(author + " <" + ae + ">\n" + committer + " <" + ce + ">", where)
             self.text(message, where, message=True)
-            for entry in git("ls-tree", "-r", "-z", sha).split(b"\0"):
-                if not entry:
-                    continue
-                info, path = entry.split(b"\t", 1)
-                _, kind, oid = info.split()
-                if kind == b"blob":
-                    self.blob(oid.decode(), path.decode("utf-8", "replace"))
+            self.tree(sha)
 
-    def tags(self):
-        for ref in git("for-each-ref", "--format=%(refname)", "refs/tags").decode().splitlines():
-            if git("cat-file", "-t", ref).strip() != b"tag":
+    def tree(self, oid):
+        for entry in git("ls-tree", "-r", "-z", oid).split(b"\0"):
+            if not entry:
                 continue
-            content = git("cat-file", "tag", ref).decode("utf-8", "replace")
+            info, path = entry.split(b"\t", 1)
+            _, kind, child = info.split()
+            name = path.decode("utf-8", "surrogateescape")
+            if kind == b"blob":
+                self.blob(child.decode(), name)
+            else:
+                self.text(name, "tracked-path:" + name)
+
+    def object(self, oid, location):
+        """Peel every annotated tag, including tags to trees/blobs and nested tags."""
+        while True:
+            kind = git("cat-file", "-t", oid).strip()
+            if kind != b"tag":
+                break
+            content = git("cat-file", "tag", oid).decode("utf-8", "replace")
             headers, _, message = content.partition("\n\n")
             tagger = next((line[7:] for line in headers.splitlines() if line.startswith("tagger ")), "")
             if not identity_ok(tagger, self.email):
-                self.add("noncanonical-tagger", ref)
-            self.text(message, ref, message=True)
+                self.add("noncanonical-tagger", location)
+            self.text(headers, location)
+            self.text(message, location, message=True)
+            oid = next(line[7:] for line in headers.splitlines() if line.startswith("object "))
+        if kind == b"tree":
+            self.tree(oid)
+        elif kind == b"blob":
+            self.blob(oid, location)
+        elif kind != b"commit":
+            raise ValueError("unsupported Git object")
+        return oid, kind
+
+    def history(self):
+        if git("rev-parse", "--is-shallow-repository").strip() == b"true":
+            raise ValueError("full history requires an unshallow repository")
+        refs = git("for-each-ref", "--format=%(refname)").decode().splitlines()
+        # Detached HEAD is not a ref; Actions explicitly checks out PR head SHAs.
+        if subprocess.run(["git", "rev-parse", "--verify", "HEAD"], capture_output=True).returncode == 0:
+            refs.append("HEAD")
+        commits = []
+        for ref in refs:
+            self.text(ref, "ref:" + ref)
+            oid, kind = self.object(ref, "ref:" + ref)
+            if kind == b"commit":
+                commits.append(oid)
+        if commits:
+            self.commits(commits)
+
+    def pre_push(self, rows, remote_name=None):
+        for row in rows:
+            fields = row.split()
+            if len(fields) != 4 or not all(re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", fields[i]) for i in (1, 3)):
+                raise ValueError("invalid pre-push input")
+            local_ref, local_sha, remote_ref, remote_sha = fields
+            if len(local_sha) != len(remote_sha):
+                raise ValueError("inconsistent object format")
+            if set(local_sha) == {"0"}:
+                continue
+            self.text(local_ref, "push-local-ref")
+            self.text(remote_ref, "push-remote-ref")
+            oid, kind = self.object(local_sha, "push-object:" + local_sha[:12])
+            if kind != b"commit":
+                continue
+            known = subprocess.run(["git", "--no-replace-objects", "cat-file", "-e", remote_sha + "^{commit}"], capture_output=True).returncode == 0
+            if known:
+                self.commits([remote_sha + ".." + oid])
+            elif set(remote_sha) == {"0"} and remote_name:
+                self.commits([oid], exclude_remote=remote_name)
+            else:
+                # An unknown nonzero remote tip cannot justify excluding ancestors.
+                self.commits([oid])
 
 
 def main(argv=None):
@@ -194,12 +265,9 @@ def main(argv=None):
         if denylist:
             bare = git("rev-parse", "--is-bare-repository").strip() == b"true"
             root = Path(git("rev-parse", "--absolute-git-dir" if bare else "--show-toplevel").decode().strip()).resolve()
-            if denylist.resolve().is_relative_to(root):
-                raise ValueError("private denylist must remain outside the checkout")
-            data = json.loads(denylist.read_text(encoding="utf-8"))
+            common = git("rev-parse", "--path-format=absolute", "--git-common-dir").decode().strip()
+            _, _, data = read_denylist(denylist, [root, common])
             terms = data["terms"]
-            if not isinstance(terms, list) or any(not isinstance(term, str) or not term for term in terms):
-                raise ValueError("invalid private denylist")
         check = Check(email, terms, args.max_bytes)
         if not any((args.staged, args.all_history, args.commits, args.message_file, args.pre_push)):
             args.staged = True
@@ -212,45 +280,24 @@ def main(argv=None):
                 raise ValueError("message exceeds read limit")
             check.text(args.message_file.read_text(encoding="utf-8", errors="replace"), "commit-message", message=True)
         if args.all_history:
-            # --all is added by the checker, not accepted as a user revision.
-            refs = git("for-each-ref", "--format=%(refname)").decode().splitlines()
-            if refs:
-                check.commits(refs)
-            check.tags()
+            check.history()
         if args.commits:
             check.commits(args.commits)
         if args.pre_push:
-            for row in sys.stdin:
-                fields = row.split()
-                if len(fields) != 4 or not all(re.fullmatch(r"[0-9a-f]{40,64}", fields[i]) for i in (1, 3)):
-                    raise ValueError("invalid pre-push input")
-                local_sha, remote_sha = fields[1], fields[3]
-                if set(local_sha) == {"0"}:
-                    continue
-                known = subprocess.run(["git", "cat-file", "-e", remote_sha + "^{commit}"], capture_output=True).returncode == 0
-                if known:
-                    check.commits([remote_sha + ".." + local_sha])
-                elif args.remote_name:
-                    # A newly created remote branch has no remote SHA. Exclude every
-                    # commit already reachable from this remote's local tracking refs,
-                    # so old main history is not re-audited while new commits are still checked.
-                    check.commits([local_sha], exclude_remote=args.remote_name)
-                else:
-                    # Manual invocations without the hook-provided remote remain conservative.
-                    check.commits([local_sha])
-            check.tags()
-        summary = {"ok": not check.issues, "commits_checked": len(check.seen_commits), "blobs_checked": len(check.seen_blobs),
+            check.pre_push(sys.stdin, args.remote_name)
+        summary = {"ok": not check.issues, "private_denylist_loaded": denylist is not None, "commits_checked": len(check.seen_commits), "blobs_checked": len(check.seen_blobs),
                    "counts": dict(Counter(issue["kind"] for issue in check.issues)), "findings": check.issues}
         if args.json:
             print(json.dumps(summary, ensure_ascii=True))
         else:
+            print("Private denylist: loaded." if denylist else "Private denylist: absent; public rules only (private names not covered).")
             print(f"Privacy check: {'PASS' if summary['ok'] else 'FAIL'}; {len(check.seen_commits)} commits, {len(check.seen_blobs)} unique blobs, {len(check.issues)} findings.")
             for issue in check.issues[:100]:
                 print(f"{issue['kind']}: {issue['location']}" + (f":{issue['line']}" if issue['line'] else ""))
             if len(check.issues) > 100:
                 print("Additional findings omitted; use --json for redacted structured locations.")
         return 0 if summary["ok"] else 1
-    except (OSError, ValueError, TypeError, KeyError, UnicodeError):
+    except (OSError, ValueError, TypeError, KeyError, UnicodeError, StopIteration):
         print("Privacy check could not complete. Check local identity initialization, Git refs, private denylist and read limits. No input values logged.", file=sys.stderr)
         return 2
 
