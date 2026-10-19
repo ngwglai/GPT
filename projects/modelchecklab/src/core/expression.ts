@@ -1,5 +1,7 @@
 import type { Expr, State, Value } from "./types";
 
+export class SemanticError extends Error {}
+
 // Only this closed AST is interpreted. No source code or property traversal.
 export function evaluate(expr: Expr, state: State): Value {
   if (typeof expr !== "object") return expr;
@@ -36,6 +38,6 @@ export function evaluate(expr: Expr, state: State): Value {
       return !a[0];
   }
   if (typeof result === "number" && !Number.isSafeInteger(result))
-    throw new Error("整数运算超出安全整数范围");
+    throw new SemanticError("整数运算超出安全整数范围");
   return result;
 }

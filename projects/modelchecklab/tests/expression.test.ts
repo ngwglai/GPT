@@ -118,3 +118,31 @@ it("性质求值溢出单独标明 evaluation_error", async () => {
   expect(r.status).toBe("counterexample");
   expect(r.violation?.kind).toBe("evaluation_error");
 });
+
+it("内部异常不会伪造模型语义反例，向Worker适配层传播", async () => {
+  const m: Model = {
+    name: "内部故障",
+    variables: { x: { type: "int", min: 0, max: 10 } },
+    initial: [{ x: 0 }],
+    actions: [
+      {
+        name: "步进",
+        guard: true,
+        set: { x: { op: "+", args: [{ var: "x" }, 1] } },
+      },
+    ],
+    invariants: [],
+    terminal: false,
+    goals: [],
+  };
+  let calls = 0;
+  await expect(
+    check(JSON.stringify(m), {
+      yieldControl: async () => {},
+      now: () => {
+        if (++calls === 9) throw new Error("内部故障");
+        return 0;
+      },
+    }),
+  ).rejects.toThrow("内部故障");
+});

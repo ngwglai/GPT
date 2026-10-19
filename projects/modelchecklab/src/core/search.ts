@@ -1,4 +1,4 @@
-import { evaluate } from "./expression";
+import { evaluate, SemanticError } from "./expression";
 import { invariantViolation, isTerminal } from "./properties";
 import { canonicalState, stateKey } from "./state";
 import { applyAction, enabled } from "./transition";
@@ -174,6 +174,7 @@ export async function check(
         try {
           next = applyAction(action, state, model);
         } catch (e) {
+          if (!(e instanceof SemanticError)) throw e;
           const v: Violation = {
             kind: "action_error",
             message: (e as Error).message,
@@ -198,6 +199,7 @@ export async function check(
       }
       expanded++;
     } catch (e) {
+      if (!(e instanceof SemanticError)) throw e;
       const v: Violation = {
         kind: "evaluation_error",
         message: `模型语义计算错误：${(e as Error).message}`,

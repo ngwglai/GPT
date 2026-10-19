@@ -26,13 +26,11 @@ for (const item of examples) {
 test("导入导出模型，真实最短反例回放、高亮与结果导出", async ({ page }) => {
   await page.goto("/");
   const m = examples.find((e) => e.id === "bank-bad")!.model;
-  await page
-    .getByLabel("导入模型", { exact: true })
-    .setInputFiles({
-      name: "synthetic-model.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(JSON.stringify(m)),
-    });
+  await page.getByLabel("导入模型", { exact: true }).setInputFiles({
+    name: "synthetic-model.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(m)),
+  });
   await expect(page.getByLabel("JSON 模型编辑器")).toHaveValue(
     JSON.stringify(m),
   );
@@ -94,13 +92,11 @@ test("非法JSON和表达式、超限输入有中文反馈", async ({ page }) =>
   await expect(page.getByTestId("result")).toContainText(
     "不支持的表达式运算符",
   );
-  await page
-    .getByLabel("导入模型", { exact: true })
-    .setInputFiles({
-      name: "too-large.json",
-      mimeType: "application/json",
-      buffer: Buffer.alloc(65537, 32),
-    });
+  await page.getByLabel("导入模型", { exact: true }).setInputFiles({
+    name: "too-large.json",
+    mimeType: "application/json",
+    buffer: Buffer.alloc(65537, 32),
+  });
   await expect(page.getByRole("status")).toContainText("64 KiB");
   await expect(page.getByTestId("result")).toContainText("inconclusive");
 });
@@ -187,4 +183,22 @@ test("Worker 无法创建时明确返回未确定", async ({ page }) => {
   await page.getByRole("button", { name: "运行检验", exact: true }).click();
   await expect(page.getByTestId("result")).toContainText("inconclusive");
   await expect(page.getByTestId("result")).toContainText("Web Worker");
+});
+
+test("Worker运行错误返回未确定，不伪造反例", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "Worker", {
+      value: class {
+        onerror: ((e: ErrorEvent) => void) | null = null;
+        postMessage() {
+          setTimeout(() => this.onerror?.(new ErrorEvent("error")), 0);
+        }
+        terminate() {}
+      },
+    });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "运行检验", exact: true }).click();
+  await expect(page.getByTestId("result")).toContainText("inconclusive");
+  await expect(page.getByTestId("result")).toContainText("异常退出");
 });
