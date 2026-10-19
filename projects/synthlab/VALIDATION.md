@@ -15,9 +15,9 @@
 | npm ci | 重新执行锁文件安装成功 |
 | npm run lint | ESLint 通过 |
 | npm run typecheck | 严格 TypeScript 通过 |
-| npm test | 104 项 Vitest 通过，无跳过 |
+| npm test | 105 项 Vitest 通过，无跳过 |
 | npm run build | 生产构建通过，包含独立打包 Worker |
-| npm run test:e2e | 13/13 通过（最终完整复跑 6.2 秒；首次标签定位问题修复后复验） |
+| npm run test:e2e | 13/13 通过（最终完整复跑 6.3 秒；首次标签定位问题修复后复验） |
 | npm audit --audit-level=moderate | 包含开发依赖，0 已知漏洞 |
 | python -m unittest discover -s tests -v（根） | 28 项隐私回归通过 |
 | python scripts/privacy_check.py --all-history（根） | 94 提交 / 435 blob / 0 命中（开发基线） |
@@ -45,7 +45,7 @@
 
 独立工作流 `.github/workflows/synthlab.yml` 已接入根 `CI required`，保留其他项目所有检查。矩阵使用原生 ubuntu-latest / windows-latest、Node 22，执行锁文件安装、完整依赖审计、lint、typecheck、Vitest、build、生产 Chromium E2E。不部署。
 
-当前尚未推送：配置存在不等于 CI 已通过。PR 与对应提交运行链接将在实际执行后补充，不能用旧头证据替代最新头。
+[PR #16](https://github.com/ngwglai/GPT/pull/16) 已创建；首头 a6e1687 的 [CI 39190366369](https://github.com/ngwglai/GPT/actions/runs/39190366369) 中 SynthLab Linux/Windows 作业已成功（各104单元/13生产E2E），全仓库汇总尚在运行。随后本地发现合法多轮历史可能超过128 KiB导入限制，已将上限调整为2 MiB并增加大记录往返回归；105单元及13生产E2E重新全部通过。更新提交须重新通过完整CI；不能以旧头证据替代最新头。
 
 ## 未验证与限制
 

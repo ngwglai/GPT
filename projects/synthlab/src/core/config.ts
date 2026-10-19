@@ -1,5 +1,6 @@
 import { INPUT_LIMIT, OPS, integer, keys, parseExpr, record } from './dsl';
 import type { Expr, Op } from './dsl';
+export const MAX_IMPORT_BYTES = 2 * 1024 * 1024;
 export const NAMES = ['Max2', 'Abs', 'Clamp', 'Sign'] as const;
 export type Name = typeof NAMES[number];
 export type Spec = { kind: 'builtin'; name: Name } | { kind: 'expression'; ast: Expr };
@@ -47,7 +48,7 @@ export function parseConfig(v: unknown): Config {
   return { version: 1, variables, constants, operators: OPS.filter(op => (c.operators as Op[]).includes(op)), examples, domain, spec, budget };
 }
 export function importExperiment(text: string): Config {
-  if (new TextEncoder().encode(text).length > 131072) throw new Error('JSON 超过 128 KiB');
+  if (new TextEncoder().encode(text).length > MAX_IMPORT_BYTES) throw new Error('JSON 超过 2 MiB');
   const raw = record(JSON.parse(text));
   if ('config' in raw) { keys(raw, ['config', 'result', 'format']); if (raw.format !== 'synthlab-v1') throw new Error('实验格式错误'); return parseConfig(raw.config); }
   return parseConfig(raw);

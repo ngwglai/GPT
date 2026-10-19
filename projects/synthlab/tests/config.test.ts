@@ -32,9 +32,17 @@ test('JSON import/export roundtrip validates config but never trusts a stored re
   expect(importExperiment(JSON.stringify(c))).toEqual(parseConfig(c));
 });
 test('import enforces UTF-8 byte size, JSON, format and fields', () => {
-  for (const text of ['{', '{}', 'null', '[]', '中'.repeat(50000), JSON.stringify({ format: 'other', config: preset('Abs'), result: null }), JSON.stringify({ format: 'synthlab-v1', config: preset('Abs'), result: null, extra: true })]) expect(() => importExperiment(text)).toThrow();
+  for (const text of ['{', '{}', 'null', '[]', '中'.repeat(800000), JSON.stringify({ format: 'other', config: preset('Abs'), result: null }), JSON.stringify({ format: 'synthlab-v1', config: preset('Abs'), result: null, extra: true })]) expect(() => importExperiment(text)).toThrow();
 });
 test('operator order is normalized and negative zero canonicalized', () => {
   const c = preset('Abs'); c.operators = ['if', 'lt', 'sub']; c.constants = [-0, 1];
   const p = parseConfig(c); expect(p.operators).toEqual(['sub', 'lt', 'if']); expect(Object.is(p.constants[0], -0)).toBe(false);
+});
+
+test('large bounded experiment histories can be reimported without trusting them', () => {
+  const c = preset('Sign');
+  const samples = Array.from({ length: 95 }, (_, i) => ({ input: [i], output: Number.MAX_SAFE_INTEGER }));
+  const text = exportExperiment(c, { iterations: Array.from({ length: 32 }, () => ({ examples: samples, verification: { complete: true } })) });
+  expect(new TextEncoder().encode(text).length).toBeGreaterThan(131072);
+  expect(importExperiment(text)).toEqual(parseConfig(c));
 });

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { lessons, preset } from './core/cases';
-import { exportExperiment, importExperiment, NAMES, parseConfig } from './core/config';
+import { exportExperiment, importExperiment, MAX_IMPORT_BYTES, NAMES, parseConfig } from './core/config';
 import type { Budget, Config, Name } from './core/config';
 import { format, OPS } from './core/dsl';
 import { emptySnapshot } from './core/engine';
@@ -66,7 +66,7 @@ export function App() {
         <div className="actions"><button className="primary" disabled={running} onClick={start}>开始合成</button><button disabled={!running} onClick={() => client.current?.cancel()}>取消</button><button onClick={() => load(preset(name))}>重置</button></div>
         <p className="note">全部计算在本地 Worker 中运行。更改配置会清除旧结论。</p>
       </section>
-      <section><h2>JSON / 实验交换</h2><label>实验 JSON<textarea aria-label="实验 JSON" rows={4} value={json} onChange={e => { invalidate(); setJson(e.target.value); }}/></label><div className="actions"><button onClick={() => importText(json)}>导入 JSON</button><button onClick={download}>导出 JSON</button></div><label className="file">导入文件<input type="file" accept=".json,application/json" onChange={async e => { invalidate(); const f = e.target.files?.[0]; if (!f) return; if (f.size > 131072) { setError('JSON 超过 128 KiB'); return; } try { importText(await f.text()); } catch { setError('文件读取失败'); } }}/></label><p className="note">导入只恢复配置；导出中的历史结果不会被当作有效结论。</p></section>
+      <section><h2>JSON / 实验交换</h2><label>实验 JSON<textarea aria-label="实验 JSON" rows={4} value={json} onChange={e => { invalidate(); setJson(e.target.value); }}/></label><div className="actions"><button onClick={() => importText(json)}>导入 JSON</button><button onClick={download}>导出 JSON</button></div><label className="file">导入文件<input type="file" accept=".json,application/json" onChange={async e => { invalidate(); const f = e.target.files?.[0]; if (!f) return; if (f.size > MAX_IMPORT_BYTES) { setError('JSON 超过 2 MiB'); return; } try { importText(await f.text()); } catch { setError('文件读取失败'); } }}/></label><p className="note">导入只恢复配置；导出中的历史结果不会被当作有效结论。</p></section>
     </aside><article>
       {error && <div role="alert" className="alert">{error}</div>}
       <section className="candidate"><div className="section-top"><h2>02 / 当前候选程序</h2><span className={`badge ${result?.status === 'verified' ? 'pass' : ''}`} role="status">{running ? 'Worker 搜索中' : result ? labels[result.status] : '等待实验'}</span></div><pre data-testid="candidate">{view.candidate ? format(view.candidate) : '从一个样例开始，寻找一个程序。'}</pre><p>{result?.message ?? '按节点数递增枚举，保留每种类型与观察签名的最小代表。'}</p>{view.candidate && <details><summary>真实 AST</summary><pre>{JSON.stringify(view.candidate, null, 2)}</pre></details>}</section>
