@@ -32,7 +32,7 @@
 
 ## 远程与隐私
 
-交付入口：[PR #19](https://github.com/ngwglai/GPT/pull/19)。初始功能头 c17820a 的 [CI 39354493849](https://github.com/ngwglai/GPT/actions/runs/39354493849) 已 29/29 作业成功，含 DeltaLab 原生 Linux/Windows、全仓库与 CI required。审查修复后的最新头仍须完整 CI 成功后合并；不使用旧头结果代替新头。每次提交执行暂存区、提交说明、实际提交和推送范围检查；合并后再检查 main。不得将未执行的 CI 或检查记录为通过。
+交付入口：[PR #19](https://github.com/ngwglai/GPT/pull/19)。初始功能头 c17820a 的 [CI 39354493849](https://github.com/ngwglai/GPT/actions/runs/39354493849) 已 29/29 作业成功，含 DeltaLab 原生 Linux/Windows、全仓库与 CI required。修复功能头 fb0b540 的 [CI 39355256554](https://github.com/ngwglai/GPT/actions/runs/39355256554) 亦已29/29作业全部成功，包含原生Linux/Windows的224单元、18生产Chromium E2E及CI required；不使用旧头结果代替新头。本验证记录提交亦遵循最新完整CI成功才合并的规则，合并SHA以PR元数据为准。每次提交执行暂存区、提交说明、实际提交和推送范围检查；合并后再检查 main。不得将未执行的 CI 或检查记录为通过。
 
 ## 验证边界
 

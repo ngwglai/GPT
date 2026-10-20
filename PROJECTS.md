@@ -16,7 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| DeltaLab | [projects/deltalab](projects/deltalab/) | Testing | 离线 DAG 缓存、脏传播与输出变化传播的真实运算比较 | PR #19；本地224单元/18生产E2E通过；初始功能头29项CI全通过，审查修复后最新CI验收中 |
+| DeltaLab | [projects/deltalab](projects/deltalab/) | Completed | 离线 DAG 缓存、脏传播与输出变化传播的真实运算比较 | PR #19；224单元/18生产E2E与修复头Linux/Windows、CI required全通过；按需本机试用，不部署 |
 | AdversaryLab | [projects/adversarylab](projects/adversarylab/) | Completed | 固定输入空间中的算法性能对抗搜索；真实计数与独立精确排序对照 | PR #17；本地125单元/17生产E2E；旧功能头跨平台CI通过，修复后最新CI通过即合并，不部署 |
 | SynthLab | [projects/synthlab](projects/synthlab/) | Completed | 本地类型引导枚举、观察等价剪枝与真实 CEGIS 程序合成 | PR #16；105单元/13生产E2E、Linux/Windows与CI required通过；按需本机试用，不部署 |
 | ModelCheckLab | [projects/modelchecklab](projects/modelchecklab/) | Completed | 有限状态 BFS、不变量/死锁/目标可达性与最短反例 | PR #14 已合并（1355655）；167单元/15生产E2E、Linux/Windows及CI required全通过；不部署 |
@@ -268,6 +268,6 @@
 - **差异 / MVP**：独立于已有程序合成、模型检验和对抗搜索；纯 TypeScript 离线计算核心、六种有限数值运算、拓扑与环校验、事务批量更新、共享后代去重、完整结构重建缓存、独立参考逐节点/缓存验证、四种子预设、中文 DOM/SVG 编辑与真实 trace 回放、明暗/窄屏、安全 JSON 导入导出。
 - **目录 / 分支**：[projects/deltalab](projects/deltalab/)；基于最新 main c7e9e75 创建 feature/deltalab，不修改其他项目业务代码。不部署。
 - **验收标准**：150种子×20批次全节点差分、1000节点长链/宽分支/共享与随机图运算计数、生产浏览器和静态/构建/审计/隐私通过；最新PR原生Linux/Windows与CI required成功后直接合并。
-- **实际验证 / 状态**：本地最终224项单元、18项生产Chromium E2E、根53隐私回归、类型/lint/build和审计0漏洞通过；含150种子×20批差分及1000节点计数。窄屏测试滚动已修正，最终完整重跑通过；最终证据见 [VALIDATION.md](projects/deltalab/VALIDATION.md)。Testing；[PR #19](https://github.com/ngwglai/GPT/pull/19) 初始功能头 c17820a 的 CI 39354493849 已29项全部通过（含原生Linux/Windows与CI required）；三处交互/参数审查修复与回归完成，修复后最新CI验收中，尚未合并。
+- **实际验证 / 状态**：本地最终224项单元、18项生产Chromium E2E、根53隐私回归、类型/lint/build和审计0漏洞通过；含150种子×20批差分及1000节点计数。窄屏测试滚动已修正，最终完整重跑通过；最终证据见 [VALIDATION.md](projects/deltalab/VALIDATION.md)。Completed（功能验收完成，合并元数据以PR为准）；[PR #19](https://github.com/ngwglai/GPT/pull/19) 修复功能头 fb0b540 的 [CI 39355256554](https://github.com/ngwglai/GPT/actions/runs/39355256554) 已29/29作业成功，含原生Linux/Windows与CI required；初始功能头CI也全部通过。三处交互/参数审查问题已修复并增加回归，身份意见误引非PR对象已核实排除；本记录提交同样要求最新完整CI通过后才合并。
 - **环境 / 隐私**：启动期间命令无法启动，等待恢复后完成工具/文件系统/远程验证；未为环境问题改代码。按现有初始化脚本验证私有源并迁移精确公共系统误列，匿名身份接口核验通过；基线107提交/534blob/0命中。
 - **边界 / 后续**：最多1000节点、512KiB JSON、同步主线程、精确双精度比较、结构变更全重建；统一单位运算成本不代表耗时节省。无任意脚本、后端、动态依赖或循环。按需增加Worker、图缩放与批次历史；用户电脑人工验收和Firefox/WebKit未验证。
