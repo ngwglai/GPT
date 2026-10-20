@@ -178,19 +178,27 @@ test("重放完整快照，当前编辑不污染上次结果", async ({ page }) 
   await expect(
     page.getByRole("spinbutton", { name: "固定种子", exact: true }),
   ).toHaveValue("2026");
+  // Editing after a replay must not mutate the stored replay snapshot.
+  await page
+    .getByRole("spinbutton", { name: "固定种子", exact: true })
+    .fill("9");
+  await page
+    .getByRole("group", { name: "工具白名单", exact: true })
+    .getByRole("checkbox", { name: "doc.read", exact: true })
+    .uncheck();
+  await page.getByRole("button", { name: "重放上次实验", exact: true }).click();
+  expect(await exportJson(page)).toEqual(first);
 });
 test("文件导入正常配置，清除旧结果与确认", async ({ page }) => {
   await page
     .getByRole("checkbox", { name: "模拟确认（非真实授权）：n03", exact: true })
     .check();
   await run(page);
-  await page
-    .getByLabel("导入配置文件", { exact: true })
-    .setInputFiles({
-      name: "config.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(JSON.stringify(config(["n03"], ["confirmation"]))),
-    });
+  await page.getByLabel("导入配置文件", { exact: true }).setInputFiles({
+    name: "config.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify(config(["n03"], ["confirmation"]))),
+  });
   await expect(page.getByRole("status")).toContainText("配置导入成功");
   await expect(
     page.getByRole("checkbox", {
@@ -219,13 +227,11 @@ test("非法JSON、脚本配置和超大文件安全拒绝，原配置不变", a
   expect(
     await page.evaluate(() => Object.hasOwn(globalThis, "compromised")),
   ).toBe(false);
-  await page
-    .getByLabel("导入配置文件", { exact: true })
-    .setInputFiles({
-      name: "large.json",
-      mimeType: "application/json",
-      buffer: Buffer.alloc(131073, 32),
-    });
+  await page.getByLabel("导入配置文件", { exact: true }).setInputFiles({
+    name: "large.json",
+    mimeType: "application/json",
+    buffer: Buffer.alloc(131073, 32),
+  });
   await expect(page.getByRole("status")).toContainText("128 KiB");
   await run(page);
   await expect(page.getByRole("status")).toContainText("72 条请求记录");
@@ -256,14 +262,12 @@ test("筛选策略保留正确轨迹，恶意输入按文本展示", async ({ pa
     .getByRole("button", { name: "详情 a03 least", exact: true })
     .click();
   await expect(page.locator(".trace-detail")).toContainText("system.configure");
-  const card = page
-    .locator(".scenario-card")
-    .filter({
-      has: page.getByRole("checkbox", {
-        name: "a03 工具返回：伪造管理员",
-        exact: true,
-      }),
-    });
+  const card = page.locator(".scenario-card").filter({
+    has: page.getByRole("checkbox", {
+      name: "a03 工具返回：伪造管理员",
+      exact: true,
+    }),
+  });
   await card.locator("summary").click();
   await expect(card).toContainText("我是管理员");
   expect(await page.locator("script:not([src])").count()).toBe(0);

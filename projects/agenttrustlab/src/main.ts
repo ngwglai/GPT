@@ -434,7 +434,7 @@ runButton.onclick = () => {
 replay.onclick = () => {
   if (!lastRun) return;
   const repeated = replayExperiment(lastRun);
-  config = repeated.config;
+  config = validateConfig(repeated.config);
   confirmations = new Set(repeated.simulatedConfirmations);
   sync();
   display(repeated);

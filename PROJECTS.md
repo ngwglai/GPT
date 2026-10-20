@@ -280,6 +280,6 @@
 - **差异 / MVP**：独立于现有算法搜索、模型检验与因果实验；18场景（12恶意/6正常）、四策略、独立授权引擎与一次性凭证模拟器、中文DOM/SVG权限配置、同输入批量比较、逐项轨迹、快照重放及安全JSON配置导入与JSON/CSV导出。无真实LLM、MCP、网络或私人文件操作，不部署。
 - **目录 / 分支**：[projects/agenttrustlab](projects/agenttrustlab/)；从最新origin/main bc1034f创建feature/agenttrustlab。复用既有TypeScript/Vite/Vitest/Playwright设施，只增加本项目及必要CI接入。
 - **验收标准**：独立授权矩阵/指标真值、零样本/确认/绕过/参数/导入安全与CSV回读、生产浏览器交互、类型/lint/build/审计/隐私及最新PR原生Linux/Windows与CI required全通过后直接合并。
-- **当前验证 / 状态**：Testing；最终161单元、13生产Chromium E2E、类型/lint/构建及0漏洞审计通过，根53隐私回归通过；PR/远程CI未执行。真实证据见[VALIDATION.md](projects/agenttrustlab/VALIDATION.md)。
+- **当前验证 / 状态**：Testing；最终161单元、13生产Chromium E2E、类型/lint/构建及0漏洞审计通过，根53隐私回归通过；[PR #20](https://github.com/ngwglai/GPT/pull/20)已创建，远程CI排队；自查修复重放后编辑共享引用问题，并增加双重重放回归。真实证据见[VALIDATION.md](projects/agenttrustlab/VALIDATION.md)。
 - **环境 / 隐私**：环境就绪后最小命令与读写通过；匿名身份及私有来源/hooks初始化成功，基线53根回归与111提交/568blob/0命中。离线缓存与浏览器安装未完成的启动失败均单独记录，未作为测试通过。
 - **限制 / 后续**：128KiB配置、最多18场景×4策略、单次预定义调用、有限枚举与主线程；结果仅适用实现的场景与策略，不代表真实LLM普遍安全率。按需增加多步模拟与参数级权限；用户电脑人工验收及Firefox/WebKit未验证。

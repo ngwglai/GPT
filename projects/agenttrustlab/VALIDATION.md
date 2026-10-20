@@ -23,6 +23,6 @@
 
 ## 远程验收与限制
 
-新增AgentTrustLab可复用工作流，原生Linux/Windows执行npm锁文件安装、审计、lint、类型、单元、生产构建与Chromium E2E，并接入根CI required。配置存在不等于运行通过。PR、最终功能头CI及main合并后结果待实际执行后记录。
+新增AgentTrustLab可复用工作流，原生Linux/Windows执行npm锁文件安装、审计、lint、类型、单元、生产构建与Chromium E2E，并接入根CI required。配置存在不等于运行通过。已创建[PR #20](https://github.com/ngwglai/GPT/pull/20)。自查修复重放后编辑与上次快照的引用共享，并扩展双重重放浏览器回归；以最新功能头CI为准，初始头的旧结果不能代替最终验收。最终功能头CI及main合并后结果待实际执行后记录。
 
 未执行用户电脑人工试用、Firefox/WebKit和真实手机测试；未部署、不连接真实LLM/MCP/邮箱/文件或网络工具。
