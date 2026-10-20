@@ -191,15 +191,20 @@ jobs:
     name: AdversaryLab
     uses: ./.github/workflows/adversarylab.yml
 
+  deltalab:
+    name: DeltaLab
+    uses: ./.github/workflows/deltalab.yml
+
   required:
     name: CI required
     if: always()
-    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab, adversarylab]
+    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab, adversarylab, deltalab]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require all applicable checks
         env:
+          DELTALAB_RESULT: ${{ needs.deltalab.result }}
           ADVERSARYLAB_RESULT: ${{ needs.adversarylab.result }}
           SYNTHLAB_RESULT: ${{ needs.synthlab.result }}
           MODELCHECKLAB_RESULT: ${{ needs.modelchecklab.result }}
@@ -214,6 +219,7 @@ jobs:
           HAS_CONSTRAINTLAB: ${{ needs.layout.outputs.constraintlab }}
           CONSTRAINTLAB_RESULT: ${{ needs.constraintlab.result }}
         run: |
+          test "$DELTALAB_RESULT" = success
           test "$ADVERSARYLAB_RESULT" = success
           test "$SYNTHLAB_RESULT" = success
           test "$MODELCHECKLAB_RESULT" = success
