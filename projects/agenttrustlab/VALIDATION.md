@@ -1,6 +1,6 @@
 # AgentTrustLab v0.1 验证记录
 
-日期：2026-10-20。当前状态：本地功能验证完成，远程 CI 与合并尚未执行，不能视为已完成。
+日期：2026-10-20。当前状态：Completed。功能通过PR #20合并至main；最新功能头及功能合并后的main CI均31/31成功。本记录为合并后文档更新，其最新完整CI仍须通过后才能合并。
 
 ## 环境前置检查
 
@@ -23,6 +23,21 @@
 
 ## 远程验收与限制
 
-新增AgentTrustLab可复用工作流，原生Linux/Windows执行npm锁文件安装、审计、lint、类型、单元、生产构建与Chromium E2E，并接入根CI required。配置存在不等于运行通过。已创建[PR #20](https://github.com/ngwglai/GPT/pull/20)。自查修复重放后编辑与上次快照的引用共享，并扩展双重重放浏览器回归；以最新功能头CI为准，初始头的旧结果不能代替最终验收。最终功能头CI及main合并后结果待实际执行后记录。
+新增AgentTrustLab可复用工作流，原生Linux/Windows执行npm锁文件安装、审计、lint、类型、单元、生产构建与Chromium E2E，并接入根CI required。[PR #20](https://github.com/ngwglai/GPT/pull/20)已经合并。自查修复重放后编辑与上次快照的引用共享，并扩展双重重放浏览器回归。最新功能头CI通过后才合并；初始头取消运行不作为最终验收证据。
 
 未执行用户电脑人工试用、Firefox/WebKit和真实手机测试；未部署、不连接真实LLM/MCP/邮箱/文件或网络工具。
+
+
+## 已核实的远程交付结果
+
+| 对象 | 实际结果 | 证据 |
+| --- | --- | --- |
+| 最终功能头0f5f935 | 31/31作业成功，含本项目Linux/Windows与CI required | [CI 39382205636](https://github.com/ngwglai/GPT/actions/runs/39382205636) |
+| 功能合并提交1b8fadf | 31/31作业成功，含本项目Linux/Windows与CI required | [main CI 39383025794](https://github.com/ngwglai/GPT/actions/runs/39383025794) |
+| PR #20 | MERGED，完整合并SHA 1b8fadf844f7d7ecf90d667d09a6b623e77c4285 | [PR #20](https://github.com/ngwglai/GPT/pull/20) |
+| 合并范围隐私 | 3提交 / 363唯一blob / 0命中 | 本地带私有词表扫描 |
+| 合并后全历史隐私 | 114提交 / 597唯一blob / 0命中 | 本地带私有词表扫描 |
+
+原生Windows与Linux均执行同一套本项目单元与生产Chromium验收。平台条件步骤（另一系统的安装分支）及仅失败时上传artifacts的跳过不计为测试通过。仓库既有RepoScope的Windows POSIX条件跳过仍按其原规则，不包含在本项目161/13的通过数中。
+
+合并后本地main已fast-forward到远程同一提交，工作区干净。此后仅通过独立文档PR更新PROJECTS和本记录，不修改业务或依赖；该文档提交仍需最新完整CI通过后才合并，并在最终交付前核实最终main CI与隐私状态。
