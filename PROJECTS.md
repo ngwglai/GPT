@@ -16,6 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
+| CalibrationLab | [projects/calibrationlab](projects/calibrationlab/) | Completed | 本地概率预测、独立样本校准与可靠性图 | PR #22；最终121单元/13生产E2E；初始功能头Linux/Windows与CI required全通过，数值修复头仍须完整CI，不部署 |
 | AgentTrustLab | [projects/agenttrustlab](projects/agenttrustlab/) | Completed | 确定性智能体信任边界与独立工具授权；四策略真实比较 | PR #20已合并；161单元/13生产E2E、Linux/Windows、CI required及合并后main CI全通过；不部署 |
 | DeltaLab | [projects/deltalab](projects/deltalab/) | Completed | 离线 DAG 缓存、脏传播与输出变化传播的真实运算比较 | PR #19；224单元/18生产E2E与修复头Linux/Windows、CI required全通过；按需本机试用，不部署 |
 | AdversaryLab | [projects/adversarylab](projects/adversarylab/) | Completed | 固定输入空间中的算法性能对抗搜索；真实计数与独立精确排序对照 | PR #17；本地125单元/17生产E2E；旧功能头跨平台CI通过，修复后最新CI通过即合并，不部署 |
@@ -291,3 +292,14 @@
 - **实际远程验证**：[功能头CI](https://github.com/ngwglai/GPT/actions/runs/39382205636)及[合并后main CI](https://github.com/ngwglai/GPT/actions/runs/39383025794)均31/31作业成功，包含本项目原生Linux/Windows及CI required；旧功能头的取消运行不代替最终验收。Windows由Actions执行，不是本地或用户电脑人工测试。
 - **隐私与工作区**：匿名身份、词表和hooks初始化成功；每次提交前主动检查暂存区/说明，提交后及推送前检查实际提交身份、尾注与文件。功能合并范围3提交/363唯一blob/0命中，全历史114提交/597唯一blob/0命中。main已同步且干净；不强推、不改写历史、不部署。本验收记录作为独立文档PR入库，仍要求其最新完整CI通过后合并。
 - **本地与边界**：Linux 161单元、13生产E2E、53根隐私回归，类型/lint/build、开发浏览器冒烟及0漏洞审计通过；初期缓存、浏览器启动、筛选标签及测试示例域的实际失败和修复见[VALIDATION.md](projects/agenttrustlab/VALIDATION.md)。保持确定性模拟、18×4请求和128KiB配置边界；不代表真实LLM普遍安全率。按需本机试用，Firefox/WebKit与真实手机未验证。
+
+
+## CalibrationLab v0.1（2026-10-20）
+
+- **目的 / 用户**：面向概率预测学习者与开发者，比较真实生成概率、预测概率与观测频率，理解校准、区分能力和总体评分的差别。
+- **差异 / 范围**：独立于 CausalLab 因果识别与 MatchupLab 决策实验；React/TypeScript/Vite 本地应用，四种数学定义的 IID 生成机制、可注入 PRNG、独立校准/测试划分、Platt 与 PAVA 保序回归、评分与 Wilson 可靠性图、中文响应式控制、同测试样本比较和 CSV/JSON 导出。无后端或付费 API，不部署。
+- **目录 / 分支**：[projects/calibrationlab](projects/calibrationlab/)；从最新 origin/main 25f3120 创建 feature/calibrationlab；开发前无未合并 PR 或重复项目。不修改其他项目业务代码或依赖。
+- **验收标准**：独立手算评分、固定种子统计性质、PAVA 穷举参考、训练测试隔离、校准可变差、真实生产浏览器操作与下载；类型/lint/build/审计/隐私及最新 PR Linux/Windows、CI required 全通过后直接合并。
+- **当前状态 / 实际验证**：Completed（功能验收完成，合并元数据以 [PR #22](https://github.com/ngwglai/GPT/pull/22) 为准）；数值与分箱边界审查修复后最终 121 项核心单元与数学性质测试、13 项生产 Chromium E2E、类型/ESLint/构建、依赖审计 0 漏洞已通过；功能头 ac9af63 的 [CI 39403983403](https://github.com/ngwglai/GPT/actions/runs/39403983403) 已 33/33 成功，含原生 Linux/Windows、四组隐私与 CI required。种子32浮点线搜索停滞已真实复现并修复，保留严格梯度阈值；增加300固定种子与生产回归。22箱精确边界问题也已修复，测试覆盖2–30箱所有边界及相邻浮点数。本最终修复提交仍须最新完整 CI 通过后才合并，不以旧头替代。最终命令、失败与修复见 [VALIDATION.md](projects/calibrationlab/VALIDATION.md)。
+- **环境 / 隐私**：首次命令因环境未就绪无法启动，待环境 ready 后最小执行及工具版本通过；私有词表、匿名身份与 hooks 初始化成功；基线 53 根隐私回归与 116 提交/599 唯一 blob 扫描 0 命中。提交前暂存区/说明、实际提交及推送前私有检查通过；功能提交范围 1 提交/377 唯一 blob/0 命中，全历史复验 117 提交/620 blob/0 命中；未绕过检查。
+- **边界 / 后续**：20,000 样本/30 箱、主线程；常量分数或不足样本明确拒绝拟合，Platt 采用明确的平滑目标与微小 L2 版本；Wilson 为逐箱区间，ECE 依赖分箱。合成结果不代表真实模型，校准不保证改进。ESLint 9 结束支持，后续独立维护升级；Firefox/WebKit、真实手机与用户电脑人工测试未执行。

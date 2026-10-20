@@ -199,15 +199,20 @@ jobs:
     name: AgentTrustLab
     uses: ./.github/workflows/agenttrustlab.yml
 
+  calibrationlab:
+    name: CalibrationLab
+    uses: ./.github/workflows/calibrationlab.yml
+
   required:
     name: CI required
     if: always()
-    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab, adversarylab, deltalab, agenttrustlab]
+    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab, adversarylab, deltalab, agenttrustlab, calibrationlab]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require all applicable checks
         env:
+          CALIBRATIONLAB_RESULT: ${{ needs.calibrationlab.result }}
           AGENTTRUSTLAB_RESULT: ${{ needs.agenttrustlab.result }}
           DELTALAB_RESULT: ${{ needs.deltalab.result }}
           ADVERSARYLAB_RESULT: ${{ needs.adversarylab.result }}
@@ -224,6 +229,7 @@ jobs:
           HAS_CONSTRAINTLAB: ${{ needs.layout.outputs.constraintlab }}
           CONSTRAINTLAB_RESULT: ${{ needs.constraintlab.result }}
         run: |
+          test "$CALIBRATIONLAB_RESULT" = success
           test "$AGENTTRUSTLAB_RESULT" = success
           test "$DELTALAB_RESULT" = success
           test "$ADVERSARYLAB_RESULT" = success
