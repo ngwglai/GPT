@@ -59,7 +59,7 @@ function prepare() {
   if (!next.ok) { render(); throw new Error(`独立验证失败：${next.issues.join('；')}`); }
   viewBase = state;
   execution = next.executions[select('strategy').value as Strategy];
-  state = execution.state; cursor = 0; drafts(); render();
+  state = execution.state; cursor = 0; drafts(); render(); editor();
 }
 function step() {
   if (!execution) prepare();
@@ -100,18 +100,21 @@ function render() {
   for (const n of state.graph.nodes) if (n.kind === 'input') {
     const label = document.createElement('label'); label.textContent = n.id;
     const field = document.createElement('input'); field.type = 'number'; field.step = 'any'; field.value = draft[n.id]; field.dataset.input = n.id; field.setAttribute('aria-label', `输入 ${n.id}`);
-    field.addEventListener('input', () => { draft[n.id] = field.value; }); label.append(field); inputs.append(label);
+    field.addEventListener('input', () => { draft[n.id] = field.value; clearRun(); renderEvidence(); renderPlayback(); }); label.append(field); inputs.append(label);
   }
   el('strategy-description').textContent = descriptions[select('strategy').value as Strategy];
+  renderEvidence();
+  const picker = select('node-select'); picker.replaceChildren(new Option('＋ 添加新节点', ''));
+  for (const n of state.graph.nodes) picker.add(new Option(n.id, n.id)); picker.value = selected;
+  renderPlayback();
+}
+function renderEvidence() {
   const m = execution?.metrics;
   el('metrics').innerHTML = [ ['实际计算', m?.executed ?? '—'], ['跳过 / 总数', m ? `${m.skipped} / ${m.total}` : '—'], ['输出变化', m?.changed ?? '—'], ['节省比例', m ? `${(m.savings * 100).toFixed(1)}%` : '—'], ['无关 / 截断缓存', m ? `${m.unaffected} / ${m.blocked}` : '—'], ['执行但输出稳定', m?.unchangedExecuted ?? '—'], ['理论成本', m ? `${m.theoreticalCost} / ${m.fullCost}` : '—'] ].map(([name, value]) => `<div><strong>${value}</strong><span>${name}</span></div>`).join('');
   el('comparison').innerHTML = report ? `<table><thead><tr><th>同批策略</th><th>实际运算</th><th>跳过</th></tr></thead><tbody>${(['full', 'dirty', 'change'] as const).map(s => `<tr><td>${s}</td><td>${report!.executions[s].metrics.executed}</td><td>${report!.executions[s].metrics.skipped}</td></tr>`).join('')}</tbody></table>` : '';
   el('verification').textContent = report ? report.ok ? '✓ 通过：三种策略全部节点数值、缓存及依赖，与独立完整重算一致。' : `验证失败：${report.issues.join('；')}` : '尚未运行。每批使用相同初态分别执行三种策略，再与独立参考实现比较。';
   el('verification').className = report ? report.ok ? 'verified' : 'error' : 'hint';
   el('repro').hidden = !report || report.ok;
-  const picker = select('node-select'); picker.replaceChildren(new Option('＋ 添加新节点', ''));
-  for (const n of state.graph.nodes) picker.add(new Option(n.id, n.id)); picker.value = selected;
-  renderPlayback();
 }
 function editor() {
   const n = state.graph.nodes.find(n => n.id === selected);
@@ -139,7 +142,7 @@ function download(text: string, name: string) {
 }
 for (const [id, action] of Object.entries({ run: prepare, step: () => { stop(); step(); }, play, pause: () => { stop(); renderPlayback(); }, reset: () => replace(structuredClone(initial)), 'save-node': saveNode,
   'delete-node': () => { if (!selected) throw new Error('请先选择节点'); const next = rebuild(deleteNode(currentGraph(), selected)); currentPreset = 'custom'; replace(next); },
-  validate: () => { if (!report) prepare(); else if (!report.ok) throw new Error(report.issues.join('；')); },
+  validate: prepare,
   load: () => {
     const name = select('preset').value as Preset, size = Number(input('size').value), seed = Number(input('seed').value);
     if (!input('seed').value.trim() || !Number.isInteger(seed) || seed < 0 || seed > 4294967295) throw new Error('随机种子必须为 uint32');

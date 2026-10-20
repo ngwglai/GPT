@@ -160,6 +160,10 @@ describe('safe, reproducible JSON', () => {
     (d: Record<string, unknown>) => { d.graph = { nodes: [input('x'), calc('a', 'abs', 'a')] }; },
     (d: Record<string, unknown>) => { d.inputs = { x: null, y: 3 }; },
   ])('rejects invalid import %#', mutate => { const data = JSON.parse(make()); mutate(data); expect(() => importExperiment(JSON.stringify(data))).toThrow(); });
+  it.each([1, 2, 3])('rejects non-reloadable preset size %i', size => {
+    const data = JSON.parse(make()); data.parameters.preset = 'large'; data.parameters.size = size;
+    expect(() => importExperiment(JSON.stringify(data))).toThrow(/参数/);
+  });
   it.each(['null', '[]', 'true', '{}', '{bad json}'])('rejects invalid JSON %s', data => expect(() => importExperiment(data)).toThrow());
   it('caps import size', () => expect(() => importExperiment(' '.repeat(MAX_JSON_BYTES + 1))).toThrow(/512/));
   it('rejects graph arithmetic overflow on import', () => {

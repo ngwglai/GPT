@@ -16,7 +16,7 @@ export function importExperiment(text: string): Experiment {
   const p = data.parameters as Record<string, unknown>;
   if (!p || typeof p !== 'object' || Array.isArray(p) || !['full', 'dirty', 'change'].includes(p.strategy as string) ||
       typeof p.preset !== 'string' || !['chain', 'branch', 'stable', 'large', 'custom'].includes(p.preset) ||
-      !Number.isInteger(p.size) || (p.size as number) < 1 || (p.size as number) > 1000) throw new Error('实验参数无效');
+      !Number.isInteger(p.size) || (p.size as number) < 4 || (p.size as number) > 1000) throw new Error('实验参数无效');
   if (!Number.isInteger(data.seed) || (data.seed as number) < 0 || (data.seed as number) > 4294967295) throw new Error('随机种子无效');
   const experiment: Experiment = { version: 1, graph, inputs,
     parameters: { strategy: p.strategy as Strategy, preset: p.preset, size: p.size as number }, seed: data.seed as number };

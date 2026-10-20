@@ -142,3 +142,25 @@ test('1000-node fixed-seed graph renders and validates without changing semantic
   await expect(page.locator('#verification')).toContainText('✓ 通过');
   await page.locator('#step').click(); await expect(page.locator('#progress')).toContainText('1 /');
 });
+
+test('editing a verified input invalidates old evidence and validation consumes the new draft', async ({ page }) => {
+  await page.locator('#run').click(); await expect(page.locator('#verification')).toContainText('✓ 通过');
+  await page.getByRole('spinbutton', { name: '输入 x', exact: true }).fill('9');
+  await expect(page.locator('#verification')).toContainText('尚未运行');
+  await expect(page.locator('#comparison tbody tr')).toHaveCount(0);
+  await page.locator('#validate').click(); await expect(page.locator('#verification')).toContainText('✓ 通过');
+  await expect(page.getByRole('spinbutton', { name: '输入 x', exact: true })).toHaveValue('9');
+  await page.locator('#step').click(); await expect(page.locator('#trace')).toContainText('-2 → 9');
+});
+test('selected input editor refreshes after a batch and saving keeps the committed value', async ({ page }) => {
+  await page.locator('#node-select').selectOption('x'); await expect(page.locator('#node-value')).toHaveValue('-2');
+  await page.getByRole('spinbutton', { name: '输入 x', exact: true }).fill('2'); await page.locator('#run').click();
+  await expect(page.locator('#node-value')).toHaveValue('2'); await page.locator('#save-node').click();
+  await expect(page.getByRole('spinbutton', { name: '输入 x', exact: true })).toHaveValue('2');
+  await page.locator('#validate').click(); await expect(page.locator('#verification')).toContainText('✓ 通过');
+});
+test('import rejects preset parameters that cannot be reloaded', async ({ page }) => {
+  const data = { version: 1, graph: { nodes: [{ id: 'x', kind: 'input', value: 1 }] }, inputs: { x: 1 }, parameters: { strategy: 'change', preset: 'large', size: 1 }, seed: 42 };
+  await page.locator('#import').setInputFiles(upload(data));
+  await expect(page.locator('#message')).toContainText('实验参数无效'); await expect(page.locator('#node-count')).toHaveText('6 节点');
+});
