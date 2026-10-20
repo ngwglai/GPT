@@ -287,3 +287,35 @@ describe('Platt floating-point stagnation', () => {
     }
   });
 });
+
+describe('exact reported bin boundaries', () => {
+  it('22 bins put p=15/22 into lower-inclusive bin 15', () => {
+    const bins = reliabilityBins([{ probability: 15 / 22, outcome: 1 }], 22);
+    expect(bins[15].count).toBe(1); expect(bins[14].count).toBe(0);
+    expect(bins[15].lower).toBe(15 / 22);
+  });
+  it('all supported boundaries and their adjacent IEEE754 values respect reported intervals', () => {
+    const adjacent = (value: number, direction: -1 | 1): number => {
+      const view = new DataView(new ArrayBuffer(8));
+      view.setFloat64(0, value);
+      view.setBigUint64(0, view.getBigUint64(0) + BigInt(direction));
+      return view.getFloat64(0);
+    };
+    for (let k = 2; k <= 30; k++) {
+      const check = (p: number, expected: number) => {
+        const bins = reliabilityBins([{ probability: p, outcome: 0 }], k);
+        const bin = bins.find(b => b.count === 1)!;
+        expect(bin.index, `k=${k}, p=${p}`).toBe(expected);
+        expect(p).toBeGreaterThanOrEqual(bin.lower);
+        if (expected === k - 1) expect(p).toBeLessThanOrEqual(bin.upper);
+        else expect(p).toBeLessThan(bin.upper);
+      };
+      for (let i = 0; i <= k; i++) {
+        const p = i / k;
+        check(p, Math.min(i, k - 1));
+        if (i > 0) check(adjacent(p, -1), i - 1);
+        if (i < k) check(adjacent(p, 1), i);
+      }
+    }
+  });
+});

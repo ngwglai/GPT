@@ -35,12 +35,21 @@ export function wilson(successes: number, count: number): [number, number] {
 export function reliabilityBins(rows: readonly Prediction[], binCount: number): Bin[] {
   integer(binCount, 2, 30, '分箱数量');
   validateRows(rows);
+  const boundaries = Array.from({ length: binCount + 1 }, (_, i) => i / binCount);
   const sums = Array.from({ length: binCount }, () => ({ count: 0, probability: 0, successes: 0 }));
   for (const row of rows) {
-    const bin = sums[Math.min(binCount - 1, Math.floor(row.probability * binCount))];
+    // Search the very same floating-point boundaries that we report. Multiplying
+    // p*k can round a documented boundary below its intended integer index.
+    let lower = 0, upper = binCount;
+    while (upper - lower > 1) {
+      const middle = Math.floor((lower + upper) / 2);
+      if (row.probability >= boundaries[middle]) lower = middle;
+      else upper = middle;
+    }
+    const bin = sums[lower];
     bin.count++; bin.probability += row.probability; bin.successes += row.outcome;
   }
-  return sums.map((s, index) => ({ index, lower: index / binCount, upper: (index + 1) / binCount,
+  return sums.map((s, index) => ({ index, lower: boundaries[index], upper: boundaries[index + 1],
     count: s.count, meanProbability: s.count ? s.probability / s.count : null,
     eventRate: s.count ? s.successes / s.count : null, interval: s.count ? wilson(s.successes, s.count) : null }));
 }
