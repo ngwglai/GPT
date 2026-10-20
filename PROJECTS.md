@@ -16,6 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
+| AgentTrustLab | [projects/agenttrustlab](projects/agenttrustlab/) | Testing | 确定性智能体信任边界与独立工具授权；四策略真实比较 | 本地161单元/13生产E2E通过，Linux/Windows CI待验收；不部署 |
 | DeltaLab | [projects/deltalab](projects/deltalab/) | Completed | 离线 DAG 缓存、脏传播与输出变化传播的真实运算比较 | PR #19；224单元/18生产E2E与修复头Linux/Windows、CI required全通过；按需本机试用，不部署 |
 | AdversaryLab | [projects/adversarylab](projects/adversarylab/) | Completed | 固定输入空间中的算法性能对抗搜索；真实计数与独立精确排序对照 | PR #17；本地125单元/17生产E2E；旧功能头跨平台CI通过，修复后最新CI通过即合并，不部署 |
 | SynthLab | [projects/synthlab](projects/synthlab/) | Completed | 本地类型引导枚举、观察等价剪枝与真实 CEGIS 程序合成 | PR #16；105单元/13生产E2E、Linux/Windows与CI required通过；按需本机试用，不部署 |
@@ -271,3 +272,14 @@
 - **实际验证 / 状态**：本地最终224项单元、18项生产Chromium E2E、根53隐私回归、类型/lint/build和审计0漏洞通过；含150种子×20批差分及1000节点计数。窄屏测试滚动已修正，最终完整重跑通过；最终证据见 [VALIDATION.md](projects/deltalab/VALIDATION.md)。Completed（功能验收完成，合并元数据以PR为准）；[PR #19](https://github.com/ngwglai/GPT/pull/19) 修复功能头 fb0b540 的 [CI 39355256554](https://github.com/ngwglai/GPT/actions/runs/39355256554) 已29/29作业成功，含原生Linux/Windows与CI required；初始功能头CI也全部通过。三处交互/参数审查问题已修复并增加回归，身份意见误引非PR对象已核实排除；本记录提交同样要求最新完整CI通过后才合并。
 - **环境 / 隐私**：启动期间命令无法启动，等待恢复后完成工具/文件系统/远程验证；未为环境问题改代码。按现有初始化脚本验证私有源并迁移精确公共系统误列，匿名身份接口核验通过；基线107提交/534blob/0命中。
 - **边界 / 后续**：最多1000节点、512KiB JSON、同步主线程、精确双精度比较、结构变更全重建；统一单位运算成本不代表耗时节省。无任意脚本、后端、动态依赖或循环。按需增加Worker、图缩放与批次历史；用户电脑人工验收和Firefox/WebKit未验证。
+
+
+## AgentTrustLab v0.1（2026-10-20）
+
+- **目的 / 用户**：面向学习者、开发者与安全研究者，通过确定性模拟比较提示注入、工具越权、最小权限及高风险确认的实际效果。
+- **差异 / MVP**：独立于现有算法搜索、模型检验与因果实验；18场景（12恶意/6正常）、四策略、独立授权引擎与一次性凭证模拟器、中文DOM/SVG权限配置、同输入批量比较、逐项轨迹、快照重放及安全JSON配置导入与JSON/CSV导出。无真实LLM、MCP、网络或私人文件操作，不部署。
+- **目录 / 分支**：[projects/agenttrustlab](projects/agenttrustlab/)；从最新origin/main bc1034f创建feature/agenttrustlab。复用既有TypeScript/Vite/Vitest/Playwright设施，只增加本项目及必要CI接入。
+- **验收标准**：独立授权矩阵/指标真值、零样本/确认/绕过/参数/导入安全与CSV回读、生产浏览器交互、类型/lint/build/审计/隐私及最新PR原生Linux/Windows与CI required全通过后直接合并。
+- **当前验证 / 状态**：Testing；最终161单元、13生产Chromium E2E、类型/lint/构建及0漏洞审计通过，根53隐私回归通过；[PR #20](https://github.com/ngwglai/GPT/pull/20)已创建，远程CI排队；自查修复重放后编辑共享引用问题，并增加双重重放回归。真实证据见[VALIDATION.md](projects/agenttrustlab/VALIDATION.md)。
+- **环境 / 隐私**：环境就绪后最小命令与读写通过；匿名身份及私有来源/hooks初始化成功，基线53根回归与111提交/568blob/0命中。离线缓存与浏览器安装未完成的启动失败均单独记录，未作为测试通过。
+- **限制 / 后续**：128KiB配置、最多18场景×4策略、单次预定义调用、有限枚举与主线程；结果仅适用实现的场景与策略，不代表真实LLM普遍安全率。按需增加多步模拟与参数级权限；用户电脑人工验收及Firefox/WebKit未验证。

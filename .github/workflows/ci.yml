@@ -195,15 +195,20 @@ jobs:
     name: DeltaLab
     uses: ./.github/workflows/deltalab.yml
 
+  agenttrustlab:
+    name: AgentTrustLab
+    uses: ./.github/workflows/agenttrustlab.yml
+
   required:
     name: CI required
     if: always()
-    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab, adversarylab, deltalab]
+    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab, adversarylab, deltalab, agenttrustlab]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require all applicable checks
         env:
+          AGENTTRUSTLAB_RESULT: ${{ needs.agenttrustlab.result }}
           DELTALAB_RESULT: ${{ needs.deltalab.result }}
           ADVERSARYLAB_RESULT: ${{ needs.adversarylab.result }}
           SYNTHLAB_RESULT: ${{ needs.synthlab.result }}
@@ -219,6 +224,7 @@ jobs:
           HAS_CONSTRAINTLAB: ${{ needs.layout.outputs.constraintlab }}
           CONSTRAINTLAB_RESULT: ${{ needs.constraintlab.result }}
         run: |
+          test "$AGENTTRUSTLAB_RESULT" = success
           test "$DELTALAB_RESULT" = success
           test "$ADVERSARYLAB_RESULT" = success
           test "$SYNTHLAB_RESULT" = success
