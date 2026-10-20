@@ -15,6 +15,7 @@
 - SynthLab：独立可复用工作流，Linux/Windows 原生 Node.js 22；锁文件安装、完整依赖审计、lint/typecheck、独立小语法穷举和50种子规格对照、生产构建、真实Worker Chromium E2E，预算/取消/故障与有限域结论独立，不部署。
 - DeltaLab：独立可复用工作流，Linux/Windows 原生 Node.js 22；锁文件安装与完整依赖审计、lint/typecheck、150种子增量差分及1000节点运算计数、生产构建、Chromium 编辑/回放/导入导出/窄屏 E2E，不部署。
 - AgentTrustLab：独立可复用工作流，Linux/Windows 原生 Node.js 22；锁文件安装、完整审计、lint/typecheck、独立授权矩阵与指标/安全数据测试、生产构建、Chromium 配置/确认/重放/导入导出/离线/窄屏 E2E。所有操作为本地模拟，不连接真实工具、不部署。
+- CalibrationLab：独立可复用工作流，Linux/Windows 原生 Node.js 22；锁文件安装/完整依赖审计、lint/typecheck、手算评分/固定种子统计/PAVA 穷举与泄漏隔离单元测试、生产构建、Chromium 控制/校准/真实下载/窄屏/离线 E2E；不部署。
 - `CI required` 汇总全部适用任务；任一必需任务失败或取消均失败。只有项目确实不存在时，允许跳过其独立任务。失败时保留服务日志与浏览器失败信息供排查。
 
 配置存在不代表运行成功，验收应引用对应提交的 Actions 运行链接。不得用旧提交结果代替新提交验证。
