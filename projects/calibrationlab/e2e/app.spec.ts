@@ -151,3 +151,15 @@ test('loaded production app runs with network blocked', async ({ page, context }
   await expect(page.locator('.fit-status')).toContainText('拟合成功');
   const json = JSON.parse(await downloaded(page, 'JSON')); expect(json.calibrated.platt.fit.ok).toBe(true);
 });
+
+test('ordinary seed 32 exposes a converged Platt model and test scores', async ({ page }) => {
+  await page.getByLabel('总样本量').fill('200');
+  await page.getByLabel('随机种子').fill('32');
+  await run(page); await calibrate(page);
+  await expect(page.locator('.fit-status')).toHaveText('Platt Scaling：拟合成功');
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  const json = JSON.parse(await downloaded(page, 'JSON')) as Experiment;
+  expect(json.calibrated!.platt.fit.ok).toBe(true);
+  expect(json.calibrated!.platt.evaluation!.count).toBe(100);
+  await expect(page.getByTestId('metrics')).toContainText(json.calibrated!.platt.evaluation!.brier!.toFixed(5));
+});

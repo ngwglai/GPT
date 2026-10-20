@@ -20,7 +20,11 @@ export function fitPlatt(rows: readonly Prediction[]): FitResult {
   const negative = rows.length - positive;
   const x = rows.map(r => logit(r.probability));
   const targets = rows.map(r => r.outcome ? (positive + 1) / (positive + 2) : 1 / (negative + 2));
-  const loss = (a: number, b: number) => x.reduce((s, v, i) => s + softplus(a * v + b) - targets[i] * (a * v + b), 0) / x.length + RIDGE / 2 * (a * a + b * b);
+  const loss = (a: number, b: number) => x.reduce((s, v, i) => {
+    const z = a * v + b;
+    // Equivalent cross-entropy without subtracting nearly equal terms.
+    return s + targets[i] * softplus(-z) + (1 - targets[i]) * softplus(z);
+  }, 0) / x.length + RIDGE / 2 * (a * a + b * b);
   let a = 0, b = Math.log((positive + 1) / (negative + 1));
   for (let iteration = 0; iteration < 100; iteration++) {
     let ga = RIDGE * a, gb = RIDGE * b, haa = RIDGE, hab = 0, hbb = RIDGE;
@@ -33,10 +37,16 @@ export function fitPlatt(rows: readonly Prediction[]): FitResult {
     if (!(determinant > 0) || !Number.isFinite(determinant)) return { ok: false, reason: 'Platt Hessian 数值退化' };
     const da = (hbb * ga - hab * gb) / determinant, db = (haa * gb - hab * ga) / determinant;
     const current = loss(a, b);
+    // Near the optimum, Armijo's expected decrease can be smaller than the
+    // objective's rounding error. Permit only a few ulps, retain the gradient
+    // convergence criterion, and let Newton take the resolvable full update.
+    const roundingSlack = 8 * Number.EPSILON * Math.max(1, Math.abs(current));
     let step = 1;
-    while (step > 1e-10 && loss(a - step * da, b - step * db) > current - 1e-4 * step * (ga * da + gb * db)) step /= 2;
+    while (step > 1e-10 && loss(a - step * da, b - step * db) > current - 1e-4 * step * (ga * da + gb * db) + roundingSlack) step /= 2;
     if (step <= 1e-10) return { ok: false, reason: 'Platt 线搜索未收敛，未输出拟合结果' };
-    a -= step * da; b -= step * db;
+    const nextA = a - step * da, nextB = b - step * db;
+    if (nextA === a && nextB === b) return { ok: false, reason: 'Platt 达到浮点精度极限，未满足梯度阈值' };
+    a = nextA; b = nextB;
   }
   return { ok: false, reason: 'Platt 达到 100 次迭代上限，未可靠收敛' };
 }

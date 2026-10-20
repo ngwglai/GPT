@@ -259,3 +259,31 @@ describe('optimizer and resource boundary regressions', () => {
     }
   });
 });
+
+describe('Platt floating-point stagnation', () => {
+  it('seed 32 completes instead of repeating an unresolvable line-search update', () => {
+    const e = runExperiment({ ...DEFAULT_CONFIG, sampleSize: 200, seed: 32 });
+    const fit = e.calibrated!.platt.fit;
+    expect(fit.ok).toBe(true);
+    if (!fit.ok || fit.model.method !== 'platt') throw new Error('fit failed');
+    expect(fit.model.iterations).toBeLessThan(20);
+    // Verify the same strict threshold independently, not success alone.
+    const rows = e.dataset.calibration;
+    const positive = rows.filter(r => r.outcome === 1).length;
+    let ga = fit.model.slope * 1e-6, gb = fit.model.intercept * 1e-6;
+    for (const r of rows) {
+      const x = Math.log(r.probability / (1 - r.probability));
+      const predicted = 1 / (1 + Math.exp(-(fit.model.slope * x + fit.model.intercept)));
+      const target = r.outcome ? (positive + 1) / (positive + 2) : 1 / (rows.length - positive + 2);
+      ga += (predicted - target) * x / rows.length;
+      gb += (predicted - target) / rows.length;
+    }
+    expect(Math.max(Math.abs(ga), Math.abs(gb))).toBeLessThan(1e-8);
+  });
+  it.each(['ideal', 'overconfident', 'underconfident'] as const)('100 ordinary fixed seeds fit without numerical stalls: %s', scenario => {
+    for (let seed = 1; seed <= 100; seed++) {
+      const e = runExperiment({ ...DEFAULT_CONFIG, scenario, sampleSize: 200, seed });
+      expect(e.calibrated!.platt.fit.ok, `seed=${seed}`).toBe(true);
+    }
+  });
+});
