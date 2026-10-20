@@ -16,7 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| CalibrationLab | [projects/calibrationlab](projects/calibrationlab/) | Testing | 本地概率预测、独立样本校准与可靠性图 | 功能与本地验证进行中；最新 Linux/Windows 及 CI required 通过后合并，不部署 |
+| CalibrationLab | [projects/calibrationlab](projects/calibrationlab/) | Completed | 本地概率预测、独立样本校准与可靠性图 | PR #22；115单元/12生产E2E、功能头Linux/Windows与CI required全通过；最新记录提交同样要求完整CI通过，不部署 |
 | AgentTrustLab | [projects/agenttrustlab](projects/agenttrustlab/) | Completed | 确定性智能体信任边界与独立工具授权；四策略真实比较 | PR #20已合并；161单元/13生产E2E、Linux/Windows、CI required及合并后main CI全通过；不部署 |
 | DeltaLab | [projects/deltalab](projects/deltalab/) | Completed | 离线 DAG 缓存、脏传播与输出变化传播的真实运算比较 | PR #19；224单元/18生产E2E与修复头Linux/Windows、CI required全通过；按需本机试用，不部署 |
 | AdversaryLab | [projects/adversarylab](projects/adversarylab/) | Completed | 固定输入空间中的算法性能对抗搜索；真实计数与独立精确排序对照 | PR #17；本地125单元/17生产E2E；旧功能头跨平台CI通过，修复后最新CI通过即合并，不部署 |
@@ -300,6 +300,6 @@
 - **差异 / 范围**：独立于 CausalLab 因果识别与 MatchupLab 决策实验；React/TypeScript/Vite 本地应用，四种数学定义的 IID 生成机制、可注入 PRNG、独立校准/测试划分、Platt 与 PAVA 保序回归、评分与 Wilson 可靠性图、中文响应式控制、同测试样本比较和 CSV/JSON 导出。无后端或付费 API，不部署。
 - **目录 / 分支**：[projects/calibrationlab](projects/calibrationlab/)；从最新 origin/main 25f3120 创建 feature/calibrationlab；开发前无未合并 PR 或重复项目。不修改其他项目业务代码或依赖。
 - **验收标准**：独立手算评分、固定种子统计性质、PAVA 穷举参考、训练测试隔离、校准可变差、真实生产浏览器操作与下载；类型/lint/build/审计/隐私及最新 PR Linux/Windows、CI required 全通过后直接合并。
-- **当前状态 / 实际验证**：Testing；115 项核心单元与数学性质测试、12 项生产 Chromium E2E、类型/ESLint/构建、依赖审计 0 漏洞已通过；远程最新 CI 待执行，不能视为已通过。最终命令、失败与修复见 [VALIDATION.md](projects/calibrationlab/VALIDATION.md)。
-- **环境 / 隐私**：首次命令因环境未就绪无法启动，待环境 ready 后最小执行及工具版本通过；私有词表、匿名身份与 hooks 初始化成功；基线 53 根隐私回归与 116 提交/599 唯一 blob 扫描 0 命中。未绕过检查。
+- **当前状态 / 实际验证**：Completed（功能验收完成，合并元数据以 [PR #22](https://github.com/ngwglai/GPT/pull/22) 为准）；115 项核心单元与数学性质测试、12 项生产 Chromium E2E、类型/ESLint/构建、依赖审计 0 漏洞已通过；功能头 ac9af63 的 [CI 39403983403](https://github.com/ngwglai/GPT/actions/runs/39403983403) 已 33/33 成功，含原生 Linux/Windows、四组隐私与 CI required。本验收记录提交仍须最新完整 CI 通过后才合并，不以旧头替代。最终命令、失败与修复见 [VALIDATION.md](projects/calibrationlab/VALIDATION.md)。
+- **环境 / 隐私**：首次命令因环境未就绪无法启动，待环境 ready 后最小执行及工具版本通过；私有词表、匿名身份与 hooks 初始化成功；基线 53 根隐私回归与 116 提交/599 唯一 blob 扫描 0 命中。提交前暂存区/说明、实际提交及推送前私有检查通过；功能提交范围 1 提交/377 唯一 blob/0 命中，全历史复验 117 提交/620 blob/0 命中；未绕过检查。
 - **边界 / 后续**：20,000 样本/30 箱、主线程；常量分数或不足样本明确拒绝拟合，Platt 采用明确的平滑目标与微小 L2 版本；Wilson 为逐箱区间，ECE 依赖分箱。合成结果不代表真实模型，校准不保证改进。ESLint 9 结束支持，后续独立维护升级；Firefox/WebKit、真实手机与用户电脑人工测试未执行。
