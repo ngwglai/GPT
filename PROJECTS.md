@@ -16,6 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
+| CompilerLab | [projects/compilerlab](projects/compilerlab/) | Testing | 本地微型编译流水线、独立解释器与栈式 VM 语义对照 | 本地验证通过，等待最新 Linux/Windows、根 CI required 后合并；不部署 |
 | CalibrationLab | [projects/calibrationlab](projects/calibrationlab/) | Completed | 本地概率预测、独立样本校准与可靠性图 | PR #22；最终121单元/13生产E2E；初始功能头Linux/Windows与CI required全通过，数值修复头仍须完整CI，不部署 |
 | AgentTrustLab | [projects/agenttrustlab](projects/agenttrustlab/) | Completed | 确定性智能体信任边界与独立工具授权；四策略真实比较 | PR #20已合并；161单元/13生产E2E、Linux/Windows、CI required及合并后main CI全通过；不部署 |
 | DeltaLab | [projects/deltalab](projects/deltalab/) | Completed | 离线 DAG 缓存、脏传播与输出变化传播的真实运算比较 | PR #19；224单元/18生产E2E与修复头Linux/Windows、CI required全通过；按需本机试用，不部署 |
@@ -303,3 +304,14 @@
 - **当前状态 / 实际验证**：Completed（功能验收完成，合并元数据以 [PR #22](https://github.com/ngwglai/GPT/pull/22) 为准）；数值与分箱边界审查修复后最终 121 项核心单元与数学性质测试、13 项生产 Chromium E2E、类型/ESLint/构建、依赖审计 0 漏洞已通过；功能头 ac9af63 的 [CI 39403983403](https://github.com/ngwglai/GPT/actions/runs/39403983403) 已 33/33 成功，含原生 Linux/Windows、四组隐私与 CI required。种子32浮点线搜索停滞已真实复现并修复，保留严格梯度阈值；增加300固定种子与生产回归。22箱精确边界问题也已修复，测试覆盖2–30箱所有边界及相邻浮点数。本最终修复提交仍须最新完整 CI 通过后才合并，不以旧头替代。最终命令、失败与修复见 [VALIDATION.md](projects/calibrationlab/VALIDATION.md)。
 - **环境 / 隐私**：首次命令因环境未就绪无法启动，待环境 ready 后最小执行及工具版本通过；私有词表、匿名身份与 hooks 初始化成功；基线 53 根隐私回归与 116 提交/599 唯一 blob 扫描 0 命中。提交前暂存区/说明、实际提交及推送前私有检查通过；功能提交范围 1 提交/377 唯一 blob/0 命中，全历史复验 117 提交/620 blob/0 命中；未绕过检查。
 - **边界 / 后续**：20,000 样本/30 箱、主线程；常量分数或不足样本明确拒绝拟合，Platt 采用明确的平滑目标与微小 L2 版本；Wilson 为逐箱区间，ECE 依赖分箱。合成结果不代表真实模型，校准不保证改进。ESLint 9 结束支持，后续独立维护升级；Firefox/WebKit、真实手机与用户电脑人工测试未执行。
+
+
+## CompilerLab v0.1（2026-10-21）
+
+- **目的 / 用户**：面向编译原理学习者与开发者，用真实流水线理解源码、类型、优化与栈式执行。
+- **差异 / MVP**：独立于 SynthLab 的程序搜索和 ModelCheckLab 的有限状态验证；先写语言规范，纯 TypeScript int/bool DSL，Lexer/Parser/AST/语义分析、独立按名 AST 解释器、安全局部优化、字节码与按槽位 VM、可复现轨迹、中文 React 阶段/优化对照和单步/继续/重置/错误定位。完全本地，无宿主代码执行或外部服务。
+- **目录 / 分支**：[projects/compilerlab](projects/compilerlab/)；从最新 origin/main 036ae0c 创建 feature/compilerlab；开始时无未合并 PR 或重复项目。不修改其他项目业务代码，仅接入必要独立 CI 与项目索引。
+- **验收标准**：模块单元、手算语义与小整数独立 oracle、160 固定种子原/优化 AST 与原/优化 VM 差分（输出、错误/位置、顶层状态）、真实 trace、生产 Chromium E2E；typecheck/lint/build/完整审计/隐私及最新 PR 原生 Linux/Windows、根 CI required 全通过后按授权合并。
+- **实际验证 / 状态**：Testing；最终本地247单元（含1156小整数独立oracle组合与160固定种子）/13生产E2E、静态/构建/0漏洞完整审计通过；最新代码和跨平台证据见 [VALIDATION.md](projects/compilerlab/VALIDATION.md)，不把旧头结果代替最新头。
+- **环境 / 隐私**：环境 ready 后最小 shell、Git/工具/实际 Chromium 启动成功；私有来源/匿名身份/hooks 初始化成功，基线53根回归及121提交/633blob/0命中。首次脚手架相对路径、类型推断、位置断言的实际失败与修正已记录；不回显私人值，不绕过检查。
+- **限制 / 后续**：8192字符/2048Token/512AST节点/32深度/128声明/2048指令/4096步骤/256输出；对称整数范围±2147483647，溢出/除零报错，除法向零截断。预算终止单独报告；同步主线程，无循环/函数/文件/网络。用户电脑人工试用、Firefox/WebKit和真实手机未验证；按需扩展控制流图或源码断点，不部署。

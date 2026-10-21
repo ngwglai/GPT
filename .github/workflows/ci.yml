@@ -203,15 +203,20 @@ jobs:
     name: CalibrationLab
     uses: ./.github/workflows/calibrationlab.yml
 
+  compilerlab:
+    name: CompilerLab
+    uses: ./.github/workflows/compilerlab.yml
+
   required:
     name: CI required
     if: always()
-    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab, adversarylab, deltalab, agenttrustlab, calibrationlab]
+    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab, adversarylab, deltalab, agenttrustlab, calibrationlab, compilerlab]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require all applicable checks
         env:
+          COMPILERLAB_RESULT: ${{ needs.compilerlab.result }}
           CALIBRATIONLAB_RESULT: ${{ needs.calibrationlab.result }}
           AGENTTRUSTLAB_RESULT: ${{ needs.agenttrustlab.result }}
           DELTALAB_RESULT: ${{ needs.deltalab.result }}
@@ -229,6 +234,7 @@ jobs:
           HAS_CONSTRAINTLAB: ${{ needs.layout.outputs.constraintlab }}
           CONSTRAINTLAB_RESULT: ${{ needs.constraintlab.result }}
         run: |
+          test "$COMPILERLAB_RESULT" = success
           test "$CALIBRATIONLAB_RESULT" = success
           test "$AGENTTRUSTLAB_RESULT" = success
           test "$DELTALAB_RESULT" = success
