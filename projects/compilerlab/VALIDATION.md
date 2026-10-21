@@ -110,3 +110,21 @@ CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e
 两条P2审查讨论在修复、回归与本项目跨平台检查成功后已标记解决；未发现新增未解决讨论。此前初始/补充头的成功保留为历史，不替代本次修复头证据。修复提交前后及全部待推送范围私有检查通过（3提交/413唯一blob/0命中）。
 
 项目恢复Completed。本次验收记录提交只更新PROJECTS.md与本文件，不改功能或测试；仍要求该最新记录头的完整CI通过后才执行PR合并。最新检查入口为[PR #23 checks](https://github.com/ngwglai/GPT/pull/23/checks)。合并后的PR状态、main包含目标提交、main CI与私有隐私检查须另行实际核对，并在最终交付报告/PR中列出；本提交前尚未执行的动作不计为已完成。
+
+## 验收记录后发生的环境中断与恢复
+
+验收记录头`dfac951f028811430fd8cb1565ac407f33c5c72d`的[CI 39525742812](https://github.com/ngwglai/GPT/actions/runs/39525742812)也已35/35全部成功。等待期间环境再次切换starting；一次`exec_command`请求未创建shell进程，工具返回`exec-server transport disconnected`及`recovery timed out after 25s`。**无shell退出状态**，不记为Git/代码/测试失败。请求的完整命令为：
+
+```sh
+git fetch origin refs/heads/main:refs/remotes/origin/main && git merge-base --is-ancestor origin/main HEAD && git diff --quiet && git diff --cached --quiet && python - <<'PY'
+import subprocess
+allowed={'.github/workflows/ci.yml','.github/workflows/compilerlab.yml','PROJECTS.md','docs/ENGINEERING.md'}
+paths=subprocess.check_output(['git','diff','--name-only','origin/main...HEAD'],text=True).splitlines()
+assert all(p.startswith('projects/compilerlab/') or p in allowed for p in paths), 'Unexpected tracked scope'
+print('Scope verified:',len(paths),'files; no other project business changes.')
+PY
+```
+
+独立诊断：`pwd`退出0，`python -c 'print("shell-ready")'`退出0；环境状态从offline/starting恢复connected/running。环境ready后再次执行匿名身份/hooks初始化与`privacy_check.py --commits origin/main..HEAD`均退出0，已有私有来源无需迁移，4提交/415唯一blob/0命中。显式fetch main、祖先校验、工作树/暂存区校验与33文件范围检查均通过，未发现其他项目业务变更。GitHub请求等待恢复后退出0，未把临时等待当成命令成功或测试失败。
+
+恢复后的实际复验：`npm run typecheck && npm test && npm run build && CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e`退出0，253核心单元/14真实生产E2E全通过。没有为环境故障修改业务代码、检查规则、hooks或词表。本次只追加这份故障/恢复记录，最新记录头仍必须完整CI成功才合并；合并后实际核对见最终报告与PR。
