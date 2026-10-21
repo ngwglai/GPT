@@ -231,6 +231,33 @@ test("production application works offline without external requests or page err
   expect(external).toEqual([]);
 });
 
+test("unfinished historical replay blocks Continue until the latest snapshot is selected", async ({
+  page,
+}) => {
+  await source(page, "print(2); print(3);");
+  await tab(page, "执行调试");
+  for (let i = 0; i < 3; i++)
+    await page.getByRole("button", { name: "单步", exact: true }).click();
+  await expect(page.getByTestId("output")).toHaveText("2");
+  await page.getByLabel("执行轨迹回放").selectOption("0");
+  await expect(page.getByTestId("output")).toHaveText("（暂无输出）");
+  await expect(
+    page.getByRole("button", { name: "继续", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "单步", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByText("正在回放历史快照；选择最后一步后可继续尚未结束的机器。"),
+  ).toBeVisible();
+  await page.getByLabel("执行轨迹回放").selectOption("2");
+  await expect(
+    page.getByRole("button", { name: "继续", exact: true }),
+  ).toBeEnabled();
+  await page.getByRole("button", { name: "继续", exact: true }).click();
+  await expect(page.getByTestId("output")).toHaveText("2\n3");
+});
+
 test("375px layout keeps all stages, editing and debugging usable without page overflow", async ({
   page,
 }) => {

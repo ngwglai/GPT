@@ -414,6 +414,85 @@ describe("Bytecode, VM and trace integrity", () => {
     expect(leave.after.variables).toEqual({ "x@0": 3 });
   });
   it.each([
+    ["AND", true],
+    ["OR", false],
+  ] as const)("validates the evaluated RHS of %s before PRINT", (op, left) => {
+    const vm = new VirtualMachine({
+      symbols: [],
+      instructions: [
+        { op: "PUSH", value: left, span: origin },
+        { op, target: 3, span: origin },
+        { op: "PUSH", value: 1, span: origin },
+        { op: "PRINT", span: origin },
+        { op: "HALT", span: origin },
+      ],
+    });
+    expect(vm.run()).toMatchObject({
+      output: [],
+      error: { code: "InvalidBytecode" },
+    });
+    const failure = vm.trace.at(-1)!;
+    expect(failure.before.pc).toBe(3);
+    expect(failure.after.stack).toEqual(failure.before.stack);
+    expect(failure.after.pc).toBe(failure.before.pc);
+  });
+  it.each([
+    ["AND", false],
+    ["OR", true],
+  ] as const)("does not validate skipped RHS values of %s", (op, left) => {
+    const vm = new VirtualMachine({
+      symbols: [],
+      instructions: [
+        { op: "PUSH", value: left, span: origin },
+        { op, target: 3, span: origin },
+        { op: "PUSH", value: 1, span: origin },
+        { op: "PRINT", span: origin },
+        { op: "HALT", span: origin },
+      ],
+    });
+    expect(vm.run()).toEqual({ output: [String(left)], globals: {} });
+    expect(vm.trace.some((entry) => entry.before.pc === 2)).toBe(false);
+  });
+  it("checks nested boolean joins sharing a continuation", () => {
+    for (const right of [true, 1]) {
+      const vm = new VirtualMachine({
+        symbols: [],
+        instructions: [
+          { op: "PUSH", value: true, span: origin },
+          { op: "AND", target: 5, span: origin },
+          { op: "PUSH", value: false, span: origin },
+          { op: "OR", target: 5, span: origin },
+          { op: "PUSH", value: right, span: origin },
+          { op: "PRINT", span: origin },
+          { op: "HALT", span: origin },
+        ],
+      });
+      const result = vm.run();
+      expect(result.error?.code).toBe(
+        right === true ? undefined : "InvalidBytecode",
+      );
+      expect(result.output).toEqual(right === true ? ["true"] : []);
+    }
+  });
+  it("rejects bytecode jumping past a pending logical boundary", () => {
+    const vm = new VirtualMachine({
+      symbols: [],
+      instructions: [
+        { op: "PUSH", value: true, span: origin },
+        { op: "AND", target: 4, span: origin },
+        { op: "PUSH", value: 1, span: origin },
+        { op: "JUMP", target: 5, span: origin },
+        { op: "HALT", span: origin },
+        { op: "PRINT", span: origin },
+        { op: "HALT", span: origin },
+      ],
+    });
+    expect(vm.run()).toMatchObject({
+      output: [],
+      error: { code: "InvalidBytecode" },
+    });
+  });
+  it.each([
     [{ op: "PRINT", span: origin }],
     [{ op: "JUMP", target: -1, span: origin }],
     [

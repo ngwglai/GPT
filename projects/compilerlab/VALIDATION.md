@@ -93,3 +93,12 @@ CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e
 ## 本地提交与隐私证据
 
 初始提交前主动检查暂存区与拟提交说明；提交后检查HEAD^..HEAD，推送前检查origin/main..HEAD，hooks同步执行，均退出0。实际功能提交范围1提交/403唯一blob/0命中；后续全历史122提交/662唯一blob/0命中，private_denylist_loaded为true。匿名作者/提交者由检查器核验，不公开私人值或来源路径。词表及备份未提交，没有跳过hooks或改写历史。
+
+## 自动审查修复（最终功能头待远程验收）
+
+补充头c0e9e59的[CI 39523871108](https://github.com/ngwglai/GPT/actions/runs/39523871108)也已35/35成功，随后自动审查指出两个P2边界，故暂缓合并并将状态恢复Testing：
+
+- [VM右操作数校验](https://github.com/ngwglai/GPT/pull/23#discussion_r4331937477)：给出的低层字节码`PUSH true; AND 3; PUSH 1; PRINT; HALT`缺少右值类型检查。新增运行时逻辑续接边界栈，在下一指令消费右值之前检查单一bool；覆盖AND/OR非短路非法值、跳过非法右值、共享嵌套边界和跳过边界。错误事务不提交栈/PC/输出变动。
+- [未完成历史回放的继续按钮](https://github.com/ngwglai/GPT/pull/23#discussion_r4331937480)：历史PC与真实机器最新状态不一致时，同时禁用单步与继续，显示回放提示。新增生产E2E先单步3次、回放第1步、确认禁用，再选最后一步继续并核对完整输出。
+
+当前修复源码实际执行`npm run lint && npm run typecheck && npm test && npm run build && CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e && npm audit --audit-level=moderate`，退出0：**253/253核心单元、14/14真实生产Chromium E2E**，类型/lint/build通过、完整审计0漏洞，无重试/跳过。原160固定种子及1156小整数独立oracle仍全通过。此修复头仍需最新Linux/Windows与根CI required全部成功，旧头成功不替代修复验收。

@@ -117,6 +117,8 @@ if (!result.diagnostics.length && result.analysis && result.optimizedCode) {
 | ENTER / LEAVE             | 建立块环境 / 移除本块声明的槽位                     |
 | HALT                      | 要求空操作数栈和仅顶层环境，正常终止                |
 
+AND/OR 的 target 必须为前向续接边界。非短路时，VM 保存该边界及当前栈深度；到达边界、执行下一指令之前，要求右侧恰好产生一个 bool。嵌套边界按栈检查；跳过/交叉边界或未完成逻辑表达式即 HALT 都返回 InvalidBytecode。被短路跳过的右侧不会求值或检查运行值。
+
 正常指令默认 PC+1。错误指令**不提交**栈、变量、输出或 PC 修改，并设置停止状态。每个成功指令与失败尝试均记录 step、instruction、before、after、error；快照含 PC、栈、所有活动槽位、累计输出、停止标记。优化前/后的 trace 属于各自真实字节码，不要求步数相同。创建新 VM 即重置；后续 step 在终止后无操作。低层损坏字节码返回 InvalidBytecode；后向跳转也受步数预算限制。
 
 ## 优化与正确性依据

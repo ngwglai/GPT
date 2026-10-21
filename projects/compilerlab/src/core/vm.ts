@@ -16,6 +16,7 @@ export class VirtualMachine {
   private stack: Value[] = [];
   private variables = new Map<number, Value>();
   private frames: number[][] = [[]];
+  private logicalBoundaries: { target: number; depth: number }[] = [];
   private output: string[] = [];
   private steps = 0;
   private done = false;
@@ -74,6 +75,7 @@ export class VirtualMachine {
     const stack = [...this.stack],
       variables = new Map(this.variables),
       frames = this.frames.map((frame) => [...frame]),
+      boundaries = this.logicalBoundaries.map((boundary) => ({ ...boundary })),
       output = [...this.output];
     let next = this.pc + 1;
     const span = instruction?.span ?? origin;
@@ -93,6 +95,19 @@ export class VirtualMachine {
       if (this.steps >= this.maxSteps)
         fail("ResourceLimit", "虚拟机指令预算耗尽", span);
       this.steps++;
+      // A non-short-circuited AND/OR must produce exactly one boolean at its
+      // continuation. Validate before executing that instruction (e.g. PRINT),
+      // so malformed RHS bytecode cannot consume or publish a non-boolean.
+      while (boundaries.at(-1)?.target === this.pc) {
+        const boundary = boundaries.pop()!;
+        if (
+          stack.length !== boundary.depth + 1 ||
+          typeof stack.at(-1) !== "boolean"
+        )
+          invalid("逻辑右操作数必须产生一个 bool");
+      }
+      if (boundaries.some((boundary) => boundary.target <= this.pc))
+        invalid("逻辑右操作数的校验边界被跳过或交叉");
       if (!instruction) invalid("PC 超出字节码");
       const ins = instruction!;
       switch (ins.op) {
@@ -146,6 +161,12 @@ export class VirtualMachine {
         }
         case "AND":
         case "OR": {
+          if (
+            !Number.isInteger(ins.target) ||
+            ins.target <= this.pc ||
+            ins.target >= codeLength
+          )
+            invalid("短路指令必须指向有效的前向边界");
           const value = pop();
           if (typeof value !== "boolean") invalid("短路条件必须为 bool");
           if (
@@ -154,6 +175,10 @@ export class VirtualMachine {
           ) {
             stack.push(value);
             jump(ins.target);
+          } else {
+            if (boundaries.length >= LIMITS.depth)
+              invalid("逻辑表达式嵌套超限");
+            boundaries.push({ target: ins.target, depth: stack.length });
           }
           break;
         }
@@ -166,7 +191,8 @@ export class VirtualMachine {
           for (const slot of frames.pop()!) variables.delete(slot);
           break;
         case "HALT":
-          if (stack.length || frames.length !== 1) invalid("终止状态不平衡");
+          if (stack.length || frames.length !== 1 || boundaries.length)
+            invalid("终止状态不平衡");
           this.done = true;
           break;
         default:
@@ -176,6 +202,7 @@ export class VirtualMachine {
       this.stack = stack;
       this.variables = variables;
       this.frames = frames;
+      this.logicalBoundaries = boundaries;
       this.output = output;
     } catch (error) {
       if (!(error instanceof LabError)) throw error;

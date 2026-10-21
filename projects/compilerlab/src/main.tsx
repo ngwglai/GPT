@@ -113,6 +113,7 @@ function App() {
   const editor = useRef<HTMLTextAreaElement>(null);
   const code = optimized ? compilation.optimizedCode : compilation.originalCode;
   const snapshot = cursor >= 0 ? trace[cursor].after : machine?.snapshot();
+  const replaying = cursor >= 0 && cursor < trace.length - 1;
   const runtimeError = cursor >= 0 ? trace[cursor].error : undefined;
   function reset(nextCode: Bytecode | undefined) {
     setMachine(nextCode ? new VirtualMachine(nextCode) : undefined);
@@ -476,17 +477,15 @@ function App() {
                     </h3>
                     <div className="toolbar debugger">
                       <button
-                        disabled={
-                          !machine ||
-                          snapshot?.done ||
-                          cursor < trace.length - 1
-                        }
+                        disabled={!machine || snapshot?.done || replaying}
                         onClick={() => execute(false)}
                       >
                         单步
                       </button>
                       <button
-                        disabled={!machine || machine.snapshot().done}
+                        disabled={
+                          !machine || machine.snapshot().done || replaying
+                        }
                         onClick={() => execute(true)}
                       >
                         继续
@@ -499,6 +498,11 @@ function App() {
                         {snapshot?.done ? "已停止" : "就绪"}
                       </span>
                     </div>
+                    {replaying && (
+                      <p className="hint" role="status">
+                        正在回放历史快照；选择最后一步后可继续尚未结束的机器。
+                      </p>
+                    )}
                     <p className="comparison" role="status">
                       {comparison}
                     </p>

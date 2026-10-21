@@ -16,7 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| CompilerLab | [projects/compilerlab](projects/compilerlab/) | Completed | 本地微型编译流水线、独立解释器与栈式 VM 语义对照 | PR #23；247单元/13生产E2E、功能头Linux/Windows及CI required均通过；验收记录提交仍须最新CI成功，不部署 |
+| CompilerLab | [projects/compilerlab](projects/compilerlab/) | Testing | 本地微型编译流水线、独立解释器与栈式 VM 语义对照 | PR #23；审查修复后253单元/14生产E2E通过，等待修复头Linux/Windows及CI required；不部署 |
 | CalibrationLab | [projects/calibrationlab](projects/calibrationlab/) | Completed | 本地概率预测、独立样本校准与可靠性图 | PR #22；最终121单元/13生产E2E；初始功能头Linux/Windows与CI required全通过，数值修复头仍须完整CI，不部署 |
 | AgentTrustLab | [projects/agenttrustlab](projects/agenttrustlab/) | Completed | 确定性智能体信任边界与独立工具授权；四策略真实比较 | PR #20已合并；161单元/13生产E2E、Linux/Windows、CI required及合并后main CI全通过；不部署 |
 | DeltaLab | [projects/deltalab](projects/deltalab/) | Completed | 离线 DAG 缓存、脏传播与输出变化传播的真实运算比较 | PR #19；224单元/18生产E2E与修复头Linux/Windows、CI required全通过；按需本机试用，不部署 |
@@ -312,6 +312,6 @@
 - **差异 / MVP**：独立于 SynthLab 的程序搜索和 ModelCheckLab 的有限状态验证；先写语言规范，纯 TypeScript int/bool DSL，Lexer/Parser/AST/语义分析、独立按名 AST 解释器、安全局部优化、字节码与按槽位 VM、可复现轨迹、中文 React 阶段/优化对照和单步/继续/重置/错误定位。完全本地，无宿主代码执行或外部服务。
 - **目录 / 分支**：[projects/compilerlab](projects/compilerlab/)；从最新 origin/main 036ae0c 创建 feature/compilerlab；开始时无未合并 PR 或重复项目。不修改其他项目业务代码，仅接入必要独立 CI 与项目索引。
 - **验收标准**：模块单元、手算语义与小整数独立 oracle、160 固定种子原/优化 AST 与原/优化 VM 差分（输出、错误/位置、顶层状态）、真实 trace、生产 Chromium E2E；typecheck/lint/build/完整审计/隐私及最新 PR 原生 Linux/Windows、根 CI required 全通过后按授权合并。
-- **实际验证 / 状态**：Completed（功能验收完成，合并元数据以[PR #23](https://github.com/ngwglai/GPT/pull/23)为准）；最终本地247单元（含1156小整数独立oracle组合与160固定种子）/13生产E2E、静态/构建/0漏洞完整审计通过；最新代码和跨平台证据见 [VALIDATION.md](projects/compilerlab/VALIDATION.md)，初始功能头a970ac3的[CI 39523075196](https://github.com/ngwglai/GPT/actions/runs/39523075196)已35/35成功，含原生Linux/Windows及CI required。本次仅补充验收记录与精确E2E阶段选择器，不改功能源码；该补充提交仍须最新完整CI成功后才合并，不把旧头代替最新头。
+- **实际验证 / 状态**：Testing（审查修复待最新远程验收，[PR #23](https://github.com/ngwglai/GPT/pull/23)）；当前本地253单元（含1156小整数独立oracle组合与160固定种子）/14生产E2E、静态/构建/0漏洞完整审计通过；最新代码和跨平台证据见 [VALIDATION.md](projects/compilerlab/VALIDATION.md)，初始功能头a970ac3的[CI 39523075196](https://github.com/ngwglai/GPT/actions/runs/39523075196)已35/35成功，含原生Linux/Windows及CI required。补充头c0e9e59的CI也35/35成功；随后审查提出低层VM逻辑右值校验与未完成历史回放继续按钮两个边界，均已修复并增加回归，状态恢复Testing；必须在最新修复头完整CI成功后才验收/合并，不把旧头代替最新头。
 - **环境 / 隐私**：环境 ready 后最小 shell、Git/工具/实际 Chromium 启动成功；私有来源/匿名身份/hooks 初始化成功，基线53根回归及121提交/633blob/0命中。首次脚手架相对路径、类型推断、位置断言的实际失败与修正已记录；不回显私人值，不绕过检查。
 - **限制 / 后续**：8192字符/2048Token/512AST节点/32深度/128声明/2048指令/4096步骤/256输出；对称整数范围±2147483647，溢出/除零报错，除法向零截断。预算终止单独报告；同步主线程，无循环/函数/文件/网络。用户电脑人工试用、Firefox/WebKit和真实手机未验证；按需扩展控制流图或源码断点，不部署。
