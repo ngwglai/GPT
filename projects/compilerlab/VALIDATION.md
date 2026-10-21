@@ -60,7 +60,7 @@ npm install --ignore-scripts
 
 代码复查另修正两个边界：独立解释器的一元负号通过整数运算规范化零，避免 -0 状态；编译失败传入 undefined 时不再触发 reset 默认参数回退旧 VM。后者有生产 E2E 回归，验证先执行成功程序、再加载错误程序时，单步/继续均禁用且输出清空。
 
-## 本地验收
+## 本地验收（审查修复前快照）
 
 初轮完整执行 `npm run typecheck && npm run lint && npm test && npm run build` 退出 0：242/242 单元、静态检查和生产构建通过；首轮 `CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e` 退出 0，13/13 真实生产 Chromium E2E 通过（无重试/跳过）。随后补充小整数独立 oracle、生成语料覆盖和错误编译状态清理回归。最终在当前源码完整执行以下串行验收命令，退出 0：247/247 单元、13/13 真实生产 E2E（无重试/跳过）、lint/typecheck/build 和 0 漏洞完整审计通过。
 
@@ -94,7 +94,7 @@ CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e
 
 初始提交前主动检查暂存区与拟提交说明；提交后检查HEAD^..HEAD，推送前检查origin/main..HEAD，hooks同步执行，均退出0。实际功能提交范围1提交/403唯一blob/0命中；后续全历史122提交/662唯一blob/0命中，private_denylist_loaded为true。匿名作者/提交者由检查器核验，不公开私人值或来源路径。词表及备份未提交，没有跳过hooks或改写历史。
 
-## 自动审查修复（最终功能头待远程验收）
+## 自动审查修复（修复功能头已通过远程验收）
 
 补充头c0e9e59的[CI 39523871108](https://github.com/ngwglai/GPT/actions/runs/39523871108)也已35/35成功，随后自动审查指出两个P2边界，故暂缓合并并将状态恢复Testing：
 
@@ -102,3 +102,11 @@ CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e
 - [未完成历史回放的继续按钮](https://github.com/ngwglai/GPT/pull/23#discussion_r4331937480)：历史PC与真实机器最新状态不一致时，同时禁用单步与继续，显示回放提示。新增生产E2E先单步3次、回放第1步、确认禁用，再选最后一步继续并核对完整输出。
 
 当前修复源码实际执行`npm run lint && npm run typecheck && npm test && npm run build && CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e && npm audit --audit-level=moderate`，退出0：**253/253核心单元、14/14真实生产Chromium E2E**，类型/lint/build通过、完整审计0漏洞，无重试/跳过。原160固定种子及1156小整数独立oracle仍全通过。此修复头仍需最新Linux/Windows与根CI required全部成功，旧头成功不替代修复验收。
+
+## 最终功能验收
+
+修复头`8afffd503a1d93503c0a8055a081c80fb9b2da66`的[CI 39524971287](https://github.com/ngwglai/GPT/actions/runs/39524971287)已**35/35全部成功**，含CompilerLab原生Linux/Windows（253单元、14生产E2E、lint/typecheck/build及完整审计）、四组根隐私检查、其他项目与CI required。Windows由Actions原生执行，不是本地或用户电脑人工验收。
+
+两条P2审查讨论在修复、回归与本项目跨平台检查成功后已标记解决；未发现新增未解决讨论。此前初始/补充头的成功保留为历史，不替代本次修复头证据。修复提交前后及全部待推送范围私有检查通过（3提交/413唯一blob/0命中）。
+
+项目恢复Completed。本次验收记录提交只更新PROJECTS.md与本文件，不改功能或测试；仍要求该最新记录头的完整CI通过后才执行PR合并。最新检查入口为[PR #23 checks](https://github.com/ngwglai/GPT/pull/23/checks)。合并后的PR状态、main包含目标提交、main CI与私有隐私检查须另行实际核对，并在最终交付报告/PR中列出；本提交前尚未执行的动作不计为已完成。
