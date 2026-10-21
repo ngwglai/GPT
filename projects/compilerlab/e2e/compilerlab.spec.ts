@@ -6,9 +6,7 @@ async function load(page: Page, name: string) {
 }
 async function tab(page: Page, name: string) {
   await page
-    .getByRole("button", { name, exact: false })
-    .filter({ hasText: name })
-    .last()
+    .getByRole("button", { name: new RegExp(`^0[1-6]\\s*${name}$`) })
     .click();
 }
 async function source(page: Page, code: string) {
@@ -29,6 +27,7 @@ test("loads real tokens, AST, symbols, optimized trees and bytecode", async ({
     page.getByRole("cell", { name: "let", exact: true }).first(),
   ).toBeVisible();
   await tab(page, "AST");
+  await expect(page.getByRole("heading", { name: /抽象语法树/ })).toBeVisible();
   await expect(page.locator(".tree").first()).toContainText("Program");
   await expect(page.locator(".tree").first()).toContainText("binary *");
   await tab(page, "类型检查");

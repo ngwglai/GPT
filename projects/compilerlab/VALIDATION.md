@@ -4,7 +4,7 @@
 
 ## 环境与开发前检查
 
-环境 ready 后在仓库根目录执行；基础 shell 能启动，未将终端故障当成代码失败。阅读根 AGENTS.md、README.md、PROJECTS.md、docs/PRIVACY.md、docs/ENGINEERING.md 及工程复核记录后实现。相关目录没有额外 AGENTS.md。
+本地 Linux 6.18.55 x86_64 / Debian 13，系统 Chromium 154.0.8037.57；Node/Python 版本见下表。环境 ready 后在仓库根目录执行；基础 shell 能启动，未将终端故障当成代码失败。阅读根 AGENTS.md、README.md、PROJECTS.md、docs/PRIVACY.md、docs/ENGINEERING.md 及工程复核记录后实现。相关目录没有额外 AGENTS.md。
 
 | 实际命令 / 检查                                                                       | 退出 / 结果                                                                                                                         |
 | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
@@ -56,6 +56,8 @@ PY
 npm install --ignore-scripts
 ```
 
+浏览器测试复查还发现宽松的 AST 按钮匹配可能落入 AST 优化页。收紧阶段选择器并断言抽象语法树标题，重新执行13项生产 E2E、lint和typecheck均退出0；这一修正随验收记录提交，仍须最新完整远程CI通过。
+
 代码复查另修正两个边界：独立解释器的一元负号通过整数运算规范化零，避免 -0 状态；编译失败传入 undefined 时不再触发 reset 默认参数回退旧 VM。后者有生产 E2E 回归，验证先执行成功程序、再加载错误程序时，单步/继续均禁用且输出清空。
 
 ## 本地验收
@@ -72,6 +74,8 @@ npm run build
 CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e
 ```
 
+实际 `npm run dev -- --port 5191 --strictPort` 启动成功；独立 Chromium 打开开发页并执行，输出21/true，无pageerror。开发和预览服务检查后均用Ctrl+C正常停止（进程退出130为主动结束）。
+
 生产构建为42模块，JS约216kB；仅作为体积记录，未声称性能验收。已查看1440px页面截图，并在375px真实浏览器测试文档宽度无溢出；截图未提交。使用固定版本Prettier格式化源代码，不新增生产依赖。
 
 独立正确性依据：手算输出/作用域/错误前状态；解释器不导入 VM、字节码执行或 VM 运算函数；160 固定种子四路径比较（原/优化 AST 与原/优化 VM）；小整数算术用与两条 BigInt 路径不同的精确 Number/Math.trunc oracle。随机失败含种子及源码。默认预算以内比较语言错误和顶层状态；预算耗尽单独报告，绝不冒充等价。
@@ -80,8 +84,12 @@ CHROMIUM_PATH=/usr/bin/chromium npm run test:e2e
 
 项目独立 `.github/workflows/compilerlab.yml`：原生 Ubuntu/Windows、Node 22，npm ci、完整审计、lint/typecheck、Vitest、生产构建与 Chromium E2E；根 CI 调用并纳入 CI required。复用仓库固定 Actions SHA，没有部署步骤。
 
-当前远程 CI、PR、合并后状态尚未验证，项目为 Testing。必须在最新功能头的 CompilerLab Linux/Windows、全部根检查及 CI required 成功后按授权合并；随后核对 PR、main 提交、隐私及 main CI，并以实际链接更新报告。
+[PR #23](https://github.com/ngwglai/GPT/pull/23) 已创建，初始功能头 `a970ac33524e84bdfd6c1decb1d5b67add069892` 的 [CI 39523075196](https://github.com/ngwglai/GPT/actions/runs/39523075196) 已35/35作业全部成功，包含本项目原生Linux/Windows、四组隐私检查和CI required。功能验收完成，项目更新为Completed。此次追加仅为文档证据与E2E精确阶段选择器，不改功能源码；此补充提交仍须最新完整CI通过后才合并。必须在最新功能头的 CompilerLab Linux/Windows、全部根检查及 CI required 成功后按授权合并；随后核对 PR、main 提交、隐私及 main CI，并在最终交付报告中给出实际链接。此处为验收记录提交时快照，合并后结果不冒充已在提交前执行。最新提交检查可从[PR检查页](https://github.com/ngwglai/GPT/pull/23/checks)核对；合并元数据以PR为准。
 
 ## 已知边界 / 未验证
 
 本地为 Linux，Windows 自动化只能由 Actions 结果确认，不等于用户电脑人工操作。Firefox/WebKit、真实手机、人工双击/浏览器检查、性能峰值、离线首次加载未验证。同步主线程且程序有限，无循环/函数/文件/网络。ESLint 9 支持结束但完整漏洞审计当前为 0。隐私扫描不证明未知姓名或编码数据中无秘密，CI 公开规则不代替本地私有词表检查。未部署、未强推、未改写共享历史。
+
+## 本地提交与隐私证据
+
+初始提交前主动检查暂存区与拟提交说明；提交后检查HEAD^..HEAD，推送前检查origin/main..HEAD，hooks同步执行，均退出0。实际功能提交范围1提交/403唯一blob/0命中；后续全历史122提交/662唯一blob/0命中，private_denylist_loaded为true。匿名作者/提交者由检查器核验，不公开私人值或来源路径。词表及备份未提交，没有跳过hooks或改写历史。
