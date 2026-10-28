@@ -33,6 +33,8 @@ func run_tests() -> void:
 		expect(r.s.energy==3,"opening energy "+id)
 		for card in r.s.deck:
 			expect(Content.CARDS.has(card.id),"valid starting card")
+	expect("Heal 5" in Content.card("siphon",true).text,"upgraded secondary heal is shown")
+	expect("Apply 5 poison" in Content.card("miasma",true).text,"upgraded secondary poison is shown")
 	var a = fresh()
 	var b = fresh()
 	expect(a.snapshot()==b.snapshot(),"same seed produces identical map and hand")

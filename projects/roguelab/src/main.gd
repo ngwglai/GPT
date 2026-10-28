@@ -275,6 +275,7 @@ func draw_combat() -> void:
 		health.add_theme_stylebox_override("background",health_bg)
 		health.add_theme_stylebox_override("fill",health_fill)
 		layer.add_child(health)
+		health.set_deferred("size",Vector2(204,10))
 		label_at("HP %d/%d   BLOCK %d\nPOISON %d  WEAK %d  VULN %d" % [e.hp,e.max_hp,e.block,e.poison,e.weak,e.vulnerable],Rect2(x-7,490,226,44),13,MUTED)
 	label_at("%d" % game.s.energy,Rect2(42,558,55,64),40,MINT)
 	label_at("ENERGY",Rect2(40,626,70,24),12,MUTED)
@@ -307,7 +308,7 @@ func card_widget(item: Dictionary, rect: Rect2, callback: Callable, enabled: boo
 	label_at(c.name,Rect2(12,36,rect.size.x-22,30),17,WHITE if enabled else MUTED,card_button)
 	var desc := label_at(c.text,Rect2(12,73,rect.size.x-24,rect.size.y-80),14,MUTED,card_button)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc.size = Vector2(rect.size.x-24,rect.size.y-80)
+	desc.set_deferred("size",Vector2(rect.size.x-24,rect.size.y-80))
 
 func draw_reward() -> void:
 	label_at("PROTOCOL RECOVERED",Rect2(60,177,1100,50),34,MINT)

@@ -23,6 +23,8 @@ func test_ui() -> void:
 		if ui.layer.get_child_count()<5:
 			failures+=1
 		await process_frame
+		if phase == "combat":
+			check_layout(ui.layer)
 	for overlay in ["help","confirm","deck","relics","piles","upgrade","remove"]:
 		ui.overlay=overlay
 		ui.redraw()
@@ -35,3 +37,12 @@ func test_ui() -> void:
 	await process_frame
 	print("UI_CHECKS_PASS" if failures==0 else "UI_CHECKS_FAILED")
 	quit(0 if failures==0 else 1)
+
+func check_layout(node: Node) -> void:
+	if node is ProgressBar and node.size.y > 12:
+		failures += 1
+	if node is Label and node.autowrap_mode != TextServer.AUTOWRAP_OFF and node.get_parent() is Button:
+		if node.position.x + node.size.x > node.get_parent().size.x:
+			failures += 1
+	for child in node.get_children():
+		check_layout(child)
