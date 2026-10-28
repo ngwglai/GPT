@@ -315,3 +315,9 @@
 - **实际验证 / 状态**：Completed（修复功能验收完成，合并元数据以[PR #23](https://github.com/ngwglai/GPT/pull/23)为准）；最终本地253单元（含1156小整数独立oracle组合与160固定种子）/14生产E2E、静态/构建/0漏洞完整审计通过；最新代码和跨平台证据见 [VALIDATION.md](projects/compilerlab/VALIDATION.md)，初始功能头a970ac3的[CI 39523075196](https://github.com/ngwglai/GPT/actions/runs/39523075196)已35/35成功，含原生Linux/Windows及CI required。补充头c0e9e59的CI也35/35成功；随后审查提出低层VM逻辑右值校验与未完成历史回放继续按钮两个边界，均已修复并增加回归，修复头8afffd5的[CI 39524971287](https://github.com/ngwglai/GPT/actions/runs/39524971287)已35/35全部通过，含原生Linux/Windows及CI required，两条讨论已解决，恢复Completed。本次仅补充验收记录，仍要求该记录提交的最新完整CI成功后才合并。
 - **环境 / 隐私**：环境 ready 后最小 shell、Git/工具/实际 Chromium 启动成功；私有来源/匿名身份/hooks 初始化成功，基线53根回归及121提交/633blob/0命中。首次脚手架相对路径、类型推断、位置断言的实际失败与修正已记录；不回显私人值，不绕过检查。
 - **限制 / 后续**：8192字符/2048Token/512AST节点/32深度/128声明/2048指令/4096步骤/256输出；对称整数范围±2147483647，溢出/除零报错，除法向零截断。预算终止单独报告；同步主线程，无循环/函数/文件/网络。用户电脑人工试用、Firefox/WebKit和真实手机未验证；按需扩展控制流图或源码断点，不部署。
+
+## 共享 CI 依赖审计修复（2026-10-28）
+
+- **触发**：RogueLab PR 的原有仓库安全门禁发现新增依赖通告；与游戏实现无关。单独维护分支修复，不关闭审计或跳过现有项目测试。
+- **变更**：共享 Python CI 与 ConstraintLab Windows 安装器将 setuptools 84.0.0 更新至 84.1.0；QQ Mail MCP 更新 postal-mime、Wrangler、匹配的 Miniflare / Workers 类型，并刷新受影响的 body-parser、fast-uri、undici 锁定版本。业务源码与部署配置不变。
+- **本地验证**：QQ Mail MCP npm audit 0 漏洞、类型检查、62 项测试、dry-run 构建及隐私基线通过；没有部署邮件服务。跨项目 Linux / Windows 完整验收仍由现有 CI 执行。
