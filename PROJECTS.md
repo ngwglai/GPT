@@ -325,3 +325,9 @@
 - **实现**：独立 `projects/roguelab/`；独立 `.github/workflows/roguelab.yml`；只扩展既有 Pages 聚合器，保留 `/entropylab/` 并增加 `/roguelab/`。
 - **测试**：本地规则检查、全部界面渲染、完整种子模拟与双平台导出；具体结果与边界见项目 `VALIDATION.md`。远端 CI 与发布以对应工作流实际状态为准。
 - **后续**：优先依据真实玩家反馈改善职业平衡、中文界面和触屏可读性；不依赖数值付费或账号服务。
+
+## 共享 CI 依赖审计修复（2026-10-28）
+
+- **触发**：RogueLab PR 的原有仓库安全门禁发现新增依赖通告；与游戏实现无关。单独维护分支修复，不关闭审计或跳过现有项目测试。
+- **变更**：共享 Python CI 与 ConstraintLab Windows 安装器将 setuptools 84.0.0 更新至 84.1.0；QQ Mail MCP 更新 postal-mime、Wrangler、匹配的 Miniflare / Workers 类型，并刷新受影响的 body-parser、fast-uri、undici 锁定版本。业务源码与部署配置不变。
+- **本地验证**：QQ Mail MCP npm audit 0 漏洞、类型检查、62 项测试、dry-run 构建及隐私基线通过；没有部署邮件服务。跨项目 Linux / Windows 完整验收仍由现有 CI 执行。
