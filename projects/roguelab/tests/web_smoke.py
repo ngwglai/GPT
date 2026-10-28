@@ -55,7 +55,7 @@ def main():
 
         def ready():
             page.wait_for_selector("#status", state="detached", timeout=120000)
-            page.wait_for_timeout(500)
+            page.wait_for_timeout(1000)
 
         def saved(predicate=lambda data: True):
             deadline = time.monotonic() + 15
@@ -78,11 +78,13 @@ def main():
         click(1190, 40)
         page.screenshot(path=str(screenshots / "guide.png"))
         page.keyboard.press("Escape")
+        page.wait_for_timeout(350)
         click(170, 626)
-        page.keyboard.type("12")
+        page.keyboard.type("12", delay=100)
+        page.wait_for_timeout(350)
         click(800, 620)
         first = saved(lambda state: state["phase"] == "map")
-        assert first["state"]["seed"] == 12
+        assert first["state"]["seed"] == 12, "Seed input was not captured before starting"
         checks += 1
         page.screenshot(path=str(screenshots / "map.png"))
         click(392, 385)
