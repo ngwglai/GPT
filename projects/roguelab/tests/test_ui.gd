@@ -24,6 +24,21 @@ func test_ui() -> void:
 			failures+=1
 		await process_frame
 		check_layout(ui.layer)
+	for id in ui.Content.CARDS:
+		for upgraded in [false,true]:
+			ui.game.start("warden",12)
+			ui.game.travel(0,1)
+			ui.game.s.hand=[{"id":id,"upgraded":upgraded}]
+			ui.redraw()
+			await process_frame
+			check_layout(ui.layer)
+	for event_id in range(ui.Content.EVENTS.size()):
+		ui.game.s.phase="event"
+		ui.game.s.event=event_id
+		ui.redraw()
+		await process_frame
+		check_layout(ui.layer)
+	ui.game.s.relics=ui.Content.RELICS.keys()
 	for overlay in ["help","confirm","deck","relics","piles","upgrade","remove"]:
 		ui.overlay=overlay
 		ui.redraw()
