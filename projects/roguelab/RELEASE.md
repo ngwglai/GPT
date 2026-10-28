@@ -1,11 +1,13 @@
-RogueLab · Deepwell Protocol is a complete single-player tactical deckbuilding roguelike built with Godot 4.6.3.
+RogueLab v1.1.0 · 深井协议简体中文版
 
-Play: https://ngwglai.github.io/GPT/roguelab/
+在线试玩：https://ngwglai.github.io/GPT/roguelab/
 
-Three operators, three sectors, branching routes, 35 card definitions, 14 relics, shops, upgrades, risk events, three bosses, seeded expeditions and five threat levels. Autosaves stay on the player's device. No account or backend required.
+完整中文界面：职业、卡牌与动态数值、遗物、敌人行动、地图、商店、随机事件、帮助、战斗提示、错误信息与结算。随附许可允许再分发的中文字体，文本集中管理。
 
-Download `RogueLab-windows-x86_64.zip`, extract, and run `RogueLab.exe`. The Windows executable is unsigned. The Web archive is also included for local HTTP hosting. Verify downloads with `SHA256SUMS.txt`.
+保留 v1.0 存档和全部原有机制、数值、随机种子及难度。无需账号，进度保存在本机。
 
-Controls: click an enemy then a card; 1–9 / 0 plays cards, arrows choose target, Space ends the turn, H uses serum, Esc opens the menu. English game UI; Chinese instructions in README.
+Windows：下载 RogueLab-windows-x86_64.zip，解压后运行 RogueLab.exe。用 SHA256SUMS.txt 校验文件。Web 压缩包可在本地 HTTP 服务上运行。
 
-Validation: deterministic rules, all UI screens, 60 full seeded expeditions, Chromium gameplay/reward/reload tests, Windows native tests and exported EXE smoke validation. See the repository's project validation record for exact evidence and limitations.
+操作：先点击敌人选目标，再点击卡牌；数字 1–9／0 出牌，左右方向键选目标，空格结束回合，H 使用药剂，Esc 返回菜单。
+
+验证包括原有完整规则测试、文本与字形覆盖、所有界面、种子模拟、Chromium 实际操作与存档恢复、Windows 原生测试及导出 EXE 启动。具体记录见 VALIDATION.md。

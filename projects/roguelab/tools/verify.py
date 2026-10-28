@@ -24,6 +24,7 @@ def main():
     run(base + ["--editor", "--import", "--quit"])
     run(base + ["--script", "tests/test_run.gd"], "0 failures")
     run(base + ["--script", "tests/test_ui.gd"], "UI_CHECKS_PASS")
+    run(base + ["--script", "tests/test_localization.gd"], "LOCALIZATION_PASS")
     run(base + ["--script", "tests/simulate.gd"], "stalled=0")
     run(base + ["--quit-after", "5"])
     if args.export:

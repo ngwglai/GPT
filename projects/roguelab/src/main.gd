@@ -1,5 +1,6 @@
 extends Control
 
+const L = preload("res://src/localization.gd")
 const Run = preload("res://src/run.gd")
 const Content = preload("res://src/content.gd")
 const Unit = preload("res://src/unit.gd")
@@ -30,6 +31,7 @@ var audio_player: AudioStreamPlayer
 var summary_recorded := false
 
 func _ready() -> void:
+	get_window().title = L.t("ROGUELAB")
 	if "--smoke" in OS.get_cmdline_user_args():
 		game.start("warden",741)
 		if not game.travel(0,1) or game.s.hand.size() != 5:
@@ -38,6 +40,9 @@ func _ready() -> void:
 			print("ROGUELAB_EXPORT_SMOKE_PASS")
 			get_tree().quit(0)
 		return
+	var chinese_theme := Theme.new()
+	chinese_theme.default_font = preload("res://assets/fonts/NotoSansSC.woff2")
+	theme = chinese_theme
 	load_profile()
 	load_run()
 	audio_player = AudioStreamPlayer.new()
@@ -81,7 +86,7 @@ func box_style(bg: Color, border: Color, width: int = 1) -> StyleBoxFlat:
 
 func label_at(text: String, rect: Rect2, font_size: int = 18, color: Color = WHITE, parent: Control = null) -> Label:
 	var node := Label.new()
-	node.text = text
+	node.text = L.t(text)
 	node.position = rect.position
 	node.size = rect.size
 	node.add_theme_font_size_override("font_size",font_size)
@@ -92,7 +97,7 @@ func label_at(text: String, rect: Rect2, font_size: int = 18, color: Color = WHI
 
 func button(text: String, rect: Rect2, callback: Callable, enabled: bool = true, accent: Color = MINT, parent: Control = null) -> Button:
 	var node := Button.new()
-	node.text = text
+	node.text = L.t(text)
 	node.position = rect.position
 	node.size = rect.size
 	node.disabled = not enabled
@@ -137,10 +142,10 @@ func redraw() -> void:
 	layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(layer)
 	label_at("R / L",Rect2(34,18,80,40),24,MINT)
-	label_at("ROGUELAB",Rect2(115,20,170,36),20)
-	label_at("DEEPWELL PROTOCOL",Rect2(286,22,220,32),13,MUTED)
-	button("SOUND " + ("OFF" if muted else "ON"),Rect2(1035,22,110,34),func(): muted = not muted; redraw())
-	button("?  GUIDE",Rect2(1155,22,95,34),func(): overlay = "help"; redraw())
+	label_at(L.t("ROGUELAB"),Rect2(115,20,170,36),20)
+	label_at(L.t("DEEPWELL PROTOCOL"),Rect2(286,22,220,32),13,MUTED)
+	button(L.t("sound.off" if muted else "sound.on"),Rect2(1035,22,110,34),func(): muted = not muted; redraw())
+	button(L.t("?  GUIDE"),Rect2(1155,22,95,34),func(): overlay = "help"; redraw())
 	if screen == "home":
 		draw_home()
 	else:
@@ -153,37 +158,38 @@ func redraw() -> void:
 			"shop": draw_shop()
 			"event": draw_event()
 			"won","lost": draw_summary()
-	label_at("GODOT 4  /  LOCAL SAVE  /  NO ACCOUNT REQUIRED",Rect2(34,764,750,24),12,MUTED)
+	label_at(L.t("GODOT 4  /  LOCAL SAVE  /  NO ACCOUNT REQUIRED"),Rect2(34,764,750,24),12,MUTED)
 	label_at(notice,Rect2(34,731,1170,28),14,CORAL)
 	if overlay != "":
 		draw_overlay()
 
 func draw_home() -> void:
-	label_at("TACTICAL DECKBUILDING ROGUELIKE",Rect2(56,104,700,26),14,MINT)
-	label_at("THE LAB WENT DARK.\nBRING BACK THE DAWN.",Rect2(52,141,900,136),46)
-	label_at("Build a protocol. Read the enemy. Descend into the unknown.\nThree sectors. One life. Every decision carries forward.",Rect2(56,287,780,60),19,MUTED)
+	label_at(L.t("TACTICAL DECKBUILDING ROGUELIKE"),Rect2(56,104,700,26),14,MINT)
+	label_at(L.t("THE LAB WENT DARK.\nBRING BACK THE DAWN."),Rect2(52,141,900,136),46)
+	label_at(L.t("Build a protocol. Read the enemy. Descend into the unknown.\nThree sectors. One life. Every decision carries forward."),Rect2(56,287,780,60),19,MUTED)
 	unit_at(Rect2(970,138,200,200),0,MINT,true)
-	label_at("01   SELECT AN OPERATOR",Rect2(56,380,500,26),14,MINT)
+	label_at(L.t("01   SELECT AN OPERATOR"),Rect2(56,380,500,26),14,MINT)
 	var ids := ["warden","venom","spark"]
 	for i in range(3):
 		var id: String = ids[i]
 		var job: Dictionary = Content.CLASSES[id]
 		var active := id == selected_class
-		button(("[x] " if active else "[ ] ")+job.name+"\n"+job.title+"\n%d HP  /  %s" % [job.hp,Content.RELICS[job.relic].name],Rect2(56+i*390,422,370,124),func(): capture_seed(); selected_class=id; tone(330+i*110); redraw(),true,MINT if active else MUTED)
-	label_at("02   SEED / OPTIONAL",Rect2(56,570,260,24),13,MUTED)
+		button(("[x] " if active else "[ ] ")+job.name+"\n"+job.title+"\n"+L.t("%d HP  /  %s") % [job.hp,Content.RELICS[job.relic].name],Rect2(56+i*390,422,370,124),func(): capture_seed(); selected_class=id; tone(330+i*110); redraw(),true,MINT if active else MUTED)
+	label_at(L.t("02   SEED / OPTIONAL"),Rect2(56,570,260,24),13,MUTED)
 	seed_input = LineEdit.new()
 	seed_input.position = Vector2(56,604)
 	seed_input.size = Vector2(250,46)
-	seed_input.placeholder_text = "Random expedition"
+	seed_input.placeholder_text = L.t("Random expedition")
 	seed_input.max_length = 24
+	seed_input.context_menu_enabled = false
 	seed_input.text = seed_text
 	seed_input.add_theme_stylebox_override("normal",box_style(Color("122330"),Color(MINT,0.4)))
 	layer.add_child(seed_input)
-	button("THREAT %d  +" % difficulty,Rect2(322,604,160,46),func(): capture_seed(); difficulty=(difficulty+1)%5; redraw())
-	button("DAILY SEED",Rect2(498,604,152,46),func(): seed_text=Time.get_date_string_from_system(true); redraw())
-	button("BEGIN DESCENT  >",Rect2(672,594,280,62),begin_requested)
-	button("CONTINUE  >",Rect2(974,594,250,62),func(): screen="run"; redraw(),not game.s.is_empty() and game.s.phase not in ["won","lost"])
-	label_at("%d EXPEDITIONS   /   %d CLEARS   /   BEST SCORE %d" % [profile.runs,profile.wins,profile.best],Rect2(56,681,1000,32),14,MUTED)
+	button(L.t("THREAT %d  +") % difficulty,Rect2(322,604,160,46),func(): capture_seed(); difficulty=(difficulty+1)%5; redraw())
+	button(L.t("DAILY SEED"),Rect2(498,604,152,46),func(): seed_text=Time.get_date_string_from_system(true); redraw())
+	button(L.t("BEGIN DESCENT  >"),Rect2(672,594,280,62),begin_requested)
+	button(L.t("CONTINUE  >"),Rect2(974,594,250,62),func(): screen="run"; redraw(),not game.s.is_empty() and game.s.phase not in ["won","lost"])
+	label_at(L.t("%d EXPEDITIONS   /   %d CLEARS   /   BEST SCORE %d") % [profile.runs,profile.wins,profile.best],Rect2(56,681,1000,32),14,MUTED)
 
 func capture_seed() -> void:
 	if is_instance_valid(seed_input):
@@ -214,18 +220,18 @@ func new_run() -> void:
 func draw_header() -> void:
 	panel(Rect2(32,77,1216,64))
 	label_at(Content.CLASSES[game.s["class"]].name,Rect2(52,89,200,36),18,MINT)
-	label_at("HP  %d / %d" % [game.s.hp,game.s.max_hp],Rect2(250,89,185,36),19,CORAL)
-	label_at("CR  %d" % game.s.gold,Rect2(445,89,105,36),19,GOLD)
-	label_at("SECTOR %d / 3  /  THREAT %d" % [game.s.act,game.s.difficulty],Rect2(575,89,360,36),16,MUTED)
-	button("DECK %d" % game.s.deck.size(),Rect2(908,91,116,36),func(): overlay="deck"; page=0; redraw())
-	button("RELICS %d" % game.s.relics.size(),Rect2(1034,91,105,36),func(): overlay="relics"; page=0; redraw())
-	button("MENU",Rect2(1149,91,80,36),func(): screen="home"; redraw())
+	label_at(L.t("HP  %d / %d") % [game.s.hp,game.s.max_hp],Rect2(250,89,185,36),19,CORAL)
+	label_at(L.t("CR  %d") % game.s.gold,Rect2(445,89,105,36),19,GOLD)
+	label_at(L.t("SECTOR %d / 3  /  THREAT %d") % [game.s.act,game.s.difficulty],Rect2(575,89,360,36),16,MUTED)
+	button(L.t("DECK %d") % game.s.deck.size(),Rect2(908,91,116,36),func(): overlay="deck"; page=0; redraw())
+	button(L.t("RELICS %d") % game.s.relics.size(),Rect2(1034,91,105,36),func(): overlay="relics"; page=0; redraw())
+	button(L.t("MENU"),Rect2(1149,91,80,36),func(): screen="home"; redraw())
 
 func draw_map() -> void:
-	label_at(["THE OUTER SHELL","THE LIVING ARCHIVE","THE REACTOR HEART"][int(game.s.act)-1],Rect2(44,177,1000,45),30)
-	label_at("CHART YOUR DESCENT",Rect2(44,248,290,30),14,MINT)
-	label_at("Follow adjacent routes.\nYour next step is highlighted.\n\nFIGHT  /  cards + credits\nELITE  /  higher risk + relic\nSIGNAL  /  risk or opportunity\nREST  /  heal or upgrade\nSHOP  /  buy or remove cards\nCORE  /  sector boss",Rect2(44,296,300,300),17,MUTED)
-	var names := {"battle":"FIGHT","elite":"ELITE","rest":"REST","shop":"SHOP","event":"SIGNAL","boss":"CORE"}
+	label_at([L.t("THE OUTER SHELL"),L.t("THE LIVING ARCHIVE"),L.t("THE REACTOR HEART")][int(game.s.act)-1],Rect2(44,177,1000,45),30)
+	label_at(L.t("CHART YOUR DESCENT"),Rect2(44,248,290,30),14,MINT)
+	label_at(L.t("Follow adjacent routes.\nYour next step is highlighted.\n\nFIGHT  /  cards + credits\nELITE  /  higher risk + relic\nSIGNAL  /  risk or opportunity\nREST  /  heal or upgrade\nSHOP  /  buy or remove cards\nCORE  /  sector boss"),Rect2(44,296,300,300),17,MUTED)
+	var names := {"battle":L.t("FIGHT"),"elite":L.t("ELITE"),"rest":L.t("REST"),"shop":L.t("SHOP"),"event":L.t("SIGNAL"),"boss":L.t("CORE")}
 	for row in range(7):
 		label_at("%02d" % (row+1),Rect2(361+row*112,630,80,28),14,MUTED)
 		for lane in range(3):
@@ -233,14 +239,14 @@ func draw_map() -> void:
 			var visited: bool = row < game.s.path.size() and game.s.path[row] == lane
 			var color := CORAL if kind in ["elite","boss"] else (GOLD if kind == "shop" else MINT)
 			button(("+ " if visited else "")+names[kind],Rect2(351+row*112,208+lane*145,90,64),func(): act(game.travel(row,lane)); selected_target=0,game.reachable(row,lane),color)
-	label_at("SEED %s   /   Reach the core. Survive. Adapt." % game.s.seed,Rect2(351,680,850,30),14,MUTED)
+	label_at(L.t("SEED %s   /   Reach the core. Survive. Adapt.") % game.s.seed,Rect2(351,680,850,30),14,MUTED)
 
 func draw_combat() -> void:
-	label_at("ENGAGEMENT  /  TURN %02d" % game.s.turn,Rect2(44,159,650,34),17,MINT)
-	label_at("Click an enemy to target it, then play a card.",Rect2(44,197,660,28),15,MUTED)
+	label_at(L.t("ENGAGEMENT  /  TURN %02d") % game.s.turn,Rect2(44,159,650,34),17,MINT)
+	label_at(L.t("Click an enemy to target it, then play a card."),Rect2(44,197,660,28),15,MUTED)
 	unit_at(Rect2(100,242,220,190),0,MINT,true)
-	label_at("YOUR OPERATOR",Rect2(112,445,230,25),16,MINT)
-	label_at("BLOCK %d   /   CHARGE %d\nSTRENGTH %d   WEAK %d   POISON %d" % [game.s.block,game.s.charge,game.s.strength,game.s.weak,game.s.poison],Rect2(64,478,440,55),16,WHITE)
+	label_at(L.t("YOUR OPERATOR"),Rect2(112,445,230,25),16,MINT)
+	label_at(L.t("BLOCK %d   /   CHARGE %d\nSTRENGTH %d   WEAK %d   POISON %d") % [game.s.block,game.s.charge,game.s.strength,game.s.weak,game.s.poison],Rect2(64,478,440,55),16,WHITE)
 	if not game.target_alive(selected_target):
 		for i in range(game.s.enemies.size()):
 			if game.target_alive(i):
@@ -252,12 +258,12 @@ func draw_combat() -> void:
 		var alive := int(e.hp) > 0
 		var color := CORAL if alive else MUTED
 		var intent: Dictionary = game.intent(e)
-		var desc: String = {"attack":"ATTACK %d","multi":"ATTACK %d x 2","block":"SHIELD %d","buff":"STRENGTH +%d","weak":"WEAK %d","poison":"POISON %d","jam":"ADD %d STATIC"}[intent.kind] % intent.amount
-		var target_button := button(("* TARGET  /  " if selected_target == i and alive else "")+(desc if alive else "NEUTRALIZED"),Rect2(x-20,235,222,294),func(): selected_target=i; tone(280); redraw(),alive,color)
+		var desc: String = {"attack":L.t("ATTACK %d"),"multi":L.t("ATTACK %d x 2"),"block":L.t("SHIELD %d"),"buff":L.t("STRENGTH +%d"),"weak":L.t("WEAK %d"),"poison":L.t("POISON %d"),"jam":L.t("ADD %d STATIC")}[intent.kind] % intent.amount
+		var target_button := button((L.t("* TARGET  /  ") if selected_target == i and alive else "")+(desc if alive else L.t("NEUTRALIZED")),Rect2(x-20,235,222,294),func(): selected_target=i; tone(280); redraw(),alive,color)
 		target_button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 		target_button.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
 		target_button.text = ""
-		label_at(("* " if selected_target == i and alive else "")+(desc if alive else "NEUTRALIZED"),Rect2(x-7,245,220,30),15,color)
+		label_at(("* " if selected_target == i and alive else "")+(desc if alive else L.t("NEUTRALIZED")),Rect2(x-7,245,220,30),15,color)
 		if alive:
 			unit_at(Rect2(x,290,180,143),int(e.shape),color)
 		label_at(e.name,Rect2(x-7,444,220,25),17,color)
@@ -276,9 +282,9 @@ func draw_combat() -> void:
 		health.add_theme_stylebox_override("fill",health_fill)
 		layer.add_child(health)
 		health.set_deferred("size",Vector2(204,10))
-		label_at("HP %d/%d   BLOCK %d\nPOISON %d  WEAK %d  VULN %d" % [e.hp,e.max_hp,e.block,e.poison,e.weak,e.vulnerable],Rect2(x-7,490,226,44),13,MUTED)
+		label_at(L.t("HP %d/%d   BLOCK %d\nPOISON %d  WEAK %d  VULN %d") % [e.hp,e.max_hp,e.block,e.poison,e.weak,e.vulnerable],Rect2(x-7,490,226,44),13,MUTED)
 	label_at("%d" % game.s.energy,Rect2(42,558,55,64),40,MINT)
-	label_at("ENERGY",Rect2(40,626,70,24),12,MUTED)
+	label_at(L.t("ENERGY"),Rect2(40,626,70,24),12,MUTED)
 	var scroll := ScrollContainer.new()
 	scroll.position = Vector2(122,550)
 	scroll.size = Vector2(910,174)
@@ -289,43 +295,43 @@ func draw_combat() -> void:
 	scroll.add_child(row)
 	for i in range(game.s.hand.size()):
 		var item: Dictionary = game.s.hand[i]
-		var card: Dictionary = Content.card(item.id,item.upgraded)
+		var card: Dictionary = L.card(item.id,item.upgraded)
 		var holder := Control.new()
 		holder.custom_minimum_size = Vector2(170,158)
 		row.add_child(holder)
 		card_widget(item,Rect2(0,0,170,158),func(): act(game.play(i,selected_target)),int(card.cost)<=int(game.s.energy),holder,str(i+1) if i < 9 else "0")
-	button("END TURN  >\n[ Space ]",Rect2(1055,557,187,62),func(): act(game.end_turn()),true,CORAL)
-	button("SERUM %d  /  +16 HP" % game.s.serum,Rect2(1055,633,187,42),func(): act(game.serum()),int(game.s.serum)>0 and int(game.s.hp)<int(game.s.max_hp),GOLD)
-	button("PILES  %d / %d / %d" % [game.s.draw.size(),game.s.discard.size(),game.s.exhaust.size()],Rect2(1055,686,187,34),func(): overlay="piles"; page=0; redraw(),true,MUTED)
-	label_at(str(game.s.message),Rect2(42,727,1200,26),13,MUTED)
+	button(L.t("END TURN  >\n[ Space ]"),Rect2(1055,557,187,62),func(): act(game.end_turn()),true,CORAL)
+	button(L.t("SERUM %d  /  +16 HP") % game.s.serum,Rect2(1055,633,187,42),func(): act(game.serum()),int(game.s.serum)>0 and int(game.s.hp)<int(game.s.max_hp),GOLD)
+	button(L.t("PILES  %d / %d / %d") % [game.s.draw.size(),game.s.discard.size(),game.s.exhaust.size()],Rect2(1055,686,187,34),func(): overlay="piles"; page=0; redraw(),true,MUTED)
+	label_at(L.message(str(game.s.message)),Rect2(42,727,1200,26),13,MUTED)
 
 func card_widget(item: Dictionary, rect: Rect2, callback: Callable, enabled: bool = true, parent: Control = null, shortcut: String = "") -> void:
-	var c: Dictionary = Content.card(item.id,item.upgraded)
+	var c: Dictionary = L.card(item.id,item.upgraded)
 	var color: Color = CORAL if c.kind == "attack" else (GOLD if c.kind == "power" else MINT)
 	var card_button := button("",rect,callback,enabled,color,parent)
-	card_button.tooltip_text = c.name+"\n"+c.text+"\nCost: "+str(c.cost)+( " | Exhausts for this combat." if c.get("exhaust",false) else "")
-	label_at(str(c.cost)+"  /  "+str(c.kind).to_upper()+"   "+shortcut,Rect2(12,9,rect.size.x-20,24),12,color,card_button)
+	card_button.tooltip_text = c.name+"\n"+c.text+"\n"+L.t("Cost: ")+str(c.cost)+(L.t(" Exhausts for this combat.") if c.get("exhaust",false) else "")
+	label_at(str(c.cost)+"  /  "+L.kind(c.kind)+"   "+shortcut,Rect2(12,9,rect.size.x-20,24),12,color,card_button)
 	label_at(c.name,Rect2(12,36,rect.size.x-22,30),17,WHITE if enabled else MUTED,card_button)
 	var desc := label_at(c.text,Rect2(12,73,rect.size.x-24,rect.size.y-80),14,MUTED,card_button)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	desc.set_deferred("size",Vector2(rect.size.x-24,rect.size.y-80))
 
 func draw_reward() -> void:
-	label_at("PROTOCOL RECOVERED",Rect2(60,177,1100,50),34,MINT)
-	label_at("Choose one card, or keep your deck lean.  /  "+str(game.s.message),Rect2(60,238,1100,34),18,MUTED)
+	label_at(L.t("PROTOCOL RECOVERED"),Rect2(60,177,1100,50),34,MINT)
+	label_at(L.t("Choose one card, or keep your deck lean.  /  ")+L.message(str(game.s.message)),Rect2(60,238,1100,34),18,MUTED)
 	for i in range(game.s.reward.size()):
 		card_widget(game.s.reward[i],Rect2(180+i*310,310,280,240),func(): act(game.choose_reward(i)))
 	if game.s.reward_relic != "":
 		var relic: Dictionary = Content.RELICS[game.s.reward_relic]
-		label_at("RELIC SECURED  /  "+relic.name+"\n"+relic.text,Rect2(180,577,1000,64),18,GOLD)
-	button("SKIP CARD  >",Rect2(480,658,320,54),func(): act(game.choose_reward(-1)))
+		label_at(L.t("RELIC SECURED  /  ")+relic.name+"\n"+relic.text,Rect2(180,577,1000,64),18,GOLD)
+	button(L.t("SKIP CARD  >"),Rect2(480,658,320,54),func(): act(game.choose_reward(-1)))
 
 func draw_rest() -> void:
-	label_at("A POCKET OF QUIET",Rect2(60,180,1000,50),36,MINT)
-	label_at("Spend this moment carefully. You may take one action.",Rect2(60,248,1100,34),20,MUTED)
+	label_at(L.t("A POCKET OF QUIET"),Rect2(60,180,1000,50),36,MINT)
+	label_at(L.t("Spend this moment carefully. You may take one action."),Rect2(60,248,1100,34),20,MUTED)
 	unit_at(Rect2(535,309,200,180),2,MINT)
-	button("REST\nRestore %d HP" % (int(game.s.max_hp)*30/100),Rect2(230,554,370,98),func(): act(game.rest()))
-	button("REFINE\nPermanently upgrade a card",Rect2(680,554,370,98),func(): overlay="upgrade"; page=0; redraw(),can_upgrade(),GOLD)
+	button(L.t("REST\nRestore %d HP") % (int(game.s.max_hp)*30/100),Rect2(230,554,370,98),func(): act(game.rest()))
+	button(L.t("REFINE\nPermanently upgrade a card"),Rect2(680,554,370,98),func(): overlay="upgrade"; page=0; redraw(),can_upgrade(),GOLD)
 
 func can_upgrade() -> bool:
 	for item in game.s.deck:
@@ -334,25 +340,25 @@ func can_upgrade() -> bool:
 	return false
 
 func draw_shop() -> void:
-	label_at("THE SALVAGE EXCHANGE",Rect2(60,174,1100,48),34,GOLD)
-	label_at("A good protocol needs fewer flaws, not just more cards.",Rect2(60,230,1100,30),18,MUTED)
+	label_at(L.t("THE SALVAGE EXCHANGE"),Rect2(60,174,1100,48),34,GOLD)
+	label_at(L.t("A good protocol needs fewer flaws, not just more cards."),Rect2(60,230,1100,30),18,MUTED)
 	for i in range(game.s.shop.size()):
 		if game.s.shop[i] != null:
 			card_widget(game.s.shop[i],Rect2(60+i*240,288,220,222),func(): act(game.buy(i)),int(game.s.gold)>=45)
-			label_at("45 CREDITS",Rect2(70+i*240,519,210,30),15,GOLD)
+			label_at(L.t("45 CREDITS"),Rect2(70+i*240,519,210,30),15,GOLD)
 	if game.s.shop_relic != "":
 		var r: Dictionary = Content.RELICS[game.s.shop_relic]
 		var b := button(r.name+"\n90 CREDITS",Rect2(1030,288,210,120),func(): act(game.buy(-1)),int(game.s.gold)>=90,GOLD)
-		b.tooltip_text = r.text
+		b.tooltip_text = L.t(r.text)
 		var desc := label_at(r.text,Rect2(1035,429,200,110),16,MUTED)
 		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	button("SERUM +1  /  30 CR",Rect2(60,604,285,60),func(): act(game.buy(-2)),int(game.s.gold)>=30 and int(game.s.serum)<5)
-	button("REMOVE CARD  /  50 CR",Rect2(365,604,285,60),func(): overlay="remove"; page=0; redraw(),int(game.s.gold)>=50 and not game.s.removed and game.s.deck.size()>5)
-	button("CONTINUE  >",Rect2(955,604,285,60),func(): act(game.leave_shop()))
+	button(L.t("SERUM +1  /  30 CR"),Rect2(60,604,285,60),func(): act(game.buy(-2)),int(game.s.gold)>=30 and int(game.s.serum)<5)
+	button(L.t("REMOVE CARD  /  50 CR"),Rect2(365,604,285,60),func(): overlay="remove"; page=0; redraw(),int(game.s.gold)>=50 and not game.s.removed and game.s.deck.size()>5)
+	button(L.t("CONTINUE  >"),Rect2(955,604,285,60),func(): act(game.leave_shop()))
 
 func draw_event() -> void:
 	var event: Dictionary = Content.EVENTS[int(game.s.event)]
-	label_at("UNKNOWN SIGNAL",Rect2(60,180,1000,30),14,MINT)
+	label_at(L.t("UNKNOWN SIGNAL"),Rect2(60,180,1000,30),14,MINT)
 	label_at(event.title,Rect2(60,229,1100,60),36)
 	label_at(event.text,Rect2(60,316,1100,100),22,MUTED)
 	for i in range(3):
@@ -360,32 +366,32 @@ func draw_event() -> void:
 
 func draw_summary() -> void:
 	var won: bool = game.s.phase == "won"
-	label_at("DAWN, RESTORED." if won else "SIGNAL LOST.",Rect2(60,186,1100,76),56,MINT if won else CORAL)
-	label_at("You silenced the Deepwell. Another protocol is waiting." if won else "The expedition ends here. What will you build differently?",Rect2(60,283,1100,55),22,MUTED)
+	label_at(L.t("DAWN, RESTORED.") if won else L.t("SIGNAL LOST."),Rect2(60,186,1100,76),56,MINT if won else CORAL)
+	label_at(L.t("You silenced the Deepwell. Another protocol is waiting.") if won else L.t("The expedition ends here. What will you build differently?"),Rect2(60,283,1100,55),22,MUTED)
 	var score := int(game.s.kills)*100+int(game.s.bosses)*500+(1000+int(game.s.hp)*10 if won else 0)+int(game.s.difficulty)*250
-	label_at("%d\nEXPEDITION SCORE" % score,Rect2(60,395,500,112),32,GOLD)
-	label_at("SECTOR %d   /   %d ENEMIES   /   %d CARDS PLAYED\nSEED %s   /   THREAT %d\n%s  /  %d CARDS  /  %d RELICS" % [game.s.act,game.s.kills,game.s.cards_played,game.s.seed,game.s.difficulty,Content.CLASSES[game.s["class"]].name,game.s.deck.size(),game.s.relics.size()],Rect2(590,394,640,140),19,MUTED)
-	button("NEW EXPEDITION  >",Rect2(60,610,400,70),func(): screen="home"; redraw())
-	button("INSPECT FINAL DECK",Rect2(490,610,300,70),func(): overlay="deck"; page=0; redraw())
+	label_at(L.t("%d\nEXPEDITION SCORE") % score,Rect2(60,395,500,112),32,GOLD)
+	label_at(L.t("SECTOR %d   /   %d ENEMIES   /   %d CARDS PLAYED\nSEED %s   /   THREAT %d\n%s  /  %d CARDS  /  %d RELICS") % [game.s.act,game.s.kills,game.s.cards_played,game.s.seed,game.s.difficulty,Content.CLASSES[game.s["class"]].name,game.s.deck.size(),game.s.relics.size()],Rect2(590,394,640,140),19,MUTED)
+	button(L.t("NEW EXPEDITION  >"),Rect2(60,610,400,70),func(): screen="home"; redraw())
+	button(L.t("INSPECT FINAL DECK"),Rect2(490,610,300,70),func(): overlay="deck"; page=0; redraw())
 
 func draw_overlay() -> void:
 	var shade := ColorRect.new()
 	shade.color = Color(0.01,0.025,0.04,0.95)
 	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	layer.add_child(shade)
-	button("CLOSE  x",Rect2(1125,35,120,44),func(): overlay=""; redraw())
-	label_at(str(overlay).to_upper(),Rect2(45,35,1030,55),30,MINT)
+	button(L.t("CLOSE  x"),Rect2(1125,35,120,44),func(): overlay=""; redraw())
+	label_at(L.overlay(overlay),Rect2(45,35,1030,55),30,MINT)
 	if overlay == "help":
-		label_at("YOUR FIRST DESCENT",Rect2(55,124,1100,45),28)
-		label_at("1. Choose a highlighted map node. Routes connect to adjacent lanes.\n2. Click an enemy to target it. Its intent shows exactly what comes next.\n3. Spend energy on cards. Unplayed cards are discarded at end of turn.\n4. Block absorbs attacks and clears at your next turn. Poison bypasses it.\n5. Defeat enemies for cards and credits. Elites and bosses also give relics.\n6. Rest to heal OR upgrade. Shops can remove a card to tighten your deck.\n7. Clear three sector bosses to win. Death ends the run, not your learning.",Rect2(55,186,1170,280),21,WHITE)
-		label_at("MECHANICS",Rect2(55,486,550,32),18,GOLD)
-		label_at("Weak: attacks deal 25% less. Vulnerable: target takes 50% more attack damage.\nPoison: damage before the owner's actions, then decreases by 1.\nCharge: feeds Overload / Static shield. Strength: adds damage to each hit.\nExhaust: removed for this combat. Powers last until combat ends.\nSerum: heal 16 at no energy cost. Progress saves after every action.",Rect2(55,529,1170,150),18,MUTED)
-		label_at("KEYS  1-9 / 0: play cards  /  < >: target  /  Space: end turn  /  H: serum  /  Esc: close/menu\nDaily seed uses UTC. Threat 0-4 increases enemy HP and strength. No paid unlocks.",Rect2(55,704,1170,62),16,MINT)
+		label_at(L.t("YOUR FIRST DESCENT"),Rect2(55,124,1100,45),28)
+		label_at(L.t("1. Choose a highlighted map node. Routes connect to adjacent lanes.\n2. Click an enemy to target it. Its intent shows exactly what comes next.\n3. Spend energy on cards. Unplayed cards are discarded at end of turn.\n4. Block absorbs attacks and clears at your next turn. Poison bypasses it.\n5. Defeat enemies for cards and credits. Elites and bosses also give relics.\n6. Rest to heal OR upgrade. Shops can remove a card to tighten your deck.\n7. Clear three sector bosses to win. Death ends the run, not your learning."),Rect2(55,186,1170,280),21,WHITE)
+		label_at(L.t("MECHANICS"),Rect2(55,486,550,32),18,GOLD)
+		label_at(L.t("Weak: attacks deal 25% less. Vulnerable: target takes 50% more attack damage.\nPoison: damage before the owner's actions, then decreases by 1.\nCharge: feeds Overload / Static shield. Strength: adds damage to each hit.\nExhaust: removed for this combat. Powers last until combat ends.\nSerum: heal 16 at no energy cost. Progress saves after every action."),Rect2(55,529,1170,150),18,MUTED)
+		label_at(L.t("KEYS  1-9 / 0: play cards  /  < >: target  /  Space: end turn  /  H: serum  /  Esc: close/menu\nDaily seed uses UTC. Threat 0-4 increases enemy HP and strength. No paid unlocks."),Rect2(55,704,1170,62),16,MINT)
 	elif overlay == "confirm":
-		label_at("Abandon the current expedition?",Rect2(120,240,1050,70),36)
-		label_at("Starting a new expedition replaces the current autosave.",Rect2(120,335,1050,50),22,MUTED)
-		button("ABANDON & BEGIN",Rect2(120,460,450,70),new_run,true,CORAL)
-		button("KEEP CURRENT RUN",Rect2(650,460,450,70),func(): overlay=""; redraw())
+		label_at(L.t("Abandon the current expedition?"),Rect2(120,240,1050,70),36)
+		label_at(L.t("Starting a new expedition replaces the current autosave."),Rect2(120,335,1050,50),22,MUTED)
+		button(L.t("ABANDON & BEGIN"),Rect2(120,460,450,70),new_run,true,CORAL)
+		button(L.t("KEEP CURRENT RUN"),Rect2(650,460,450,70),func(): overlay=""; redraw())
 	elif overlay == "relics":
 		for i in range(game.s.relics.size()):
 			var relic: Dictionary = Content.RELICS[game.s.relics[i]]
@@ -398,7 +404,7 @@ func draw_overlay() -> void:
 			var hidden_draw: Array = game.s.draw.duplicate(true)
 			hidden_draw.sort_custom(func(a,b): return a.id < b.id)
 			items = hidden_draw+game.s.discard+game.s.exhaust
-			label_at("Draw %d / discard %d / exhaust %d. Listed in that order; draw order is hidden." % [game.s.draw.size(),game.s.discard.size(),game.s.exhaust.size()],Rect2(50,96,1170,30),17,MUTED)
+			label_at(L.t("Draw %d / discard %d / exhaust %d. Listed in that order; draw order is hidden.") % [game.s.draw.size(),game.s.discard.size(),game.s.exhaust.size()],Rect2(50,96,1170,30),17,MUTED)
 		var start := page*10
 		for i in range(start,mini(start+10,items.size())):
 			var item: Dictionary = items[i]
@@ -411,9 +417,9 @@ func draw_overlay() -> void:
 				callback = func(): overlay=""; act(game.remove_card(i))
 			var j := i-start
 			card_widget(item,Rect2(50+(j%5)*240,150+(j/5)*240,220,215),callback,enabled)
-		button("< PREVIOUS",Rect2(50,680,230,50),func(): page-=1; redraw(),page>0)
-		label_at("PAGE %d / %d" % [page+1,maxi(1,ceili(items.size()/10.0))],Rect2(535,683,300,42),18,MUTED)
-		button("NEXT >",Rect2(990,680,230,50),func(): page+=1; redraw(),start+10<items.size())
+		button(L.t("< PREVIOUS"),Rect2(50,680,230,50),func(): page-=1; redraw(),page>0)
+		label_at(L.t("PAGE %d / %d") % [page+1,maxi(1,ceili(items.size()/10.0))],Rect2(535,683,300,42),18,MUTED)
+		button(L.t("NEXT >"),Rect2(990,680,230,50),func(): page+=1; redraw(),start+10<items.size())
 
 func act(success: bool) -> void:
 	if not success:
@@ -443,17 +449,17 @@ func save_json(path: String, data: Dictionary) -> bool:
 
 func save_run() -> void:
 	if not save_json(SAVE_PATH,game.snapshot()):
-		notice = "Storage unavailable. This run can continue, but may not survive a reload."
+		notice = L.t("Storage unavailable. This run can continue, but may not survive a reload.")
 
 func load_run() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
 		return
 	var file := FileAccess.open(SAVE_PATH,FileAccess.READ)
 	if file == null or file.get_length() > 1048576:
-		notice = "Autosave could not be read. Start a new expedition."
+		notice = L.t("Autosave could not be read. Start a new expedition.")
 		return
 	if not game.restore(JSON.parse_string(file.get_as_text())):
-		notice = "Autosave is invalid or from another version. Start a new expedition."
+		notice = L.t("Autosave is invalid or from another version. Start a new expedition.")
 	summary_recorded = not game.s.is_empty() and game.s.phase in ["won","lost"]
 
 func load_profile() -> void:
