@@ -5,7 +5,7 @@ name: GitHub Pages
 on:
   push:
     branches: [main]
-    paths: ['projects/entropylab/**', '.github/workflows/pages.yml']
+    paths: ['projects/entropylab/**', 'projects/roguelab/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 
 permissions:
@@ -19,7 +19,7 @@ jobs:
   build:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 35
     defaults:
       run:
         working-directory: projects/entropylab
@@ -38,14 +38,32 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ${{ runner.temp }}/roguelab-tools
+          key: roguelab-godot-4.6.3-${{ runner.os }}-v1
+      - name: Install verified RogueLab toolchain
+        working-directory: .
+        run: python projects/roguelab/tools/setup_godot.py --directory "$RUNNER_TEMP/roguelab-tools" --templates
+      - name: Build and validate RogueLab
+        working-directory: .
+        run: |
+          python projects/roguelab/tools/verify.py --export
+          python -m pip install playwright==1.62.0
+          python -m playwright install --with-deps chromium
+          python projects/roguelab/tests/web_smoke.py
       - name: Assemble project site
         working-directory: .
         run: |
-          mkdir -p _site/entropylab
+          mkdir -p _site/entropylab _site/roguelab
           cp -R projects/entropylab/dist/. _site/entropylab/
+          cp -R projects/roguelab/build/web/. _site/roguelab/
           touch _site/.nojekyll
           cat > _site/index.html <<'HTML'
-          <!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GPT 项目</title><h1>交互实验</h1><p><a href="./entropylab/">EntropyLab · 计算物理实验室</a></p></html>
+          <!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GPT 项目</title><h1>交互实验</h1><p><a href="./entropylab/">EntropyLab · 计算物理实验室</a></p><p><a href="./roguelab/">RogueLab · 深井协议 / 卡组肉鸽</a></p></html>
           HTML
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:

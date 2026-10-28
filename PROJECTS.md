@@ -16,6 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
+| RogueLab | [projects/roguelab](projects/roguelab/) | Completed | Godot 4 三职业卡组肉鸽：三幕路线、遗物构筑、随机事件与首领；Web / Windows | PR #24；独立 Linux/Windows 验收通过，Web / 下载入口见 README；后续中文化与玩家反馈 |
 | CompilerLab | [projects/compilerlab](projects/compilerlab/) | Completed | 本地微型编译流水线、独立解释器与栈式 VM 语义对照 | PR #23；最终修复头253单元/14生产E2E、Linux/Windows与CI required已35/35通过；最新验收记录仍需完整CI成功，不部署 |
 | CalibrationLab | [projects/calibrationlab](projects/calibrationlab/) | Completed | 本地概率预测、独立样本校准与可靠性图 | PR #22；最终121单元/13生产E2E；初始功能头Linux/Windows与CI required全通过，数值修复头仍须完整CI，不部署 |
 | AgentTrustLab | [projects/agenttrustlab](projects/agenttrustlab/) | Completed | 确定性智能体信任边界与独立工具授权；四策略真实比较 | PR #20已合并；161单元/13生产E2E、Linux/Windows、CI required及合并后main CI全通过；不部署 |
@@ -315,6 +316,15 @@
 - **实际验证 / 状态**：Completed（修复功能验收完成，合并元数据以[PR #23](https://github.com/ngwglai/GPT/pull/23)为准）；最终本地253单元（含1156小整数独立oracle组合与160固定种子）/14生产E2E、静态/构建/0漏洞完整审计通过；最新代码和跨平台证据见 [VALIDATION.md](projects/compilerlab/VALIDATION.md)，初始功能头a970ac3的[CI 39523075196](https://github.com/ngwglai/GPT/actions/runs/39523075196)已35/35成功，含原生Linux/Windows及CI required。补充头c0e9e59的CI也35/35成功；随后审查提出低层VM逻辑右值校验与未完成历史回放继续按钮两个边界，均已修复并增加回归，修复头8afffd5的[CI 39524971287](https://github.com/ngwglai/GPT/actions/runs/39524971287)已35/35全部通过，含原生Linux/Windows及CI required，两条讨论已解决，恢复Completed。本次仅补充验收记录，仍要求该记录提交的最新完整CI成功后才合并。
 - **环境 / 隐私**：环境 ready 后最小 shell、Git/工具/实际 Chromium 启动成功；私有来源/匿名身份/hooks 初始化成功，基线53根回归及121提交/633blob/0命中。首次脚手架相对路径、类型推断、位置断言的实际失败与修正已记录；不回显私人值，不绕过检查。
 - **限制 / 后续**：8192字符/2048Token/512AST节点/32深度/128声明/2048指令/4096步骤/256输出；对称整数范围±2147483647，溢出/除零报错，除法向零截断。预算终止单独报告；同步主线程，无循环/函数/文件/网络。用户电脑人工试用、Firefox/WebKit和真实手机未验证；按需扩展控制流图或源码断点，不部署。
+
+## RogueLab · 深井协议（2026-10-28）
+
+- **目的与差异**：面向单人策略玩家的完整卡组肉鸽；与既有算法教学实验室不同，不改动其他项目业务代码。
+- **范围**：Godot 4.6.3；三职业、三幕七层分支地图、35 种卡牌定义、14 种遗物、11 种敌人（含首领）、四个事件、商店、升级与删牌、五档难度、种子复现、自动存档和胜负结算。
+- **验收标准**：三职业可自然通关；失败可重新开始；规则与存档可复验；Web 实际操作、Windows 原生运行；继承匿名身份、隐私词表和 hooks；发布不得覆盖其他项目。
+- **实现**：独立 `projects/roguelab/`；独立 `.github/workflows/roguelab.yml`；只扩展既有 Pages 聚合器，保留 `/entropylab/` 并增加 `/roguelab/`。
+- **测试**：本地规则检查、全部界面渲染、完整种子模拟与双平台导出；具体结果与边界见项目 `VALIDATION.md`。远端 CI 与发布以对应工作流实际状态为准。
+- **后续**：优先依据真实玩家反馈改善职业平衡、中文界面和触屏可读性；不依赖数值付费或账号服务。
 
 ## 共享 CI 依赖审计修复（2026-10-28）
 
