@@ -16,7 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| RogueLab | [projects/roguelab](projects/roguelab/) | Completed | Godot 4 三职业卡组肉鸽：三幕路线、遗物构筑、随机事件与首领；Web / Windows | PR #24；独立 Linux/Windows 验收通过，Web / 下载入口见 README；后续中文化与玩家反馈 |
+| RogueLab | [projects/roguelab](projects/roguelab/) | Completed | Godot 4 三职业卡组肉鸽：三幕路线、遗物构筑、随机事件与首领；Web / Windows | PR #24；独立 Linux/Windows 验收通过，Web / 下载入口见 README；v1.1 完整简体中文；后续玩家反馈 |
 | CompilerLab | [projects/compilerlab](projects/compilerlab/) | Completed | 本地微型编译流水线、独立解释器与栈式 VM 语义对照 | PR #23；最终修复头253单元/14生产E2E、Linux/Windows与CI required已35/35通过；最新验收记录仍需完整CI成功，不部署 |
 | CalibrationLab | [projects/calibrationlab](projects/calibrationlab/) | Completed | 本地概率预测、独立样本校准与可靠性图 | PR #22；最终121单元/13生产E2E；初始功能头Linux/Windows与CI required全通过，数值修复头仍须完整CI，不部署 |
 | AgentTrustLab | [projects/agenttrustlab](projects/agenttrustlab/) | Completed | 确定性智能体信任边界与独立工具授权；四策略真实比较 | PR #20已合并；161单元/13生产E2E、Linux/Windows、CI required及合并后main CI全通过；不部署 |
@@ -331,3 +331,8 @@
 - **触发**：RogueLab PR 的原有仓库安全门禁发现新增依赖通告；与游戏实现无关。单独维护分支修复，不关闭审计或跳过现有项目测试。
 - **变更**：共享 Python CI 与 ConstraintLab Windows 安装器将 setuptools 84.0.0 更新至 84.1.0；QQ Mail MCP 更新 postal-mime、Wrangler、匹配的 Miniflare / Workers 类型，并刷新受影响的 body-parser、fast-uri、undici 锁定版本。业务源码与部署配置不变。
 - **本地验证**：QQ Mail MCP npm audit 0 漏洞、类型检查、62 项测试、dry-run 构建及隐私基线通过；没有部署邮件服务。跨项目 Linux / Windows 完整验收仍由现有 CI 执行。
+
+## RogueLab v1.1 简体中文（2026-10-28）
+
+- 集中中文资源、OFL 中文字体、全部游戏界面与 Web 外壳本地化；保留 v1 存档与规则数据，不改数值或随机数。
+- 复用独立 CI 与聚合 Pages 发布，新版下载使用独立 v1.1.0 标签，保留旧版与其他项目产物。

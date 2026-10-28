@@ -23,22 +23,39 @@ func test_ui() -> void:
 		if ui.layer.get_child_count()<5:
 			failures+=1
 		await process_frame
-		if phase == "combat":
-			check_layout(ui.layer)
+		check_layout(ui.layer)
 	for overlay in ["help","confirm","deck","relics","piles","upgrade","remove"]:
 		ui.overlay=overlay
 		ui.redraw()
 		await process_frame
+		check_layout(ui.layer)
 	ui.screen="home"
 	ui.overlay=""
 	ui.redraw()
 	await process_frame
+	check_layout(ui.layer)
 	ui.queue_free()
 	await process_frame
 	print("UI_CHECKS_PASS" if failures==0 else "UI_CHECKS_FAILED")
 	quit(0 if failures==0 else 1)
 
 func check_layout(node: Node) -> void:
+	if node is Button:
+		var latin_button := RegEx.new()
+		latin_button.compile("[A-Za-z]{2,}")
+		if latin_button.search(node.text+node.tooltip_text) != null:
+			printerr("UNTRANSLATED_BUTTON: "+node.text+node.tooltip_text)
+			failures += 1
+	if node is Label:
+		if node.get_line_count()*node.get_line_height() > node.size.y + 3:
+			printerr("TEXT_HEIGHT: "+node.text)
+			failures += 1
+		var latin := RegEx.new()
+		latin.compile("[A-Za-z]{3,}")
+		var safe: String = node.text.replace("UTC", "").replace("Esc", "")
+		if latin.search(safe) != null:
+			printerr("UNTRANSLATED: "+node.text)
+			failures += 1
 	if node is ProgressBar and node.size.y > 12:
 		failures += 1
 	if node is Label and node.autowrap_mode != TextServer.AUTOWRAP_OFF and node.get_parent() is Button:

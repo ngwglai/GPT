@@ -110,6 +110,7 @@ jobs:
           cp projects/roguelab/README.md windows/README.md
           cp projects/roguelab/LICENSE windows/LICENSE
           cp projects/roguelab/THIRD_PARTY.md windows/THIRD_PARTY.md
+          cp projects/roguelab/assets/fonts/OFL.txt windows/FONT-LICENSE.txt
           cd windows
           zip -r ../RogueLab-windows-x86_64.zip .
           cd ../web
@@ -120,8 +121,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view roguelab-v1.0.0 >/dev/null 2>&1; then
+          if gh release view roguelab-v1.1.0 >/dev/null 2>&1; then
             echo 'Version already published; bump the version for a new release.'
           else
-            gh release create roguelab-v1.0.0 --target "$GITHUB_SHA" --title 'RogueLab v1.0.0 — Deepwell Protocol' --notes-file projects/roguelab/RELEASE.md RogueLab-windows-x86_64.zip RogueLab-web.zip SHA256SUMS.txt
+            gh release create roguelab-v1.1.0 --target "$GITHUB_SHA" --title 'RogueLab v1.1.0 — Deepwell Protocol' --notes-file projects/roguelab/RELEASE.md RogueLab-windows-x86_64.zip RogueLab-web.zip SHA256SUMS.txt
           fi
