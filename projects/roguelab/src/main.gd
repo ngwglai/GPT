@@ -31,6 +31,7 @@ var audio_player: AudioStreamPlayer
 var summary_recorded := false
 
 func _ready() -> void:
+	get_window().title = L.t("ROGUELAB")
 	if "--smoke" in OS.get_cmdline_user_args():
 		game.start("warden",741)
 		if not game.travel(0,1) or game.s.hand.size() != 5:
