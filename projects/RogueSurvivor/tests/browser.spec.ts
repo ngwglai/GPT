@@ -120,6 +120,8 @@ test("最终 Boss 实际受击后结算，并继续无尽", async ({ page }) => 
   w.s.nextBoss = 1500;
   w.s.nextEvent = 1260;
   w.s.bossIndex = 4;
+  // Keep this transition test independent of queued level rewards (covered separately).
+  w.s.player.level = 100;
   const e = spawn(w, "titan", { x: 1880, y: 1800 })!;
   e.hp = 1;
   await resume(page, w.s);
