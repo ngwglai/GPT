@@ -207,15 +207,20 @@ jobs:
     name: CompilerLab
     uses: ./.github/workflows/compilerlab.yml
 
+  rogue-survivor:
+    name: RogueSurvivor
+    uses: ./.github/workflows/rogue-survivor.yml
+
   required:
     name: CI required
     if: always()
-    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab, adversarylab, deltalab, agenttrustlab, calibrationlab, compilerlab]
+    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab, adversarylab, deltalab, agenttrustlab, calibrationlab, compilerlab, rogue-survivor]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require all applicable checks
         env:
+          ROGUE_SURVIVOR_RESULT: ${{ needs.rogue-survivor.result }}
           COMPILERLAB_RESULT: ${{ needs.compilerlab.result }}
           CALIBRATIONLAB_RESULT: ${{ needs.calibrationlab.result }}
           AGENTTRUSTLAB_RESULT: ${{ needs.agenttrustlab.result }}
@@ -234,6 +239,7 @@ jobs:
           HAS_CONSTRAINTLAB: ${{ needs.layout.outputs.constraintlab }}
           CONSTRAINTLAB_RESULT: ${{ needs.constraintlab.result }}
         run: |
+          test "$ROGUE_SURVIVOR_RESULT" = success
           test "$COMPILERLAB_RESULT" = success
           test "$CALIBRATIONLAB_RESULT" = success
           test "$AGENTTRUSTLAB_RESULT" = success
