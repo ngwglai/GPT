@@ -1,3 +1,6 @@
+import { ensureDeck } from "../src/core/deckState";
+import { recalculate } from "../src/core/fate";
+import { heldLayers } from "../src/core/deckState";
 import { test, expect, Page } from "@playwright/test";
 import { createRun } from "../src/core/create";
 import { World } from "../src/core/world";
@@ -42,6 +45,11 @@ async function get(page: Page, key: string) {
   );
 }
 async function resume(page: Page, s: Run) {
+  // Fixtures that manually enter an upgrade must declare its v1.2 draw type.
+  if (s.phase === "upgrade")
+    ensureDeck(s).active = s.choices.every((id) => id.startsWith("hex_"))
+      ? "negative"
+      : "positive";
   await page.goto("/");
   await page.getByRole("button", { name: "开启远征" }).waitFor();
   await put(page, "run", s);
@@ -297,7 +305,10 @@ denseTest("密集战斗真实渲染、性能面板、无控制台异常", async 
   w.s.nextBoss = 7500;
   w.s.nextEvent = 7290;
   w.s.player.invincible = 300;
-  w.s.player.weapons = { bow: 5, blade: 5, ember: 5, orbit: 5, drone: 5 };
+  for (const id of ["bow", "blade", "ember", "orbit", "drone"] as const)
+    w.s.player.upgrades["weapon_" + id] =
+      5 - (ensureDeck(w.s).baseWeapons[id] || 0);
+  recalculate(w.s);
   for (let i = 0; i < 140; i++) {
     const a = i * 2.4;
     spawn(
@@ -440,6 +451,7 @@ test("不透明自定义地面保持可见，敌方预警绘制在其上方", as
   });
   const w = new World(createRun("standard"));
   w.s.player.weapons = {};
+  ensureDeck(w.s).baseWeapons = {};
   w.s.rocks = [];
   w.s.spawnTimer = 9;
   w.zone({ x: 2000, y: 1800 }, 80, 10, "meteor", true, 8, 0.2);
@@ -538,8 +550,12 @@ test("v1.1 重抽、遗忘与属性落盘", async ({ page }) => {
   reroll.choices = ["reroll", "vitality", "power"];
   await resume(page, reroll);
   await page.locator('[data-action="upgrade-reroll"]').click();
-  await expect(page.locator(".upgrade-card")).toHaveCount(3);
-  await expect(page.locator('[data-action="upgrade-reroll"]')).toHaveCount(0);
+  await expect(page.locator(".upgrade-card")).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "保存当前进度" }).click();
+  await expect
+    .poll(async () => (await get(page, "run")).deck.refreshes)
+    .toBe(6);
   const forgotten = structuredClone(s);
   forgotten.choices = ["forget", "vitality", "power"];
   await resume(page, forgotten);
@@ -548,4 +564,98 @@ test("v1.1 重抽、遗忘与属性落盘", async ({ page }) => {
   await expect
     .poll(async () => (await get(page, "run")).player.upgrades.vigor)
     .toBe(0);
+});
+
+test("v1.2 三类图鉴、当前构筑合并层数及独立刷新", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".version")).toContainText("v1.2");
+  await page.getByRole("button", { name: "远征图鉴", exact: true }).click();
+  await expect(page.locator(".codex-card")).toHaveCount(70);
+  await page.getByRole("button", { name: "技能图鉴", exact: true }).click();
+  await expect(page.locator(".codex-card")).toHaveCount(11);
+  await page.getByRole("button", { name: "怪物图鉴", exact: true }).click();
+  await expect(page.locator(".codex-card")).toHaveCount(10);
+  const { grant } = await import("../src/core/progression");
+  const s = createRun("standard");
+  grant(s, "power");
+  grant(s, "power");
+  s.phase = "upgrade";
+  ensureDeck(s).active = "positive";
+  s.choices = ["vitality", "power", "critical"];
+  await resume(page, s);
+  await page.getByRole("button", { name: /刷新 · 剩余 3/ }).click();
+  await expect(
+    page.getByRole("button", { name: /刷新 · 剩余 2/ }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "当前构筑", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "星核 ×2" })).toBeVisible();
+  await page.getByRole("button", { name: "← 返回", exact: true }).click();
+  await expect(page.locator(".upgrade-card")).toHaveCount(3);
+  await expect
+    .poll(async () => (await get(page, "run")).deck.refreshes)
+    .toBe(2);
+});
+test("v1.2 掉落触发负面抽卡，读取后奖励队列不丢失", async ({ page }) => {
+  const { placeDrop } = await import("../src/core/drops");
+  const s = createRun("endless");
+  ensureDeck(s);
+  placeDrop(s, s.player, "negative", 2);
+  placeDrop(s, s.player, "positive", 1);
+  await resume(page, s);
+  await expect(
+    page.getByRole("heading", { name: "选择一项负面命运" }),
+  ).toBeVisible();
+  await expect(page.locator(".upgrade-card.polarity-negative")).toHaveCount(3);
+  await expect(
+    page.getByRole("button", { name: /刷新 · 剩余/ }),
+  ).toBeDisabled();
+  const saved = await get(page, "run");
+  expect(saved.deck.pending).toEqual({ negative: 1, positive: 1 });
+  await page.reload();
+  await page.getByRole("button", { name: /继续旅程/ }).click();
+  await page.locator(".upgrade-card").first().click();
+  await expect
+    .poll(async () => (await get(page, "run")).deck.pending.negative)
+    .toBe(0);
+  await expect(
+    page.getByRole("heading", { name: "选择一项负面命运" }),
+  ).toBeVisible();
+  await page.locator(".upgrade-card").first().click();
+  await expect(
+    page.getByRole("heading", { name: "选择一份馈赠" }),
+  ).toBeVisible();
+  await page.locator(".upgrade-card").first().click();
+  await expect(page.locator(".upgrade-card")).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "保存当前进度" }).click();
+  await expect
+    .poll(async () => (await get(page, "run")).deck.pending)
+    .toEqual({ positive: 0, negative: 0 });
+});
+test("v1.2 命运洗牌包括自身等量替换，恢复后构筑一致", async ({ page }) => {
+  const s = createRun("standard");
+  ensureDeck(s);
+  s.player.upgrades = { power: 30, hex_damage: 8 };
+  recalculate(s);
+  s.phase = "upgrade";
+  s.deck!.active = "positive";
+  s.choices = ["shuffle", "power", "vitality"];
+  await resume(page, s);
+  await page.locator('[data-action="upgrade-shuffle"]').click();
+  await expect
+    .poll(async () => (await get(page, "run")).deck.lastShuffle?.added)
+    .toBe(39);
+  const saved = await get(page, "run");
+  expect(heldLayers(saved)).toBe(39);
+  expect(
+    Object.keys(saved.player.upgrades).some((id) => id.startsWith("hex_")),
+  ).toBe(false);
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "当前构筑", exact: true }).click();
+  await expect(page.getByText(/当前持有39层/)).toBeVisible();
+  await expect(page.locator(".polarity-negative")).toHaveCount(0);
+  await page.reload();
+  await page.getByRole("button", { name: /继续旅程/ }).click();
+  await expect(page.locator("#clock")).toBeVisible();
+  expect(heldLayers(await get(page, "run"))).toBe(39);
 });

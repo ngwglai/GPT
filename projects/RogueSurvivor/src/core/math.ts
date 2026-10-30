@@ -21,18 +21,30 @@ export function move(
   r: number,
   rocks: Rock[],
 ) {
-  body.x = clamp(body.x + dx, r, LIMITS.world - r);
-  body.y = clamp(body.y + dy, r, LIMITS.world - r);
-  for (const o of rocks) {
-    const d = distance(body, o);
-    if (d < r + o.r) {
-      const n = unit(body.x - o.x, body.y - o.y);
-      body.x = o.x + n.x * (r + o.r);
-      body.y = o.y + n.y * (r + o.r);
+  if (!Number.isFinite(dx) || !Number.isFinite(dy)) return;
+  dx = clamp(dx, -LIMITS.world, LIMITS.world);
+  dy = clamp(dy, -LIMITS.world, LIMITS.world);
+  const steps = Math.min(
+    256,
+    Math.max(
+      1,
+      Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / Math.max(4, r)),
+    ),
+  );
+  for (let step = 0; step < steps; step++) {
+    body.x = clamp(body.x + dx / steps, r, LIMITS.world - r);
+    body.y = clamp(body.y + dy / steps, r, LIMITS.world - r);
+    for (const o of rocks) {
+      const d = distance(body, o);
+      if (d < r + o.r) {
+        const n = unit(body.x - o.x, body.y - o.y);
+        body.x = o.x + n.x * (r + o.r);
+        body.y = o.y + n.y * (r + o.r);
+      }
     }
+    body.x = clamp(body.x, r, LIMITS.world - r);
+    body.y = clamp(body.y, r, LIMITS.world - r);
   }
-  body.x = clamp(body.x, r, LIMITS.world - r);
-  body.y = clamp(body.y, r, LIMITS.world - r);
 }
 export class SpatialHash<T extends Vec> {
   private cells = new Map<string, T[]>();

@@ -1,4 +1,7 @@
-import { modifier } from "./fate";
+import { ENEMY_RULES } from "../data/enemies";
+import { skillStats } from "../data/skills";
+import { weaponStats } from "../data/weapons";
+import { modifier, soft } from "./fate";
 import type { Run, Enemy, Bullet, Vec, Effect } from "./types";
 import { LIMITS, SKILLS, WEAPONS } from "../data/content";
 import {
@@ -27,7 +30,9 @@ export class Combat {
     const p = this.s.player;
     const critical = crit && random(this.s) < p.crit;
     const synergy =
-      e.slow > 0 || e.freeze > 0 ? 1 + (p.upgrades.shatter || 0) * 0.3 : 1;
+      e.slow > 0 || e.freeze > 0
+        ? 1 + soft(p.upgrades.shatter || 0, 2) * 0.3
+        : 1;
     const value = Math.min(
       LIMITS.number,
       amount *
@@ -39,7 +44,7 @@ export class Combat {
           ? 1 + 0.3 / Math.max(1, Object.keys(p.weapons).length)
           : 1) *
         (critical ? 2 : 1) *
-        (e.kind === "guard" ? 0.72 : 1),
+        (e.kind === "guard" ? ENEMY_RULES.guardDamageFactor : 1),
     );
     const actual = Math.min(e.hp, value);
     e.hp -= value;
@@ -79,8 +84,9 @@ export class Combat {
     this.s.stats.healed = Math.min(LIMITS.number, this.s.stats.healed + n);
   }
   burn(e: Enemy, power: number, source: string) {
-    e.burn = 3 + (this.s.player.upgrades.burn || 0);
-    e.burnPower = power * (1 + (this.s.player.upgrades.burn || 0) * 0.25);
+    e.burn = 3 + soft(this.s.player.upgrades.burn || 0, 4);
+    e.burnPower =
+      power * (1 + soft(this.s.player.upgrades.burn || 0, 4) * 0.25);
     e.burnSource = source;
   }
   area(p: Vec, r: number, damage: number, kind: string, source: string) {
@@ -179,7 +185,7 @@ export class Combat {
       target = { x: p.x + d.x * range, y: p.y + d.y * range };
     const zonesNeeded =
       id === "storm"
-        ? 5 + lv * 2
+        ? skillStats(id, lv).shots
         : id === "fire"
           ? lv >= 3
             ? 3
@@ -196,17 +202,18 @@ export class Combat {
       this.s.eventUntil = this.s.time + 2;
       return false;
     }
+    const stats = skillStats(id, lv);
     p.cooldowns[slot] = SKILLS[id].cooldown * p.cooldown;
     this.lastSound = "cast";
     if (id === "fire") {
       this.zone(
         target,
-        105 + lv * 12,
-        90 + lv * 20,
+        stats.radius,
+        stats.damage,
         "fire",
         false,
         0.25,
-        1 + lv * 0.35,
+        stats.duration,
       );
       if (lv >= 3)
         for (const dx of [-95, 95])
@@ -221,8 +228,8 @@ export class Combat {
           );
     }
     if (id === "ice") {
-      this.area(p, 145 + lv * 15, 40 + lv * 10, "ice", "ice");
-      this.zone(p, 145 + lv * 15, 12, "ice", false, 0, 2 + lv * 0.5);
+      this.area(p, stats.radius, stats.damage, "ice", "ice");
+      this.zone(p, stats.radius, 12, "ice", false, 0, stats.duration);
     }
     if (id === "lance") {
       for (let i = 0; i < (lv >= 3 ? 3 : 1); i++) {
@@ -231,7 +238,7 @@ export class Combat {
         this.shoot(
           p,
           { x: Math.cos(a), y: Math.sin(a) },
-          85 + lv * 25,
+          stats.damage,
           "lance",
           "lance",
           false,
@@ -239,30 +246,38 @@ export class Combat {
             vx: Math.cos(a) * 950,
             vy: Math.sin(a) * 950,
             pierce: 25,
-            r: 10 + lv * 2,
+            r: stats.radius,
             life: 0.8,
           },
         );
       }
     }
     if (id === "ward") {
-      p.shield = Math.min(200, p.shield + 40 + lv * 15);
-      p.invincible = Math.max(p.invincible, 1 + lv * 0.2);
-      this.area(p, 125 + lv * 12, 35 + lv * 12, "ward", "ward");
+      p.shield = Math.min(200, p.shield + stats.shield);
+      p.invincible = Math.max(p.invincible, stats.duration);
+      this.area(p, stats.radius, stats.damage, "ward", "ward");
     }
     if (id === "bloom") {
-      this.heal(20 + lv * 12);
-      this.zone(p, 110 + lv * 10, 16 + lv * 6, "bloom", false, 0, 4 + lv);
+      this.heal(stats.heal);
+      this.zone(
+        p,
+        stats.radius,
+        stats.damage,
+        "bloom",
+        false,
+        0,
+        stats.duration,
+      );
       this.effect(p, "bloom", 130);
     }
     if (id === "storm") {
-      for (let i = 0; i < 5 + lv * 2; i++) {
+      for (let i = 0; i < skillStats(id, lv).shots; i++) {
         const a = i * 2.4,
           r = i === 0 ? 0 : 70 + random(this.s) * 190;
         this.zone(
           { x: target.x + Math.cos(a) * r, y: target.y + Math.sin(a) * r },
           130,
-          135 + lv * 25,
+          stats.damage,
           "storm",
           false,
           0.2 + i * 0.14,
@@ -282,7 +297,7 @@ export class Combat {
       if (p.weaponTimers[key] > 0) continue;
       const w = WEAPONS[key],
         lv = p.weapons[key]!,
-        mult = 1 + (lv - 1) * 0.3;
+        mult = weaponStats(key, lv).damage / w.damage;
       p.weaponTimers[key] =
         w.interval /
         ((1 + (lv - 1) * 0.08) * modifier(this.s, "interval", key));
@@ -290,14 +305,16 @@ export class Combat {
       if (key === "blade") {
         this.area(
           p,
-          w.range + (p.upgrades.wide || 0) * 18 + (lv >= 5 ? 35 : 0),
+          w.range +
+            Math.min(240, (p.upgrades.wide || 0) * 18) +
+            (lv >= 5 ? 35 : 0),
           w.damage * mult,
           "slash",
           key,
         );
         p.shield += Math.min(
           Math.max(0, 80 - p.shield),
-          (p.upgrades.wide || 0) * 2,
+          Math.min(40, (p.upgrades.wide || 0) * 2),
         );
         continue;
       }

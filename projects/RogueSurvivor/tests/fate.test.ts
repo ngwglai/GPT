@@ -16,6 +16,8 @@ import {
   modifier,
 } from "../src/core/fate";
 import { validateRun } from "../src/services/storage";
+import { ensureDeck } from "../src/core/deckState";
+import { refresh } from "../src/core/cardPool";
 import { UPGRADES } from "../src/data/content";
 import {
   NEW_CARDS,
@@ -34,7 +36,9 @@ describe("命运与奇遇", () => {
     expect(grant(s, "pierce")).toBe(false);
   });
   it("limits every new definition", () => {
-    for (const u of NEW_CARDS) {
+    for (const u of UPGRADES.filter((u) =>
+      NEW_CARDS.some((n) => n.id === u.id),
+    )) {
       const s = createRun("standard");
       s.player.upgrades[u.id] = u.max;
       expect(eligible(s).some((x) => x.id === u.id)).toBe(false);
@@ -83,16 +87,20 @@ describe("命运与奇遇", () => {
     grant(s, "chest_common");
     expect(s.player.shield).toBe(20);
   });
-  it("rerolls without consuming the level or chaining itself", () => {
+  it("fate gift grants refresh resources; the independent button preserves the draw", () => {
     const s = createRun("standard");
-    s.phase = "upgrade";
+    offer(s);
+    const level = s.player.level;
+    ensureDeck(s).refreshes = 0;
     s.choices = ["reroll"];
-    const lv = s.player.level;
     expect(applyUpgrade(s, "reroll")).toBe(true);
+    expect(s.phase).toBe("playing");
+    expect(s.deck!.refreshes).toBe(3);
+    offer(s);
+    expect(refresh(s)).toBe(true);
     expect(s.phase).toBe("upgrade");
-    expect(s.player.level).toBe(lv);
-    expect(s.choices).not.toContain("reroll");
-    expect(s.choices).not.toContain("forget");
+    expect(s.player.level).toBe(level);
+    expect(s.deck!.refreshes).toBe(2);
   });
   it("supports all five weapons through save restore", () => {
     const s = createRun("standard");
@@ -156,6 +164,7 @@ it("execution and specialist alter actual damage; harvest heals on kill", async 
   const w = new World(s);
   s.player.weapons = {};
   s.player.regen = 0;
+  fate(s).base.regen = 0;
   s.player.hp = 50;
   grant(s, "execution");
   grant(s, "specialist");

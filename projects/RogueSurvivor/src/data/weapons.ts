@@ -51,3 +51,12 @@ export const WEAPONS: Record<
     color: 0x8edaf5,
   },
 };
+
+export function weaponStats(id: WeaponId, level: number) {
+  const w = WEAPONS[id];
+  return {
+    damage: w.damage * (1 + (level - 1) * 0.3),
+    interval: w.interval / (1 + (level - 1) * 0.08),
+    range: w.range,
+  };
+}

@@ -1,4 +1,7 @@
-import { modifier } from "./fate";
+import { ENEMY_RULES } from "../data/enemies";
+import { ensureDeck } from "./deckState";
+import { rollDrops, collectDrops } from "./drops";
+import { modifier, soft } from "./fate";
 import type { Run, Input } from "./types";
 import { Combat } from "./combat";
 import { ai, director } from "./director";
@@ -8,6 +11,7 @@ import { distance, move, unit, clamp } from "./math";
 export class World extends Combat {
   constructor(s: Run) {
     super(s);
+    ensureDeck(s);
     this.grid.rebuild(s.enemies);
   }
   choose(id: string) {
@@ -83,8 +87,9 @@ export class World extends Combat {
       if (e.hp > 0) continue;
       s.stats.kills = Math.min(LIMITS.number, s.stats.kills + 1);
       const def = ENEMIES[e.kind];
+      rollDrops(s, e, def.boss ? "boss" : e.elite ? "elite" : "normal");
       if (p.upgrades.harvest) this.heal(0.3);
-      const value = def.xp * (e.elite ? 3 : 1);
+      const value = def.xp * (e.elite ? ENEMY_RULES.elite.xp : 1);
       if (s.gems.length < LIMITS.gems) s.gems.push({ x: e.x, y: e.y, value });
       else {
         let g = s.gems[0];
@@ -97,7 +102,7 @@ export class World extends Combat {
           if (other.hp > 0 && distance(other, e) < 145)
             this.burn(
               other,
-              e.burnPower / (1 + (p.upgrades.burn || 0) * 0.25),
+              e.burnPower / (1 + soft(p.upgrades.burn || 0, 4) * 0.25),
               e.burnSource,
             );
         }
@@ -129,6 +134,7 @@ export class World extends Combat {
       }
     }
     s.gems = s.gems.filter((g) => g.value > 0);
+    collectDrops(s, dt);
     checkLevel(s);
     s.stats.peakEnemies = Math.max(s.stats.peakEnemies, s.enemies.length);
     s.stats.peakBullets = Math.max(s.stats.peakBullets, s.bullets.length);

@@ -52,3 +52,41 @@ export const SKILLS: Record<
     aim: "area",
   },
 };
+
+// Numeric level parameters are shared by combat and the codex.
+export function skillStats(id: SkillId, level: number) {
+  const v = Math.min(5, Math.max(1, level));
+  return {
+    radius: {
+      fire: 105 + v * 12,
+      ice: 145 + v * 15,
+      lance: 10 + v * 2,
+      ward: 125 + v * 12,
+      bloom: 110 + v * 10,
+      storm: 130,
+    }[id],
+    damage: {
+      fire: 90 + v * 20,
+      ice: 40 + v * 10,
+      lance: 85 + v * 25,
+      ward: 35 + v * 12,
+      bloom: 16 + v * 6,
+      storm: 135 + v * 25,
+    }[id],
+    duration: {
+      fire: 1 + v * 0.35,
+      ice: 2 + v * 0.5,
+      lance: 0.8,
+      ward: 1 + v * 0.2,
+      bloom: 4 + v,
+      storm: 0.25,
+    }[id],
+    shield: 40 + v * 15,
+    heal: 20 + v * 12,
+    shots: id === "storm" ? 5 + v * 2 : id === "lance" && v >= 3 ? 3 : 1,
+  };
+}
+export function skillLevelText(id: SkillId, level: number) {
+  const a = skillStats(id, level);
+  return `Lv.${level}：半径${a.radius}，基础伤害${a.damage}，${id === "ward" ? `护盾+${a.shield}（上限200），无敌${a.duration}秒` : id === "bloom" ? `立即治疗${a.heal}，领域${a.duration}秒` : id === "storm" ? `${a.shots}次星爆，清除弹幕` : id === "lance" ? `${a.shots}束，穿透25，持续${a.duration}秒` : `持续${a.duration.toFixed(2)}秒；${id === "fire" && level >= 3 ? "额外两片半径70/伤害65区域" : id === "ice" ? "冻结1.2秒，冰域每跳伤害12" : ""}`}`;
+}

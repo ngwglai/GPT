@@ -106,3 +106,21 @@ export const ENEMIES: Record<
     boss: true,
   },
 };
+
+export const ENEMY_RULES = {
+  elite: { hp: 2.4, damage: 1.3, speed: 1.12, r: 1.2, xp: 3 },
+  guardDamageFactor: 0.72,
+  bossPhaseHp: 0.45,
+};
+export const ENEMY_BEHAVIORS: Record<EnemyId, string> = {
+  crawler: "持续追击并造成接触伤害",
+  runner: "停顿预警后朝锁定方向突进",
+  archer: "保持距离发射弹道，后期改为扇形多发",
+  seer: "预判玩家移动方向，在前方生成范围预警",
+  shaman: "保持距离，周期召唤普通追击敌人",
+  guard: "缓慢追击并以岩甲减伤",
+  bomber: "接近玩家后，周期标记玩家位置造成范围伤害",
+  warden: "围绕玩家生成树根范围预警；低血量追加中心打击",
+  witch: "旋转环形弹幕；低血量追加玩家落点范围打击",
+  titan: "交替蓄力突进与多重陨落预警；低血量增加打击数量",
+};

@@ -1,0 +1,844 @@
+[
+  {
+    "shuffles": [
+      {
+        "time": 3600,
+        "before": 481,
+        "after": 482,
+        "damageBefore": 3.925678785788437,
+        "damageAfter": 4.557114861172217
+      }
+    ],
+    "extraDraws": {
+      "positive": 431,
+      "negative": 117
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 0,
+    "refreshes": 0,
+    "negativeLayers": 14,
+    "output": [
+      {
+        "time": 300,
+        "damage": 23357,
+        "layers": 44,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 3,
+          "negative": 0
+        },
+        "attack": 2.08,
+        "maxHp": 185
+      },
+      {
+        "time": 600,
+        "damage": 95457,
+        "layers": 68,
+        "negativeLayers": 2,
+        "extraDraws": {
+          "positive": 4,
+          "negative": 1
+        },
+        "attack": 1.1226415094339623,
+        "maxHp": 160
+      },
+      {
+        "time": 900,
+        "damage": 221414,
+        "layers": 97,
+        "negativeLayers": 3,
+        "extraDraws": {
+          "positive": 6,
+          "negative": 3
+        },
+        "attack": 1.55,
+        "maxHp": 160
+      },
+      {
+        "time": 1200,
+        "damage": 420699,
+        "layers": 127,
+        "negativeLayers": 5,
+        "extraDraws": {
+          "positive": 11,
+          "negative": 5
+        },
+        "attack": 1.6886792452830188,
+        "maxHp": 303
+      },
+      {
+        "time": 1500,
+        "damage": 743239,
+        "layers": 159,
+        "negativeLayers": 8,
+        "extraDraws": {
+          "positive": 20,
+          "negative": 7
+        },
+        "attack": 2.276785714285714,
+        "maxHp": 282.48
+      },
+      {
+        "time": 1800,
+        "damage": 1230400,
+        "layers": 201,
+        "negativeLayers": 10,
+        "extraDraws": {
+          "positive": 30,
+          "negative": 9
+        },
+        "attack": 2.868131439879126,
+        "maxHp": 386.32
+      },
+      {
+        "time": 2100,
+        "damage": 1895843,
+        "layers": 245,
+        "negativeLayers": 13,
+        "extraDraws": {
+          "positive": 45,
+          "negative": 12
+        },
+        "attack": 3.408665449933212,
+        "maxHp": 423.32
+      },
+      {
+        "time": 2400,
+        "damage": 2658913,
+        "layers": 290,
+        "negativeLayers": 20,
+        "extraDraws": {
+          "positive": 59,
+          "negative": 18
+        },
+        "attack": 3.5411548136084594,
+        "maxHp": 427.52
+      },
+      {
+        "time": 2700,
+        "damage": 3536600,
+        "layers": 326,
+        "negativeLayers": 22,
+        "extraDraws": {
+          "positive": 76,
+          "negative": 20
+        },
+        "attack": 3.721692091827082,
+        "maxHp": 535.04
+      },
+      {
+        "time": 3000,
+        "damage": 4875563,
+        "layers": 374,
+        "negativeLayers": 24,
+        "extraDraws": {
+          "positive": 99,
+          "negative": 22
+        },
+        "attack": 3.8637194360411766,
+        "maxHp": 606.08
+      },
+      {
+        "time": 3300,
+        "damage": 6329310,
+        "layers": 423,
+        "negativeLayers": 29,
+        "extraDraws": {
+          "positive": 124,
+          "negative": 28
+        },
+        "attack": 4.266361457399003,
+        "maxHp": 709.12
+      },
+      {
+        "time": 3600,
+        "damage": 7897670,
+        "layers": 481,
+        "negativeLayers": 38,
+        "extraDraws": {
+          "positive": 154,
+          "negative": 37
+        },
+        "attack": 3.925678785788437,
+        "maxHp": 816.64
+      },
+      {
+        "time": 3900,
+        "damage": 9594357,
+        "layers": 553,
+        "negativeLayers": 3,
+        "extraDraws": {
+          "positive": 185,
+          "negative": 45
+        },
+        "attack": 3.969167268434718,
+        "maxHp": 487.52
+      },
+      {
+        "time": 4200,
+        "damage": 11302598,
+        "layers": 609,
+        "negativeLayers": 7,
+        "extraDraws": {
+          "positive": 207,
+          "negative": 48
+        },
+        "attack": 3.884268892136695,
+        "maxHp": 586.72
+      },
+      {
+        "time": 4500,
+        "damage": 13172894,
+        "layers": 677,
+        "negativeLayers": 14,
+        "extraDraws": {
+          "positive": 236,
+          "negative": 56
+        },
+        "attack": 3.9483923880787044,
+        "maxHp": 624.64
+      },
+      {
+        "time": 4800,
+        "damage": 15108236,
+        "layers": 733,
+        "negativeLayers": 4,
+        "extraDraws": {
+          "positive": 259,
+          "negative": 61
+        },
+        "attack": 5.034613479031046,
+        "maxHp": 1198
+      },
+      {
+        "time": 5100,
+        "damage": 17117111,
+        "layers": 795,
+        "negativeLayers": 10,
+        "extraDraws": {
+          "positive": 283,
+          "negative": 67
+        },
+        "attack": 5.045143392013129,
+        "maxHp": 1095.16
+      },
+      {
+        "time": 5400,
+        "damage": 19130470,
+        "layers": 851,
+        "negativeLayers": 17,
+        "extraDraws": {
+          "positive": 302,
+          "negative": 75
+        },
+        "attack": 5.300112592514305,
+        "maxHp": 1293.52
+      },
+      {
+        "time": 5700,
+        "damage": 21305679,
+        "layers": 901,
+        "negativeLayers": 24,
+        "extraDraws": {
+          "positive": 319,
+          "negative": 82
+        },
+        "attack": 4.939918295366833,
+        "maxHp": 1391.56
+      },
+      {
+        "time": 6000,
+        "damage": 23521497,
+        "layers": 955,
+        "negativeLayers": 29,
+        "extraDraws": {
+          "positive": 336,
+          "negative": 89
+        },
+        "attack": 4.5403225255154105,
+        "maxHp": 1503.28
+      },
+      {
+        "time": 6300,
+        "damage": 25836066,
+        "layers": 1018,
+        "negativeLayers": 39,
+        "extraDraws": {
+          "positive": 364,
+          "negative": 100
+        },
+        "attack": 4.036226939735784,
+        "maxHp": 1344.2786766855902
+      },
+      {
+        "time": 6600,
+        "damage": 28163754,
+        "layers": 1068,
+        "negativeLayers": 4,
+        "extraDraws": {
+          "positive": 386,
+          "negative": 108
+        },
+        "attack": 5.156991998473885,
+        "maxHp": 1275.1200000000001
+      },
+      {
+        "time": 6900,
+        "damage": 30615084,
+        "layers": 1122,
+        "negativeLayers": 7,
+        "extraDraws": {
+          "positive": 411,
+          "negative": 110
+        },
+        "attack": 5.600861192484822,
+        "maxHp": 1223.6
+      },
+      {
+        "time": 7200,
+        "damage": 33112714,
+        "layers": 1168,
+        "negativeLayers": 14,
+        "extraDraws": {
+          "positive": 431,
+          "negative": 117
+        },
+        "attack": 5.511063410040883,
+        "maxHp": 1073.92
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 7,
+    "remainingRanks": 10,
+    "acquiredRanks": 1168,
+    "weapons": {
+      "bow": 5,
+      "blade": 5,
+      "ember": 5,
+      "orbit": 5,
+      "drone": 5
+    },
+    "fate": {
+      "chests": 39,
+      "gained": 125,
+      "cleansed": 14
+    },
+    "character": "ranger",
+    "seed": 77,
+    "stress": true,
+    "seconds": 7201,
+    "phase": "playing",
+    "level": 532,
+    "kills": 44942,
+    "bosses": 23,
+    "damage": 33124646,
+    "peakEnemies": 66,
+    "peakBullets": 138,
+    "frames": 144020,
+    "checkpoint": [
+      600,
+      1200,
+      1800,
+      2400,
+      3000,
+      3600,
+      4200,
+      4800,
+      5400,
+      6000,
+      6600,
+      7200
+    ],
+    "validatedSnapshots": 12,
+    "peakHeapMiB": 147,
+    "wallSeconds": 81.15,
+    "build": [
+      "碎星",
+      "陨火学派",
+      "旅人步伐",
+      "双生星轨",
+      "终章学派",
+      "古树之心",
+      "萤火灵",
+      "不熄余烬",
+      "磐石体魄",
+      "引力信标",
+      "春芽",
+      "鹰眼",
+      "凝神",
+      "时砂",
+      "月环",
+      "弓弦张力",
+      "追星弓",
+      "星核",
+      "独行之道",
+      "灵体聚能",
+      "主术精通",
+      "星纹护甲",
+      "星尘引力",
+      "速射弦",
+      "拾星",
+      "月核增幅",
+      "生息",
+      "时隙",
+      "蜂群节律",
+      "烬火杖",
+      "冰火共鸣",
+      "战意",
+      "生命收割",
+      "轻羽",
+      "无垠领悟",
+      "炽热核心",
+      "野火蔓延",
+      "燃素循环",
+      "残星裁决",
+      "弧月刃",
+      "重月锋",
+      "回旋刃",
+      "满月",
+      "月轮加速",
+      "双月共舞",
+      "求知者",
+      "辅术精通",
+      "星坠回响",
+      "萤火之森",
+      "黯光",
+      "枯萎",
+      "铅足",
+      "遗忘药剂",
+      "命运馈赠",
+      "缄默",
+      "星辰洗礼",
+      "血月契约",
+      "迷惘",
+      "旅途宝箱",
+      "禁忌之书",
+      "脆弱"
+    ]
+  },
+  {
+    "shuffles": [
+      {
+        "time": 3600,
+        "before": 436,
+        "after": 437,
+        "damageBefore": 2.9531705497554888,
+        "damageAfter": 3.362939304795932
+      }
+    ],
+    "extraDraws": {
+      "positive": 435,
+      "negative": 119
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 0,
+    "refreshes": 0,
+    "negativeLayers": 28,
+    "output": [
+      {
+        "time": 300,
+        "damage": 22281,
+        "layers": 43,
+        "negativeLayers": 2,
+        "extraDraws": {
+          "positive": 0,
+          "negative": 2
+        },
+        "attack": 1.24,
+        "maxHp": 213
+      },
+      {
+        "time": 600,
+        "damage": 91716,
+        "layers": 67,
+        "negativeLayers": 3,
+        "extraDraws": {
+          "positive": 3,
+          "negative": 3
+        },
+        "attack": 1.3962264150943395,
+        "maxHp": 299
+      },
+      {
+        "time": 900,
+        "damage": 217633,
+        "layers": 92,
+        "negativeLayers": 4,
+        "extraDraws": {
+          "positive": 10,
+          "negative": 4
+        },
+        "attack": 1.3962264150943395,
+        "maxHp": 399
+      },
+      {
+        "time": 1200,
+        "damage": 416662,
+        "layers": 119,
+        "negativeLayers": 7,
+        "extraDraws": {
+          "positive": 16,
+          "negative": 7
+        },
+        "attack": 1.8124999999999998,
+        "maxHp": 417.12
+      },
+      {
+        "time": 1500,
+        "damage": 750032,
+        "layers": 145,
+        "negativeLayers": 8,
+        "extraDraws": {
+          "positive": 26,
+          "negative": 8
+        },
+        "attack": 2.0423728813559325,
+        "maxHp": 476.96
+      },
+      {
+        "time": 1800,
+        "damage": 1246372,
+        "layers": 170,
+        "negativeLayers": 9,
+        "extraDraws": {
+          "positive": 34,
+          "negative": 9
+        },
+        "attack": 2.0423728813559325,
+        "maxHp": 498.96
+      },
+      {
+        "time": 2100,
+        "damage": 1905839,
+        "layers": 209,
+        "negativeLayers": 11,
+        "extraDraws": {
+          "positive": 48,
+          "negative": 10
+        },
+        "attack": 2.7536819662131524,
+        "maxHp": 394.88
+      },
+      {
+        "time": 2400,
+        "damage": 2675608,
+        "layers": 239,
+        "negativeLayers": 14,
+        "extraDraws": {
+          "positive": 57,
+          "negative": 14
+        },
+        "attack": 2.7574885702624807,
+        "maxHp": 406.40000000000003
+      },
+      {
+        "time": 2700,
+        "damage": 3592967,
+        "layers": 273,
+        "negativeLayers": 16,
+        "extraDraws": {
+          "positive": 74,
+          "negative": 18
+        },
+        "attack": 2.761796034540691,
+        "maxHp": 481.92
+      },
+      {
+        "time": 3000,
+        "damage": 4899547,
+        "layers": 328,
+        "negativeLayers": 25,
+        "extraDraws": {
+          "positive": 99,
+          "negative": 27
+        },
+        "attack": 2.982921020225699,
+        "maxHp": 525.44
+      },
+      {
+        "time": 3300,
+        "damage": 6325598,
+        "layers": 381,
+        "negativeLayers": 30,
+        "extraDraws": {
+          "positive": 125,
+          "negative": 32
+        },
+        "attack": 3.066606273706773,
+        "maxHp": 573.44
+      },
+      {
+        "time": 3600,
+        "damage": 7875254,
+        "layers": 436,
+        "negativeLayers": 35,
+        "extraDraws": {
+          "positive": 156,
+          "negative": 38
+        },
+        "attack": 2.9531705497554888,
+        "maxHp": 680.96
+      },
+      {
+        "time": 3900,
+        "damage": 9560206,
+        "layers": 516,
+        "negativeLayers": 5,
+        "extraDraws": {
+          "positive": 188,
+          "negative": 43
+        },
+        "attack": 3.9893813163780956,
+        "maxHp": 855.36
+      },
+      {
+        "time": 4200,
+        "damage": 11272005,
+        "layers": 576,
+        "negativeLayers": 3,
+        "extraDraws": {
+          "positive": 209,
+          "negative": 46
+        },
+        "attack": 3.582498839826383,
+        "maxHp": 1051
+      },
+      {
+        "time": 4500,
+        "damage": 13003934,
+        "layers": 639,
+        "negativeLayers": 11,
+        "extraDraws": {
+          "positive": 229,
+          "negative": 54
+        },
+        "attack": 3.1781795347255395,
+        "maxHp": 912.76
+      },
+      {
+        "time": 4800,
+        "damage": 14910529,
+        "layers": 706,
+        "negativeLayers": 14,
+        "extraDraws": {
+          "positive": 258,
+          "negative": 58
+        },
+        "attack": 3.6377338285082397,
+        "maxHp": 944.64
+      },
+      {
+        "time": 5100,
+        "damage": 16859833,
+        "layers": 768,
+        "negativeLayers": 4,
+        "extraDraws": {
+          "positive": 281,
+          "negative": 64
+        },
+        "attack": 5.032774681408529,
+        "maxHp": 1459.92
+      },
+      {
+        "time": 5400,
+        "damage": 18835357,
+        "layers": 838,
+        "negativeLayers": 14,
+        "extraDraws": {
+          "positive": 303,
+          "negative": 72
+        },
+        "attack": 5.251034680945861,
+        "maxHp": 1132.8
+      },
+      {
+        "time": 5700,
+        "damage": 20955018,
+        "layers": 896,
+        "negativeLayers": 19,
+        "extraDraws": {
+          "positive": 324,
+          "negative": 78
+        },
+        "attack": 4.707194614140207,
+        "maxHp": 1210.88
+      },
+      {
+        "time": 6000,
+        "damage": 23112135,
+        "layers": 956,
+        "negativeLayers": 27,
+        "extraDraws": {
+          "positive": 351,
+          "negative": 86
+        },
+        "attack": 4.182077750148754,
+        "maxHp": 1313.4783455703696
+      },
+      {
+        "time": 6300,
+        "damage": 25529112,
+        "layers": 1011,
+        "negativeLayers": 2,
+        "extraDraws": {
+          "positive": 370,
+          "negative": 93
+        },
+        "attack": 5.908931209633539,
+        "maxHp": 1647
+      },
+      {
+        "time": 6600,
+        "damage": 28047028,
+        "layers": 1072,
+        "negativeLayers": 11,
+        "extraDraws": {
+          "positive": 389,
+          "negative": 102
+        },
+        "attack": 5.074513372766872,
+        "maxHp": 1591.04
+      },
+      {
+        "time": 6900,
+        "damage": 30589925,
+        "layers": 1134,
+        "negativeLayers": 21,
+        "extraDraws": {
+          "positive": 412,
+          "negative": 111
+        },
+        "attack": 5.280795018298504,
+        "maxHp": 1216.64
+      },
+      {
+        "time": 7200,
+        "damage": 33220640,
+        "layers": 1190,
+        "negativeLayers": 28,
+        "extraDraws": {
+          "positive": 435,
+          "negative": 119
+        },
+        "attack": 5.037251378742287,
+        "maxHp": 1260.16
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 6,
+    "remainingRanks": 8,
+    "acquiredRanks": 1191,
+    "weapons": {
+      "bow": 5,
+      "blade": 4,
+      "ember": 5,
+      "orbit": 5,
+      "drone": 5
+    },
+    "fate": {
+      "chests": 38,
+      "gained": 123,
+      "cleansed": 9
+    },
+    "character": "mage",
+    "seed": 88,
+    "stress": true,
+    "seconds": 7201,
+    "phase": "playing",
+    "level": 540,
+    "kills": 45474,
+    "bosses": 23,
+    "damage": 33235438,
+    "peakEnemies": 61,
+    "peakBullets": 144,
+    "frames": 144020,
+    "checkpoint": [
+      600,
+      1200,
+      1800,
+      2400,
+      3000,
+      3600,
+      4200,
+      4800,
+      5400,
+      6000,
+      6600,
+      7200
+    ],
+    "validatedSnapshots": 12,
+    "peakHeapMiB": 96,
+    "wallSeconds": 29.59,
+    "build": [
+      "陨火学派",
+      "终章学派",
+      "鹰眼",
+      "星纹护甲",
+      "时砂",
+      "星坠回响",
+      "时隙",
+      "炽热核心",
+      "引力信标",
+      "春芽",
+      "生息",
+      "追星弓",
+      "月环",
+      "轻羽",
+      "独行之道",
+      "不熄余烬",
+      "野火蔓延",
+      "弧月刃",
+      "燃素循环",
+      "碎星",
+      "凝神",
+      "辅术精通",
+      "满月",
+      "月轮加速",
+      "残星裁决",
+      "星核",
+      "双生星轨",
+      "无垠领悟",
+      "弓弦张力",
+      "主术精通",
+      "拾星",
+      "古树之心",
+      "星尘引力",
+      "烬火杖",
+      "求知者",
+      "磐石体魄",
+      "速射弦",
+      "战意",
+      "旅人步伐",
+      "重月锋",
+      "萤火灵",
+      "萤火之森",
+      "回旋刃",
+      "双月共舞",
+      "冰火共鸣",
+      "灵体聚能",
+      "月核增幅",
+      "蜂群节律",
+      "生命收割",
+      "铅足",
+      "迷惘",
+      "旅途宝箱",
+      "遗忘药剂",
+      "黯光",
+      "缄默",
+      "枯萎",
+      "脆弱",
+      "荒芜",
+      "星银宝箱",
+      "贪婪之冠",
+      "命运馈赠",
+      "星辰洗礼",
+      "禁忌之书"
+    ]
+  }
+]

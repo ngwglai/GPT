@@ -1,3 +1,6 @@
+import { refresh } from "../src/core/cardPool";
+import { ensureDeck, heldLayers } from "../src/core/deckState";
+import { grant } from "../src/core/progression";
 import { World } from "../src/core/world";
 import { createRun } from "../src/core/create";
 import { closest, distance, unit } from "../src/core/math";
@@ -9,6 +12,7 @@ export function simulate(
   character: string,
   seed: number,
   stress = false,
+  shuffleAt?: number,
 ) {
   const w = new World(
     createRun(
@@ -22,19 +26,52 @@ export function simulate(
   if (stress)
     for (const id of ["bow", "blade", "ember", "orbit", "drone"] as const) {
       w.s.player.weapons[id] = 5;
-      w.s.player.upgrades["weapon_" + id] = 5;
+      w.s.player.upgrades["weapon_" + id] =
+        5 - (ensureDeck(w.s).baseWeapons[id] || 0);
     }
+  const shuffles: {
+    time: number;
+    before: number;
+    after: number;
+    damageBefore: number;
+    damageAfter: number;
+  }[] = [];
   const start = performance.now();
   let frames = 0,
     saves = 0,
     peakHeapMiB = 0;
   const checkpoint: number[] = [];
-  const output: { time: number; damage: number }[] = [];
+  const output: {
+    time: number;
+    damage: number;
+    layers: number;
+    negativeLayers: number;
+    extraDraws: { positive: number; negative: number };
+    attack: number;
+    maxHp: number;
+  }[] = [];
   while (
     w.s.time < seconds &&
     w.s.phase !== "dead" &&
     w.s.phase !== "victory"
   ) {
+    if (
+      shuffleAt !== undefined &&
+      w.s.phase === "playing" &&
+      w.s.time >= shuffleAt &&
+      !shuffles.length
+    ) {
+      const before = heldLayers(w.s),
+        damageBefore = w.s.player.attack;
+      if (!grant(w.s, "shuffle")) throw Error("shuffle failed");
+      shuffles.push({
+        time: Math.round(w.s.time),
+        before,
+        after: heldLayers(w.s),
+        damageBefore,
+        damageAfter: w.s.player.attack,
+      });
+    }
     if (w.s.phase === "upgrade") {
       const affinity =
         character === "knight"
@@ -48,6 +85,12 @@ export function simulate(
         if (id === "power" || id === "skill_e") return 7;
         return affinity.includes(id) ? 9 : id === "ascend" ? 6 : 1;
       };
+      if (
+        ensureDeck(w.s).active === "positive" &&
+        w.s.choices.every((id) => rank(id) <= 1) &&
+        refresh(w.s)
+      )
+        continue;
       w.choose([...w.s.choices].sort((a, b) => rank(b) - rank(a))[0]);
       continue;
     }
@@ -107,6 +150,13 @@ export function simulate(
       output.push({
         time: Math.round(w.s.time),
         damage: Math.round(w.s.stats.damage),
+        layers: heldLayers(w.s),
+        negativeLayers: UPGRADES.filter(
+          (u) => u.polarity === "negative",
+        ).reduce((n, u) => n + (w.s.player.upgrades[u.id] || 0), 0),
+        extraDraws: { ...ensureDeck(w.s).earned },
+        attack: w.s.player.attack,
+        maxHp: w.s.player.maxHp,
       });
     if (frames % 12000 === 0) {
       validateRun(w.s);
@@ -125,12 +175,21 @@ export function simulate(
       throw Error("Simulation invariant failed");
   }
   const result = {
+    shuffles,
+    extraDraws: ensureDeck(w.s).earned,
+    pendingDraws: ensureDeck(w.s).pending,
+    dropObjects: w.s.rewardDrops?.length || 0,
+    refreshes: ensureDeck(w.s).refreshes,
+    negativeLayers: UPGRADES.filter((u) => u.polarity === "negative").reduce(
+      (n, u) => n + (w.s.player.upgrades[u.id] || 0),
+      0,
+    ),
     output,
-    finiteDefinitions: UPGRADES.filter((u) => u.id !== "ascend").length,
+    finiteDefinitions: UPGRADES.filter((u) => u.maxStacks !== null).length,
     remainingDefinitions: UPGRADES.filter(
-      (u) => u.id !== "ascend" && (w.s.player.upgrades[u.id] || 0) < u.max,
+      (u) => u.maxStacks !== null && (w.s.player.upgrades[u.id] || 0) < u.max,
     ).length,
-    remainingRanks: UPGRADES.filter((u) => u.id !== "ascend").reduce(
+    remainingRanks: UPGRADES.filter((u) => u.maxStacks !== null).reduce(
       (n, u) => n + u.max - (w.s.player.upgrades[u.id] || 0),
       0,
     ),
@@ -167,16 +226,22 @@ export function simulate(
   return result;
 }
 if (process.argv[1]?.endsWith("simulate.ts")) {
-  const stress = process.argv.includes("--stress");
+  const stress = process.argv.includes("--stress"),
+    shuffleMode = process.argv.includes("--shuffle");
   const results = stress
-    ? [simulate(7201, "ranger", 77, true)]
-    : ["ranger", "knight", "mage"].flatMap((c) =>
-        [11, 29, 83].map((seed) => simulate(1500, c, seed)),
-      );
+    ? [simulate(7201, "ranger", 77, true, 3600)]
+    : shuffleMode
+      ? ["ranger", "knight", "mage"].map((c) =>
+          simulate(1500, c, 29, false, 600),
+        )
+      : ["ranger", "knight", "mage"].flatMap((c) =>
+          [11, 29, 83].map((seed) => simulate(1500, c, seed)),
+        );
   console.log(JSON.stringify(results, null, 2));
   if (stress && results[0].seconds < 7200) process.exitCode = 1;
   if (
     !stress &&
+    !shuffleMode &&
     !["ranger", "knight", "mage"].every((c) =>
       results.some((r) => r.character === c && r.phase === "victory"),
     )

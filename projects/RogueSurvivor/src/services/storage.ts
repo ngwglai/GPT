@@ -1,3 +1,6 @@
+import { ensureDeck } from "../core/deckState";
+import { recalculate } from "../core/fate";
+import { DROP_RULES } from "../core/drops";
 import { CURSES } from "../core/fate";
 import type { Run, Settings, Profile } from "../core/types";
 import { createRun } from "../core/create";
@@ -141,15 +144,15 @@ export function validateRun(value: unknown): Run {
     p.hp >= 0 &&
       p.hp <= p.maxHp &&
       p.maxHp > 0 &&
-      p.maxHp <= 10000 &&
+      p.maxHp <= 1e6 &&
       p.speed >= 0 &&
       p.speed <= 1000 &&
       p.level >= 1 &&
       Number.isInteger(p.level) &&
       p.cooldown >= 0.1 &&
-      p.cooldown <= 2 &&
+      p.cooldown <= 3 &&
       p.attack >= 0 &&
-      p.attack <= 1000,
+      p.attack <= 1e6,
   );
   assert(
     s.time >= 0 &&
@@ -329,7 +332,95 @@ export function validateRun(value: unknown): Run {
       (s.phase !== "upgrade" || s.choices.length > 0),
   );
   assert(typeof s.event === "string" && typeof s.victoryClaimed === "boolean");
-  return structuredClone(s);
+  if (s.deck) {
+    const d = s.deck;
+    assert(
+      obj(d) &&
+        d.schema === 2 &&
+        obj(d.baseWeapons) &&
+        obj(d.baseSkills) &&
+        obj(d.pending) &&
+        obj(d.earned) &&
+        obj(d.dropsInWindow),
+    );
+    assert(
+      [
+        d.refreshes,
+        d.revision,
+        d.dropWindow,
+        ...Object.values(d.pending),
+        ...Object.values(d.earned),
+        ...Object.values(d.dropsInWindow),
+      ].every((n) => Number.isInteger(n) && n >= 0),
+    );
+    assert(
+      ["positive", "negative"].every(
+        (k) =>
+          Object.hasOwn(d.pending, k) &&
+          Object.hasOwn(d.earned, k) &&
+          Object.hasOwn(d.dropsInWindow, k),
+      ),
+    );
+    assert(d.active === null || ["positive", "negative"].includes(d.active));
+    assert(
+      Object.entries(d.baseWeapons).every(
+        ([id, n]) =>
+          Object.hasOwn(WEAPONS, id) && Number.isInteger(n) && n >= 1 && n <= 5,
+      ),
+    );
+    assert(
+      Object.keys(SKILLS).every(
+        (id) =>
+          Number.isInteger(d.baseSkills[id as keyof typeof SKILLS]) &&
+          d.baseSkills[id as keyof typeof SKILLS] >= 1 &&
+          d.baseSkills[id as keyof typeof SKILLS] <= 5,
+      ),
+    );
+    if (d.lastShuffle)
+      assert(
+        Number.isInteger(d.lastShuffle.removed) &&
+          d.lastShuffle.removed === d.lastShuffle.added &&
+          d.lastShuffle.removed >= 1,
+      );
+    if (s.phase === "upgrade")
+      assert(
+        d.active !== null &&
+          s.choices.every((id) =>
+            UPGRADES.some(
+              (u) =>
+                u.id === id &&
+                (d.active === "negative"
+                  ? u.polarity === "negative"
+                  : u.polarity !== "negative"),
+            ),
+          ),
+      );
+  }
+  if (s.rewardDrops) {
+    assert(
+      Array.isArray(s.rewardDrops) &&
+        s.rewardDrops.length <= DROP_RULES.perKindObjects * 2,
+    );
+    for (const drop of s.rewardDrops) {
+      point(drop);
+      assert(
+        ["positive", "negative"].includes(drop.kind) &&
+          Number.isInteger(drop.count) &&
+          drop.count > 0,
+      );
+    }
+    for (const kind of ["positive", "negative"])
+      assert(
+        s.rewardDrops.filter((d) => d.kind === kind).length <=
+          DROP_RULES.perKindObjects,
+      );
+  }
+  const result = structuredClone(s),
+    d = ensureDeck(result),
+    revision = d.revision;
+  recalculate(result);
+  d.revision = revision;
+  return result;
 }
 let saveQueue = Promise.resolve();
 export function saveRun(run: Run) {
