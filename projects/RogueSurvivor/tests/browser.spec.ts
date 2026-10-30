@@ -300,7 +300,37 @@ function isolatedBrowserSuite() {
   });
 }
 const denseTest = isolatedBrowserSuite();
-const fateTest = isolatedBrowserSuite();
+const fateTest = test.extend({
+  context: async (
+    { playwright, launchOptions, headless, baseURL, viewport },
+    use,
+    testInfo,
+  ) => {
+    // A fresh temporary profile avoids Chromium's failing incognito-context path.
+    // The profile belongs only to this test and is removed when the browser closes.
+    const context = await playwright.chromium.launchPersistentContext("", {
+      ...launchOptions,
+      headless,
+      baseURL,
+      viewport,
+    });
+    try {
+      await use(context);
+    } finally {
+      if (testInfo.status !== testInfo.expectedStatus) {
+        const page = context.pages().find((p) => p.url() !== "about:blank");
+        if (page && !page.isClosed())
+          await testInfo
+            .attach("failure screenshot", {
+              body: await page.screenshot(),
+              contentType: "image/png",
+            })
+            .catch(() => {});
+      }
+      await context.close();
+    }
+  },
+});
 denseTest("密集战斗真实渲染、性能面板、无控制台异常", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
