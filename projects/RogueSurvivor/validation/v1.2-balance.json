@@ -94,8 +94,8 @@
       1200
     ],
     "validatedSnapshots": 2,
-    "peakHeapMiB": 18,
-    "wallSeconds": 14.98,
+    "peakHeapMiB": 64,
+    "wallSeconds": 13.75,
     "build": [
       "追星弓",
       "古树之心",
@@ -229,8 +229,8 @@
       1200
     ],
     "validatedSnapshots": 2,
-    "peakHeapMiB": 42,
-    "wallSeconds": 11.2,
+    "peakHeapMiB": 52,
+    "wallSeconds": 10.31,
     "build": [
       "春芽",
       "时隙",
@@ -374,8 +374,8 @@
       1200
     ],
     "validatedSnapshots": 2,
-    "peakHeapMiB": 64,
-    "wallSeconds": 12.1,
+    "peakHeapMiB": 70,
+    "wallSeconds": 12.26,
     "build": [
       "追星弓",
       "古树之心",
@@ -557,8 +557,8 @@
       1200
     ],
     "validatedSnapshots": 2,
-    "peakHeapMiB": 69,
-    "wallSeconds": 12.79,
+    "peakHeapMiB": 73,
+    "wallSeconds": 15.28,
     "build": [
       "弧月刃",
       "古树之心",
@@ -692,8 +692,8 @@
       1200
     ],
     "validatedSnapshots": 2,
-    "peakHeapMiB": 73,
-    "wallSeconds": 10.8,
+    "peakHeapMiB": 77,
+    "wallSeconds": 9.44,
     "build": [
       "弧月刃",
       "春芽",
@@ -834,8 +834,8 @@
       1200
     ],
     "validatedSnapshots": 2,
-    "peakHeapMiB": 61,
-    "wallSeconds": 5.8,
+    "peakHeapMiB": 60,
+    "wallSeconds": 3.52,
     "build": [
       "烬火杖",
       "春芽",
@@ -971,8 +971,8 @@
       1200
     ],
     "validatedSnapshots": 2,
-    "peakHeapMiB": 43,
-    "wallSeconds": 7.32,
+    "peakHeapMiB": 85,
+    "wallSeconds": 4.23,
     "build": [
       "烬火杖",
       "星核",
@@ -1104,8 +1104,8 @@
       1200
     ],
     "validatedSnapshots": 2,
-    "peakHeapMiB": 81,
-    "wallSeconds": 8.4,
+    "peakHeapMiB": 89,
+    "wallSeconds": 4.91,
     "build": [
       "烬火杖",
       "春芽",

@@ -451,3 +451,20 @@ it("bulk random allocation varies by seed, remains all-positive and keeps every 
   }
   expect(runs[0].player.upgrades).not.toEqual(runs[1].player.upgrades);
 });
+
+it("shuffle replaces cursed remaining cooldowns with exactly the new full cooldown", async () => {
+  const { SKILLS } = await import("../src/data/skills");
+  const s = make();
+  for (let i = 0; i < 3; i++) addCurse(s, "silence");
+  s.player.cooldowns = s.player.skills.map(
+    (id) => SKILLS[id].cooldown * s.player.cooldown,
+  );
+  expect(s.player.cooldowns[2]).toBe(46.800000000000004);
+  s.player.upgrades.shuffle = 1;
+  expect(shuffleDeck(s, () => "power")).toBe(true);
+  expect(s.player.cooldown).toBe(1);
+  expect(s.player.cooldowns).toEqual(
+    s.player.skills.map((id) => SKILLS[id].cooldown),
+  );
+  expect(s.player.dashCd).toBe(2.7);
+});

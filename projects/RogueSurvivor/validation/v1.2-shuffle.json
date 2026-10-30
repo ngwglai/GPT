@@ -103,8 +103,8 @@
       1200
     ],
     "validatedSnapshots": 2,
-    "peakHeapMiB": 41,
-    "wallSeconds": 16.45,
+    "peakHeapMiB": 22,
+    "wallSeconds": 13.73,
     "build": [
       "无垠领悟",
       "终章学派",
@@ -259,8 +259,8 @@
       1200
     ],
     "validatedSnapshots": 2,
-    "peakHeapMiB": 48,
-    "wallSeconds": 13.98,
+    "peakHeapMiB": 43,
+    "wallSeconds": 15.19,
     "build": [
       "战意",
       "无垠领悟",
@@ -415,8 +415,8 @@
       1200
     ],
     "validatedSnapshots": 2,
-    "peakHeapMiB": 98,
-    "wallSeconds": 9.64,
+    "peakHeapMiB": 65,
+    "wallSeconds": 10.71,
     "build": [
       "不熄余烬",
       "冰火共鸣",

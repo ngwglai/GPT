@@ -78,13 +78,8 @@ export function shuffleDeck(
     p.dash = 0;
     p.invincible = 0.3;
     p.weaponTimers = { bow: 0, blade: 0, ember: 0, orbit: 0, drone: 0 };
-    p.cooldowns = p.skills.map((id, i) =>
-      Math.max(p.cooldowns[i], SKILLS[id].cooldown * p.cooldown),
-    );
-    p.dashCd = Math.max(
-      p.dashCd,
-      Math.max(1.3, 2.7 - (p.upgrades.stride || 0) * 0.2),
-    );
+    p.cooldowns = p.skills.map((id) => SKILLS[id].cooldown * p.cooldown);
+    p.dashCd = Math.max(1.3, 2.7 - (p.upgrades.stride || 0) * 0.2);
     d.lastShuffle = { removed: count, added: count };
     report(draft, `命运洗牌：${count}层已等量重构为纯正面卡牌`);
     s.player = p;

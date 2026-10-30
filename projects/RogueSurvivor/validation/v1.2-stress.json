@@ -353,8 +353,8 @@
       7200
     ],
     "validatedSnapshots": 12,
-    "peakHeapMiB": 147,
-    "wallSeconds": 81.15,
+    "peakHeapMiB": 163,
+    "wallSeconds": 67.49,
     "build": [
       "碎星",
       "陨火学派",
@@ -430,8 +430,8 @@
       }
     ],
     "extraDraws": {
-      "positive": 435,
-      "negative": 119
+      "positive": 430,
+      "negative": 122
     },
     "pendingDraws": {
       "positive": 0,
@@ -439,7 +439,7 @@
     },
     "dropObjects": 0,
     "refreshes": 0,
-    "negativeLayers": 28,
+    "negativeLayers": 32,
     "output": [
       {
         "time": 300,
@@ -683,57 +683,57 @@
       },
       {
         "time": 6300,
-        "damage": 25529112,
-        "layers": 1011,
-        "negativeLayers": 2,
+        "damage": 25529070,
+        "layers": 1010,
+        "negativeLayers": 3,
         "extraDraws": {
-          "positive": 370,
-          "negative": 93
+          "positive": 366,
+          "negative": 94
         },
-        "attack": 5.908931209633539,
-        "maxHp": 1647
+        "attack": 5.759124041986235,
+        "maxHp": 1604
       },
       {
         "time": 6600,
-        "damage": 28047028,
-        "layers": 1072,
-        "negativeLayers": 11,
+        "damage": 28016342,
+        "layers": 1067,
+        "negativeLayers": 10,
         "extraDraws": {
-          "positive": 389,
-          "negative": 102
+          "positive": 385,
+          "negative": 101
         },
-        "attack": 5.074513372766872,
-        "maxHp": 1591.04
+        "attack": 5.848089056576747,
+        "maxHp": 1537.36
       },
       {
         "time": 6900,
-        "damage": 30589925,
-        "layers": 1134,
-        "negativeLayers": 21,
+        "damage": 30417522,
+        "layers": 1123,
+        "negativeLayers": 23,
         "extraDraws": {
-          "positive": 412,
-          "negative": 111
+          "positive": 405,
+          "negative": 113
         },
-        "attack": 5.280795018298504,
-        "maxHp": 1216.64
+        "attack": 5.583626752776611,
+        "maxHp": 1177.6000000000001
       },
       {
         "time": 7200,
-        "damage": 33220640,
-        "layers": 1190,
-        "negativeLayers": 28,
+        "damage": 33059007,
+        "layers": 1178,
+        "negativeLayers": 32,
         "extraDraws": {
-          "positive": 435,
-          "negative": 119
+          "positive": 429,
+          "negative": 122
         },
-        "attack": 5.037251378742287,
-        "maxHp": 1260.16
+        "attack": 4.973562691941934,
+        "maxHp": 1221.1200000000001
       }
     ],
     "finiteDefinitions": 25,
-    "remainingDefinitions": 6,
-    "remainingRanks": 8,
-    "acquiredRanks": 1191,
+    "remainingDefinitions": 4,
+    "remainingRanks": 6,
+    "acquiredRanks": 1179,
     "weapons": {
       "bow": 5,
       "blade": 4,
@@ -742,21 +742,21 @@
       "drone": 5
     },
     "fate": {
-      "chests": 38,
-      "gained": 123,
-      "cleansed": 9
+      "chests": 40,
+      "gained": 126,
+      "cleansed": 8
     },
     "character": "mage",
     "seed": 88,
     "stress": true,
     "seconds": 7201,
     "phase": "playing",
-    "level": 540,
-    "kills": 45474,
+    "level": 530,
+    "kills": 45234,
     "bosses": 23,
-    "damage": 33235438,
+    "damage": 33069144,
     "peakEnemies": 61,
-    "peakBullets": 144,
+    "peakBullets": 152,
     "frames": 144020,
     "checkpoint": [
       600,
@@ -773,8 +773,8 @@
       7200
     ],
     "validatedSnapshots": 12,
-    "peakHeapMiB": 96,
-    "wallSeconds": 29.59,
+    "peakHeapMiB": 93,
+    "wallSeconds": 27.98,
     "build": [
       "陨火学派",
       "终章学派",
@@ -825,20 +825,18 @@
       "月核增幅",
       "蜂群节律",
       "生命收割",
+      "荒芜",
       "铅足",
+      "星银宝箱",
+      "缄默",
       "迷惘",
       "旅途宝箱",
-      "遗忘药剂",
       "黯光",
-      "缄默",
       "枯萎",
-      "脆弱",
-      "荒芜",
-      "星银宝箱",
-      "贪婪之冠",
+      "遗忘药剂",
       "命运馈赠",
-      "星辰洗礼",
-      "禁忌之书"
+      "脆弱",
+      "血月契约"
     ]
   }
 ]
