@@ -13,6 +13,7 @@ export class GameScene extends Phaser.Scene {
   needsPaint = true;
   onFrame?: (dt: number) => void;
   onPause?: () => void;
+  private background!: Phaser.GameObjects.Graphics;
   private graphics!: Phaser.GameObjects.Graphics;
   private sprites: Phaser.GameObjects.Sprite[] = [];
   private labels: Phaser.GameObjects.Text[] = [];
@@ -29,7 +30,8 @@ export class GameScene extends Phaser.Scene {
   }
   create() {
     for (const a of ASSET_IDS) this.textures.addCanvas(a.id, defaultArt(a.id));
-    this.graphics = this.add.graphics();
+    this.background = this.add.graphics().setDepth(-2);
+    this.graphics = this.add.graphics().setDepth(0);
     this.keys = this.input.keyboard!.addKeys(
       "W,A,S,D,Q,E,R,SPACE,ESC",
     ) as Record<string, Phaser.Input.Keyboard.Key>;
@@ -205,11 +207,10 @@ export class GameScene extends Phaser.Scene {
     g.clear();
     const sx = (x: number) => x - this.cx + W / 2,
       sy = (y: number) => y - this.cy + H / 2;
-    g.fillStyle(0x17332e);
-    g.fillRect(0, 0, W, H);
+    this.background.clear().fillStyle(0x17332e).fillRect(0, 0, W, H);
     if (assetPack.assets["map.ground"]) {
       this.sprite("map.ground", p, Math.max(W, H));
-      this.sprites[this.used - 1]?.setDepth(0);
+      this.sprites[this.used - 1]?.setDepth(-1);
     }
     g.lineStyle(1, 0x779c80, 0.055);
     for (

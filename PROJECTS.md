@@ -16,7 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| 星烬远征 RogueSurvivor | [projects/RogueSurvivor](projects/RogueSurvivor/) | Completed | 浏览器俯视角动作肉鸽：自动攻击、手动技能、三角色构筑、标准/无尽、存档与资源工坊 | 本地功能验收：70 单元 / 12 生产 E2E、三角色自然通关、7201 秒压力模拟；远端 CI / 发布状态见 PR 与 Actions，后续收集玩家反馈 |
+| 星烬远征 RogueSurvivor | [projects/RogueSurvivor](projects/RogueSurvivor/) | Completed | 浏览器俯视角动作肉鸽：自动攻击、手动技能、三角色构筑、标准/无尽、存档与资源工坊 | 本地功能验收：77 单元 / 16 生产 E2E、三角色自然通关、7201 秒压力模拟；远端 CI / 发布状态见 PR 与 Actions，后续收集玩家反馈 |
 | RogueLab | [projects/roguelab](projects/roguelab/) | Completed | Godot 4 三职业卡组肉鸽：三幕路线、遗物构筑、随机事件与首领；Web / Windows | PR #24；独立 Linux/Windows 验收通过，Web / 下载入口见 README；v1.1 完整简体中文；后续玩家反馈 |
 | CompilerLab | [projects/compilerlab](projects/compilerlab/) | Completed | 本地微型编译流水线、独立解释器与栈式 VM 语义对照 | PR #23；最终修复头253单元/14生产E2E、Linux/Windows与CI required已35/35通过；最新验收记录仍需完整CI成功，不部署 |
 | CalibrationLab | [projects/calibrationlab](projects/calibrationlab/) | Completed | 本地概率预测、独立样本校准与可靠性图 | PR #22；最终121单元/13生产E2E；初始功能头Linux/Windows与CI required全通过，数值修复头仍须完整CI，不部署 |
@@ -346,3 +346,9 @@
 - **验收**：核心规则单元测试、正常三角色多种子自然通关、7201 秒全逻辑压力运行、生产浏览器键鼠/存档/资源包/最终战流程。正式结果见项目 `VALIDATION.md`。
 - **集成**：独立双平台工作流接入根 CI required；扩展既有 Pages 聚合器，保留已有站点与所有其他项目业务代码。
 - **后续**：真实玩家平衡反馈、Firefox/Safari、触屏战斗与跨设备存档目前不在已验证范围；不把加速无敌压力测试当作正常玩家胜率。
+
+
+### 星烬远征审查修复（2026-10-30）
+
+- [PR #27](https://github.com/ngwglai/GPT/pull/27)：修复护盾回退、燃烧死亡后行动、地面图层遮挡、静态图片裁切及终局保存竞争，补充对应规则和真实浏览器回归。
+- 本地 77 单元 / 16 生产 E2E、三角色九种子正常战斗与 7201 秒压力运行通过；最终远端 CI / 合并与 Pages 状态见 PR、Actions 和最终交付记录。完整证据见项目 VALIDATION.md。

@@ -512,3 +512,51 @@ describe("defensive regression checks", () => {
 it("reports malformed resource JSON in Chinese before decoding images", async () => {
   await expect(importPack("{bad")).rejects.toThrow("有效的 JSON");
 });
+
+describe("review combat regressions", () => {
+  it.each([0, 1, 3])(
+    "blade regeneration preserves a stronger ward at wide level %s",
+    (wide) => {
+      const w = make();
+      w.s.player.weapons = { blade: 1 };
+      w.s.player.upgrades.wide = wide;
+      w.s.player.skillLevels.ward = 5;
+      w.cast(1, input.aim);
+      expect(w.s.player.shield).toBe(115);
+      w.auto(0.05);
+      expect(w.s.player.shield).toBe(115);
+      w.s.player.shield = 79;
+      w.s.player.weaponTimers.blade = 0;
+      w.auto(0.05);
+      expect(w.s.player.shield).toBe(wide ? 80 : 79);
+    },
+  );
+  it.each(["crawler", "archer", "seer", "shaman"] as EnemyId[])(
+    "lethal burn prevents %s movement, attacks and contact before rewarding death",
+    (kind) => {
+      const w = make(),
+        p = w.s.player;
+      p.hp = 1;
+      p.invincible = 0;
+      p.regen = 0;
+      p.weapons = {};
+      const e = enemy(w, kind, p.x, p.y);
+      e.hp = 0.01;
+      e.burn = 1;
+      e.burnPower = 10;
+      e.timer = 0;
+      const before = { x: e.x, y: e.y };
+      w.step(0.05, input);
+      expect(w.s.phase).toBe("playing");
+      expect(p.hp).toBe(1);
+      expect({ x: e.x, y: e.y }).toEqual(before);
+      expect(w.s.stats.kills).toBe(1);
+      expect(w.s.enemies).toHaveLength(0);
+      expect(w.s.bullets).toHaveLength(0);
+      expect(w.s.zones).toHaveLength(0);
+      expect(w.s.gems.reduce((v, g) => v + g.value, 0) + p.xp).toBe(
+        ENEMIES[kind].xp,
+      );
+    },
+  );
+});

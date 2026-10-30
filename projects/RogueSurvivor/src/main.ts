@@ -214,11 +214,17 @@ function upgrade() {
   );
   void saveCurrent(false);
 }
+let saveRevision = 0;
 async function saveCurrent(show = true) {
   if (!world) return false;
+  const snapshot = structuredClone(world.s);
+  const revision = ++saveRevision;
+  // Hide the continue entry immediately for finished runs, even while disk writes wait.
+  if (snapshot.phase === "dead" || snapshot.phase === "victory")
+    saved = snapshot;
   try {
-    await saveRun(world.s);
-    saved = structuredClone(world.s);
+    await saveRun(snapshot);
+    if (revision === saveRevision) saved = snapshot;
     saveError = "";
     if (show) notify("进度已保存，可关闭浏览器后继续。");
     return true;
@@ -240,6 +246,7 @@ function start(s: Run) {
 async function record() {
   if (!world) return;
   const s = world.s;
+  const terminalSave = saveCurrent(false);
   profile.best = Math.max(profile.best, s.time);
   profile.records.unshift({
     mode: s.mode,
@@ -262,7 +269,7 @@ async function record() {
   } catch (e) {
     notify((e as Error).message);
   }
-  await saveCurrent(false);
+  await terminalSave;
 }
 function results() {
   const s = world!.s,
@@ -482,14 +489,18 @@ async function action(id: string) {
           (document.getElementById("asset-" + id) as HTMLInputElement).value,
         );
       const a = {
-        ...current,
+        data: current.data,
         scale: num("scale"),
         x: num("x"),
         y: num("y"),
-        frames: num("frames"),
-        frameWidth: num("frameWidth"),
-        frameHeight: num("frameHeight"),
-        fps: num("fps"),
+        ...(num("frames") > 1
+          ? {
+              frames: num("frames"),
+              frameWidth: num("frameWidth"),
+              frameHeight: num("frameHeight"),
+              fps: num("fps"),
+            }
+          : {}),
       };
       await validateAsset(a);
       await persistAssets({ ...assetPack.assets, [assetId]: a });

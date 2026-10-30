@@ -137,7 +137,7 @@ export function ai(c: Combat, dt: number) {
       e.burn -= dt;
       c.damage(e, e.burnPower * dt, e.burnSource, false);
     }
-    if (e.freeze > 0) continue;
+    if (e.hp <= 0 || e.freeze > 0) continue;
     const def = ENEMIES[e.kind];
     const d = distance(e, p),
       n = unit(p.x - e.x, p.y - e.y);

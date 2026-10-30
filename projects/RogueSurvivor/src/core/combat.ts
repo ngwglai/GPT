@@ -286,7 +286,10 @@ export class Combat {
           "slash",
           key,
         );
-        p.shield = Math.min(80, p.shield + (p.upgrades.wide || 0) * 2);
+        p.shield += Math.min(
+          Math.max(0, 80 - p.shield),
+          (p.upgrades.wide || 0) * 2,
+        );
         continue;
       }
       if (key === "orbit") {

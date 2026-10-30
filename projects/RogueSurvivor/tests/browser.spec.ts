@@ -349,13 +349,11 @@ test("暂停中替换角色资源，恢复战斗后纹理有效且碰撞数据�
     g.fillRect(8, 8, 48, 48);
     return c.toDataURL();
   });
-  await page
-    .locator("#asset-file")
-    .setInputFiles({
-      name: "hero.png",
-      mimeType: "image/png",
-      buffer: Buffer.from(data.split(",")[1], "base64"),
-    });
+  await page.locator("#asset-file").setInputFiles({
+    name: "hero.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(data.split(",")[1], "base64"),
+  });
   await expect(page.locator(".asset-editor")).toContainText(
     "已使用本地自定义图片",
   );
@@ -373,4 +371,119 @@ test("暂停中替换角色资源，恢复战斗后纹理有效且碰撞数据�
   expect(s.player.maxHp).toBe(110);
   expect(s.player.speed).toBe(230);
   expect(errors).toEqual([]);
+});
+
+for (const size of [32, 256]) {
+  test(`静态 ${size} 像素图片调整缩放偏移后不被裁切`, async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "资源工坊", exact: true }).click();
+    const data = await page.evaluate((size) => {
+      const c = document.createElement("canvas");
+      c.width = c.height = size;
+      const g = c.getContext("2d")!;
+      g.fillStyle = "#ec8648";
+      g.fillRect(0, 0, size, size);
+      g.fillStyle = "#82d8aa";
+      g.fillRect(size / 2, size / 2, size / 2, size / 2);
+      return c.toDataURL();
+    }, size);
+    await page.locator("#asset-file").setInputFiles({
+      name: "static.png",
+      mimeType: "image/png",
+      buffer: Buffer.from(data.split(",")[1], "base64"),
+    });
+    await expect(page.locator(".asset-editor")).toContainText(
+      "已使用本地自定义图片",
+    );
+    await page.locator("#asset-scale").fill("1.5");
+    await page.locator("#asset-x").fill("7");
+    await page.getByRole("button", { name: "应用配置" }).click();
+    await expect(page.locator("#toast")).toContainText("资源配置已应用");
+    const a = (await get(page, "assets")).assets["player.ranger"];
+    expect(a.frames).toBeUndefined();
+    expect(a.frameWidth).toBeUndefined();
+    expect(a.scale).toBe(1.5);
+    expect(a.x).toBe(7);
+    expect(a.data).toBe(data);
+  });
+}
+
+test("不透明自定义地面保持可见，敌方预警绘制在其上方", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "开启远征" }).waitFor();
+  const data = await page.evaluate(() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 32;
+    const g = c.getContext("2d")!;
+    g.fillStyle = "#0000ff";
+    g.fillRect(0, 0, 32, 32);
+    return c.toDataURL();
+  });
+  await put(page, "assets", {
+    version: 1,
+    assets: { "map.ground": { data, scale: 1, x: 0, y: 0 } },
+  });
+  const w = new World(createRun("standard"));
+  w.s.player.weapons = {};
+  w.s.rocks = [];
+  w.s.spawnTimer = 9;
+  w.zone({ x: 2000, y: 1800 }, 80, 10, "meteor", true, 8, 0.2);
+  await resume(page, w.s);
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const g = document.querySelector("canvas")!.getContext("2d")!;
+        const b = g.getImageData(700, 650, 1, 1).data;
+        const pixels = g.getImageData(835, 365, 170, 170).data;
+        let red = 0;
+        for (let i = 0; i < pixels.length; i += 4)
+          if (pixels[i] > 160 && pixels[i + 1] < 210 && pixels[i + 2] < 200)
+            red++;
+        return { blue: b[2] > 200 && b[0] < 80, warning: red > 100 };
+      }),
+    )
+    .toEqual({ blue: true, warning: true });
+});
+
+test("结算写入延迟时立即回营地不会复活旧存档", async ({ page }) => {
+  await page.addInitScript(() => {
+    const original = IDBObjectStore.prototype.put;
+    IDBObjectStore.prototype.put = function (
+      value: unknown,
+      key?: IDBValidKey,
+    ) {
+      const request = original.call(this, value, key);
+      if (key === "profile") {
+        // Delay the application's completion callback while retaining real IndexedDB writes.
+        const tx = this.transaction;
+        tx.addEventListener("complete", () => {
+          const done = tx.oncomplete;
+          tx.oncomplete = null;
+          if (done)
+            Object.assign(window, {
+              __releaseProfile: () => done.call(tx, new Event("complete")),
+            });
+        });
+      }
+      return request;
+    };
+  });
+  const w = new World(createRun("endless", "ranger", 55));
+  w.s.player.hp = 1;
+  w.s.player.invincible = 0;
+  w.s.player.regen = 0;
+  spawn(w, "warden", { x: 1800, y: 1800 });
+  await resume(page, w.s);
+  await expect(page.getByRole("heading", { name: "此行落幕" })).toBeVisible();
+  await page.waitForFunction(
+    () => typeof (window as any).__releaseProfile === "function",
+  );
+  await page.getByRole("button", { name: "返回营地", exact: true }).click();
+  await expect(page.getByRole("button", { name: /继续旅程/ })).toHaveCount(0);
+  await expect.poll(async () => (await get(page, "run"))?.phase).toBe("dead");
+  await page.evaluate(() => (window as any).__releaseProfile());
+  await page.reload();
+  await expect(page.getByRole("button", { name: "开启远征" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /继续旅程/ })).toHaveCount(0);
+  expect((await get(page, "profile")).records).toHaveLength(1);
 });
