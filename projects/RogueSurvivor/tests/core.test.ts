@@ -208,11 +208,13 @@ describe("builds and rewards", () => {
     upgrade(v, "pierce");
     expect(eligible(v.s).some((u) => u.id === "split")).toBe(false);
   });
-  it("allows only three weapon families and keeps them at five levels", () => {
+  it("allows all five weapon families and keeps them at five levels", () => {
     const w = make();
     upgrade(w, "weapon_blade");
     upgrade(w, "weapon_orbit");
-    expect(eligible(w.s).some((u) => u.id === "weapon_drone")).toBe(false);
+    upgrade(w, "weapon_drone");
+    upgrade(w, "weapon_ember");
+    expect(Object.keys(w.s.player.weapons)).toHaveLength(5);
     for (let i = 0; i < 4; i++) upgrade(w, "weapon_bow");
     expect(w.s.player.weapons.bow).toBe(5);
     expect(eligible(w.s).some((u) => u.id === "weapon_bow")).toBe(false);

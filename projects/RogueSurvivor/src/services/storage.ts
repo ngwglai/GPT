@@ -1,3 +1,4 @@
+import { CURSES } from "../core/fate";
 import type { Run, Settings, Profile } from "../core/types";
 import { createRun } from "../core/create";
 import {
@@ -83,6 +84,38 @@ export function validateRun(value: unknown): Run {
       );
   };
   visit(s);
+  if (s.fate) {
+    assert(
+      obj(s.fate) &&
+        obj(s.fate.base) &&
+        obj(s.fate.curses) &&
+        Array.isArray(s.fate.history) &&
+        Array.isArray(s.fate.log),
+    );
+    assert(
+      ["maxHp", "speed", "attack", "crit", "regen", "magnet", "cooldown"].every(
+        (k) =>
+          typeof (s.fate!.base as unknown as Record<string, unknown>)[k] ===
+          "number",
+      ),
+    );
+    assert(
+      Object.entries(s.fate.curses).every(
+        ([k, v]) =>
+          Object.hasOwn(CURSES, k) && Number.isInteger(v) && v >= 0 && v <= 3,
+      ),
+    );
+    assert(
+      s.fate.history.every((id) => UPGRADES.some((u) => u.id === id)) &&
+        s.fate.log.length <= 8 &&
+        s.fate.log.every((x) => typeof x === "string"),
+    );
+    assert(
+      [s.fate.chests, s.fate.gained, s.fate.cleansed].every(
+        (n) => Number.isInteger(n) && n >= 0,
+      ),
+    );
+  }
   const base = createRun("standard");
   for (const [k, v] of Object.entries(base)) {
     assert(Object.hasOwn(s, k));
@@ -135,7 +168,7 @@ export function validateRun(value: unknown): Run {
   );
   assert(
     obj(p.weapons) &&
-      Object.keys(p.weapons).length <= 3 &&
+      Object.keys(p.weapons).length <= 5 &&
       Object.entries(p.weapons).every(
         ([k, v]) =>
           Object.hasOwn(WEAPONS, k) && Number.isInteger(v) && v >= 1 && v <= 5,

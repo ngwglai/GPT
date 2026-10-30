@@ -1,0 +1,733 @@
+[
+  {
+    "output": [
+      {
+        "time": 300,
+        "damage": 21697
+      },
+      {
+        "time": 600,
+        "damage": 93995
+      },
+      {
+        "time": 900,
+        "damage": 221182
+      },
+      {
+        "time": 1200,
+        "damage": 403322
+      }
+    ],
+    "finiteDefinitions": 61,
+    "remainingDefinitions": 45,
+    "remainingRanks": 105,
+    "acquiredRanks": 86,
+    "weapons": {
+      "bow": 4,
+      "drone": 3,
+      "orbit": 2,
+      "ember": 2,
+      "blade": 1
+    },
+    "fate": {
+      "chests": 4,
+      "gained": 0,
+      "cleansed": 0
+    },
+    "character": "ranger",
+    "seed": 11,
+    "stress": false,
+    "seconds": 1225,
+    "phase": "victory",
+    "level": 80,
+    "kills": 3256,
+    "bosses": 4,
+    "damage": 434634,
+    "peakEnemies": 46,
+    "peakBullets": 61,
+    "frames": 24506,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 40,
+    "wallSeconds": 3.56,
+    "build": [
+      "追星弓",
+      "古树之心",
+      "萤火灵",
+      "春芽",
+      "生息",
+      "独行之道",
+      "双生星轨",
+      "求知者",
+      "星核",
+      "残星裁决",
+      "轻羽",
+      "月环",
+      "战意",
+      "引力信标",
+      "拾星",
+      "凝神",
+      "穿林",
+      "无垠领悟",
+      "星金宝箱",
+      "终章学派",
+      "烬火杖",
+      "弧月刃",
+      "辅术精通",
+      "旅途宝箱",
+      "旅人步伐",
+      "磐石体魄",
+      "星尘引力",
+      "星贯学派",
+      "星纹护甲",
+      "回旋刃",
+      "速射弦",
+      "月轮加速",
+      "萤火之森",
+      "重月锋",
+      "炽热核心",
+      "霜潮学派",
+      "蜂群节律"
+    ]
+  },
+  {
+    "output": [
+      {
+        "time": 300,
+        "damage": 22432
+      },
+      {
+        "time": 600,
+        "damage": 104215
+      },
+      {
+        "time": 900,
+        "damage": 228860
+      },
+      {
+        "time": 1200,
+        "damage": 428866
+      }
+    ],
+    "finiteDefinitions": 61,
+    "remainingDefinitions": 50,
+    "remainingRanks": 111,
+    "acquiredRanks": 79,
+    "weapons": {
+      "bow": 4,
+      "orbit": 5,
+      "drone": 2,
+      "blade": 3,
+      "ember": 3
+    },
+    "fate": {
+      "chests": 3,
+      "gained": 2,
+      "cleansed": 2
+    },
+    "character": "ranger",
+    "seed": 29,
+    "stress": false,
+    "seconds": 1225,
+    "phase": "victory",
+    "level": 74,
+    "kills": 3516,
+    "bosses": 4,
+    "damage": 468962,
+    "peakEnemies": 65,
+    "peakBullets": 50,
+    "frames": 24505,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 54,
+    "wallSeconds": 4.4,
+    "build": [
+      "追星弓",
+      "月环",
+      "萤火灵",
+      "旅途宝箱",
+      "星核",
+      "弧月刃",
+      "春芽",
+      "古树之心",
+      "烬火杖",
+      "双生星轨",
+      "不熄余烬",
+      "旅人步伐",
+      "时砂",
+      "蜂群节律",
+      "战意",
+      "辅术精通",
+      "星纹护甲",
+      "凝神",
+      "拾星",
+      "无垠领悟",
+      "轻羽",
+      "鹰眼",
+      "速射弦",
+      "弓弦张力",
+      "时隙",
+      "主术精通",
+      "炽热核心",
+      "穿林",
+      "终章学派",
+      "禁忌之书",
+      "求知者",
+      "净化之光",
+      "血月契约"
+    ]
+  },
+  {
+    "output": [],
+    "finiteDefinitions": 61,
+    "remainingDefinitions": 59,
+    "remainingRanks": 171,
+    "acquiredRanks": 15,
+    "weapons": {
+      "bow": 1,
+      "drone": 1
+    },
+    "fate": {
+      "chests": 0,
+      "gained": 0,
+      "cleansed": 0
+    },
+    "character": "ranger",
+    "seed": 83,
+    "stress": false,
+    "seconds": 242,
+    "phase": "dead",
+    "level": 15,
+    "kills": 243,
+    "bosses": 0,
+    "damage": 13069,
+    "peakEnemies": 24,
+    "peakBullets": 28,
+    "frames": 4845,
+    "checkpoint": [],
+    "validatedSnapshots": 0,
+    "peakHeapMiB": 0,
+    "wallSeconds": 0.44,
+    "build": [
+      "追星弓",
+      "古树之心",
+      "星核",
+      "春芽",
+      "星纹护甲",
+      "轻羽",
+      "萤火灵"
+    ]
+  },
+  {
+    "output": [],
+    "finiteDefinitions": 61,
+    "remainingDefinitions": 61,
+    "remainingRanks": 177,
+    "acquiredRanks": 9,
+    "weapons": {
+      "blade": 1,
+      "orbit": 1
+    },
+    "fate": {
+      "chests": 0,
+      "gained": 0,
+      "cleansed": 0
+    },
+    "character": "knight",
+    "seed": 11,
+    "stress": false,
+    "seconds": 122,
+    "phase": "dead",
+    "level": 9,
+    "kills": 109,
+    "bosses": 0,
+    "damage": 4803,
+    "peakEnemies": 25,
+    "peakBullets": 29,
+    "frames": 2441,
+    "checkpoint": [],
+    "validatedSnapshots": 0,
+    "peakHeapMiB": 0,
+    "wallSeconds": 0.22,
+    "build": [
+      "弧月刃",
+      "磐石体魄",
+      "拾星",
+      "星核",
+      "春芽",
+      "月环",
+      "战意"
+    ]
+  },
+  {
+    "output": [
+      {
+        "time": 300,
+        "damage": 19950
+      },
+      {
+        "time": 600,
+        "damage": 104057
+      },
+      {
+        "time": 900,
+        "damage": 241380
+      },
+      {
+        "time": 1200,
+        "damage": 435455
+      }
+    ],
+    "finiteDefinitions": 61,
+    "remainingDefinitions": 45,
+    "remainingRanks": 108,
+    "acquiredRanks": 80,
+    "weapons": {
+      "blade": 5,
+      "orbit": 5,
+      "ember": 1
+    },
+    "fate": {
+      "chests": 3,
+      "gained": 1,
+      "cleansed": 1
+    },
+    "character": "knight",
+    "seed": 29,
+    "stress": false,
+    "seconds": 1230,
+    "phase": "victory",
+    "level": 76,
+    "kills": 3750,
+    "bosses": 4,
+    "damage": 475369,
+    "peakEnemies": 63,
+    "peakBullets": 47,
+    "frames": 24608,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 81,
+    "wallSeconds": 4.55,
+    "build": [
+      "弧月刃",
+      "不熄余烬",
+      "月环",
+      "春芽",
+      "古树之心",
+      "星核",
+      "辅术精通",
+      "生命收割",
+      "主术精通",
+      "旅途宝箱",
+      "鹰眼",
+      "遗忘药剂",
+      "净化之光",
+      "双月共舞",
+      "星纹护甲",
+      "穿林",
+      "星贯学派",
+      "旅人步伐",
+      "烬火杖",
+      "陨火学派",
+      "求知者",
+      "月轮加速",
+      "拾星",
+      "满月",
+      "星尘引力",
+      "血月契约",
+      "星银宝箱",
+      "终章学派",
+      "燃素循环",
+      "重月锋",
+      "独行之道",
+      "回旋刃",
+      "时砂",
+      "轻羽",
+      "无垠领悟",
+      "磐石体魄"
+    ]
+  },
+  {
+    "output": [
+      {
+        "time": 300,
+        "damage": 20663
+      },
+      {
+        "time": 600,
+        "damage": 93431
+      },
+      {
+        "time": 900,
+        "damage": 228533
+      },
+      {
+        "time": 1200,
+        "damage": 414231
+      }
+    ],
+    "finiteDefinitions": 61,
+    "remainingDefinitions": 48,
+    "remainingRanks": 107,
+    "acquiredRanks": 87,
+    "weapons": {
+      "blade": 5,
+      "orbit": 5,
+      "ember": 2,
+      "drone": 1,
+      "bow": 1
+    },
+    "fate": {
+      "chests": 2,
+      "gained": 2,
+      "cleansed": 1
+    },
+    "character": "knight",
+    "seed": 83,
+    "stress": false,
+    "seconds": 1243,
+    "phase": "victory",
+    "level": 81,
+    "kills": 3561,
+    "bosses": 4,
+    "damage": 460340,
+    "peakEnemies": 49,
+    "peakBullets": 37,
+    "frames": 24858,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 91,
+    "wallSeconds": 5.43,
+    "build": [
+      "弧月刃",
+      "月环",
+      "凝神",
+      "古树之心",
+      "春芽",
+      "生息",
+      "战意",
+      "重月锋",
+      "双月共舞",
+      "求知者",
+      "星核",
+      "满月",
+      "穿林",
+      "冰火共鸣",
+      "旅人步伐",
+      "霜潮学派",
+      "辅术精通",
+      "月核增幅",
+      "血月契约",
+      "轻羽",
+      "陨火学派",
+      "拾星",
+      "净化之光",
+      "无垠领悟",
+      "烬火杖",
+      "鹰眼",
+      "星尘引力",
+      "星贯学派",
+      "星纹护甲",
+      "命运重铸",
+      "萤火灵",
+      "时砂",
+      "星银宝箱",
+      "回旋刃",
+      "炽热核心",
+      "禁忌之书",
+      "蜂群节律",
+      "终章学派",
+      "追星弓",
+      "生命收割"
+    ]
+  },
+  {
+    "output": [
+      {
+        "time": 300,
+        "damage": 20876
+      },
+      {
+        "time": 600,
+        "damage": 90876
+      },
+      {
+        "time": 900,
+        "damage": 222955
+      },
+      {
+        "time": 1200,
+        "damage": 421662
+      }
+    ],
+    "finiteDefinitions": 61,
+    "remainingDefinitions": 50,
+    "remainingRanks": 114,
+    "acquiredRanks": 75,
+    "weapons": {
+      "ember": 3,
+      "drone": 5,
+      "bow": 2,
+      "orbit": 5,
+      "blade": 1
+    },
+    "fate": {
+      "chests": 1,
+      "gained": 0,
+      "cleansed": 0
+    },
+    "character": "mage",
+    "seed": 11,
+    "stress": false,
+    "seconds": 1226,
+    "phase": "victory",
+    "level": 72,
+    "kills": 3355,
+    "bosses": 4,
+    "damage": 451782,
+    "peakEnemies": 56,
+    "peakBullets": 46,
+    "frames": 24527,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 55,
+    "wallSeconds": 6.8,
+    "build": [
+      "烬火杖",
+      "磐石体魄",
+      "轻羽",
+      "旅人步伐",
+      "不熄余烬",
+      "古树之心",
+      "鹰眼",
+      "春芽",
+      "旅途宝箱",
+      "战意",
+      "星贯学派",
+      "野火蔓延",
+      "萤火灵",
+      "萤火之森",
+      "星核",
+      "生息",
+      "凝神",
+      "引力信标",
+      "星辰洗礼",
+      "追星弓",
+      "星尘引力",
+      "速射弦",
+      "星纹护甲",
+      "无垠领悟",
+      "月环",
+      "主术精通",
+      "遗忘药剂",
+      "双月共舞",
+      "辅术精通",
+      "穿林",
+      "月轮加速",
+      "霜潮学派",
+      "弧月刃",
+      "命运重铸",
+      "生命收割"
+    ]
+  },
+  {
+    "output": [
+      {
+        "time": 300,
+        "damage": 21414
+      },
+      {
+        "time": 600,
+        "damage": 110752
+      },
+      {
+        "time": 900,
+        "damage": 248498
+      },
+      {
+        "time": 1200,
+        "damage": 437932
+      }
+    ],
+    "finiteDefinitions": 61,
+    "remainingDefinitions": 49,
+    "remainingRanks": 118,
+    "acquiredRanks": 72,
+    "weapons": {
+      "ember": 4,
+      "drone": 5,
+      "orbit": 3
+    },
+    "fate": {
+      "chests": 0,
+      "gained": 0,
+      "cleansed": 0
+    },
+    "character": "mage",
+    "seed": 29,
+    "stress": false,
+    "seconds": 1215,
+    "phase": "victory",
+    "level": 72,
+    "kills": 3661,
+    "bosses": 4,
+    "damage": 459949,
+    "peakEnemies": 71,
+    "peakBullets": 57,
+    "frames": 24300,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 99,
+    "wallSeconds": 8.7,
+    "build": [
+      "烬火杖",
+      "春芽",
+      "引力信标",
+      "古树之心",
+      "鹰眼",
+      "萤火灵",
+      "星核",
+      "生息",
+      "不熄余烬",
+      "月环",
+      "旅人步伐",
+      "拾星",
+      "战意",
+      "磐石体魄",
+      "轻羽",
+      "时砂",
+      "无垠领悟",
+      "凝神",
+      "辅术精通",
+      "净化之光",
+      "独行之道",
+      "萤火之森",
+      "终章学派",
+      "残星裁决",
+      "炽热核心",
+      "星贯学派",
+      "星纹护甲",
+      "求知者",
+      "生命收割",
+      "月轮加速",
+      "野火蔓延",
+      "冰火共鸣",
+      "蜂群节律",
+      "主术精通",
+      "双月共舞"
+    ]
+  },
+  {
+    "output": [
+      {
+        "time": 300,
+        "damage": 22957
+      },
+      {
+        "time": 600,
+        "damage": 98669
+      },
+      {
+        "time": 900,
+        "damage": 232236
+      },
+      {
+        "time": 1200,
+        "damage": 428233
+      }
+    ],
+    "finiteDefinitions": 61,
+    "remainingDefinitions": 45,
+    "remainingRanks": 104,
+    "acquiredRanks": 90,
+    "weapons": {
+      "ember": 4,
+      "drone": 5,
+      "orbit": 5,
+      "bow": 1
+    },
+    "fate": {
+      "chests": 3,
+      "gained": 1,
+      "cleansed": 0
+    },
+    "character": "mage",
+    "seed": 83,
+    "stress": false,
+    "seconds": 1207,
+    "phase": "victory",
+    "level": 83,
+    "kills": 3325,
+    "bosses": 4,
+    "damage": 446629,
+    "peakEnemies": 48,
+    "peakBullets": 55,
+    "frames": 24149,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 69,
+    "wallSeconds": 6.82,
+    "build": [
+      "烬火杖",
+      "萤火灵",
+      "古树之心",
+      "春芽",
+      "月环",
+      "星核",
+      "磐石体魄",
+      "追星弓",
+      "轻羽",
+      "灵体聚能",
+      "凝神",
+      "萤火之森",
+      "陨火学派",
+      "辅术精通",
+      "霜潮学派",
+      "求知者",
+      "月核增幅",
+      "不熄余烬",
+      "终章学派",
+      "星尘引力",
+      "无垠领悟",
+      "生息",
+      "命运重铸",
+      "星银宝箱",
+      "鹰眼",
+      "拾星",
+      "贪婪之冠",
+      "炽热核心",
+      "星贯学派",
+      "独行之道",
+      "碎星",
+      "双生星轨",
+      "旅途宝箱",
+      "战意",
+      "星纹护甲",
+      "时砂",
+      "蜂群节律",
+      "速射弦",
+      "野火蔓延"
+    ]
+  }
+]

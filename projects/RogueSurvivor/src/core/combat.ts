@@ -1,3 +1,4 @@
+import { modifier } from "./fate";
 import type { Run, Enemy, Bullet, Vec, Effect } from "./types";
 import { LIMITS, SKILLS, WEAPONS } from "../data/content";
 import {
@@ -31,7 +32,12 @@ export class Combat {
       LIMITS.number,
       amount *
         damageMultiplier(this.s) *
+        modifier(this.s, "damage", source) *
         synergy *
+        (p.upgrades.execution && e.hp / e.maxHp < 0.25 ? 1.4 : 1) *
+        (p.upgrades.specialist
+          ? 1 + 0.3 / Math.max(1, Object.keys(p.weapons).length)
+          : 1) *
         (critical ? 2 : 1) *
         (e.kind === "guard" ? 0.72 : 1),
     );
@@ -54,6 +60,7 @@ export class Combat {
   hurt(amount: number) {
     const p = this.s.player;
     if (p.invincible > 0 || p.hp <= 0) return;
+    amount *= modifier(this.s, "taken");
     const absorbed = Math.min(p.shield, amount);
     p.shield -= absorbed;
     amount -= absorbed;
@@ -276,7 +283,9 @@ export class Combat {
       const w = WEAPONS[key],
         lv = p.weapons[key]!,
         mult = 1 + (lv - 1) * 0.3;
-      p.weaponTimers[key] = w.interval / (1 + (lv - 1) * 0.08);
+      p.weaponTimers[key] =
+        w.interval /
+        ((1 + (lv - 1) * 0.08) * modifier(this.s, "interval", key));
       const target = closest(p, this.s.enemies, w.range);
       if (key === "blade") {
         this.area(
