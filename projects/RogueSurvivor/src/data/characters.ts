@@ -1,0 +1,36 @@
+import type { EnemyId, SkillId, WeaponId } from "../core/types";
+export const CHARACTERS = [
+  {
+    id: "ranger",
+    name: "逐星游侠",
+    role: "灵巧 · 弹道构筑",
+    weapon: "bow" as WeaponId,
+    hp: 110,
+    speed: 230,
+    skill: "fire" as SkillId,
+    desc: "穿行于星光之间。弓矢自动锁敌，远距离掌控战场。",
+    color: "#a9eccb",
+  },
+  {
+    id: "knight",
+    name: "余烬守卫",
+    role: "坚韧 · 近战反击",
+    weapon: "blade" as WeaponId,
+    hp: 155,
+    speed: 205,
+    skill: "ice" as SkillId,
+    desc: "深入怪潮中心。宽幅斩击与额外生命让你从容迎战。",
+    color: "#ffc383",
+  },
+  {
+    id: "mage",
+    name: "月棘术士",
+    role: "奥术 · 持续伤害",
+    weapon: "ember" as WeaponId,
+    hp: 95,
+    speed: 220,
+    skill: "lance" as SkillId,
+    desc: "让森林燃起星火。法术灼烧与控制创造施法空间。",
+    color: "#c9b2ff",
+  },
+];

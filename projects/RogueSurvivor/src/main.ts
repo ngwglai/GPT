@@ -1,3 +1,5 @@
+import { cardDescription } from "./core/progression";
+import { CURSES } from "./core/fate";
 import Phaser from "phaser";
 import "./ui/style.css";
 import { GameScene } from "./render/scene";
@@ -155,7 +157,18 @@ function updateHud() {
       `${Math.min(100, (cd / (SKILLS[p.skills[i]].cooldown * p.cooldown)) * 100)}%`;
   });
   set("dash-cd", p.dashCd > 0 ? p.dashCd.toFixed(1) : "");
-  set("event", s.time < s.eventUntil ? s.event : "");
+  set(
+    "event",
+    (s.time < s.eventUntil ? s.event : "") +
+      (s.time < (s.fate?.noticeUntil || 0) ? " · " + s.fate!.log.at(-1) : "") +
+      Object.entries(s.fate?.curses || {})
+        .filter(([, n]) => n)
+        .map(
+          ([k, n]) =>
+            ` · ${CURSES[k as keyof typeof CURSES].name}×${n}（${CURSES[k as keyof typeof CURSES].desc}）`,
+        )
+        .join(""),
+  );
   set(
     "budget",
     s.enemies.length >= LIMITS.enemies - 3
@@ -193,7 +206,15 @@ function pause() {
   if (!world || screen !== "game") return;
   screen = "pause";
   modal(
-    `<div class="eyebrow">呼吸片刻，再向前</div><h2>远征已暂停</h2><p>你的旅程停留在 ${time(world.s.time)}。怪物与冷却也已暂停。</p><div class="pause-actions">${button("resume", "继续远征", "primary")}${button("save", "保存当前进度")}${button("settings", "游戏设置")}${button("assets", "资源工坊")}${button("save-home", "保存并返回营地", "subtle")}</div><div class="help"><b>行路指南</b><p>WASD 移动 · Q / E / R 技能 · 空格闪避<br>鼠标指定落点或方向 · 1 / 2 / 3 选择升级<br>躲开红色预警；拾取绿色星晶升级。<br>第 5、10、15 分钟迎战首领，第 20 分钟迎来最终战。</p></div>`,
+    `<div class="eyebrow">呼吸片刻，再向前</div><h2>远征已暂停</h2><p>你的旅程停留在 ${time(world.s.time)}。怪物与冷却也已暂停。</p><p>${
+      Object.entries(world.s.fate?.curses || {})
+        .filter(([, n]) => n)
+        .map(
+          ([k, n]) =>
+            `${CURSES[k as keyof typeof CURSES].name}×${n}：${CURSES[k as keyof typeof CURSES].desc}`,
+        )
+        .join("；") || "当前没有诅咒"
+    }</p><p>${world.s.fate?.log.join("<br>") || "尚无奇遇记录"}</p><div class="pause-actions">${button("resume", "继续远征", "primary")}${button("save", "保存当前进度")}${button("settings", "游戏设置")}${button("assets", "资源工坊")}${button("save-home", "保存并返回营地", "subtle")}</div><div class="help"><b>行路指南</b><p>WASD 移动 · Q / E / R 技能 · 空格闪避<br>鼠标指定落点或方向 · 1 / 2 / 3 选择升级<br>躲开红色预警；拾取绿色星晶升级。<br>第 5、10、15 分钟迎战首领，第 20 分钟迎来最终战。</p></div>`,
     "small",
   );
   void saveCurrent(false);
@@ -207,7 +228,7 @@ function upgrade() {
     `<div class="eyebrow">星光回应了你 / 等级 ${world.s.player.level}</div><h2>选择一份馈赠</h2><p>三选一。让这次远征，走向不同的可能。</p><div class="upgrade-grid">${world.s.choices
       .map((id, i) => {
         const u = UPGRADES.find((x) => x.id === id)!;
-        return `<button class="upgrade-card rarity-${u.rarity}" data-action="upgrade-${id}"><div class="rarity">${RARITIES[u.rarity]} <kbd>${i + 1}</kbd></div>${u.weapon ? img("weapon." + u.weapon, "reward-icon") : '<div class="reward-symbol">✧</div>'}<h3>${u.name}</h3><p>${u.desc}</p><small>当前 ${world!.s.player.upgrades[id] || 0} / ${u.id === "ascend" ? "∞" : u.max}</small></button>`;
+        return `<button class="upgrade-card rarity-${u.rarity}" data-action="upgrade-${id}"><div class="rarity">${RARITIES[u.rarity]} <kbd>${i + 1}</kbd></div>${u.weapon ? img("weapon." + u.weapon, "reward-icon") : '<div class="reward-symbol">✧</div>'}<h3>${u.name}</h3><p>${cardDescription(world!.s, id)}</p><small>当前 ${world!.s.player.upgrades[id] || 0} / ${u.id === "ascend" ? "∞" : u.max}</small></button>`;
       })
       .join("")}</div>`,
     "wide",

@@ -107,6 +107,7 @@ export interface Stats {
   peakBullets: number;
 }
 export interface Run {
+  fate?: import("./fate").Fate;
   version: 1;
   seed: number;
   rng: number;

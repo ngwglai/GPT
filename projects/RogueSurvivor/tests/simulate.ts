@@ -19,11 +19,17 @@ export function simulate(
       "bloom",
     ),
   );
+  if (stress)
+    for (const id of ["bow", "blade", "ember", "orbit", "drone"] as const) {
+      w.s.player.weapons[id] = 5;
+      w.s.player.upgrades["weapon_" + id] = 5;
+    }
   const start = performance.now();
   let frames = 0,
     saves = 0,
     peakHeapMiB = 0;
   const checkpoint: number[] = [];
+  const output: { time: number; damage: number }[] = [];
   while (
     w.s.time < seconds &&
     w.s.phase !== "dead" &&
@@ -97,6 +103,11 @@ export function simulate(
       ],
     });
     frames++;
+    if (frames % 6000 === 0)
+      output.push({
+        time: Math.round(w.s.time),
+        damage: Math.round(w.s.stats.damage),
+      });
     if (frames % 12000 === 0) {
       validateRun(w.s);
       peakHeapMiB = Math.max(
@@ -114,6 +125,25 @@ export function simulate(
       throw Error("Simulation invariant failed");
   }
   const result = {
+    output,
+    finiteDefinitions: UPGRADES.filter((u) => u.id !== "ascend").length,
+    remainingDefinitions: UPGRADES.filter(
+      (u) => u.id !== "ascend" && (w.s.player.upgrades[u.id] || 0) < u.max,
+    ).length,
+    remainingRanks: UPGRADES.filter((u) => u.id !== "ascend").reduce(
+      (n, u) => n + u.max - (w.s.player.upgrades[u.id] || 0),
+      0,
+    ),
+    acquiredRanks: Object.values(w.s.player.upgrades).reduce(
+      (a, b) => a + b,
+      0,
+    ),
+    weapons: w.s.player.weapons,
+    fate: w.s.fate && {
+      chests: w.s.fate.chests,
+      gained: w.s.fate.gained,
+      cleansed: w.s.fate.cleansed,
+    },
     character,
     seed,
     stress,

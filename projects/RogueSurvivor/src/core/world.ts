@@ -1,3 +1,4 @@
+import { modifier } from "./fate";
 import type { Run, Input } from "./types";
 import { Combat } from "./combat";
 import { ai, director } from "./director";
@@ -82,6 +83,7 @@ export class World extends Combat {
       if (e.hp > 0) continue;
       s.stats.kills = Math.min(LIMITS.number, s.stats.kills + 1);
       const def = ENEMIES[e.kind];
+      if (p.upgrades.harvest) this.heal(0.3);
       const value = def.xp * (e.elite ? 3 : 1);
       if (s.gems.length < LIMITS.gems) s.gems.push({ x: e.x, y: e.y, value });
       else {
@@ -93,12 +95,16 @@ export class World extends Combat {
       if (e.burn > 0 && p.upgrades.wildfire) {
         for (const other of this.grid.nearby(e, 145)) {
           if (other.hp > 0 && distance(other, e) < 145)
-            this.burn(other, e.burnPower, e.burnSource);
+            this.burn(
+              other,
+              e.burnPower / (1 + (p.upgrades.burn || 0) * 0.25),
+              e.burnSource,
+            );
         }
       }
       if (def.boss) {
         s.stats.bosses++;
-        p.xp += value;
+        p.xp += value * modifier(s, "xp");
         this.heal(p.maxHp * 0.3);
         s.event = "首领已击破";
         s.eventUntil = s.time + 5;
@@ -118,7 +124,7 @@ export class World extends Combat {
         g.y += n.y * speed;
       }
       if (distance(g, p) < 22) {
-        p.xp = Math.min(LIMITS.number, p.xp + g.value);
+        p.xp = Math.min(LIMITS.number, p.xp + g.value * modifier(s, "xp"));
         g.value = 0;
       }
     }

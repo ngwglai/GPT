@@ -282,7 +282,7 @@ test("密集战斗真实渲染、性能面板、无控制台异常", async ({ pa
   w.s.nextBoss = 7500;
   w.s.nextEvent = 7290;
   w.s.player.invincible = 300;
-  w.s.player.weapons = { ember: 5, orbit: 5, drone: 5 };
+  w.s.player.weapons = { bow: 5, blade: 5, ember: 5, orbit: 5, drone: 5 };
   for (let i = 0; i < 140; i++) {
     const a = i * 2.4;
     spawn(
@@ -486,4 +486,51 @@ test("结算写入延迟时立即回营地不会复活旧存档", async ({ page 
   await expect(page.getByRole("button", { name: "开启远征" })).toBeVisible();
   await expect(page.getByRole("button", { name: /继续旅程/ })).toHaveCount(0);
   expect((await get(page, "profile")).records).toHaveLength(1);
+});
+
+test("v1.1 宝箱、诅咒、净化、重抽、遗忘及五武器存档", async ({ page }) => {
+  const { grant } = await import("../src/core/progression");
+  const { addCurse } = await import("../src/core/fate");
+  const s = createRun("standard", "ranger", 155);
+  for (const id of ["blade", "ember", "orbit", "drone"])
+    grant(s, "weapon_" + id);
+  grant(s, "vigor");
+  addCurse(s, "wither");
+  s.phase = "upgrade";
+  s.choices = ["chest_epic", "cleanse", "reroll"];
+  await resume(page, s);
+  await page.locator('[data-action="upgrade-chest_epic"]').click();
+  await expect(page.locator("#event")).toContainText("星金宝箱");
+  await expect(page.locator("#event")).toContainText("枯萎");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "保存当前进度" }).click();
+  const saved = await get(page, "run");
+  expect(Object.keys(saved.player.weapons)).toHaveLength(5);
+  expect(saved.fate.chests).toBe(1);
+  saved.phase = "upgrade";
+  saved.choices = ["cleanse", "reroll", "forget"];
+  await resume(page, saved);
+  await page.locator('[data-action="upgrade-cleanse"]').click();
+  await expect(page.locator("#event")).toContainText("净化完成");
+  await expect(page.locator("#event")).not.toContainText("枯萎");
+});
+test("v1.1 重抽、遗忘与属性落盘", async ({ page }) => {
+  const { grant } = await import("../src/core/progression");
+  const s = createRun("standard", "ranger", 155);
+  grant(s, "vigor");
+  s.phase = "upgrade";
+  const reroll = structuredClone(s);
+  reroll.choices = ["reroll", "vitality", "power"];
+  await resume(page, reroll);
+  await page.locator('[data-action="upgrade-reroll"]').click();
+  await expect(page.locator(".upgrade-card")).toHaveCount(3);
+  await expect(page.locator('[data-action="upgrade-reroll"]')).toHaveCount(0);
+  const forgotten = structuredClone(s);
+  forgotten.choices = ["forget", "vitality", "power"];
+  await resume(page, forgotten);
+  await page.locator('[data-action="upgrade-forget"]').click();
+  await expect(page.locator(".upgrade-card")).toHaveCount(3);
+  await expect
+    .poll(async () => (await get(page, "run")).player.upgrades.vigor)
+    .toBe(0);
 });
