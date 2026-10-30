@@ -1,19 +1,21 @@
-import { MODIFIERS } from "../data/cards/expedition";
-import { SKILLS } from "../data/skills";
 import { UPGRADES, GROWTH } from "../data/content";
 import type { Run, WeaponId } from "./types";
 import { random } from "./math";
 import { removable } from "./fate";
-export function eligible(s: Run) {
+import { ensureDeck, type DrawKind } from "./deckState";
+export function eligible(s: Run, kind: DrawKind = "positive") {
+  ensureDeck(s);
   const p = s.player;
   return UPGRADES.filter(
     (u) =>
+      (kind === "negative"
+        ? u.polarity === "negative"
+        : u.polarity !== "negative") &&
       (p.upgrades[u.id] || 0) < u.max &&
-      (!MODIFIERS[u.id]?.source ||
-        !Object.hasOwn(SKILLS, MODIFIERS[u.id].source!) ||
-        p.skills.includes(
-          MODIFIERS[u.id].source as (typeof p.skills)[number],
-        )) &&
+      (!u.conditions.source ||
+        p.skills.includes(u.conditions.source as (typeof p.skills)[number]) ||
+        (Object.hasOwn(p.weapons, u.conditions.source) &&
+          !!p.weapons[u.conditions.source as WeaponId])) &&
       (!u.weapon || (p.weapons[u.weapon] || 0) < 5) &&
       (!u.id.startsWith("skill_") ||
         p.skillLevels[p.skills[{ skill_q: 0, skill_e: 1, skill_r: 2 }[u.id]!]] <
@@ -27,13 +29,25 @@ export function eligible(s: Run) {
         p.weapons[u.weapon] ||
         GROWTH.maxEquippedWeapons === null ||
         Object.keys(p.weapons).length < GROWTH.maxEquippedWeapons) &&
-      (u.id !== "ascend" || p.level >= 25) &&
+      p.level >= u.conditions.minLevel &&
+      (u.id !== "reroll" || ensureDeck(s).refreshes <= 1e12 - 3) &&
       (u.id !== "forget" || !!removable(s)),
   );
 }
-export function offer(s: Run, exclude: string[] = []) {
-  const pool = eligible(s).filter((u) => !exclude.includes(u.id)),
-    chosen: string[] = [];
+export function offer(
+  s: Run,
+  exclude: string[] = [],
+  kind: DrawKind = ensureDeck(s).active || "positive",
+) {
+  const d = ensureDeck(s);
+  d.active = kind;
+  const all = eligible(s, kind),
+    fresh = all.filter((u) => !exclude.includes(u.id));
+  const pool =
+    fresh.length >= 3
+      ? fresh
+      : [...fresh, ...all.filter((u) => exclude.includes(u.id))];
+  const chosen: string[] = [];
   while (pool.length && chosen.length < 3) {
     const weights = pool.map(
       (u) =>
@@ -51,4 +65,12 @@ export function offer(s: Run, exclude: string[] = []) {
   }
   s.choices = chosen;
   s.phase = "upgrade";
+}
+export function refresh(s: Run) {
+  const d = ensureDeck(s);
+  if (s.phase !== "upgrade" || d.active === "negative" || d.refreshes < 1)
+    return false;
+  d.refreshes--;
+  offer(s, s.choices);
+  return true;
 }

@@ -1691,3 +1691,62 @@ td {
     padding: 22px;
   }
 }
+
+.codex-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin: 22px 0;
+}
+.codex-card {
+  padding: 20px;
+  border: 1px solid #658d7b;
+  border-radius: 14px;
+  background: #17352eee;
+  line-height: 1.7;
+}
+.codex-card img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+.codex-card p {
+  font-size: 13px;
+  color: #d3dfce;
+}
+.codex-card small {
+  color: #a7c1b0;
+}
+.polarity-negative {
+  border-color: #e884b5;
+  background: #412639ee;
+}
+.polarity-mixed {
+  border-color: #e9aa69;
+}
+.draw-toolbar,
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0;
+}
+.codex-card[hidden] {
+  display: none;
+}
+#card-search {
+  display: block;
+  width: min(420px, 100%);
+  box-sizing: border-box;
+  margin-top: 8px;
+  padding: 12px 16px;
+  border: 1px solid #587a6d;
+  border-radius: 10px;
+  background: #173b32;
+  color: #e2eedb;
+  font: inherit;
+}
+#card-search:focus {
+  outline: 2px solid #a9eccb;
+  outline-offset: 2px;
+}

@@ -1,3 +1,5 @@
+import { skillLevelText } from "../skills";
+import { weaponStats } from "../weapons";
 import { WEAPONS } from "../weapons";
 import type { WeaponId } from "../../core/types";
 import type { Run } from "../../core/types";
@@ -21,7 +23,7 @@ export function detail(s: Run, id: string) {
       lv = s.player.weapons[key] || 0;
     const stat = (n: number) =>
       n
-        ? `基础单次伤害${(w.damage * (1 + (n - 1) * 0.3)).toFixed(1)}，基础间隔${(w.interval / (1 + (n - 1) * 0.08)).toFixed(2)}秒`
+        ? `基础单次伤害${weaponStats(key, n).damage.toFixed(1)}，基础间隔${weaponStats(key, n).interval.toFixed(2)}秒`
         : "尚未持有";
     const evolution = {
       bow: "5级额外1箭",
@@ -46,20 +48,7 @@ export function detail(s: Run, id: string) {
     const slot = { skill_q: 0, skill_e: 1, skill_r: 2 }[id]!;
     const skill = s.player.skills[slot],
       lv = s.player.skillLevels[skill];
-    const formulas: Record<string, (v: number) => string> = {
-      fire: (v) =>
-        `基础区域半径${105 + v * 12}，每跳伤害${90 + v * 20}，持续${(1 + v * 0.35).toFixed(2)}秒；3级额外两片半径70/伤害65区域`,
-      ice: (v) =>
-        `冻结半径${145 + v * 15}，瞬伤${40 + v * 10}，冻结1.2秒；伤害12的冰域持续${2 + v * 0.5}秒`,
-      lance: (v) => `伤害${85 + v * 25}，半径${10 + v * 2}，穿透25；3级变为3束`,
-      ward: (v) =>
-        `护盾+${40 + v * 15}（总上限200），无敌${1 + v * 0.2}秒，震退半径${125 + v * 12}/伤害${35 + v * 12}`,
-      bloom: (v) =>
-        `立即治疗${20 + v * 12}，花园半径${110 + v * 10}/每跳伤害${16 + v * 6}/持续${4 + v}秒`,
-      storm: (v) =>
-        `${5 + v * 2}次星爆，每次半径130/伤害${135 + v * 25}；清除敌方弹道`,
-    };
-    return `技能等级${lv} → ${lv + 1}。当前：${formulas[skill](lv)}。升级后：${formulas[skill](lv + 1)}。伤害受全局加成，领域每0.5秒结算。`;
+    return `技能等级${lv} → ${Math.min(5, lv + 1)}。当前：${skillLevelText(skill, lv)}。升级后：${skillLevelText(skill, Math.min(5, lv + 1))}。伤害受全局加成，领域每0.5秒结算。`;
   }
   return exact[id] || "";
 }

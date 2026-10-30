@@ -1,3 +1,12 @@
+import { ENEMY_RULES } from "./data/enemies";
+import {
+  cardBrowser,
+  skillBrowser,
+  enemyBrowser,
+  nextEffect,
+} from "./ui/cards";
+import { ensureDeck } from "./core/deckState";
+import { refresh } from "./core/cardPool";
 import { cardDescription } from "./core/progression";
 import { CURSES } from "./core/fate";
 import Phaser from "phaser";
@@ -94,7 +103,7 @@ function notify(message: string) {
   toastTimer = window.setTimeout(() => toast.classList.remove("show"), 4500);
 }
 function header() {
-  return `<header><a href="#" data-action="home" class="brand"><span class="brand-star">✦</span><span>星烬远征<small>ROGUE SURVIVOR</small></span></a><nav>${button("records", "远征记录")}${button("assets", "资源工坊")}${button("settings", "设置", "nav-setting")}</nav><span class="version">离线单人 · v1.0</span></header>`;
+  return `<header><a href="#" data-action="home" class="brand"><span class="brand-star">✦</span><span>星烬远征<small>ROGUE SURVIVOR</small></span></a><nav>${button("codex", "远征图鉴")}${button("records", "远征记录")}${button("assets", "资源工坊")}${button("settings", "设置", "nav-setting")}</nav><span class="version">离线单人 · v1.2</span></header>`;
 }
 function shell(content: string, cls = "") {
   scene.showWorld = false;
@@ -132,7 +141,7 @@ function hud() {
   scene.showWorld = true;
   scene.needsPaint = true;
   screen = "game";
-  app.innerHTML = `<div class="hud"><div class="hud-top"><div class="player-hud">${img("player." + world!.s.character)}<div><div class="player-name">${CHARACTERS.find((c) => c.id === world!.s.character)!.name} <span id="level"></span></div><div class="health"><div id="health-fill"></div><span id="health-label"></span></div><small id="shield"></small></div></div><div class="run-clock"><b id="clock">00:00</b><span>${world!.s.mode === "standard" ? "星林远征" : "无尽星夜"}</span></div><div class="hud-actions"><span id="kills"></span>${button("pause", "Ⅱ 暂停", "hud-button")}</div></div><div class="xp"><div id="xp-fill"></div></div><div id="boss-hud"></div><div id="event"></div><div class="hud-bottom"><div id="weapons" class="weapon-hud"></div><div class="skills">${world!.s.player.skills.map((id, i) => `<div class="skill-slot" title="${SKILLS[id].desc}">${img("skill." + id)}<div class="cooldown-shade" id="shade-${i}"></div><kbd>${["Q", "E", "R"][i]}</kbd><b id="cd-${i}"></b><span>${SKILLS[id].name}</span></div>`).join("")}<div class="skill-slot dash-slot"><span class="dash-icon">➶</span><kbd>空格</kbd><b id="dash-cd"></b><span>闪避</span></div></div><div class="hint">鼠标瞄准 · 自动攻击<br><span id="budget"></span></div></div><div id="performance"></div></div>`;
+  app.innerHTML = `<div class="hud"><div class="hud-top"><div class="player-hud">${img("player." + world!.s.character)}<div><div class="player-name">${CHARACTERS.find((c) => c.id === world!.s.character)!.name} <span id="level"></span></div><div class="health"><div id="health-fill"></div><span id="health-label"></span></div><small id="shield"></small></div></div><div class="run-clock"><b id="clock">00:00</b><span>${world!.s.mode === "standard" ? "星林远征" : "无尽星夜"}</span></div><div class="hud-actions"><span id="kills"></span>${button("build", "当前构筑", "hud-button")}${button("pause", "Ⅱ 暂停", "hud-button")}</div></div><div class="xp"><div id="xp-fill"></div></div><div id="boss-hud"></div><div id="event"></div><div class="hud-bottom"><div id="weapons" class="weapon-hud"></div><div class="skills">${world!.s.player.skills.map((id, i) => `<div class="skill-slot" title="${SKILLS[id].desc}">${img("skill." + id)}<div class="cooldown-shade" id="shade-${i}"></div><kbd>${["Q", "E", "R"][i]}</kbd><b id="cd-${i}"></b><span>${SKILLS[id].name}</span></div>`).join("")}<div class="skill-slot dash-slot"><span class="dash-icon">➶</span><kbd>空格</kbd><b id="dash-cd"></b><span>闪避</span></div></div><div class="hint">鼠标瞄准 · 自动攻击<br><span id="budget"></span></div></div><div id="performance"></div></div>`;
   updateHud();
 }
 function updateHud() {
@@ -143,14 +152,20 @@ function updateHud() {
     document.getElementById(id)!.textContent = text;
   };
   set("level", `等级 ${p.level}`);
-  set("health-label", `${Math.ceil(p.hp)} / ${p.maxHp}`);
+  set(
+    "health-label",
+    `${Math.round(p.hp * 10) / 10} / ${Math.round(p.maxHp * 10) / 10}`,
+  );
   set("shield", p.shield > 0 ? `◈ 护盾 ${Math.ceil(p.shield)}` : "生命");
   document.getElementById("health-fill")!.style.width =
     `${(p.hp / p.maxHp) * 100}%`;
   document.getElementById("xp-fill")!.style.width =
     `${Math.min(100, (p.xp / xpNeeded(p.level)) * 100)}%`;
   set("clock", time(s.time));
-  set("kills", `✧ 击败 ${s.stats.kills}`);
+  set(
+    "kills",
+    `✧ 击败 ${s.stats.kills} · 待领 +${ensureDeck(s).pending.positive} / −${ensureDeck(s).pending.negative}`,
+  );
   p.cooldowns.forEach((cd, i) => {
     set("cd-" + i, cd > 0.05 ? cd.toFixed(1) : "");
     document.getElementById("shade-" + i)!.style.height =
@@ -185,7 +200,7 @@ function updateHud() {
     .join("");
   const boss = s.enemies.find((e) => ENEMIES[e.kind].boss);
   document.getElementById("boss-hud")!.innerHTML = boss
-    ? `<div class="boss-name">${ENEMIES[boss.kind].name} <small>${boss.hp / boss.maxHp < 0.45 ? "狂暴阶段" : "第一阶段"}</small></div><div class="boss-bar"><i style="width:${Math.max(0, (boss.hp / boss.maxHp) * 100)}%"></i></div>`
+    ? `<div class="boss-name">${ENEMIES[boss.kind].name} <small>${boss.hp / boss.maxHp < ENEMY_RULES.bossPhaseHp ? "狂暴阶段" : "第一阶段"}</small></div><div class="boss-bar"><i style="width:${Math.max(0, (boss.hp / boss.maxHp) * 100)}%"></i></div>`
     : "";
   set(
     "performance",
@@ -200,7 +215,9 @@ function modal(content: string, cls = "") {
     `<div class="overlay"><section class="dialog ${cls}" role="dialog" aria-modal="true">${content}</section></div>`,
   );
   scene.paused = true;
+  document.querySelector(".hud")?.setAttribute("inert", "");
   document.querySelector<HTMLButtonElement>(".dialog button")?.focus();
+  document.querySelector(".hud")?.setAttribute("aria-hidden", "true");
 }
 function pause() {
   if (!world || screen !== "game") return;
@@ -214,7 +231,7 @@ function pause() {
             `${CURSES[k as keyof typeof CURSES].name}×${n}：${CURSES[k as keyof typeof CURSES].desc}`,
         )
         .join("；") || "当前没有诅咒"
-    }</p><p>${world.s.fate?.log.join("<br>") || "尚无奇遇记录"}</p><div class="pause-actions">${button("resume", "继续远征", "primary")}${button("save", "保存当前进度")}${button("settings", "游戏设置")}${button("assets", "资源工坊")}${button("save-home", "保存并返回营地", "subtle")}</div><div class="help"><b>行路指南</b><p>WASD 移动 · Q / E / R 技能 · 空格闪避<br>鼠标指定落点或方向 · 1 / 2 / 3 选择升级<br>躲开红色预警；拾取绿色星晶升级。<br>第 5、10、15 分钟迎战首领，第 20 分钟迎来最终战。</p></div>`,
+    }</p><p>${world.s.fate?.log.join("<br>") || "尚无奇遇记录"}</p><div class="pause-actions">${button("resume", "继续远征", "primary")}${button("save", "保存当前进度")}${button("build", "当前构筑")}${button("codex", "远征图鉴")}${button("settings", "游戏设置")}${button("assets", "资源工坊")}${button("save-home", "保存并返回营地", "subtle")}</div><div class="help"><b>行路指南</b><p>WASD 移动 · Q / E / R 技能 · 空格闪避<br>鼠标指定落点或方向 · 1 / 2 / 3 选择升级<br>躲开红色预警；拾取绿色星晶升级。<br>金色+牌：额外正面抽卡；紫色−牌：强制负面三选一。<br>第 5、10、15 分钟迎战首领，第 20 分钟迎来最终战。</p></div>`,
     "small",
   );
   void saveCurrent(false);
@@ -225,12 +242,14 @@ function upgrade() {
   screen = "upgrade";
   audio.effect("level");
   modal(
-    `<div class="eyebrow">星光回应了你 / 等级 ${world.s.player.level}</div><h2>选择一份馈赠</h2><p>三选一。让这次远征，走向不同的可能。</p><div class="upgrade-grid">${world.s.choices
+    `<div class="eyebrow">星光回应了你 / 等级 ${world.s.player.level}</div><h2>${ensureDeck(world.s).active === "negative" ? "选择一项负面命运" : "选择一份馈赠"}</h2><p>${ensureDeck(world.s).active === "negative" ? "纯负面奖励：必须选择一项，普通刷新不可用。" : "三选一。让这次远征，走向不同的可能。"}</p><div class="upgrade-grid">${world.s.choices
       .map((id, i) => {
         const u = UPGRADES.find((x) => x.id === id)!;
-        return `<button class="upgrade-card rarity-${u.rarity}" data-action="upgrade-${id}"><div class="rarity">${RARITIES[u.rarity]} <kbd>${i + 1}</kbd></div>${u.weapon ? img("weapon." + u.weapon, "reward-icon") : '<div class="reward-symbol">✧</div>'}<h3>${u.name}</h3><p>${cardDescription(world!.s, id)}</p><small>当前 ${world!.s.player.upgrades[id] || 0} / ${u.id === "ascend" ? "∞" : u.max}</small></button>`;
+        return `<button class="upgrade-card rarity-${u.rarity} polarity-${u.polarity}" data-action="upgrade-${id}"><div class="rarity">${RARITIES[u.rarity]} <kbd>${i + 1}</kbd></div>${u.weapon ? img("weapon." + u.weapon, "reward-icon") : '<div class="reward-symbol">✧</div>'}<h3>${u.name}</h3><p>${cardDescription(world!.s, id)} ${nextEffect(world!.s, id)}</p><small>当前 ${world!.s.player.upgrades[id] || 0} / ${u.maxStacks === null ? "∞" : u.max}</small></button>`;
       })
-      .join("")}</div>`,
+      .join(
+        "",
+      )}</div><div class="draw-toolbar">${button("refresh", `刷新 · 剩余 ${ensureDeck(world.s).refreshes} 次`, "", ensureDeck(world.s).active === "negative" || ensureDeck(world.s).refreshes < 1 ? "disabled" : "")}${button("build", "当前构筑")}</div>`,
     "wide",
   );
   void saveCurrent(false);
@@ -355,7 +374,9 @@ function assetManager() {
   );
 }
 function back() {
-  if (world && returnScreen === "pause") {
+  if (world && returnScreen === "upgrade") {
+    upgrade();
+  } else if (world && returnScreen === "pause") {
     hud();
     pause();
   } else if (world && returnScreen === "result") results();
@@ -365,9 +386,57 @@ async function reloadArt() {
   panelArt();
   await scene.reloadAssets();
 }
+function rememberReturnTarget() {
+  if (["build", "codex", "settings", "assets", "records"].includes(screen))
+    return;
+  returnScreen = world
+    ? world.s.phase === "upgrade"
+      ? "upgrade"
+      : screen === "result"
+        ? "result"
+        : "pause"
+    : "home";
+}
+let codexTab = "cards";
+function collectionPage(owned = false) {
+  screen = owned ? "build" : "codex";
+  scene.paused = true;
+  const state = world?.s || createRun("standard");
+  ensureDeck(state);
+  if (world) void saveCurrent(false);
+  shell(
+    `<main class="page"><div class="page-heading"><h2>${owned ? "当前构筑" : "远征图鉴"}</h2>${button("back", "← 返回")}</div>${owned ? "" : `<div class="tabs">${button("codex-cards", "卡牌图鉴")}${button("codex-skills", "技能图鉴")}${button("codex-enemies", "怪物图鉴")}</div>`}${owned || codexTab === "cards" ? cardBrowser(state, owned) : codexTab === "skills" ? skillBrowser(state, img) : enemyBrowser(img)}</main>`,
+  );
+  const search = document.getElementById(
+    "card-search",
+  ) as HTMLInputElement | null;
+  search?.addEventListener("input", () => {
+    for (const el of Array.from(
+      document.querySelectorAll<HTMLElement>("[data-search]"),
+    ))
+      el.hidden = !el.dataset.search!.includes(search.value.trim());
+  });
+}
 async function action(id: string) {
   audio.unlock();
   if (busy) return;
+  if (id.startsWith("codex-")) {
+    codexTab = id.slice(6);
+    collectionPage();
+    return;
+  }
+  if (id === "build" || id === "codex") {
+    rememberReturnTarget();
+    collectionPage(id === "build");
+    return;
+  }
+  if (id === "refresh") {
+    if (world && refresh(world.s)) {
+      upgrade();
+      await saveCurrent(false);
+    }
+    return;
+  }
   if (id.startsWith("mode-")) {
     mode = id.endsWith("endless") ? "endless" : "standard";
     home();
@@ -443,13 +512,7 @@ async function action(id: string) {
     case "settings":
     case "assets":
     case "records":
-      if (!["settings", "assets", "records"].includes(screen))
-        returnScreen =
-          screen === "pause"
-            ? "pause"
-            : screen === "result"
-              ? "result"
-              : "home";
+      rememberReturnTarget();
       if (id === "settings") settingsPage();
       else if (id === "assets") assetManager();
       else records();

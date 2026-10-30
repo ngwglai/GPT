@@ -108,6 +108,8 @@ export interface Stats {
 }
 export interface Run {
   fate?: import("./fate").Fate;
+  deck?: import("./deckState").DeckState;
+  rewardDrops?: import("./drops").RewardDrop[];
   version: 1;
   seed: number;
   rng: number;

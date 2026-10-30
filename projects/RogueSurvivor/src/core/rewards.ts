@@ -1,15 +1,15 @@
+import { ensureDeck } from "./deckState";
+import { shuffleDeck } from "./shuffle";
 import { eligible } from "./cardPool";
 import {
   fate,
   recalculate,
-  LEGACY_MODIFIERS,
   addCurse,
   cleanse,
   CURSES,
   forget,
   report,
 } from "./fate";
-import { MODIFIERS } from "../data/cards/expedition";
 import { UPGRADES, GROWTH } from "../data/content";
 import type { Run } from "./types";
 import { random } from "./math";
@@ -19,22 +19,21 @@ function fallback(s: Run) {
   return "生命恢复20% / 护盾+20";
 }
 export function grant(s: Run, id: string): boolean {
-  const u = eligible(s).find((u) => u.id === id);
+  const u = eligible(s, id.startsWith("hex_") ? "negative" : "positive").find(
+    (u) => u.id === id,
+  );
   if (!u) return false;
+  if (id === "shuffle") return shuffleDeck(s, undefined, true);
   const p = s.player;
   const f = fate(s);
   p.upgrades[id] = (p.upgrades[id] || 0) + 1;
+  f.history = f.history.filter((x) => x !== id);
   f.history.push(id);
-  f.history = f.history.slice(-900);
-  if (u.weapon)
-    p.weapons[u.weapon] = Math.min(5, (p.weapons[u.weapon] || 0) + 1);
-  if (LEGACY_MODIFIERS[id] || MODIFIERS[id]?.stat) recalculate(s);
+  recalculate(s);
+  if (u.polarity === "negative") f.gained = Math.min(1e12, f.gained + 1);
+  if (id === "reroll") ensureDeck(s).refreshes += 3;
   if (id === "vitality") p.hp = Math.min(p.maxHp, p.hp + 35);
   if (id === "ascend") p.hp = Math.min(p.maxHp, p.hp + p.maxHp * 0.15);
-  if (id.startsWith("skill_")) {
-    const slot = { skill_q: 0, skill_e: 1, skill_r: 2 }[id]!;
-    p.skillLevels[p.skills[slot]]++;
-  }
   if (id === "bloodmoon") addCurse(s, "wither");
   if (id === "greed") addCurse(s, "frail");
   if (id === "cleanse" || id === "baptism") {
@@ -49,7 +48,7 @@ export function grant(s: Run, id: string): boolean {
     );
   }
   if (id.startsWith("chest_") || id === "baptism") {
-    if (id.startsWith("chest_")) f.chests++;
+    if (id.startsWith("chest_")) f.chests = Math.min(1e12, f.chests + 1);
     const count =
       id === "chest_common" || id === "baptism"
         ? 1
@@ -69,6 +68,7 @@ export function grant(s: Run, id: string): boolean {
             "ascend",
             "bloodmoon",
             "greed",
+            "shuffle",
           ].includes(u.id) &&
           (id === "chest_common" || id === "baptism"
             ? u.rarity === 0

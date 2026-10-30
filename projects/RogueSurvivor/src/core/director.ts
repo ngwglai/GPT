@@ -1,3 +1,4 @@
+import { ENEMY_RULES } from "../data/enemies";
 import type { EnemyId, Vec } from "./types";
 import { ENEMIES, LIMITS, difficulty } from "../data/content";
 import { clamp, distance, move, random, unit } from "./math";
@@ -19,16 +20,16 @@ export function spawn(c: Combat, kind: EnemyId, position?: Vec, elite = false) {
   const hp =
     def.hp *
     (def.boss ? 1 + Math.max(0, s.time / 60 - 5) * 0.065 : d.hp) *
-    (elite ? 2.4 : 1);
+    (elite ? ENEMY_RULES.elite.hp : 1);
   const e = {
     id: s.nextId++,
     kind,
     ...p,
     hp,
     maxHp: hp,
-    r: def.r * (elite ? 1.2 : 1),
-    speed: def.speed * d.speed * (elite ? 1.12 : 1),
-    damage: def.damage * d.damage * (elite ? 1.3 : 1),
+    r: def.r * (elite ? ENEMY_RULES.elite.r : 1),
+    speed: def.speed * d.speed * (elite ? ENEMY_RULES.elite.speed : 1),
+    damage: def.damage * d.damage * (elite ? ENEMY_RULES.elite.damage : 1),
     elite,
     timer: 1.2 + random(s),
     phase: 0,
@@ -210,7 +211,7 @@ export function ai(c: Combat, dt: number) {
         e.timer = 7;
       }
       if (def.boss && e.timer <= 0) {
-        const phase = e.hp / e.maxHp < 0.45 ? 2 : 1,
+        const phase = e.hp / e.maxHp < ENEMY_RULES.bossPhaseHp ? 2 : 1,
           level = Math.min(5, Math.floor(s.time / 1200));
         e.phase++;
         e.timer = Math.max(1.8, 4.8 - phase * 0.6 - level * 0.2);

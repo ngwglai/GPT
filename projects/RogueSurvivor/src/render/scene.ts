@@ -252,6 +252,17 @@ export class GameScene extends Phaser.Scene {
     for (const rock of s.rocks) this.sprite("map.rock", rock, rock.r * 2.7);
     for (const gem of s.gems)
       this.sprite("ui.gem", gem, gem.value > 40 ? 22 : 14);
+    for (const drop of s.rewardDrops || []) {
+      const x = sx(drop.x),
+        y = sy(drop.y),
+        color = drop.kind === "positive" ? 0xffdc8a : 0xef83c1;
+      g.fillStyle(0x172b2d, 1);
+      g.fillRoundedRect(x - 15, y - 19, 30, 38, 5);
+      g.lineStyle(3, color, 1);
+      g.strokeRoundedRect(x - 15, y - 19, 30, 38, 5);
+      g.lineBetween(x - 7, y, x + 7, y);
+      if (drop.kind === "positive") g.lineBetween(x, y - 7, x, y + 7);
+    }
     for (const z of s.zones) {
       const x = sx(z.x),
         y = sy(z.y),
