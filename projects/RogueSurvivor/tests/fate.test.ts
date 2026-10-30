@@ -185,3 +185,11 @@ it("wildfire transmits without exponential burn amplification", async () => {
   w.step(0.05, { x: 0, y: 0, aim: s.player });
   expect(b.burnPower).toBe(20);
 });
+
+it("checks actual equipment levels as well as card counters", () => {
+  const s = createRun("standard");
+  s.player.weapons.bow = 5;
+  s.player.skillLevels[s.player.skills[0]] = 5;
+  expect(grant(s, "weapon_bow")).toBe(false);
+  expect(grant(s, "skill_q")).toBe(false);
+});

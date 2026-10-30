@@ -7,6 +7,10 @@ export function eligible(s: Run) {
   return UPGRADES.filter(
     (u) =>
       (p.upgrades[u.id] || 0) < u.max &&
+      (!u.weapon || (p.weapons[u.weapon] || 0) < 5) &&
+      (!u.id.startsWith("skill_") ||
+        p.skillLevels[p.skills[{ skill_q: 0, skill_e: 1, skill_r: 2 }[u.id]!]] <
+          5) &&
       (!u.requires ||
         (u.requires.startsWith("weapon_")
           ? p.weapons[u.requires.slice(7) as WeaponId]
