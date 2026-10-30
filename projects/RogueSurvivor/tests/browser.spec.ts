@@ -282,20 +282,54 @@ test("拒绝脚本图片、超尺寸图片、坏资源包并回退默认", async
   await expect(page.locator("#toast")).toContainText("回退到默认");
   await expect(page.getByRole("button", { name: "开启远征" })).toBeVisible();
 });
-// Keep the high-density software-rendering process out of ordinary UI tests.
-// Chromium may fail to create the next context after releasing this GPU workload.
-const denseTest = test.extend({
-  browser: [
-    async ({ playwright, launchOptions }, use) => {
-      const browser = await playwright.chromium.launch(launchOptions);
-      try {
-        await use(browser);
-      } finally {
-        await browser.close();
+// Bound each graphics/collection suite to its own Chromium worker lifetime.
+// Long context reuse can fail before the next application page is even created.
+function isolatedBrowserSuite() {
+  return test.extend({
+    browser: [
+      async ({ playwright, launchOptions }, use) => {
+        const browser = await playwright.chromium.launch(launchOptions);
+        try {
+          await use(browser);
+        } finally {
+          await browser.close();
+        }
+      },
+      { scope: "worker" },
+    ],
+  });
+}
+const denseTest = isolatedBrowserSuite();
+const fateTest = test.extend({
+  context: async (
+    { playwright, launchOptions, headless, baseURL, viewport },
+    use,
+    testInfo,
+  ) => {
+    // A fresh temporary profile avoids Chromium's failing incognito-context path.
+    // The profile belongs only to this test and is removed when the browser closes.
+    const context = await playwright.chromium.launchPersistentContext("", {
+      ...launchOptions,
+      headless,
+      baseURL,
+      viewport,
+    });
+    try {
+      await use(context);
+    } finally {
+      if (testInfo.status !== testInfo.expectedStatus) {
+        const page = context.pages().find((p) => p.url() !== "about:blank");
+        if (page && !page.isClosed())
+          await testInfo
+            .attach("failure screenshot", {
+              body: await page.screenshot(),
+              contentType: "image/png",
+            })
+            .catch(() => {});
       }
-    },
-    { scope: "worker" },
-  ],
+      await context.close();
+    }
+  },
 });
 denseTest("密集战斗真实渲染、性能面板、无控制台异常", async ({ page }) => {
   const errors: string[] = [];
@@ -566,7 +600,7 @@ test("v1.1 重抽、遗忘与属性落盘", async ({ page }) => {
     .toBe(0);
 });
 
-test("v1.2 三类图鉴、当前构筑合并层数及独立刷新", async ({ page }) => {
+fateTest("v1.2 三类图鉴、当前构筑合并层数及独立刷新", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator(".version")).toContainText("v1.2");
   await page.getByRole("button", { name: "远征图鉴", exact: true }).click();
@@ -595,7 +629,7 @@ test("v1.2 三类图鉴、当前构筑合并层数及独立刷新", async ({ pag
     .poll(async () => (await get(page, "run")).deck.refreshes)
     .toBe(2);
 });
-test("v1.2 掉落触发负面抽卡，读取后奖励队列不丢失", async ({ page }) => {
+fateTest("v1.2 掉落触发负面抽卡，读取后奖励队列不丢失", async ({ page }) => {
   const { placeDrop } = await import("../src/core/drops");
   const s = createRun("endless");
   ensureDeck(s);
@@ -632,7 +666,7 @@ test("v1.2 掉落触发负面抽卡，读取后奖励队列不丢失", async ({ 
     .poll(async () => (await get(page, "run")).deck.pending)
     .toEqual({ positive: 0, negative: 0 });
 });
-test("v1.2 命运洗牌包括自身等量替换，恢复后构筑一致", async ({ page }) => {
+fateTest("v1.2 命运洗牌包括自身等量替换，恢复后构筑一致", async ({ page }) => {
   const s = createRun("standard");
   ensureDeck(s);
   s.player.upgrades = { power: 30, hex_damage: 8 };
@@ -660,53 +694,55 @@ test("v1.2 命运洗牌包括自身等量替换，恢复后构筑一致", async 
   expect(heldLayers(await get(page, "run"))).toBe(39);
 });
 
-test("v1.2 构筑跨设置、资源、记录后保留当前战局并自动保存", async ({
-  page,
-}) => {
-  await launch(page);
-  await page.keyboard.down("d");
-  await page.waitForTimeout(700);
-  await page.keyboard.up("d");
-  for (const name of ["设置", "资源工坊", "远征记录"]) {
-    await page.getByRole("button", { name: "当前构筑", exact: true }).click();
+fateTest(
+  "v1.2 构筑跨设置、资源、记录后保留当前战局并自动保存",
+  async ({ page }) => {
+    await launch(page);
+    await page.keyboard.down("d");
+    await page.waitForTimeout(700);
+    await page.keyboard.up("d");
+    for (const name of ["设置", "资源工坊", "远征记录"]) {
+      await page.getByRole("button", { name: "当前构筑", exact: true }).click();
+      await expect
+        .poll(async () => (await get(page, "run")).player.x)
+        .toBeGreaterThan(1800);
+      await page.getByRole("button", { name, exact: true }).click();
+      await page.getByRole("button", { name: "← 返回", exact: true }).click();
+      await expect(
+        page.getByRole("heading", { name: "远征已暂停" }),
+      ).toBeVisible();
+      await page.getByRole("button", { name: "继续远征", exact: true }).click();
+      await expect(page.locator("#clock")).toBeVisible();
+    }
+  },
+);
+fateTest(
+  "v1.2 升级图鉴跨菜单后保留原选择、负面类型和刷新余额",
+  async ({ page }) => {
+    const { offer } = await import("../src/core/cardPool");
+    const s = createRun("standard");
+    offer(s, [], "negative");
+    const choices = [...s.choices],
+      rng = s.rng;
+    await resume(page, s);
+    for (const name of ["设置", "资源工坊", "远征记录"]) {
+      await page.getByRole("button", { name: "当前构筑", exact: true }).click();
+      await page.getByRole("button", { name: "远征图鉴", exact: true }).click();
+      await page.getByRole("button", { name, exact: true }).click();
+      await page.getByRole("button", { name: "← 返回", exact: true }).click();
+      await expect(
+        page.getByRole("heading", { name: "选择一项负面命运" }),
+      ).toBeVisible();
+      await expect(page.locator(".upgrade-card.polarity-negative")).toHaveCount(
+        3,
+      );
+    }
     await expect
-      .poll(async () => (await get(page, "run")).player.x)
-      .toBeGreaterThan(1800);
-    await page.getByRole("button", { name, exact: true }).click();
-    await page.getByRole("button", { name: "← 返回", exact: true }).click();
-    await expect(
-      page.getByRole("heading", { name: "远征已暂停" }),
-    ).toBeVisible();
-    await page.getByRole("button", { name: "继续远征", exact: true }).click();
-    await expect(page.locator("#clock")).toBeVisible();
-  }
-});
-test("v1.2 升级图鉴跨菜单后保留原选择、负面类型和刷新余额", async ({
-  page,
-}) => {
-  const { offer } = await import("../src/core/cardPool");
-  const s = createRun("standard");
-  offer(s, [], "negative");
-  const choices = [...s.choices],
-    rng = s.rng;
-  await resume(page, s);
-  for (const name of ["设置", "资源工坊", "远征记录"]) {
-    await page.getByRole("button", { name: "当前构筑", exact: true }).click();
-    await page.getByRole("button", { name: "远征图鉴", exact: true }).click();
-    await page.getByRole("button", { name, exact: true }).click();
-    await page.getByRole("button", { name: "← 返回", exact: true }).click();
-    await expect(
-      page.getByRole("heading", { name: "选择一项负面命运" }),
-    ).toBeVisible();
-    await expect(page.locator(".upgrade-card.polarity-negative")).toHaveCount(
-      3,
-    );
-  }
-  await expect
-    .poll(async () => (await get(page, "run")).choices)
-    .toEqual(choices);
-  const saved = await get(page, "run");
-  expect(saved.rng).toBe(rng);
-  expect(saved.deck.active).toBe("negative");
-  expect(saved.deck.refreshes).toBe(3);
-});
+      .poll(async () => (await get(page, "run")).choices)
+      .toEqual(choices);
+    const saved = await get(page, "run");
+    expect(saved.rng).toBe(rng);
+    expect(saved.deck.active).toBe("negative");
+    expect(saved.deck.refreshes).toBe(3);
+  },
+);
