@@ -659,3 +659,54 @@ test("v1.2 命运洗牌包括自身等量替换，恢复后构筑一致", async 
   await expect(page.locator("#clock")).toBeVisible();
   expect(heldLayers(await get(page, "run"))).toBe(39);
 });
+
+test("v1.2 构筑跨设置、资源、记录后保留当前战局并自动保存", async ({
+  page,
+}) => {
+  await launch(page);
+  await page.keyboard.down("d");
+  await page.waitForTimeout(700);
+  await page.keyboard.up("d");
+  for (const name of ["设置", "资源工坊", "远征记录"]) {
+    await page.getByRole("button", { name: "当前构筑", exact: true }).click();
+    await expect
+      .poll(async () => (await get(page, "run")).player.x)
+      .toBeGreaterThan(1800);
+    await page.getByRole("button", { name, exact: true }).click();
+    await page.getByRole("button", { name: "← 返回", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { name: "远征已暂停" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "继续远征", exact: true }).click();
+    await expect(page.locator("#clock")).toBeVisible();
+  }
+});
+test("v1.2 升级图鉴跨菜单后保留原选择、负面类型和刷新余额", async ({
+  page,
+}) => {
+  const { offer } = await import("../src/core/cardPool");
+  const s = createRun("standard");
+  offer(s, [], "negative");
+  const choices = [...s.choices],
+    rng = s.rng;
+  await resume(page, s);
+  for (const name of ["设置", "资源工坊", "远征记录"]) {
+    await page.getByRole("button", { name: "当前构筑", exact: true }).click();
+    await page.getByRole("button", { name: "远征图鉴", exact: true }).click();
+    await page.getByRole("button", { name, exact: true }).click();
+    await page.getByRole("button", { name: "← 返回", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { name: "选择一项负面命运" }),
+    ).toBeVisible();
+    await expect(page.locator(".upgrade-card.polarity-negative")).toHaveCount(
+      3,
+    );
+  }
+  await expect
+    .poll(async () => (await get(page, "run")).choices)
+    .toEqual(choices);
+  const saved = await get(page, "run");
+  expect(saved.rng).toBe(rng);
+  expect(saved.deck.active).toBe("negative");
+  expect(saved.deck.refreshes).toBe(3);
+});

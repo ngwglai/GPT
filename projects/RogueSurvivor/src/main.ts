@@ -386,12 +386,24 @@ async function reloadArt() {
   panelArt();
   await scene.reloadAssets();
 }
+function rememberReturnTarget() {
+  if (["build", "codex", "settings", "assets", "records"].includes(screen))
+    return;
+  returnScreen = world
+    ? world.s.phase === "upgrade"
+      ? "upgrade"
+      : screen === "result"
+        ? "result"
+        : "pause"
+    : "home";
+}
 let codexTab = "cards";
 function collectionPage(owned = false) {
   screen = owned ? "build" : "codex";
   scene.paused = true;
   const state = world?.s || createRun("standard");
   ensureDeck(state);
+  if (world) void saveCurrent(false);
   shell(
     `<main class="page"><div class="page-heading"><h2>${owned ? "当前构筑" : "远征图鉴"}</h2>${button("back", "← 返回")}</div>${owned ? "" : `<div class="tabs">${button("codex-cards", "卡牌图鉴")}${button("codex-skills", "技能图鉴")}${button("codex-enemies", "怪物图鉴")}</div>`}${owned || codexTab === "cards" ? cardBrowser(state, owned) : codexTab === "skills" ? skillBrowser(state, img) : enemyBrowser(img)}</main>`,
   );
@@ -414,14 +426,7 @@ async function action(id: string) {
     return;
   }
   if (id === "build" || id === "codex") {
-    if (!["build", "codex"].includes(screen))
-      returnScreen = world
-        ? screen === "upgrade"
-          ? "upgrade"
-          : screen === "result"
-            ? "result"
-            : "pause"
-        : "home";
+    rememberReturnTarget();
     collectionPage(id === "build");
     return;
   }
@@ -507,13 +512,7 @@ async function action(id: string) {
     case "settings":
     case "assets":
     case "records":
-      if (!["settings", "assets", "records"].includes(screen))
-        returnScreen =
-          screen === "pause"
-            ? "pause"
-            : screen === "result"
-              ? "result"
-              : "home";
+      rememberReturnTarget();
       if (id === "settings") settingsPage();
       else if (id === "assets") assetManager();
       else records();
