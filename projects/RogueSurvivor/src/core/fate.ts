@@ -20,6 +20,7 @@ export const LEGACY_MODIFIERS: Record<string, { stat: Stat; amount: number }> =
     power: { stat: "attack", amount: 0.12 },
   };
 export interface Fate {
+  noticeUntil?: number;
   base: Record<Stat, number>;
   curses: Partial<Record<Curse, number>>;
   history: string[];
@@ -132,6 +133,5 @@ export function report(s: Run, text: string) {
   const f = fate(s);
   f.log.push(text);
   f.log = f.log.slice(-8);
-  s.event = text.slice(0, 290);
-  s.eventUntil = s.time + 8;
+  f.noticeUntil = s.time + 8;
 }

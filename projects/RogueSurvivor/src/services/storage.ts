@@ -86,6 +86,10 @@ export function validateRun(value: unknown): Run {
   visit(s);
   if (s.fate) {
     assert(
+      s.fate.noticeUntil === undefined ||
+        typeof s.fate.noticeUntil === "number",
+    );
+    assert(
       obj(s.fate) &&
         obj(s.fate.base) &&
         obj(s.fate.curses) &&

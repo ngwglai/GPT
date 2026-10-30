@@ -193,3 +193,25 @@ it("checks actual equipment levels as well as card counters", () => {
   expect(grant(s, "weapon_bow")).toBe(false);
   expect(grant(s, "skill_q")).toBe(false);
 });
+
+it("skill-specific upgrades require equipped sources, including chest rewards", () => {
+  const s = createRun("standard", "ranger", 99, "fire");
+  expect(grant(s, "ice_master")).toBe(false);
+  expect(grant(s, "lance_master")).toBe(false);
+  expect(grant(s, "fire_master")).toBe(true);
+  for (const id of ["chest_rare", "chest_epic", "chest_risk"]) grant(s, id);
+  expect(s.player.upgrades.ice_master || 0).toBe(0);
+  expect(s.player.upgrades.lance_master || 0).toBe(0);
+});
+it.each(["兽潮来袭", "流星雨", "月蚀弹幕"])(
+  "rewards preserve active encounter %s",
+  (event) => {
+    const s = createRun("standard");
+    s.event = event;
+    s.eventUntil = 40;
+    for (const id of ["chest_common", "cleanse"]) grant(s, id);
+    expect(s.event).toBe(event);
+    expect(s.eventUntil).toBe(40);
+    expect(s.fate!.noticeUntil).toBe(8);
+  },
+);

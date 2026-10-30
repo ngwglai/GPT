@@ -1,3 +1,5 @@
+import { MODIFIERS } from "../data/cards/expedition";
+import { SKILLS } from "../data/skills";
 import { UPGRADES, GROWTH } from "../data/content";
 import type { Run, WeaponId } from "./types";
 import { random } from "./math";
@@ -7,6 +9,11 @@ export function eligible(s: Run) {
   return UPGRADES.filter(
     (u) =>
       (p.upgrades[u.id] || 0) < u.max &&
+      (!MODIFIERS[u.id]?.source ||
+        !Object.hasOwn(SKILLS, MODIFIERS[u.id].source!) ||
+        p.skills.includes(
+          MODIFIERS[u.id].source as (typeof p.skills)[number],
+        )) &&
       (!u.weapon || (p.weapons[u.weapon] || 0) < 5) &&
       (!u.id.startsWith("skill_") ||
         p.skillLevels[p.skills[{ skill_q: 0, skill_e: 1, skill_r: 2 }[u.id]!]] <

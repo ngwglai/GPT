@@ -160,6 +160,7 @@ function updateHud() {
   set(
     "event",
     (s.time < s.eventUntil ? s.event : "") +
+      (s.time < (s.fate?.noticeUntil || 0) ? " · " + s.fate!.log.at(-1) : "") +
       Object.entries(s.fate?.curses || {})
         .filter(([, n]) => n)
         .map(

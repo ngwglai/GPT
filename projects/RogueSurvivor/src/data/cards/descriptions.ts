@@ -1,3 +1,5 @@
+import { WEAPONS } from "../weapons";
+import type { WeaponId } from "../../core/types";
 import type { Run } from "../../core/types";
 import { MODIFIERS } from "./expedition";
 import { LEGACY_MODIFIERS } from "../../core/fate";
@@ -13,6 +15,24 @@ const exact: Record<string, string> = {
     "每级回复15%最大生命；伤害乘区为1+0.23×ln(1+领悟等级)。25级起出现，无限叠加。",
 };
 export function detail(s: Run, id: string) {
+  if (id.startsWith("weapon_")) {
+    const key = id.slice(7) as WeaponId,
+      w = WEAPONS[key],
+      lv = s.player.weapons[key] || 0;
+    const stat = (n: number) =>
+      n
+        ? `基础单次伤害${(w.damage * (1 + (n - 1) * 0.3)).toFixed(1)}，基础间隔${(w.interval / (1 + (n - 1) * 0.08)).toFixed(2)}秒`
+        : "尚未持有";
+    const evolution = {
+      bow: "5级额外1箭",
+      blade: "5级横扫半径额外+35",
+      ember: "命中爆炸并燃烧，5级爆炸半径55→90",
+      orbit: "5级额外2颗卫星",
+      drone: "5级弹道自动追踪",
+    };
+    return `${stat(lv)} → ${stat(Math.min(5, lv + 1))}；锁敌/基础范围${w.range}；${evolution[key]}。伤害、频率还受其他卡牌影响。`;
+  }
+
   const n = s.player.upgrades[id] || 0,
     m = MODIFIERS[id] || LEGACY_MODIFIERS[id];
   if (m?.stat) {
