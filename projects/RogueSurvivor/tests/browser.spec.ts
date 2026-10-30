@@ -274,7 +274,22 @@ test("拒绝脚本图片、超尺寸图片、坏资源包并回退默认", async
   await expect(page.locator("#toast")).toContainText("回退到默认");
   await expect(page.getByRole("button", { name: "开启远征" })).toBeVisible();
 });
-test("密集战斗真实渲染、性能面板、无控制台异常", async ({ page }) => {
+// Keep the high-density software-rendering process out of ordinary UI tests.
+// Chromium may fail to create the next context after releasing this GPU workload.
+const denseTest = test.extend({
+  browser: [
+    async ({ playwright, launchOptions }, use) => {
+      const browser = await playwright.chromium.launch(launchOptions);
+      try {
+        await use(browser);
+      } finally {
+        await browser.close();
+      }
+    },
+    { scope: "worker" },
+  ],
+});
+denseTest("密集战斗真实渲染、性能面板、无控制台异常", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   const w = new World(createRun("endless", "mage", 77));
