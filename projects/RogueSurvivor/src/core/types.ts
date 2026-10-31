@@ -143,6 +143,7 @@ export interface Input {
 }
 export interface Settings {
   music: number;
+  musicEnabled?: boolean;
   sfx: number;
   quality: "high" | "low";
   shake: boolean;

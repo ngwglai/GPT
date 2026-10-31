@@ -349,7 +349,7 @@ function settingsPage() {
   screen = "settings";
   scene.paused = true;
   shell(
-    `<main class="page narrow"><div class="page-heading"><div><div class="eyebrow">调整你的旅途</div><h2>游戏设置</h2></div>${button("back", "← 返回")}</div><div class="settings-panel"><label>背景音乐 <output id="music-value">${Math.round(settings.music * 100)}%</output><input id="music" type="range" min="0" max="1" step=".01" value="${settings.music}"></label><label>音效音量 <output id="sfx-value">${Math.round(settings.sfx * 100)}%</output><input id="sfx" type="range" min="0" max="1" step=".01" value="${settings.sfx}"></label><label>画面效果<select id="quality"><option value="high" ${settings.quality === "high" ? "selected" : ""}>完整 · 植被与全部特效</option><option value="low" ${settings.quality === "low" ? "selected" : ""}>简约 · 降低装饰与特效预算</option></select></label><label class="check"><input id="shake" type="checkbox" ${settings.shake ? "checked" : ""}>命中屏幕震动</label><label class="check"><input id="showStats" type="checkbox" ${settings.showStats ? "checked" : ""}>显示性能统计（FPS、敌人、投射物、特效）</label><p>画面降级仅减少装饰与特效，不改变攻击判定。<br>失去焦点会自动暂停。进度与图片只保存在本浏览器。</p>${button("apply-settings", "保存设置", "primary")}</div></main>`,
+    `<main class="page narrow"><div class="page-heading"><div><div class="eyebrow">调整你的旅途</div><h2>游戏设置</h2></div>${button("back", "← 返回")}</div><div class="settings-panel"><label class="check"><input id="musicEnabled" type="checkbox" ${settings.musicEnabled !== false ? "checked" : ""}>战斗音乐开关 · 六首自动循环</label><label>背景音乐 <output id="music-value">${Math.round(settings.music * 100)}%</output><input id="music" type="range" min="0" max="1" step=".01" value="${settings.music}"></label><label>音效音量 <output id="sfx-value">${Math.round(settings.sfx * 100)}%</output><input id="sfx" type="range" min="0" max="1" step=".01" value="${settings.sfx}"></label><label>画面效果<select id="quality"><option value="high" ${settings.quality === "high" ? "selected" : ""}>完整 · 植被与全部特效</option><option value="low" ${settings.quality === "low" ? "selected" : ""}>简约 · 降低装饰与特效预算</option></select></label><label class="check"><input id="shake" type="checkbox" ${settings.shake ? "checked" : ""}>命中屏幕震动</label><label class="check"><input id="showStats" type="checkbox" ${settings.showStats ? "checked" : ""}>显示性能统计（FPS、敌人、投射物、特效）</label><p>画面降级仅减少装饰与特效，不改变攻击判定。<br>失去焦点会自动暂停。进度与图片只保存在本浏览器。</p>${button("apply-settings", "保存设置", "primary")}</div></main>`,
   );
 }
 function assetManager() {
@@ -533,6 +533,9 @@ async function action(id: string) {
       break;
     case "apply-settings":
       settings = {
+        musicEnabled: (
+          document.getElementById("musicEnabled") as HTMLInputElement
+        ).checked,
         music: Number(
           (document.getElementById("music") as HTMLInputElement).value,
         ),
@@ -605,6 +608,10 @@ app.addEventListener("click", (e) => {
 });
 app.addEventListener("input", (e) => {
   const el = e.target as HTMLInputElement;
+  if (el.id === "music")
+    audio.settings = { ...audio.settings, music: Number(el.value) };
+  if (el.id === "musicEnabled")
+    audio.settings = { ...audio.settings, musicEnabled: el.checked };
   if (["music", "sfx"].includes(el.id))
     document.getElementById(el.id + "-value")!.textContent =
       Math.round(Number(el.value) * 100) + "%";
