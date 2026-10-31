@@ -221,6 +221,7 @@ function modal(content: string, cls = "") {
 }
 function pause() {
   if (!world || screen !== "game") return;
+  audio.update(0, false);
   screen = "pause";
   modal(
     `<div class="eyebrow">呼吸片刻，再向前</div><h2>远征已暂停</h2><p>你的旅程停留在 ${time(world.s.time)}。怪物与冷却也已暂停。</p><p>${
