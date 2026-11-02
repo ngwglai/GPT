@@ -1,0 +1,2529 @@
+[
+  {
+    "map": "cavern",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 9,
+      "negative": 3
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 0,
+    "refreshes": 0,
+    "negativeLayers": 4,
+    "output": [
+      {
+        "time": 300,
+        "damage": 36118,
+        "layers": 25,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 2,
+          "negative": 0
+        },
+        "attack": 1,
+        "maxHp": 335
+      },
+      {
+        "time": 600,
+        "damage": 124563,
+        "layers": 50,
+        "negativeLayers": 2,
+        "extraDraws": {
+          "positive": 3,
+          "negative": 1
+        },
+        "attack": 1.1900000000000002,
+        "maxHp": 354.64
+      },
+      {
+        "time": 900,
+        "damage": 274331,
+        "layers": 80,
+        "negativeLayers": 3,
+        "extraDraws": {
+          "positive": 8,
+          "negative": 1
+        },
+        "attack": 1.1900000000000002,
+        "maxHp": 458.48
+      },
+      {
+        "time": 1200,
+        "damage": 498373,
+        "layers": 103,
+        "negativeLayers": 4,
+        "extraDraws": {
+          "positive": 8,
+          "negative": 3
+        },
+        "attack": 1.38,
+        "maxHp": 502.48
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 18,
+    "remainingRanks": 39,
+    "acquiredRanks": 105,
+    "weapons": {
+      "bow": 5,
+      "ember": 1,
+      "orbit": 4,
+      "drone": 5
+    },
+    "fate": {
+      "chests": 4,
+      "gained": 5,
+      "cleansed": 1
+    },
+    "character": "ranger",
+    "seed": 11,
+    "stress": false,
+    "seconds": 1215,
+    "phase": "victory",
+    "level": 86,
+    "kills": 3329,
+    "bosses": 4,
+    "damage": 520715,
+    "peakEnemies": 41,
+    "peakBullets": 37,
+    "frames": 24304,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 42,
+    "wallSeconds": 7.12,
+    "build": [
+      "追星弓",
+      "月环",
+      "穿林",
+      "古树之心",
+      "萤火灵",
+      "星纹护甲",
+      "星银宝箱",
+      "双生星轨",
+      "旅途宝箱",
+      "时砂",
+      "春芽",
+      "命运馈赠",
+      "月轮加速",
+      "磐石体魄",
+      "战意",
+      "生息",
+      "陨火学派",
+      "不熄余烬",
+      "无垠领悟",
+      "星核",
+      "时隙",
+      "缄默",
+      "凝神",
+      "禁忌之书",
+      "鹰眼",
+      "求知者",
+      "引力信标",
+      "枯萎",
+      "贪婪之冠",
+      "脆弱",
+      "灵体聚能",
+      "星尘引力",
+      "蜂群节律",
+      "月核增幅",
+      "轻羽",
+      "速射弦",
+      "烬火杖",
+      "拾星",
+      "生命收割",
+      "独行之道",
+      "主术精通",
+      "萤火之森",
+      "净化之光",
+      "辅术精通"
+    ]
+  },
+  {
+    "map": "cavern",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 18,
+      "negative": 6
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 0,
+    "refreshes": 0,
+    "negativeLayers": 6,
+    "output": [
+      {
+        "time": 300,
+        "damage": 34061,
+        "layers": 23,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 1,
+          "negative": 0
+        },
+        "attack": 1.12,
+        "maxHp": 305
+      },
+      {
+        "time": 600,
+        "damage": 122821,
+        "layers": 46,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 5,
+          "negative": 1
+        },
+        "attack": 1.55,
+        "maxHp": 405
+      },
+      {
+        "time": 900,
+        "damage": 267539,
+        "layers": 72,
+        "negativeLayers": 2,
+        "extraDraws": {
+          "positive": 11,
+          "negative": 3
+        },
+        "attack": 1.69,
+        "maxHp": 394.24
+      },
+      {
+        "time": 1200,
+        "damage": 469967,
+        "layers": 98,
+        "negativeLayers": 6,
+        "extraDraws": {
+          "positive": 18,
+          "negative": 6
+        },
+        "attack": 2.21,
+        "maxHp": 302.72
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 21,
+    "remainingRanks": 45,
+    "acquiredRanks": 98,
+    "weapons": {
+      "bow": 1,
+      "blade": 3,
+      "ember": 3,
+      "orbit": 3
+    },
+    "fate": {
+      "chests": 4,
+      "gained": 7,
+      "cleansed": 1
+    },
+    "character": "knight",
+    "seed": 11,
+    "stress": false,
+    "seconds": 1212,
+    "phase": "victory",
+    "level": 69,
+    "kills": 3241,
+    "bosses": 4,
+    "damage": 489319,
+    "peakEnemies": 38,
+    "peakBullets": 23,
+    "frames": 24248,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 83,
+    "wallSeconds": 4.44,
+    "build": [
+      "弧月刃",
+      "古树之心",
+      "春芽",
+      "星核",
+      "满月",
+      "月环",
+      "不熄余烬",
+      "时隙",
+      "双月共舞",
+      "鹰眼",
+      "星银宝箱",
+      "追星弓",
+      "净化之光",
+      "双生星轨",
+      "铅足",
+      "旅途宝箱",
+      "战意",
+      "时砂",
+      "无垠领悟",
+      "拾星",
+      "烬火杖",
+      "月轮加速",
+      "冰火共鸣",
+      "星尘引力",
+      "燃素循环",
+      "生息",
+      "枯萎",
+      "旅人步伐",
+      "磐石体魄",
+      "迷惘",
+      "残星裁决",
+      "凝神",
+      "主术精通",
+      "回旋刃",
+      "霜潮学派",
+      "穿林",
+      "辅术精通",
+      "缄默",
+      "月核增幅",
+      "血月契约"
+    ]
+  },
+  {
+    "map": "cavern",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 14,
+      "negative": 3
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 1,
+    "refreshes": 0,
+    "negativeLayers": 3,
+    "output": [
+      {
+        "time": 300,
+        "damage": 33666,
+        "layers": 20,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 1,
+          "negative": 0
+        },
+        "attack": 1.24,
+        "maxHp": 195
+      },
+      {
+        "time": 600,
+        "damage": 117250,
+        "layers": 44,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 3,
+          "negative": 1
+        },
+        "attack": 1.43,
+        "maxHp": 288
+      },
+      {
+        "time": 900,
+        "damage": 257944,
+        "layers": 68,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 9,
+          "negative": 1
+        },
+        "attack": 1.55,
+        "maxHp": 381
+      },
+      {
+        "time": 1200,
+        "damage": 474126,
+        "layers": 96,
+        "negativeLayers": 2,
+        "extraDraws": {
+          "positive": 14,
+          "negative": 3
+        },
+        "attack": 1.5754716981132075,
+        "maxHp": 406
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 17,
+    "remainingRanks": 41,
+    "acquiredRanks": 102,
+    "weapons": {
+      "ember": 5,
+      "orbit": 5,
+      "drone": 4
+    },
+    "fate": {
+      "chests": 4,
+      "gained": 4,
+      "cleansed": 1
+    },
+    "character": "mage",
+    "seed": 11,
+    "stress": false,
+    "seconds": 1228,
+    "phase": "victory",
+    "level": 80,
+    "kills": 3301,
+    "bosses": 4,
+    "damage": 508953,
+    "peakEnemies": 46,
+    "peakBullets": 22,
+    "frames": 24567,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 67,
+    "wallSeconds": 6.2,
+    "build": [
+      "烬火杖",
+      "古树之心",
+      "星核",
+      "月环",
+      "春芽",
+      "萤火灵",
+      "蜂群节律",
+      "时砂",
+      "辅术精通",
+      "萤火之森",
+      "独行之道",
+      "炽热核心",
+      "旅途宝箱",
+      "求知者",
+      "凝神",
+      "磐石体魄",
+      "铅足",
+      "无垠领悟",
+      "燃素循环",
+      "战意",
+      "终章学派",
+      "轻羽",
+      "拾星",
+      "双月共舞",
+      "引力信标",
+      "旅人步伐",
+      "残星裁决",
+      "不熄余烬",
+      "穿林",
+      "星尘引力",
+      "时隙",
+      "脆弱",
+      "星纹护甲",
+      "净化之光",
+      "鹰眼",
+      "黯光",
+      "生命收割",
+      "野火蔓延",
+      "禁忌之书",
+      "陨火学派"
+    ]
+  },
+  {
+    "map": "cavern",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 8,
+      "negative": 4
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 0,
+    "refreshes": 0,
+    "negativeLayers": 1,
+    "output": [
+      {
+        "time": 300,
+        "damage": 33197,
+        "layers": 20,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 1,
+          "negative": 0
+        },
+        "attack": 1.12,
+        "maxHp": 228
+      },
+      {
+        "time": 600,
+        "damage": 117030,
+        "layers": 40,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 2,
+          "negative": 1
+        },
+        "attack": 1.6700000000000002,
+        "maxHp": 222.64000000000001
+      },
+      {
+        "time": 900,
+        "damage": 258611,
+        "layers": 60,
+        "negativeLayers": 3,
+        "extraDraws": {
+          "positive": 4,
+          "negative": 3
+        },
+        "attack": 1.79,
+        "maxHp": 266.64
+      },
+      {
+        "time": 1200,
+        "damage": 500910,
+        "layers": 84,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 7,
+          "negative": 3
+        },
+        "attack": 1.45,
+        "maxHp": 153
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 20,
+    "remainingRanks": 40,
+    "acquiredRanks": 87,
+    "weapons": {
+      "bow": 5,
+      "blade": 2,
+      "ember": 4,
+      "orbit": 5,
+      "drone": 2
+    },
+    "fate": {
+      "chests": 1,
+      "gained": 4,
+      "cleansed": 0
+    },
+    "character": "ranger",
+    "seed": 29,
+    "stress": false,
+    "seconds": 1207,
+    "phase": "victory",
+    "level": 74,
+    "kills": 3223,
+    "bosses": 4,
+    "damage": 517375,
+    "peakEnemies": 45,
+    "peakBullets": 41,
+    "frames": 24146,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 51,
+    "wallSeconds": 5.53,
+    "build": [
+      "春芽",
+      "时隙",
+      "星尘引力",
+      "战意",
+      "碎星",
+      "冰火共鸣",
+      "追星弓",
+      "无垠领悟",
+      "萤火灵",
+      "星纹护甲",
+      "星核",
+      "独行之道",
+      "月环",
+      "弧月刃",
+      "磐石体魄",
+      "萤火之森",
+      "双生星轨",
+      "旅人步伐",
+      "速射弦",
+      "月轮加速",
+      "终章学派",
+      "辅术精通",
+      "满月",
+      "残星裁决",
+      "主术精通",
+      "烬火杖",
+      "求知者",
+      "回旋刃",
+      "重月锋",
+      "灵体聚能",
+      "炽热核心",
+      "凝神",
+      "双月共舞",
+      "轻羽",
+      "燃素循环",
+      "星坠回响",
+      "古树之心",
+      "不熄余烬",
+      "蜂群节律",
+      "拾星",
+      "荒芜"
+    ]
+  },
+  {
+    "map": "cavern",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 19,
+      "negative": 5
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 1,
+    "refreshes": 0,
+    "negativeLayers": 5,
+    "output": [
+      {
+        "time": 300,
+        "damage": 36429,
+        "layers": 21,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 0,
+          "negative": 1
+        },
+        "attack": 1.1226415094339623,
+        "maxHp": 291
+      },
+      {
+        "time": 600,
+        "damage": 119917,
+        "layers": 47,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 5,
+          "negative": 1
+        },
+        "attack": 1.3490566037735847,
+        "maxHp": 416
+      },
+      {
+        "time": 900,
+        "damage": 265980,
+        "layers": 76,
+        "negativeLayers": 2,
+        "extraDraws": {
+          "positive": 12,
+          "negative": 2
+        },
+        "attack": 1.6886792452830188,
+        "maxHp": 466
+      },
+      {
+        "time": 1200,
+        "damage": 504864,
+        "layers": 107,
+        "negativeLayers": 4,
+        "extraDraws": {
+          "positive": 18,
+          "negative": 4
+        },
+        "attack": 1.5982142857142856,
+        "maxHp": 527
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 22,
+    "remainingRanks": 43,
+    "acquiredRanks": 110,
+    "weapons": {
+      "bow": 2,
+      "blade": 5,
+      "ember": 1,
+      "orbit": 4,
+      "drone": 4
+    },
+    "fate": {
+      "chests": 7,
+      "gained": 5,
+      "cleansed": 0
+    },
+    "character": "knight",
+    "seed": 29,
+    "stress": false,
+    "seconds": 1215,
+    "phase": "victory",
+    "level": 74,
+    "kills": 3262,
+    "bosses": 4,
+    "damage": 528179,
+    "peakEnemies": 42,
+    "peakBullets": 27,
+    "frames": 24291,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 101,
+    "wallSeconds": 5.1,
+    "build": [
+      "弧月刃",
+      "古树之心",
+      "月环",
+      "春芽",
+      "磐石体魄",
+      "终章学派",
+      "满月",
+      "生息",
+      "星核",
+      "拾星",
+      "黯光",
+      "战意",
+      "追星弓",
+      "凝神",
+      "辅术精通",
+      "旅途宝箱",
+      "时隙",
+      "星银宝箱",
+      "独行之道",
+      "月核增幅",
+      "双月共舞",
+      "鹰眼",
+      "旅人步伐",
+      "无垠领悟",
+      "回旋刃",
+      "萤火灵",
+      "星金宝箱",
+      "星纹护甲",
+      "重月锋",
+      "霜潮学派",
+      "缄默",
+      "穿林",
+      "双生星轨",
+      "轻羽",
+      "烬火杖",
+      "萤火之森",
+      "灵体聚能",
+      "星尘引力",
+      "不熄余烬",
+      "荒芜",
+      "炽热核心",
+      "命运馈赠",
+      "引力信标",
+      "枯萎"
+    ]
+  },
+  {
+    "map": "cavern",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 10,
+      "negative": 2
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 3,
+    "refreshes": 0,
+    "negativeLayers": 3,
+    "output": [
+      {
+        "time": 300,
+        "damage": 30895,
+        "layers": 19,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 1,
+          "negative": 0
+        },
+        "attack": 1.3599999999999999,
+        "maxHp": 295
+      },
+      {
+        "time": 600,
+        "damage": 119810,
+        "layers": 44,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 4,
+          "negative": 0
+        },
+        "attack": 1.48,
+        "maxHp": 363
+      },
+      {
+        "time": 900,
+        "damage": 264136,
+        "layers": 64,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 7,
+          "negative": 0
+        },
+        "attack": 1.6,
+        "maxHp": 363
+      },
+      {
+        "time": 1200,
+        "damage": 482205,
+        "layers": 87,
+        "negativeLayers": 3,
+        "extraDraws": {
+          "positive": 8,
+          "negative": 2
+        },
+        "attack": 1.91,
+        "maxHp": 463
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 21,
+    "remainingRanks": 45,
+    "acquiredRanks": 90,
+    "weapons": {
+      "bow": 2,
+      "blade": 1,
+      "ember": 5,
+      "orbit": 3,
+      "drone": 4
+    },
+    "fate": {
+      "chests": 2,
+      "gained": 3,
+      "cleansed": 0
+    },
+    "character": "mage",
+    "seed": 29,
+    "stress": false,
+    "seconds": 1221,
+    "phase": "victory",
+    "level": 72,
+    "kills": 3267,
+    "bosses": 4,
+    "damage": 511224,
+    "peakEnemies": 36,
+    "peakBullets": 39,
+    "frames": 24417,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 102,
+    "wallSeconds": 5.53,
+    "build": [
+      "烬火杖",
+      "古树之心",
+      "不熄余烬",
+      "春芽",
+      "星核",
+      "月环",
+      "萤火灵",
+      "辅术精通",
+      "独行之道",
+      "萤火之森",
+      "无垠领悟",
+      "拾星",
+      "穿林",
+      "生息",
+      "星金宝箱",
+      "双月共舞",
+      "弧月刃",
+      "磐石体魄",
+      "追星弓",
+      "炽热核心",
+      "回旋刃",
+      "鹰眼",
+      "时砂",
+      "命运馈赠",
+      "引力信标",
+      "禁忌之书",
+      "旅人步伐",
+      "燃素循环",
+      "脆弱",
+      "缄默",
+      "星纹护甲",
+      "生命收割",
+      "终章学派",
+      "战意",
+      "满月"
+    ]
+  },
+  {
+    "map": "garden",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 16,
+      "negative": 4
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 1,
+    "refreshes": 0,
+    "negativeLayers": 0,
+    "output": [
+      {
+        "time": 300,
+        "damage": 26576,
+        "layers": 23,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 4,
+          "negative": 0
+        },
+        "attack": 1.24,
+        "maxHp": 160
+      },
+      {
+        "time": 600,
+        "damage": 104445,
+        "layers": 54,
+        "negativeLayers": 2,
+        "extraDraws": {
+          "positive": 10,
+          "negative": 2
+        },
+        "attack": 1.6700000000000002,
+        "maxHp": 140.8
+      },
+      {
+        "time": 900,
+        "damage": 243316,
+        "layers": 83,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 14,
+          "negative": 4
+        },
+        "attack": 1.62,
+        "maxHp": 185
+      },
+      {
+        "time": 1200,
+        "damage": 451447,
+        "layers": 105,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 16,
+          "negative": 4
+        },
+        "attack": 1.93,
+        "maxHp": 210
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 19,
+    "remainingRanks": 48,
+    "acquiredRanks": 108,
+    "weapons": {
+      "bow": 5,
+      "blade": 1,
+      "ember": 3,
+      "orbit": 3
+    },
+    "fate": {
+      "chests": 3,
+      "gained": 4,
+      "cleansed": 1
+    },
+    "character": "ranger",
+    "seed": 11,
+    "stress": false,
+    "seconds": 1204,
+    "phase": "victory",
+    "level": 85,
+    "kills": 3455,
+    "bosses": 4,
+    "damage": 467637,
+    "peakEnemies": 54,
+    "peakBullets": 45,
+    "frames": 24089,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 72,
+    "wallSeconds": 4.31,
+    "build": [
+      "不熄余烬",
+      "凝神",
+      "碎星",
+      "时隙",
+      "战意",
+      "星核",
+      "速射弦",
+      "鹰眼",
+      "求知者",
+      "陨火学派",
+      "无垠领悟",
+      "终章学派",
+      "生息",
+      "残星裁决",
+      "旅人步伐",
+      "古树之心",
+      "星坠回响",
+      "冰火共鸣",
+      "春芽",
+      "烬火杖",
+      "独行之道",
+      "追星弓",
+      "双生星轨",
+      "炽热核心",
+      "星纹护甲",
+      "拾星",
+      "月环",
+      "月轮加速",
+      "轻羽",
+      "月核增幅",
+      "燃素循环",
+      "生命收割",
+      "双月共舞",
+      "时砂",
+      "引力信标",
+      "弓弦张力",
+      "野火蔓延",
+      "弧月刃",
+      "星尘引力",
+      "回旋刃",
+      "净化之光",
+      "主术精通",
+      "星银宝箱"
+    ]
+  },
+  {
+    "map": "garden",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 18,
+      "negative": 5
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 1,
+    "refreshes": 0,
+    "negativeLayers": 6,
+    "output": [
+      {
+        "time": 300,
+        "damage": 20687,
+        "layers": 18,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 1,
+          "negative": 0
+        },
+        "attack": 1.48,
+        "maxHp": 305
+      },
+      {
+        "time": 600,
+        "damage": 94931,
+        "layers": 42,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 6,
+          "negative": 0
+        },
+        "attack": 1.72,
+        "maxHp": 398
+      },
+      {
+        "time": 900,
+        "damage": 242546,
+        "layers": 67,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 10,
+          "negative": 1
+        },
+        "attack": 1.72,
+        "maxHp": 448
+      },
+      {
+        "time": 1200,
+        "damage": 452968,
+        "layers": 98,
+        "negativeLayers": 6,
+        "extraDraws": {
+          "positive": 17,
+          "negative": 5
+        },
+        "attack": 2.113207547169811,
+        "maxHp": 416.48
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 23,
+    "remainingRanks": 47,
+    "acquiredRanks": 101,
+    "weapons": {
+      "bow": 1,
+      "blade": 4,
+      "ember": 1,
+      "orbit": 4,
+      "drone": 1
+    },
+    "fate": {
+      "chests": 3,
+      "gained": 6,
+      "cleansed": 0
+    },
+    "character": "knight",
+    "seed": 11,
+    "stress": false,
+    "seconds": 1238,
+    "phase": "victory",
+    "level": 75,
+    "kills": 3757,
+    "bosses": 4,
+    "damage": 503575,
+    "peakEnemies": 125,
+    "peakBullets": 47,
+    "frames": 24769,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 103,
+    "wallSeconds": 4.36,
+    "build": [
+      "弧月刃",
+      "星核",
+      "月环",
+      "春芽",
+      "古树之心",
+      "冰火共鸣",
+      "满月",
+      "双月共舞",
+      "时砂",
+      "星纹护甲",
+      "辅术精通",
+      "旅途宝箱",
+      "磐石体魄",
+      "无垠领悟",
+      "鹰眼",
+      "轻羽",
+      "星尘引力",
+      "追星弓",
+      "净化之光",
+      "铅足",
+      "弓弦张力",
+      "不熄余烬",
+      "拾星",
+      "求知者",
+      "穿林",
+      "萤火灵",
+      "黯光",
+      "月轮加速",
+      "蜂群节律",
+      "脆弱",
+      "血月契约",
+      "枯萎",
+      "烬火杖",
+      "燃素循环",
+      "缄默",
+      "萤火之森"
+    ]
+  },
+  {
+    "map": "garden",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 15,
+      "negative": 1
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 1,
+    "refreshes": 0,
+    "negativeLayers": 1,
+    "output": [
+      {
+        "time": 300,
+        "damage": 22682,
+        "layers": 19,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 2,
+          "negative": 0
+        },
+        "attack": 1.24,
+        "maxHp": 195
+      },
+      {
+        "time": 600,
+        "damage": 100771,
+        "layers": 42,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 4,
+          "negative": 1
+        },
+        "attack": 1.48,
+        "maxHp": 245
+      },
+      {
+        "time": 900,
+        "damage": 236910,
+        "layers": 64,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 8,
+          "negative": 1
+        },
+        "attack": 1.72,
+        "maxHp": 295
+      },
+      {
+        "time": 1200,
+        "damage": 443494,
+        "layers": 88,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 15,
+          "negative": 1
+        },
+        "attack": 1.8399999999999999,
+        "maxHp": 420
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 19,
+    "remainingRanks": 43,
+    "acquiredRanks": 88,
+    "weapons": {
+      "ember": 4,
+      "orbit": 5,
+      "drone": 5
+    },
+    "fate": {
+      "chests": 3,
+      "gained": 1,
+      "cleansed": 0
+    },
+    "character": "mage",
+    "seed": 11,
+    "stress": false,
+    "seconds": 1215,
+    "phase": "victory",
+    "level": 69,
+    "kills": 3428,
+    "bosses": 4,
+    "damage": 469021,
+    "peakEnemies": 44,
+    "peakBullets": 43,
+    "frames": 24309,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 110,
+    "wallSeconds": 4.61,
+    "build": [
+      "烬火杖",
+      "月环",
+      "古树之心",
+      "星核",
+      "春芽",
+      "萤火灵",
+      "不熄余烬",
+      "穿林",
+      "月轮加速",
+      "缄默",
+      "遗忘药剂",
+      "萤火之森",
+      "星尘引力",
+      "星银宝箱",
+      "主术精通",
+      "蜂群节律",
+      "燃素循环",
+      "旅途宝箱",
+      "无垠领悟",
+      "凝神",
+      "辅术精通",
+      "拾星",
+      "生息",
+      "残星裁决",
+      "冰火共鸣",
+      "灵体聚能",
+      "鹰眼"
+    ]
+  },
+  {
+    "map": "garden",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 11,
+      "negative": 5
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 2,
+    "refreshes": 0,
+    "negativeLayers": 4,
+    "output": [
+      {
+        "time": 300,
+        "damage": 23753,
+        "layers": 18,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 0,
+          "negative": 0
+        },
+        "attack": 1.6,
+        "maxHp": 260
+      },
+      {
+        "time": 600,
+        "damage": 101974,
+        "layers": 42,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 4,
+          "negative": 0
+        },
+        "attack": 1.79,
+        "maxHp": 285
+      },
+      {
+        "time": 900,
+        "damage": 241199,
+        "layers": 72,
+        "negativeLayers": 4,
+        "extraDraws": {
+          "positive": 8,
+          "negative": 4
+        },
+        "attack": 2.41,
+        "maxHp": 328
+      },
+      {
+        "time": 1200,
+        "damage": 450112,
+        "layers": 97,
+        "negativeLayers": 3,
+        "extraDraws": {
+          "positive": 10,
+          "negative": 4
+        },
+        "attack": 2.53,
+        "maxHp": 428
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 19,
+    "remainingRanks": 39,
+    "acquiredRanks": 101,
+    "weapons": {
+      "bow": 4,
+      "blade": 3,
+      "orbit": 3,
+      "drone": 3
+    },
+    "fate": {
+      "chests": 1,
+      "gained": 6,
+      "cleansed": 2
+    },
+    "character": "ranger",
+    "seed": 29,
+    "stress": false,
+    "seconds": 1227,
+    "phase": "victory",
+    "level": 85,
+    "kills": 3640,
+    "bosses": 4,
+    "damage": 481838,
+    "peakEnemies": 85,
+    "peakBullets": 48,
+    "frames": 24534,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 90,
+    "wallSeconds": 5.56,
+    "build": [
+      "追星弓",
+      "萤火灵",
+      "古树之心",
+      "月环",
+      "春芽",
+      "星核",
+      "命运馈赠",
+      "穿林",
+      "双生星轨",
+      "战意",
+      "辅术精通",
+      "陨火学派",
+      "速射弦",
+      "星坠回响",
+      "弓弦张力",
+      "贪婪之冠",
+      "脆弱",
+      "无垠领悟",
+      "轻羽",
+      "星尘引力",
+      "时砂",
+      "残星裁决",
+      "灵体聚能",
+      "缄默",
+      "铅足",
+      "磐石体魄",
+      "求知者",
+      "净化之光",
+      "冰火共鸣",
+      "拾星",
+      "鹰眼",
+      "星银宝箱",
+      "弧月刃",
+      "独行之道",
+      "引力信标",
+      "遗忘药剂",
+      "主术精通",
+      "满月",
+      "重月锋"
+    ]
+  },
+  {
+    "map": "garden",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 6,
+      "negative": 4
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 3,
+    "refreshes": 0,
+    "negativeLayers": 2,
+    "output": [
+      {
+        "time": 300,
+        "damage": 21017,
+        "layers": 17,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 0,
+          "negative": 0
+        },
+        "attack": 1.55,
+        "maxHp": 280
+      },
+      {
+        "time": 600,
+        "damage": 105434,
+        "layers": 42,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 2,
+          "negative": 0
+        },
+        "attack": 2.03,
+        "maxHp": 330
+      },
+      {
+        "time": 900,
+        "damage": 249240,
+        "layers": 66,
+        "negativeLayers": 3,
+        "extraDraws": {
+          "positive": 4,
+          "negative": 3
+        },
+        "attack": 2.094339622641509,
+        "maxHp": 380
+      },
+      {
+        "time": 1200,
+        "damage": 475411,
+        "layers": 84,
+        "negativeLayers": 2,
+        "extraDraws": {
+          "positive": 6,
+          "negative": 4
+        },
+        "attack": 2.320754716981132,
+        "maxHp": 405
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 21,
+    "remainingRanks": 48,
+    "acquiredRanks": 85,
+    "weapons": {
+      "bow": 1,
+      "blade": 5,
+      "orbit": 3,
+      "drone": 3
+    },
+    "fate": {
+      "chests": 3,
+      "gained": 5,
+      "cleansed": 3
+    },
+    "character": "knight",
+    "seed": 29,
+    "stress": false,
+    "seconds": 1222,
+    "phase": "victory",
+    "level": 70,
+    "kills": 3640,
+    "bosses": 4,
+    "damage": 505853,
+    "peakEnemies": 83,
+    "peakBullets": 45,
+    "frames": 24449,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 106,
+    "wallSeconds": 5.98,
+    "build": [
+      "弧月刃",
+      "古树之心",
+      "春芽",
+      "星核",
+      "旅途宝箱",
+      "拾星",
+      "战意",
+      "萤火灵",
+      "满月",
+      "禁忌之书",
+      "星尘引力",
+      "萤火之森",
+      "辅术精通",
+      "枯萎",
+      "时砂",
+      "追星弓",
+      "灵体聚能",
+      "穿林",
+      "时隙",
+      "星辰洗礼",
+      "星纹护甲",
+      "轻羽",
+      "无垠领悟",
+      "月环",
+      "黯光",
+      "独行之道",
+      "迷惘",
+      "星金宝箱",
+      "蜂群节律",
+      "弓弦张力",
+      "引力信标",
+      "生息",
+      "铅足",
+      "双生星轨",
+      "净化之光",
+      "鹰眼",
+      "双月共舞",
+      "月轮加速",
+      "霜潮学派",
+      "回旋刃",
+      "荒芜"
+    ]
+  },
+  {
+    "map": "garden",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 14,
+      "negative": 6
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 3,
+    "refreshes": 0,
+    "negativeLayers": 8,
+    "output": [
+      {
+        "time": 300,
+        "damage": 23969,
+        "layers": 18,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 0,
+          "negative": 0
+        },
+        "attack": 1.24,
+        "maxHp": 220
+      },
+      {
+        "time": 600,
+        "damage": 110328,
+        "layers": 44,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 3,
+          "negative": 1
+        },
+        "attack": 1.79,
+        "maxHp": 237.6
+      },
+      {
+        "time": 900,
+        "damage": 244801,
+        "layers": 69,
+        "negativeLayers": 3,
+        "extraDraws": {
+          "positive": 7,
+          "negative": 2
+        },
+        "attack": 1.91,
+        "maxHp": 307.12
+      },
+      {
+        "time": 1200,
+        "damage": 466155,
+        "layers": 103,
+        "negativeLayers": 7,
+        "extraDraws": {
+          "positive": 14,
+          "negative": 5
+        },
+        "attack": 2.22,
+        "maxHp": 388.96
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 20,
+    "remainingRanks": 44,
+    "acquiredRanks": 106,
+    "weapons": {
+      "bow": 1,
+      "ember": 2,
+      "orbit": 3,
+      "drone": 5
+    },
+    "fate": {
+      "chests": 5,
+      "gained": 8,
+      "cleansed": 0
+    },
+    "character": "mage",
+    "seed": 29,
+    "stress": false,
+    "seconds": 1235,
+    "phase": "victory",
+    "level": 73,
+    "kills": 3681,
+    "bosses": 4,
+    "damage": 510617,
+    "peakEnemies": 59,
+    "peakBullets": 41,
+    "frames": 24694,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 121,
+    "wallSeconds": 4.49,
+    "build": [
+      "烬火杖",
+      "春芽",
+      "古树之心",
+      "萤火灵",
+      "月环",
+      "星核",
+      "穿林",
+      "枯萎",
+      "星纹护甲",
+      "不熄余烬",
+      "燃素循环",
+      "独行之道",
+      "星金宝箱",
+      "冰火共鸣",
+      "陨火学派",
+      "双月共舞",
+      "萤火之森",
+      "月核增幅",
+      "星尘引力",
+      "战意",
+      "鹰眼",
+      "无垠领悟",
+      "灵体聚能",
+      "缄默",
+      "磐石体魄",
+      "轻羽",
+      "旅途宝箱",
+      "禁忌之书",
+      "月轮加速",
+      "拾星",
+      "辅术精通",
+      "脆弱",
+      "主术精通",
+      "迷惘",
+      "求知者",
+      "时隙",
+      "追星弓",
+      "生息",
+      "铅足",
+      "星银宝箱",
+      "终章学派"
+    ]
+  },
+  {
+    "map": "eclipse",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 11,
+      "negative": 2
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 3,
+    "refreshes": 0,
+    "negativeLayers": 1,
+    "output": [
+      {
+        "time": 300,
+        "damage": 17245,
+        "layers": 20,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 3,
+          "negative": 0
+        },
+        "attack": 1.31,
+        "maxHp": 310
+      },
+      {
+        "time": 600,
+        "damage": 74486,
+        "layers": 40,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 5,
+          "negative": 1
+        },
+        "attack": 1.55,
+        "maxHp": 360
+      },
+      {
+        "time": 900,
+        "damage": 176434,
+        "layers": 56,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 7,
+          "negative": 1
+        },
+        "attack": 1.55,
+        "maxHp": 396
+      },
+      {
+        "time": 1200,
+        "damage": 330218,
+        "layers": 80,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 11,
+          "negative": 2
+        },
+        "attack": 1.79,
+        "maxHp": 396
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 21,
+    "remainingRanks": 46,
+    "acquiredRanks": 81,
+    "weapons": {
+      "bow": 5,
+      "ember": 2,
+      "orbit": 2,
+      "drone": 3
+    },
+    "fate": {
+      "chests": 1,
+      "gained": 2,
+      "cleansed": 1
+    },
+    "character": "ranger",
+    "seed": 11,
+    "stress": false,
+    "seconds": 1212,
+    "phase": "victory",
+    "level": 67,
+    "kills": 2779,
+    "bosses": 4,
+    "damage": 346978,
+    "peakEnemies": 48,
+    "peakBullets": 35,
+    "frames": 24232,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 114,
+    "wallSeconds": 3.56,
+    "build": [
+      "追星弓",
+      "双生星轨",
+      "古树之心",
+      "萤火灵",
+      "春芽",
+      "战意",
+      "星核",
+      "月环",
+      "辅术精通",
+      "命运馈赠",
+      "穿林",
+      "无垠领悟",
+      "脆弱",
+      "不熄余烬",
+      "月轮加速",
+      "净化之光",
+      "旅人步伐",
+      "鹰眼",
+      "磐石体魄",
+      "双月共舞",
+      "独行之道",
+      "终章学派",
+      "时隙",
+      "烬火杖",
+      "生息",
+      "引力信标",
+      "荒芜",
+      "主术精通",
+      "星尘引力",
+      "星金宝箱",
+      "星坠回响",
+      "拾星"
+    ]
+  },
+  {
+    "map": "eclipse",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 8,
+      "negative": 7
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 1,
+    "refreshes": 0,
+    "negativeLayers": 7,
+    "output": [
+      {
+        "time": 300,
+        "damage": 17846,
+        "layers": 19,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 1,
+          "negative": 0
+        },
+        "attack": 1.24,
+        "maxHp": 305
+      },
+      {
+        "time": 600,
+        "damage": 74625,
+        "layers": 39,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 3,
+          "negative": 1
+        },
+        "attack": 1.6226415094339621,
+        "maxHp": 330
+      },
+      {
+        "time": 900,
+        "damage": 188067,
+        "layers": 63,
+        "negativeLayers": 3,
+        "extraDraws": {
+          "positive": 7,
+          "negative": 3
+        },
+        "attack": 1.80188679245283,
+        "maxHp": 344.08
+      },
+      {
+        "time": 1200,
+        "damage": 346951,
+        "layers": 88,
+        "negativeLayers": 6,
+        "extraDraws": {
+          "positive": 8,
+          "negative": 6
+        },
+        "attack": 1.981132075471698,
+        "maxHp": 392.16
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 22,
+    "remainingRanks": 50,
+    "acquiredRanks": 91,
+    "weapons": {
+      "blade": 4,
+      "orbit": 4
+    },
+    "fate": {
+      "chests": 4,
+      "gained": 7,
+      "cleansed": 0
+    },
+    "character": "knight",
+    "seed": 11,
+    "stress": false,
+    "seconds": 1241,
+    "phase": "victory",
+    "level": 71,
+    "kills": 3082,
+    "bosses": 4,
+    "damage": 385726,
+    "peakEnemies": 45,
+    "peakBullets": 21,
+    "frames": 24829,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 87,
+    "wallSeconds": 2.56,
+    "build": [
+      "弧月刃",
+      "春芽",
+      "古树之心",
+      "月环",
+      "星核",
+      "月核增幅",
+      "星纹护甲",
+      "黯光",
+      "主术精通",
+      "旅途宝箱",
+      "时砂",
+      "满月",
+      "时隙",
+      "穿林",
+      "引力信标",
+      "无垠领悟",
+      "轻羽",
+      "枯萎",
+      "辅术精通",
+      "铅足",
+      "终章学派",
+      "磐石体魄",
+      "冰火共鸣",
+      "生息",
+      "求知者",
+      "战意",
+      "重月锋",
+      "星金宝箱",
+      "独行之道",
+      "回旋刃",
+      "拾星",
+      "迷惘",
+      "旅人步伐",
+      "凝神",
+      "脆弱",
+      "双月共舞"
+    ]
+  },
+  {
+    "map": "eclipse",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 3,
+      "negative": 5
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 0,
+    "refreshes": 0,
+    "negativeLayers": 4,
+    "output": [
+      {
+        "time": 300,
+        "damage": 17676,
+        "layers": 18,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 1,
+          "negative": 0
+        },
+        "attack": 1,
+        "maxHp": 170
+      },
+      {
+        "time": 600,
+        "damage": 75813,
+        "layers": 37,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 1,
+          "negative": 1
+        },
+        "attack": 1.1900000000000002,
+        "maxHp": 193.6
+      },
+      {
+        "time": 900,
+        "damage": 176911,
+        "layers": 58,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 1,
+          "negative": 2
+        },
+        "attack": 1.33,
+        "maxHp": 245
+      },
+      {
+        "time": 1200,
+        "damage": 332821,
+        "layers": 81,
+        "negativeLayers": 4,
+        "extraDraws": {
+          "positive": 3,
+          "negative": 5
+        },
+        "attack": 1.33,
+        "maxHp": 263
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 23,
+    "remainingRanks": 49,
+    "acquiredRanks": 81,
+    "weapons": {
+      "bow": 1,
+      "blade": 1,
+      "ember": 5,
+      "orbit": 2,
+      "drone": 5
+    },
+    "fate": {
+      "chests": 3,
+      "gained": 5,
+      "cleansed": 1
+    },
+    "character": "mage",
+    "seed": 11,
+    "stress": false,
+    "seconds": 1215,
+    "phase": "victory",
+    "level": 71,
+    "kills": 2835,
+    "bosses": 4,
+    "damage": 350640,
+    "peakEnemies": 35,
+    "peakBullets": 33,
+    "frames": 24291,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 92,
+    "wallSeconds": 3.79,
+    "build": [
+      "烬火杖",
+      "春芽",
+      "萤火灵",
+      "古树之心",
+      "辅术精通",
+      "星核",
+      "战意",
+      "星坠回响",
+      "枯萎",
+      "求知者",
+      "月环",
+      "不熄余烬",
+      "旅人步伐",
+      "穿林",
+      "弧月刃",
+      "萤火之森",
+      "无垠领悟",
+      "野火蔓延",
+      "陨火学派",
+      "轻羽",
+      "迷惘",
+      "星银宝箱",
+      "燃素循环",
+      "回旋刃",
+      "拾星",
+      "净化之光",
+      "旅途宝箱",
+      "星纹护甲",
+      "满月",
+      "生息",
+      "星尘引力",
+      "双月共舞",
+      "磐石体魄",
+      "重月锋",
+      "月核增幅",
+      "追星弓",
+      "凝神",
+      "冰火共鸣",
+      "铅足",
+      "月轮加速"
+    ]
+  },
+  {
+    "map": "eclipse",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 15,
+      "negative": 3
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 0,
+    "refreshes": 0,
+    "negativeLayers": 0,
+    "output": [
+      {
+        "time": 300,
+        "damage": 17474,
+        "layers": 17,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 0,
+          "negative": 0
+        },
+        "attack": 1,
+        "maxHp": 260
+      },
+      {
+        "time": 600,
+        "damage": 72805,
+        "layers": 38,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 5,
+          "negative": 0
+        },
+        "attack": 1.24,
+        "maxHp": 360
+      },
+      {
+        "time": 900,
+        "damage": 169878,
+        "layers": 49,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 8,
+          "negative": 1
+        },
+        "attack": 1.6700000000000002,
+        "maxHp": 338.8
+      },
+      {
+        "time": 1200,
+        "damage": 322046,
+        "layers": 90,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 15,
+          "negative": 3
+        },
+        "attack": 1.45,
+        "maxHp": 289
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 18,
+    "remainingRanks": 46,
+    "acquiredRanks": 91,
+    "weapons": {
+      "bow": 3,
+      "blade": 3,
+      "orbit": 3,
+      "drone": 3
+    },
+    "fate": {
+      "chests": 4,
+      "gained": 3,
+      "cleansed": 1
+    },
+    "character": "ranger",
+    "seed": 29,
+    "stress": false,
+    "seconds": 1213,
+    "phase": "victory",
+    "level": 70,
+    "kills": 2710,
+    "bosses": 4,
+    "damage": 338212,
+    "peakEnemies": 32,
+    "peakBullets": 39,
+    "frames": 24252,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 117,
+    "wallSeconds": 3.98,
+    "build": [
+      "星尘引力",
+      "双生星轨",
+      "残星裁决",
+      "碎星",
+      "鹰眼",
+      "终章学派",
+      "战意",
+      "求知者",
+      "不熄余烬",
+      "无垠领悟",
+      "生命收割",
+      "月环",
+      "追星弓",
+      "春芽",
+      "主术精通",
+      "磐石体魄",
+      "速射弦",
+      "引力信标",
+      "野火蔓延",
+      "古树之心",
+      "生息",
+      "弧月刃",
+      "萤火灵",
+      "陨火学派",
+      "月核增幅",
+      "时隙",
+      "旅人步伐",
+      "星纹护甲",
+      "凝神",
+      "灵体聚能",
+      "独行之道",
+      "星核",
+      "冰火共鸣",
+      "轻羽",
+      "辅术精通",
+      "萤火之森",
+      "月轮加速",
+      "重月锋",
+      "时砂",
+      "蜂群节律",
+      "旅途宝箱",
+      "拾星",
+      "回旋刃",
+      "迷惘",
+      "净化之光"
+    ]
+  },
+  {
+    "map": "eclipse",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 17,
+      "negative": 1
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 1,
+    "refreshes": 0,
+    "negativeLayers": 2,
+    "output": [
+      {
+        "time": 300,
+        "damage": 17815,
+        "layers": 18,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 1,
+          "negative": 0
+        },
+        "attack": 1.3599999999999999,
+        "maxHp": 255
+      },
+      {
+        "time": 600,
+        "damage": 71010,
+        "layers": 38,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 5,
+          "negative": 0
+        },
+        "attack": 1.55,
+        "maxHp": 391
+      },
+      {
+        "time": 900,
+        "damage": 174675,
+        "layers": 62,
+        "negativeLayers": 1,
+        "extraDraws": {
+          "positive": 9,
+          "negative": 1
+        },
+        "attack": 1.7400000000000002,
+        "maxHp": 459
+      },
+      {
+        "time": 1200,
+        "damage": 332668,
+        "layers": 91,
+        "negativeLayers": 2,
+        "extraDraws": {
+          "positive": 17,
+          "negative": 1
+        },
+        "attack": 2.5,
+        "maxHp": 403.92
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 19,
+    "remainingRanks": 49,
+    "acquiredRanks": 92,
+    "weapons": {
+      "bow": 2,
+      "blade": 2,
+      "ember": 1,
+      "orbit": 3,
+      "drone": 1
+    },
+    "fate": {
+      "chests": 3,
+      "gained": 2,
+      "cleansed": 0
+    },
+    "character": "knight",
+    "seed": 29,
+    "stress": false,
+    "seconds": 1222,
+    "phase": "victory",
+    "level": 69,
+    "kills": 2839,
+    "bosses": 4,
+    "damage": 355467,
+    "peakEnemies": 41,
+    "peakBullets": 29,
+    "frames": 24436,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 135,
+    "wallSeconds": 3.19,
+    "build": [
+      "弧月刃",
+      "春芽",
+      "月环",
+      "星核",
+      "古树之心",
+      "鹰眼",
+      "追星弓",
+      "星尘引力",
+      "生命收割",
+      "星纹护甲",
+      "战意",
+      "重月锋",
+      "终章学派",
+      "时隙",
+      "双生星轨",
+      "净化之光",
+      "穿林",
+      "磐石体魄",
+      "凝神",
+      "不熄余烬",
+      "旅途宝箱",
+      "拾星",
+      "烬火杖",
+      "生息",
+      "霜潮学派",
+      "萤火灵",
+      "求知者",
+      "双月共舞",
+      "回旋刃",
+      "荒芜",
+      "无垠领悟",
+      "满月",
+      "旅人步伐",
+      "独行之道",
+      "星金宝箱",
+      "弓弦张力",
+      "月核增幅",
+      "萤火之森",
+      "辅术精通",
+      "血月契约",
+      "枯萎",
+      "灵体聚能",
+      "引力信标"
+    ]
+  },
+  {
+    "map": "eclipse",
+    "shuffles": [],
+    "extraDraws": {
+      "positive": 16,
+      "negative": 9
+    },
+    "pendingDraws": {
+      "positive": 0,
+      "negative": 0
+    },
+    "dropObjects": 3,
+    "refreshes": 0,
+    "negativeLayers": 9,
+    "output": [
+      {
+        "time": 300,
+        "damage": 16584,
+        "layers": 18,
+        "negativeLayers": 0,
+        "extraDraws": {
+          "positive": 1,
+          "negative": 0
+        },
+        "attack": 1.24,
+        "maxHp": 195
+      },
+      {
+        "time": 600,
+        "damage": 68275,
+        "layers": 38,
+        "negativeLayers": 2,
+        "extraDraws": {
+          "positive": 3,
+          "negative": 2
+        },
+        "attack": 1.6226415094339621,
+        "maxHp": 245
+      },
+      {
+        "time": 900,
+        "damage": 176313,
+        "layers": 64,
+        "negativeLayers": 6,
+        "extraDraws": {
+          "positive": 9,
+          "negative": 6
+        },
+        "attack": 1.962264150943396,
+        "maxHp": 247.28
+      },
+      {
+        "time": 1200,
+        "damage": 339707,
+        "layers": 89,
+        "negativeLayers": 9,
+        "extraDraws": {
+          "positive": 15,
+          "negative": 9
+        },
+        "attack": 2.1886792452830184,
+        "maxHp": 269.28000000000003
+      }
+    ],
+    "finiteDefinitions": 25,
+    "remainingDefinitions": 22,
+    "remainingRanks": 45,
+    "acquiredRanks": 90,
+    "weapons": {
+      "bow": 2,
+      "blade": 1,
+      "ember": 4,
+      "orbit": 4,
+      "drone": 2
+    },
+    "fate": {
+      "chests": 1,
+      "gained": 9,
+      "cleansed": 0
+    },
+    "character": "mage",
+    "seed": 29,
+    "stress": false,
+    "seconds": 1215,
+    "phase": "victory",
+    "level": 64,
+    "kills": 2842,
+    "bosses": 4,
+    "damage": 357560,
+    "peakEnemies": 41,
+    "peakBullets": 38,
+    "frames": 24292,
+    "checkpoint": [
+      600,
+      1200
+    ],
+    "validatedSnapshots": 2,
+    "peakHeapMiB": 70,
+    "wallSeconds": 3.91,
+    "build": [
+      "烬火杖",
+      "古树之心",
+      "春芽",
+      "辅术精通",
+      "星核",
+      "遗忘药剂",
+      "月环",
+      "不熄余烬",
+      "追星弓",
+      "萤火灵",
+      "命运馈赠",
+      "缄默",
+      "萤火之森",
+      "星纹护甲",
+      "磐石体魄",
+      "燃素循环",
+      "双月共舞",
+      "时隙",
+      "黯光",
+      "时砂",
+      "穿林",
+      "凝神",
+      "弓弦张力",
+      "枯萎",
+      "炽热核心",
+      "蜂群节律",
+      "铅足",
+      "无垠领悟",
+      "迷惘",
+      "独行之道",
+      "星银宝箱",
+      "月核增幅",
+      "冰火共鸣",
+      "终章学派",
+      "荒芜",
+      "灵体聚能",
+      "弧月刃",
+      "鹰眼",
+      "拾星"
+    ]
+  }
+]

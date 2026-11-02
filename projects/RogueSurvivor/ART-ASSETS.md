@@ -1,3 +1,7 @@
+# 美术资源清单
+
+当前v1.4新增资源见 [ART-ASSETS-v1.4.md](ART-ASSETS-v1.4.md)。下表保留v1.3原始映射；全部当前ID以public/assets/manifest.json为准。
+
 # v1.3 美术资源清单
 
 来源：本任务内置 OpenAI image_gen 原创生成；无外部素材/API。可通过资源工坊覆盖稳定ID，或修改映射文件并构建。母图与处理说明见 V1.3.md。

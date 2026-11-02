@@ -1,3 +1,4 @@
+import type { MapId } from "../src/data/maps";
 import { refresh } from "../src/core/cardPool";
 import { ensureDeck, heldLayers } from "../src/core/deckState";
 import { grant } from "../src/core/progression";
@@ -13,6 +14,7 @@ export function simulate(
   seed: number,
   stress = false,
   shuffleAt?: number,
+  map: MapId = "forest",
 ) {
   const w = new World(
     createRun(
@@ -21,6 +23,7 @@ export function simulate(
       seed,
       character === "knight" ? "ice" : "fire",
       "bloom",
+      map,
     ),
   );
   if (stress)
@@ -175,6 +178,7 @@ export function simulate(
       throw Error("Simulation invariant failed");
   }
   const result = {
+    map,
     shuffles,
     extraDraws: ensureDeck(w.s).earned,
     pendingDraws: ensureDeck(w.s).pending,

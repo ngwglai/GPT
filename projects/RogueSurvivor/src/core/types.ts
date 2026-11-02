@@ -12,7 +12,21 @@ export type EnemyId =
   | "bomber"
   | "warden"
   | "witch"
-  | "titan";
+  | "titan"
+  | "fairy"
+  | "protector"
+  | "ghost"
+  | "splitter"
+  | "mirror"
+  | "mimic"
+  | "summoner"
+  | "hexer"
+  | "butterfly"
+  | "crab"
+  | "crystalQueen"
+  | "candyWitch"
+  | "eclipseSaint"
+  | "mirrorMaiden";
 export type Phase = "playing" | "upgrade" | "dead" | "victory";
 export interface Player extends Vec {
   hp: number;
@@ -39,6 +53,21 @@ export interface Player extends Vec {
   upgrades: Record<string, number>;
 }
 export interface Enemy extends Vec {
+  behavior?: {
+    facing: number;
+    shield: number;
+    shieldTime: number;
+    shieldOwner: number;
+    summonOwner: number;
+    child: boolean;
+    rewardless: boolean;
+    warning: number;
+    target: Vec | null;
+    reflecting: number;
+    awakened: boolean;
+    copied: string[];
+    healUntil: number;
+  };
   id: number;
   kind: EnemyId;
   hp: number;
@@ -71,8 +100,11 @@ export interface Bullet extends Vec {
   source: string;
   homing: boolean;
   split: boolean;
+  reflected?: boolean;
+  status?: "slow" | "curseHaste" | "curseCooldown";
 }
 export interface Zone extends Vec {
+  anchor?: number;
   id: number;
   r: number;
   delay: number;
@@ -94,6 +126,7 @@ export interface Effect extends Vec {
   text?: string;
 }
 export interface Rock extends Vec {
+  crystalId?: number;
   r: number;
 }
 export interface Stats {
@@ -110,7 +143,8 @@ export interface Run {
   fate?: import("./fate").Fate;
   deck?: import("./deckState").DeckState;
   rewardDrops?: import("./drops").RewardDrop[];
-  version: 1;
+  version: 1 | 2;
+  environment?: import("./environmentTypes").EnvironmentState;
   seed: number;
   rng: number;
   mode: Mode;

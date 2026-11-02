@@ -1,3 +1,4 @@
+import { WORLD_ASSET_NAMES } from "../data/worldVisuals";
 import { VISUALS } from "../data/visuals";
 import { CHARACTERS, ENEMIES, SKILLS, WEAPONS } from "../data/content";
 import { read, write } from "./storage";
@@ -34,27 +35,29 @@ export const ASSET_IDS = [
     .filter((id) => !LEGACY_ASSET_IDS.some((a) => a.id === id))
     .map((id) => ({
       id,
-      name: id.startsWith("portrait.")
-        ? "角色立绘 · " + CHARACTERS.find((c) => id.endsWith(c.id))?.name
-        : id.startsWith("avatar.")
-          ? "角色头像 · " + CHARACTERS.find((c) => id.endsWith(c.id))?.name
-          : (
-              {
-                "map.tree": "星光小树",
-                "map.obelisk": "魔法石碑",
-                "ui.world": "魔法世界背景",
-                "card.shuffle": "命运洗牌插画",
-                "card.negative": "恶作剧卡面",
-                "card.treasure": "惊喜礼盒",
-                "card.lucky": "幸运星卡面",
-                "card.common": "普通卡面",
-                "card.rare": "稀有卡面",
-                "card.epic": "史诗卡面",
-                "card.mechanism": "机制卡面",
-                "effect.bloom": "花朵领域",
-                "effect.ward": "魔法结界",
-              } as Record<string, string>
-            )[id] || id,
+      name:
+        WORLD_ASSET_NAMES[id] ||
+        (id.startsWith("portrait.")
+          ? "角色立绘 · " + CHARACTERS.find((c) => id.endsWith(c.id))?.name
+          : id.startsWith("avatar.")
+            ? "角色头像 · " + CHARACTERS.find((c) => id.endsWith(c.id))?.name
+            : (
+                {
+                  "map.tree": "星光小树",
+                  "map.obelisk": "魔法石碑",
+                  "ui.world": "魔法世界背景",
+                  "card.shuffle": "命运洗牌插画",
+                  "card.negative": "恶作剧卡面",
+                  "card.treasure": "惊喜礼盒",
+                  "card.lucky": "幸运星卡面",
+                  "card.common": "普通卡面",
+                  "card.rare": "稀有卡面",
+                  "card.epic": "史诗卡面",
+                  "card.mechanism": "机制卡面",
+                  "effect.bloom": "花朵领域",
+                  "effect.ward": "魔法结界",
+                } as Record<string, string>
+              )[id] || id),
       group: "星光美术",
     })),
 ];

@@ -1,0 +1,205 @@
+{
+  "browser": "154.0.8037.57",
+  "renderer": "Phaser CANVAS",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "errors": [],
+  "badResources": [],
+  "requests": {
+    "characters/ranger-full.webp": 7,
+    "enemies/crawler.webp": 7,
+    "enemies/archer.webp": 7,
+    "maps/rock.webp": 7,
+    "maps/flower.webp": 7,
+    "ui/world.webp": 7,
+    "v1.4/enemy/fairy.webp": 7,
+    "v1.4/enemy/protector.webp": 7,
+    "v1.4/enemy/ghost.webp": 7,
+    "v1.4/enemy/splitter.webp": 7,
+    "v1.4/enemy/mirror.webp": 7,
+    "v1.4/enemy/mimic.webp": 7,
+    "v1.4/enemy/summoner.webp": 7,
+    "v1.4/enemy/hexer.webp": 7,
+    "v1.4/enemy/butterfly.webp": 7,
+    "v1.4/enemy/crab.webp": 7,
+    "v1.4/projectile/crystal.webp": 7,
+    "v1.4/effect/heal.webp": 7,
+    "v1.4/enemy/crystalQueen.webp": 7,
+    "v1.4/enemy/candyWitch.webp": 7,
+    "v1.4/enemy/eclipseSaint.webp": 7,
+    "v1.4/enemy/mirrorMaiden.webp": 7,
+    "v1.4/map/cavern/ground.webp": 7,
+    "v1.4/map/garden/ground.webp": 7,
+    "v1.4/map/eclipse/ground.webp": 7,
+    "v1.4/map/cavern/crystal.webp": 7,
+    "v1.4/map/cavern/lake.webp": 7,
+    "v1.4/map/cavern/ore.webp": 7,
+    "v1.4/map/garden/tree.webp": 7,
+    "v1.4/map/garden/tea.webp": 7,
+    "v1.4/map/garden/house.webp": 7,
+    "v1.4/map/eclipse/pillar.webp": 7,
+    "v1.4/map/eclipse/altar.webp": 7,
+    "v1.4/map/eclipse/rune.webp": 7,
+    "v1.4/map/candy/speed.webp": 7,
+    "v1.4/map/candy/haste.webp": 7,
+    "v1.4/map/candy/heal.webp": 7,
+    "v1.4/map/candy/xp.webp": 7,
+    "v1.4/map/candy/slow.webp": 7,
+    "v1.4/map/candy/weak.webp": 7,
+    "v1.4/map/magicCircle.webp": 7,
+    "characters/ranger-battle.webp": 7,
+    "characters/knight-battle.webp": 7,
+    "characters/mage-battle.webp": 7,
+    "enemies/runner.webp": 7,
+    "enemies/seer.webp": 7,
+    "enemies/shaman.webp": 7,
+    "enemies/guard.webp": 7,
+    "enemies/bomber.webp": 7,
+    "enemies/warden.webp": 7,
+    "enemies/witch.webp": 7,
+    "enemies/titan.webp": 7,
+    "weapons/bow.webp": 7,
+    "weapons/blade.webp": 7,
+    "weapons/ember.webp": 7,
+    "weapons/orbit.webp": 7,
+    "weapons/drone.webp": 7,
+    "ui/gem.webp": 7,
+    "maps/tree.webp": 7,
+    "maps/obelisk.webp": 7,
+    "effects/bow.webp": 7,
+    "effects/ember.webp": 7,
+    "effects/drone.webp": 7,
+    "effects/enemy.webp": 7,
+    "effects/bloom.webp": 7,
+    "effects/ward.webp": 7,
+    "maps/grass.webp": 7,
+    "characters/knight-full.webp": 1,
+    "characters/mage-full.webp": 1,
+    "effects/storm.webp": 7,
+    "v1.4/map/cavern/preview.webp": 2,
+    "v1.4/map/garden/preview.webp": 2,
+    "v1.4/map/eclipse/preview.webp": 2,
+    "characters/mage-avatar.webp": 6,
+    "effects/ice.webp": 6,
+    "effects/lance.webp": 1,
+    "cards/lucky.webp": 1,
+    "cards/treasure.webp": 1,
+    "cards/negative.webp": 1,
+    "cards/shuffle.webp": 1
+  },
+  "performanceSamples": [
+    {
+      "map": "cavern",
+      "wallSeconds": 30,
+      "fixture": "147 enemies including four new bosses, five max weapons, invulnerable player and enemy health 1e7",
+      "samples": [
+        {
+          "hud": "FPS 15 ｜ 敌人 147/150 ｜ 弹道 24/360 ｜ 特效 30 ｜ 完整画面",
+          "clock": "20:03",
+          "heapMiB": 28
+        },
+        {
+          "hud": "FPS 8 ｜ 敌人 147/150 ｜ 弹道 41/360 ｜ 特效 27 ｜ 完整画面",
+          "clock": "20:06",
+          "heapMiB": 31
+        },
+        {
+          "hud": "FPS 6 ｜ 敌人 147/150 ｜ 弹道 21/360 ｜ 特效 52 ｜ 完整画面",
+          "clock": "20:08",
+          "heapMiB": 16
+        },
+        {
+          "hud": "FPS 5 ｜ 敌人 147/150 ｜ 弹道 31/360 ｜ 特效 69 ｜ 完整画面",
+          "clock": "20:10",
+          "heapMiB": 26
+        },
+        {
+          "hud": "FPS 5 ｜ 敌人 147/150 ｜ 弹道 0/360 ｜ 特效 70 ｜ 完整画面",
+          "clock": "20:13",
+          "heapMiB": 16
+        },
+        {
+          "hud": "FPS 5 ｜ 敌人 147/150 ｜ 弹道 2/360 ｜ 特效 44 ｜ 完整画面",
+          "clock": "20:15",
+          "heapMiB": 22
+        }
+      ]
+    },
+    {
+      "map": "garden",
+      "wallSeconds": 30,
+      "fixture": "147 enemies including four new bosses, five max weapons, invulnerable player and enemy health 1e7",
+      "samples": [
+        {
+          "hud": "FPS 19 ｜ 敌人 147/150 ｜ 弹道 21/360 ｜ 特效 57 ｜ 完整画面",
+          "clock": "20:04",
+          "heapMiB": 19
+        },
+        {
+          "hud": "FPS 9 ｜ 敌人 147/150 ｜ 弹道 48/360 ｜ 特效 64 ｜ 完整画面",
+          "clock": "20:06",
+          "heapMiB": 21
+        },
+        {
+          "hud": "FPS 6 ｜ 敌人 147/150 ｜ 弹道 19/360 ｜ 特效 34 ｜ 完整画面",
+          "clock": "20:08",
+          "heapMiB": 17
+        },
+        {
+          "hud": "FPS 5 ｜ 敌人 147/150 ｜ 弹道 31/360 ｜ 特效 59 ｜ 完整画面",
+          "clock": "20:10",
+          "heapMiB": 20
+        },
+        {
+          "hud": "FPS 5 ｜ 敌人 147/150 ｜ 弹道 0/360 ｜ 特效 34 ｜ 完整画面",
+          "clock": "20:12",
+          "heapMiB": 17
+        },
+        {
+          "hud": "FPS 5 ｜ 敌人 147/150 ｜ 弹道 7/360 ｜ 特效 47 ｜ 完整画面",
+          "clock": "20:15",
+          "heapMiB": 34
+        }
+      ]
+    },
+    {
+      "map": "eclipse",
+      "wallSeconds": 30,
+      "fixture": "147 enemies including four new bosses, five max weapons, invulnerable player and enemy health 1e7",
+      "samples": [
+        {
+          "hud": "FPS 15 ｜ 敌人 147/150 ｜ 弹道 20/360 ｜ 特效 56 ｜ 完整画面",
+          "clock": "20:04",
+          "heapMiB": 18
+        },
+        {
+          "hud": "FPS 8 ｜ 敌人 147/150 ｜ 弹道 43/360 ｜ 特效 59 ｜ 完整画面",
+          "clock": "20:06",
+          "heapMiB": 40
+        },
+        {
+          "hud": "FPS 6 ｜ 敌人 147/150 ｜ 弹道 19/360 ｜ 特效 33 ｜ 完整画面",
+          "clock": "20:08",
+          "heapMiB": 26
+        },
+        {
+          "hud": "FPS 5 ｜ 敌人 147/150 ｜ 弹道 32/360 ｜ 特效 73 ｜ 完整画面",
+          "clock": "20:10",
+          "heapMiB": 47
+        },
+        {
+          "hud": "FPS 5 ｜ 敌人 147/150 ｜ 弹道 0/360 ｜ 特效 50 ｜ 完整画面",
+          "clock": "20:13",
+          "heapMiB": 25
+        },
+        {
+          "hud": "FPS 5 ｜ 敌人 147/150 ｜ 弹道 6/360 ｜ 特效 43 ｜ 完整画面",
+          "clock": "20:15",
+          "heapMiB": 43
+        }
+      ]
+    }
+  ]
+}

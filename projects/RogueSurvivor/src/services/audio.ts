@@ -1,3 +1,4 @@
+import type { MusicState } from "./musicPolicy";
 import type { Settings } from "../core/types";
 export class AudioEngine {
   private ctx?: AudioContext;
@@ -72,7 +73,8 @@ export class AudioEngine {
       kind === "hurt" ? "triangle" : "sine",
     );
   }
-  update(_dt: number, playing: boolean) {
+  update(_dt: number, state: boolean | MusicState) {
+    const playing = state === true || state === "playing";
     this.active =
       playing &&
       this.settings.music > 0 &&
@@ -91,6 +93,13 @@ export class AudioEngine {
     music.volume = Math.max(0, Math.min(1, this.settings.music));
     if (!this.active) {
       music.pause();
+      if (state === "stopped") {
+        try {
+          music.currentTime = 0;
+        } catch {
+          /* optional media */
+        }
+      }
       return;
     }
     if (
