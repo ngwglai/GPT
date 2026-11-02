@@ -487,3 +487,26 @@ it("ghost teleport distance stays bounded even far from the player", () => {
     );
   }
 });
+it("an intact queen anchor detonates before removal while player breaking still cancels", () => {
+  const c = w("cavern");
+  c.s.rocks = [];
+  environment(c.s).crystals = [];
+  c.s.player.invincible = 0;
+  const x = addCrystal(c.s, { x: 1970, y: 1800 })!;
+  const q = enemy(c, "crystalQueen", 2200);
+  q.timer = 0;
+  advancedAI(c, q, 0.05);
+  expect(c.s.zones.some((z) => z.anchor === x.id)).toBe(true);
+  for (let i = 0; i < 31; i++) advancedAI(c, q, 0.05);
+  expect(environment(c.s).crystals.some((y) => y.id === x.id)).toBe(false);
+  expect(
+    c.s.zones.some(
+      (z) =>
+        z.kind === "crystalChain" && z.anchor === undefined && z.delay === 0,
+    ),
+  ).toBe(true);
+  const hp = c.s.player.hp;
+  c.projectiles(0.01);
+  expect(c.s.player.hp).toBeLessThan(hp);
+  expect(() => validateRun(c.s)).not.toThrow();
+});

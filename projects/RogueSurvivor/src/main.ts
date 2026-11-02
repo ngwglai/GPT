@@ -250,6 +250,10 @@ function modal(content: string, cls = "") {
   document.querySelector(".hud")?.setAttribute("aria-hidden", "true");
 }
 function pause() {
+  if (world && (world.s.phase === "dead" || world.s.phase === "victory")) {
+    results();
+    return;
+  }
   if (!world || !["game", "upgrade", "build", "codex"].includes(screen)) return;
   manualPaused = true;
   document.querySelector(".overlay")?.remove();
@@ -411,6 +415,15 @@ function assetManager() {
   );
 }
 function back() {
+  if (world && (world.s.phase === "dead" || world.s.phase === "victory")) {
+    results();
+    return;
+  }
+  if (world && manualPaused) {
+    hud();
+    pause();
+    return;
+  }
   if (world && returnScreen === "upgrade") {
     upgrade();
   } else if (world && returnScreen === "game") {
@@ -562,6 +575,10 @@ async function action(id: string) {
       pause();
       break;
     case "resume":
+      if (world && (world.s.phase === "dead" || world.s.phase === "victory")) {
+        results();
+        break;
+      }
       manualPaused = false;
       focusBlocked = document.hidden;
       if (world?.s.phase === "upgrade") upgrade();
@@ -759,6 +776,10 @@ async function boot() {
   scene.onPause = () => {
     if (["game", "upgrade", "build", "codex"].includes(screen)) pause();
     else if (screen === "pause") {
+      if (world && (world.s.phase === "dead" || world.s.phase === "victory")) {
+        results();
+        return;
+      }
       manualPaused = false;
       focusBlocked = document.hidden;
       if (world?.s.phase === "upgrade") upgrade();

@@ -314,3 +314,66 @@ test("v1.4 mimic has a real closed disguise before revealing its creature art", 
     saved.enemies.find((e: any) => e.kind === "mimic").behavior.awakened,
   ).toBe(true);
 });
+for (const terminal of ["victory", "dead"] as const)
+  test(`v1.4 ${terminal} codex Escape preserves terminal results`, async ({
+    page,
+  }) => {
+    const w = new World(
+      createRun(terminal === "victory" ? "standard" : "endless", "ranger", 47),
+    );
+    if (terminal === "victory") {
+      w.s.time = 1201;
+      w.s.nextBoss = 1500;
+      w.s.nextEvent = 1500;
+      w.s.bossIndex = 4;
+      w.s.player.level = 100;
+      spawn(w, "titan", { x: 1880, y: 1800 })!.hp = 1;
+    } else {
+      w.s.player.hp = 1;
+      w.s.player.invincible = 0;
+      spawn(w, "crawler", w.s.player)!.hp = 1e6;
+    }
+    await resume(page, w.s);
+    const title = terminal === "victory" ? "远征告捷" : "此行落幕";
+    await expect(page.getByRole("heading", { name: title })).toBeVisible();
+    await page.getByRole("button", { name: "远征图鉴", exact: true }).click();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("heading", { name: title })).toBeVisible();
+    await expect(
+      page.getByRole("button", {
+        name: terminal === "victory" ? "继续无尽星夜" : "再启远征",
+      }),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "远征已暂停" })).toHaveCount(
+      0,
+    );
+  });
+test("v1.4 upgrade-settings focus loss returns through explicit pause and restores music", async ({
+  page,
+}) => {
+  await observeAudio(page);
+  const s = createRun("endless", "ranger", 51);
+  ensureDeck(s).active = "positive";
+  s.phase = "upgrade";
+  s.choices = ["power", "vitality", "critical"];
+  await resume(page, s);
+  await expect.poll(() => audioTime(page)).toBeGreaterThan(0.1);
+  await page.getByRole("button", { name: "当前构筑", exact: true }).click();
+  await page.getByRole("button", { name: "设置", exact: true }).click();
+  await page.evaluate(() => window.dispatchEvent(new Event("blur")));
+  await page.getByRole("button", { name: "← 返回", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "远征已暂停" })).toBeVisible();
+  expect(await page.evaluate(() => (window as any).battleAudio.paused)).toBe(
+    true,
+  );
+  await page.getByRole("button", { name: "继续远征", exact: true }).click();
+  await expect(page.locator(".upgrade-card")).toHaveCount(3);
+  await page.locator('[data-action="upgrade-power"]').click();
+  await expect(page.locator(".upgrade-card")).toHaveCount(0);
+  await expect
+    .poll(() => page.evaluate(() => (window as any).battleAudio.paused))
+    .toBe(false);
+  const t = await audioTime(page);
+  await page.waitForTimeout(400);
+  expect(await audioTime(page)).toBeGreaterThan(t);
+});

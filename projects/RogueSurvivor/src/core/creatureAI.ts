@@ -105,6 +105,18 @@ function boss(c: Combat, e: Enemy, dt: number) {
   if (b.target && b.warning > 0) {
     b.warning -= dt;
     if (b.warning <= 0) {
+      // A live anchor detonates first; player destruction during the warning
+      // has already removed this linked zone and therefore still cancels it.
+      for (const z of s.zones)
+        if (
+          z.kind === "crystalChain" &&
+          z.anchor !== undefined &&
+          distance(z, b.target) < 1 &&
+          environment(s).crystals.some((x) => x.id === z.anchor)
+        ) {
+          delete z.anchor;
+          z.delay = 0;
+        }
       hitCrystals(c, b.target, 175, 999);
       b.target = null;
     }
@@ -165,7 +177,7 @@ function boss(c: Combat, e: Enemy, dt: number) {
     c.zone({ ...p }, 80, e.damage, "candyTrap", true, 1.3, 0.3, e.kind);
     if (second) ring(c, e, 10, e.phase * 0.2);
   } else if (e.kind === "eclipseSaint") {
-    // Broken ring always has a 120-degree exit; radius leaves movement space.
+    // Broken ring leaves a visible exit; collision radii reduce its safe angle.
     for (let i = 0; i < 6; i++) {
       const a = e.phase * 0.45 + (i * Math.PI) / 4;
       c.zone(
