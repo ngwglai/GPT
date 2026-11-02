@@ -3,7 +3,10 @@ import { environment } from "./environment";
 import { MAPS } from "../data/maps";
 import { ENEMY_RULES } from "../data/enemies";
 import type { EnemyId, Vec } from "./types";
-import { ENEMIES, LIMITS, difficulty } from "../data/content";
+import {
+  ENEMIES, LIMITS, difficulty,
+  bossHpMultiplier, bossDamageMultiplier, bossAttackInterval,
+} from "../data/content";
 import { clamp, distance, move, random, unit } from "./math";
 import { Combat } from "./combat";
 export function spawn(c: Combat, kind: EnemyId, position?: Vec, elite = false) {
@@ -28,7 +31,7 @@ export function spawn(c: Combat, kind: EnemyId, position?: Vec, elite = false) {
   const hp =
     def.hp *
     MAPS[environment(s).mapId].difficulty *
-    (def.boss ? 1 + Math.max(0, s.time / 60 - 5) * 0.065 : d.hp) *
+    (def.boss ? bossHpMultiplier(s.time) : d.hp) *
     (elite ? ENEMY_RULES.elite.hp : 1);
   const e = {
     id: s.nextId++,
@@ -38,7 +41,10 @@ export function spawn(c: Combat, kind: EnemyId, position?: Vec, elite = false) {
     maxHp: hp,
     r: def.r * (elite ? ENEMY_RULES.elite.r : 1),
     speed: def.speed * d.speed * (elite ? ENEMY_RULES.elite.speed : 1),
-    damage: def.damage * d.damage * (elite ? ENEMY_RULES.elite.damage : 1),
+    damage:
+      def.damage *
+      (def.boss ? bossDamageMultiplier(s.time) : d.damage) *
+      (elite ? ENEMY_RULES.elite.damage : 1),
     elite,
     timer: 1.2 + random(s),
     phase: 0,
@@ -63,14 +69,17 @@ export function director(c: Combat, dt: number) {
       d.spawn * (s.event === "兽潮来袭" && s.time < s.eventUntil ? 0.6 : 1);
     const map = MAPS[environment(s).mapId];
     const pool = map.spawns.filter((x) => s.time >= x.after);
-    let roll = random(s) * pool.reduce((n, x) => n + x.weight, 0);
-    const chosen = pool.find((x) => (roll -= x.weight) < 0) || pool[0];
-    const elite = random(s) < d.elite;
-    const kind =
-      elite && s.time > 300 && random(s) < 0.3
-        ? map.elite[Math.floor(random(s) * map.elite.length)]
-        : chosen.kind;
-    spawn(c, kind, undefined, elite);
+    // Spawn a whole wave each cycle, while retaining room for bosses.
+    for (let i = 0; i < d.pack && s.enemies.length < LIMITS.enemies - 3; i++) {
+      let roll = random(s) * pool.reduce((n, x) => n + x.weight, 0);
+      const chosen = pool.find((x) => (roll -= x.weight) < 0) || pool[0];
+      const elite = random(s) < d.elite;
+      const kind =
+        elite && s.time > 300 && random(s) < 0.3
+          ? map.elite[Math.floor(random(s) * map.elite.length)]
+          : chosen.kind;
+      spawn(c, kind, undefined, elite);
+    }
   }
   if (s.time >= s.nextBoss && !s.enemies.some((e) => ENEMIES[e.kind].boss)) {
     const map = MAPS[environment(s).mapId];
@@ -165,7 +174,9 @@ export function ai(c: Combat, dt: number) {
         vy = e.charge.y * 4;
       } else {
         e.charge = null;
-        e.timer = 2.8;
+        e.timer = ENEMIES[e.kind].boss
+          ? bossAttackInterval(s.time, e.hp / e.maxHp < ENEMY_RULES.bossPhaseHp)
+          : 2.8 / difficulty(s.time).attackRate;
       }
     }
     if (!e.charge) {
@@ -184,7 +195,7 @@ export function ai(c: Combat, dt: number) {
       }
       if (e.kind === "bomber" && d < 100 && e.timer <= 0) {
         c.zone({ ...p }, 80, e.damage, "meteor", true, 0.95, 0.2);
-        e.timer = 3;
+        e.timer = 3 / difficulty(s.time).attackRate;
       }
       if (e.kind === "archer" && e.timer <= 0) {
         const count = s.time >= 1200 ? 3 : 1;
@@ -199,7 +210,7 @@ export function ai(c: Combat, dt: number) {
             true,
           );
         }
-        e.timer = 2.7;
+        e.timer = 2.7 / difficulty(s.time).attackRate;
       }
       if (e.kind === "seer" && e.timer <= 0) {
         c.zone(
@@ -214,21 +225,21 @@ export function ai(c: Combat, dt: number) {
           1.2,
           0.2,
         );
-        e.timer = 3.8;
+        e.timer = 3.8 / difficulty(s.time).attackRate;
       }
       if (e.kind === "shaman" && e.timer <= 0) {
         for (let i = 0; i < 2; i++)
           spawn(c, "crawler", { x: e.x + (i * 2 - 1) * 50, y: e.y });
-        e.timer = 7;
+        e.timer = 7 / Math.sqrt(difficulty(s.time).attackRate);
       }
       if (def.boss && e.timer <= 0) {
         const phase = e.hp / e.maxHp < ENEMY_RULES.bossPhaseHp ? 2 : 1,
           level = Math.min(5, Math.floor(s.time / 1200));
         e.phase++;
-        e.timer = Math.max(1.8, 4.8 - phase * 0.6 - level * 0.2);
+        e.timer = bossAttackInterval(s.time, phase === 2);
         if (e.kind === "warden") {
-          for (let i = 0; i < 3 + phase + level; i++) {
-            const a = (i * Math.PI * 2) / (3 + phase + level);
+          for (let i = 0; i < 6 + phase * 2 + level * 2; i++) {
+            const a = (i * Math.PI * 2) / (6 + phase * 2 + level * 2);
             c.zone(
               { x: p.x + Math.cos(a) * 120, y: p.y + Math.sin(a) * 120 },
               67,
@@ -242,7 +253,7 @@ export function ai(c: Combat, dt: number) {
           if (phase === 2) c.zone(p, 75, e.damage, "roots", true, 1.5, 0.2);
         }
         if (e.kind === "witch") {
-          const count = 10 + phase * 3 + level * 2;
+          const count = 18 + phase * 6 + level * 4;
           for (let i = 0; i < count; i++) {
             const a = (i * Math.PI * 2) / count + e.phase * 0.33;
             c.shoot(
@@ -261,9 +272,9 @@ export function ai(c: Combat, dt: number) {
         if (e.kind === "titan") {
           if (e.phase % 2 === 0) {
             e.charge = n;
-            e.timer = 1.1;
+            e.timer = Math.max(0.6, Math.min(1.1, bossAttackInterval(s.time, phase === 2)));
           } else
-            for (let i = 0; i < 4 + phase + level; i++)
+            for (let i = 0; i < 8 + phase * 3 + level * 2; i++)
               c.zone(
                 {
                   x: p.x + (random(s) - 0.5) * 550,
