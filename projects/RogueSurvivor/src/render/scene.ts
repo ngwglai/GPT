@@ -33,7 +33,10 @@ export class GameScene extends Phaser.Scene {
     super("expedition");
   }
   create() {
-    for (const a of ASSET_IDS) this.textures.addCanvas(a.id, defaultArt(a.id));
+    // Keep only the two safety textures needed before any world is painted.
+    // Other legacy vectors are created lazily if their generated image is absent.
+    for (const id of ["ui.gem", "map.ground"])
+      this.textures.addCanvas(id, defaultArt(id));
     this.background = this.add.graphics().setDepth(-2);
     this.graphics = this.add.graphics().setDepth(0);
     this.keys = this.input.keyboard!.addKeys(
@@ -151,6 +154,8 @@ export class GameScene extends Phaser.Scene {
           : this.textures.exists("builtin:" + id)
             ? "builtin:" + id
             : id;
+    if (!this.textures.exists(key))
+      this.textures.addCanvas(key, defaultArt(id));
     let sprite = this.sprites[this.used];
     if (!sprite) {
       sprite = this.add.sprite(0, 0, key);

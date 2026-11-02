@@ -1,11 +1,40 @@
-import { test, expect } from "@playwright/test";
+import { test as base, expect } from "@playwright/test";
+// Release this artwork suite's browser before legacy combat/collection workers.
+const test = base.extend({
+  browser: [
+    async ({ playwright, launchOptions }, use) => {
+      const browser = await playwright.chromium.launch(launchOptions);
+      try {
+        await use(browser);
+      } finally {
+        await browser.close();
+      }
+    },
+    { scope: "worker" },
+  ],
+});
 test("v1.3 original background, three consistent portraits and card art actually decode", async ({
   page,
 }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
+  await page.addInitScript(() => {
+    (window as any).fallbackCanvases = 0;
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      kind: any,
+      ...args: any[]
+    ) {
+      if (kind === "2d" && this.width === 128 && this.height === 128)
+        (window as any).fallbackCanvases++;
+      return (original as any).call(this, kind, ...args);
+    } as any;
+  });
   await page.goto("/");
   await expect(page.locator(".version")).toContainText("v1.3");
+  expect(
+    await page.evaluate(() => (window as any).fallbackCanvases),
+  ).toBeLessThan(15);
   const bg = await page
     .locator(".shell")
     .evaluate((el) => getComputedStyle(el).backgroundImage);
@@ -101,13 +130,11 @@ test("暂停中重复更换地表再恢复，生成纹理只解码一次", async
     return c.toDataURL();
   });
   for (let i = 0; i < 3; i++) {
-    await page
-      .locator("#asset-file")
-      .setInputFiles({
-        name: "ground.png",
-        mimeType: "image/png",
-        buffer: Buffer.from(data.split(",")[1], "base64"),
-      });
+    await page.locator("#asset-file").setInputFiles({
+      name: "ground.png",
+      mimeType: "image/png",
+      buffer: Buffer.from(data.split(",")[1], "base64"),
+    });
     await expect(page.locator(".asset-editor")).toContainText(
       "已使用本地自定义图片",
     );
