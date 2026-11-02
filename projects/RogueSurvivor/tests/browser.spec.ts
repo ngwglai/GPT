@@ -302,15 +302,16 @@ function isolatedBrowserSuite() {
 const denseTest = isolatedBrowserSuite();
 const fateTest = test.extend({
   context: async (
-    { playwright, launchOptions, headless, baseURL, viewport },
+    { playwright, launchOptions, contextOptions, baseURL, viewport },
     use,
     testInfo,
   ) => {
-    // A fresh temporary profile avoids Chromium's failing incognito-context path.
-    // The profile belongs only to this test and is removed when the browser closes.
-    const context = await playwright.chromium.launchPersistentContext("", {
-      ...launchOptions,
-      headless,
+    // Own one browser and one ephemeral context per collection test. Persistent
+    // profiles create an unused startup tab and introduce Windows profile/IDB
+    // startup races; no on-disk profile is needed for reload/save assertions.
+    const browser = await playwright.chromium.launch(launchOptions);
+    const context = await browser.newContext({
+      ...contextOptions,
       baseURL,
       viewport,
     });
@@ -328,6 +329,7 @@ const fateTest = test.extend({
             .catch(() => {});
       }
       await context.close();
+      await browser.close();
     }
   },
 });

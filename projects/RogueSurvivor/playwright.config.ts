@@ -25,6 +25,7 @@ export default defineConfig({
       ],
     },
     screenshot: "only-on-failure",
+    trace: "retain-on-failure",
   },
   webServer: {
     command: "npm run preview -- --port 4174 --strictPort",
