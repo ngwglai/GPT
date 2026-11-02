@@ -78,6 +78,7 @@ s=src('decor')
 ids=['map.cavern.crystal','map.cavern.lake','map.cavern.ore','map.garden.tree','map.garden.tea','map.garden.house','map.eclipse.pillar','map.eclipse.altar','map.eclipse.rune','map.candy.speed','map.candy.haste','map.candy.heal','map.candy.xp','map.candy.slow','map.candy.weak','map.magicCircle']
 cn=['可破坏水晶','地下湖泊','魔法矿石','糖果树','魔法茶会','奶油小屋','遗迹石柱','月光祭坛','星空符石','疾风糖果','闪电糖果','爱心糖果','星星糖果','恶作剧缓行糖','裂纹虚弱糖','月光法阵']
 for i,(id,name) in enumerate(zip(ids,cn)):asset(id,name,cell(s,i,4,4),256)
+visuals['enemy.mimicDormant']='cards/treasure.webp';names['enemy.mimicDormant']='宝箱怪伪装外观'
 (ROOT/'src/data/worldVisuals.ts').write_text('/** Generated atlas mapping; no combat parameters. */\nexport const WORLD_VISUALS:Record<string,string> = '+json.dumps(visuals,ensure_ascii=False,indent=2)+';\nexport const WORLD_ASSET_NAMES:Record<string,string> = '+json.dumps(names,ensure_ascii=False,indent=2)+';\n')
 manifest=json.loads((OUT/'manifest.json').read_text());manifest['version']='1.4';manifest['assets'].update(visuals);(OUT/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
 print(len(visuals),'new IDs;',len(set(visuals.values())),'new files')

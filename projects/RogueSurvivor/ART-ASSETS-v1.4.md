@@ -42,3 +42,4 @@
 |`map.magicCircle`|`v1.4/map/magicCircle.webp`|256×256|
 |`projectile.crystal`|`v1.4/projectile/crystal.webp`|128×128|
 |`effect.heal`|`v1.4/effect/heal.webp`|128×128|
+|`enemy.mimicDormant`|`cards/treasure.webp`（复用原礼盒）|128×128|

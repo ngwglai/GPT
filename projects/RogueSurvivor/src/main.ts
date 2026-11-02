@@ -271,6 +271,7 @@ function pause() {
 }
 function upgrade() {
   if (!world) return;
+  lastPhase = "upgrade";
   hud();
   screen = "upgrade";
   audio.effect("level");
@@ -509,12 +510,12 @@ async function action(id: string) {
   }
   if (id.startsWith("upgrade-")) {
     if (world?.choose(id.slice(8))) {
-      await saveCurrent(false);
       if (world.s.phase === "upgrade") upgrade();
       else {
         hud();
         scene.paused = false;
         lastPhase = "playing";
+        await saveCurrent(false);
       }
     }
     return;
@@ -630,8 +631,8 @@ async function action(id: string) {
       const next = { ...assetPack.assets };
       delete next[assetId];
       await persistAssets(next);
-      await reloadArt();
       assetManager();
+      await reloadArt();
       break;
     }
     case "apply-asset": {
@@ -657,8 +658,8 @@ async function action(id: string) {
       };
       await validateAsset(a);
       await persistAssets({ ...assetPack.assets, [assetId]: a });
-      await reloadArt();
       assetManager();
+      await reloadArt();
       notify("资源配置已应用");
       break;
     }
@@ -696,9 +697,11 @@ app.addEventListener("change", async (e) => {
       const pack = await importPack(await el.files[0].text());
       await persistAssets(pack.assets);
     }
-    await reloadArt();
     assetManager();
-    notify("资源已保存并应用");
+    void reloadArt().catch((e) =>
+      notify(e.message || "战斗贴图加载失败，已保留默认外观。"),
+    );
+    notify("资源已保存");
   } catch (e) {
     notify((e as Error).message);
   } finally {

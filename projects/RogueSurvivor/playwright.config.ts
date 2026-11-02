@@ -10,10 +10,9 @@ export default defineConfig({
     viewport: { width: 1440, height: 900 },
     headless: true,
     launchOptions: {
-      // Full Chromium's modern headless mode avoids Windows legacy Shell
+      // Full Chromium's modern headless mode avoids legacy Shell
       // context/Skia mailbox failures; keep the same WebGL and media coverage.
-      ...(process.platform === "win32" &&
-      !process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
+      ...(!process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
         ? { channel: "chromium" }
         : {}),
       ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH

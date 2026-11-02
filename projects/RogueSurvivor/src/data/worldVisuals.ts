@@ -1,5 +1,6 @@
 /** Generated atlas mapping; no combat parameters. */
-export const WORLD_VISUALS:Record<string,string> = {
+export const WORLD_VISUALS: Record<string, string> = {
+  "enemy.mimicDormant": "cards/treasure.webp",
   "enemy.fairy": "v1.4/enemy/fairy.webp",
   "enemy.protector": "v1.4/enemy/protector.webp",
   "enemy.ghost": "v1.4/enemy/ghost.webp",
@@ -37,9 +38,10 @@ export const WORLD_VISUALS:Record<string,string> = {
   "map.candy.xp": "v1.4/map/candy/xp.webp",
   "map.candy.slow": "v1.4/map/candy/slow.webp",
   "map.candy.weak": "v1.4/map/candy/weak.webp",
-  "map.magicCircle": "v1.4/map/magicCircle.webp"
+  "map.magicCircle": "v1.4/map/magicCircle.webp",
 };
-export const WORLD_ASSET_NAMES:Record<string,string> = {
+export const WORLD_ASSET_NAMES: Record<string, string> = {
+  "enemy.mimicDormant": "宝箱怪伪装外观",
   "enemy.fairy": "治愈妖精",
   "enemy.protector": "星光护卫",
   "enemy.ghost": "时空幽灵",
@@ -77,5 +79,5 @@ export const WORLD_ASSET_NAMES:Record<string,string> = {
   "map.candy.xp": "星星糖果",
   "map.candy.slow": "恶作剧缓行糖",
   "map.candy.weak": "裂纹虚弱糖",
-  "map.magicCircle": "月光法阵"
+  "map.magicCircle": "月光法阵",
 };

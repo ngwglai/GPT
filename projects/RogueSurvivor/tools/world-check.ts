@@ -2,7 +2,7 @@
 import { simulate } from "../tests/simulate";
 import { mkdirSync, writeFileSync } from "node:fs";
 import type { MapId } from "../src/data/maps";
-const dir = "validation/v1.4";
+const dir = process.env.WORLD_REPORT_OUT || "validation/v1.4";
 mkdirSync(dir, { recursive: true });
 const stress = process.argv.includes("--stress");
 const maps: MapId[] = ["cavern", "garden", "eclipse"];

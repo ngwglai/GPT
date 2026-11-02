@@ -93,6 +93,7 @@
     "map.candy.weak": "v1.4/map/candy/weak.webp",
     "map.magicCircle": "v1.4/map/magicCircle.webp",
     "projectile.crystal": "v1.4/projectile/crystal.webp",
-    "effect.heal": "v1.4/effect/heal.webp"
+    "effect.heal": "v1.4/effect/heal.webp",
+    "enemy.mimicDormant": "cards/treasure.webp"
   }
 }

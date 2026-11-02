@@ -151,6 +151,7 @@ export const MAPS: Record<MapId, MapDefinition> = {
   },
 };
 export const ENV_RULES = {
+  teleportRange: 240,
   crystals: 24,
   crystalHp: 120,
   chain: 16,

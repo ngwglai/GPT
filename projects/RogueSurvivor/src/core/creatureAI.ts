@@ -299,7 +299,7 @@ export function advancedAI(c: Combat, e: Enemy, dt: number) {
       vx = vy = 0;
       if (b.warning <= 0) {
         const pos = safeLanding(s, b.target, e.r);
-        if (pos) {
+        if (pos && distance(e, pos) <= ENV_RULES.teleportRange) {
           e.x = pos.x;
           e.y = pos.y;
           c.effect(e, "portal", 50);
@@ -308,11 +308,22 @@ export function advancedAI(c: Combat, e: Enemy, dt: number) {
       }
     } else if (e.timer <= 0) {
       const a = random(s) * Math.PI * 2;
-      const pos = safeLanding(
-        s,
-        { x: p.x + Math.cos(a) * 160, y: p.y + Math.sin(a) * 160 },
-        e.r,
-      );
+      let pos: Vec | undefined;
+      for (let i = 0; i < 8; i++) {
+        const angle = a + (i * Math.PI) / 4;
+        const candidate = safeLanding(
+          s,
+          {
+            x: e.x + n.x * 80 + Math.cos(angle) * 140,
+            y: e.y + n.y * 80 + Math.sin(angle) * 140,
+          },
+          e.r,
+        );
+        if (candidate && distance(candidate, e) <= ENV_RULES.teleportRange) {
+          pos = candidate;
+          break;
+        }
+      }
       if (pos) {
         b.target = pos;
         b.warning = 0.8;
@@ -334,7 +345,7 @@ export function advancedAI(c: Combat, e: Enemy, dt: number) {
   if (e.kind === "mimic") {
     if (!b.awakened) {
       vx = vy = 0;
-      if (d < 190) {
+      if (d < 190 || e.hp < e.maxHp) {
         b.awakened = true;
         e.charge = n;
         b.warning = 0.7;

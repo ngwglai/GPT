@@ -274,3 +274,43 @@ test("v1.4 new boss second phase, map state and five weapons resume", async ({
   await page.getByRole("button", { name: /继续旅程/ }).click();
   await expect(page.locator("#boss-hud")).toContainText("水晶女王");
 });
+test("v1.4 mimic has a real closed disguise before revealing its creature art", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    (window as any).disguiseDraws = 0;
+    (window as any).mimicDraws = 0;
+    const original = CanvasRenderingContext2D.prototype.drawImage;
+    CanvasRenderingContext2D.prototype.drawImage = function (
+      img: any,
+      ...args: any[]
+    ) {
+      if (img instanceof HTMLImageElement) {
+        if (img.src.includes("cards/treasure.webp"))
+          (window as any).disguiseDraws++;
+        if (img.src.includes("v1.4/enemy/mimic.webp"))
+          (window as any).mimicDraws++;
+      }
+      return (original as any).call(this, img, ...args);
+    } as any;
+  });
+  const w = new World(createRun("endless", "ranger", 12));
+  w.s.player.invincible = 30;
+  w.s.player.weaponTimers.bow = 1000;
+  w.s.spawnTimer = 9;
+  spawn(w, "mimic", { x: 2080, y: 1800 });
+  await resume(page, w.s);
+  await expect
+    .poll(() => page.evaluate(() => (window as any).disguiseDraws))
+    .toBeGreaterThan(5);
+  await page.keyboard.down("d");
+  await page.waitForTimeout(850);
+  await page.keyboard.up("d");
+  await expect
+    .poll(() => page.evaluate(() => (window as any).mimicDraws))
+    .toBeGreaterThan(3);
+  const saved = await save(page);
+  expect(
+    saved.enemies.find((e: any) => e.kind === "mimic").behavior.awakened,
+  ).toBe(true);
+});

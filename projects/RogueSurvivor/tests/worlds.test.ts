@@ -470,3 +470,20 @@ it("new chasing creatures steer around circular obstacles", () => {
   expect(Math.abs(e.y - y)).toBeGreaterThan(5);
   expect(distance(e, c.s.rocks[0])).toBeGreaterThanOrEqual(e.r + 45 - 0.01);
 });
+it("ghost teleport distance stays bounded even far from the player", () => {
+  for (const x of [500, 2000, 3200]) {
+    const c = w();
+    c.s.rocks = [];
+    const e = enemy(c, "ghost", x, 2200);
+    e.timer = 0;
+    advancedAI(c, e, 0.05);
+    const target = behavior(e).target;
+    expect(target).not.toBeNull();
+    expect(distance(target!, e)).toBeLessThanOrEqual(ENV_RULES.teleportRange);
+    const before = { x: e.x, y: e.y };
+    for (let i = 0; i < 17; i++) advancedAI(c, e, 0.05);
+    expect(distance(e, before)).toBeLessThanOrEqual(
+      ENV_RULES.teleportRange + 5,
+    );
+  }
+});

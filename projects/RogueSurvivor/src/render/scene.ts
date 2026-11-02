@@ -119,6 +119,7 @@ export class GameScene extends Phaser.Scene {
         /* Default key remains. */
       }
     }
+    this.needsPaint = true;
   }
   inputState(): Input {
     const k = this.keys,
@@ -442,7 +443,9 @@ export class GameScene extends Phaser.Scene {
       const bob =
         Math.sin(s.time * (e.kind === "runner" ? 12 : 5) + e.id) * 0.04;
       this.sprite(
-        "enemy." + e.kind,
+        e.kind === "mimic" && !e.behavior?.awakened
+          ? "enemy.mimicDormant"
+          : "enemy." + e.kind,
         e,
         e.r * 2.7 * (1 + bob),
         e.kind === "crab"
@@ -466,6 +469,10 @@ export class GameScene extends Phaser.Scene {
           0.75,
         );
         g.strokeCircle(sx(e.x), sy(e.y), e.r + 2);
+      }
+      if (e.kind === "mimic" && !e.behavior?.awakened) {
+        g.fillStyle(0xeb8ca7, 0.9);
+        g.fillCircle(sx(e.x) + e.r + 12, sy(e.y) - e.r - 8, 3);
       }
       if (e.behavior) {
         const b = e.behavior;
