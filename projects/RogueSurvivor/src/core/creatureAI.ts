@@ -3,6 +3,7 @@ import type { Combat } from "./combat";
 import { spawn } from "./director";
 import { NEW_ENEMIES } from "../data/creatures";
 import { ENV_RULES } from "../data/maps";
+import { difficulty, bossAttackInterval } from "../data/content";
 import { ENEMY_RULES } from "../data/enemies";
 import { WEAPONS } from "../data/weapons";
 import { distance, unit, move, clamp, random } from "./math";
@@ -84,7 +85,7 @@ function ring(c: Combat, e: Enemy, count: number, offset = 0) {
   }
 }
 function beam(c: Combat, e: Enemy, dir: Vec) {
-  for (let i = 1; i <= 7; i++)
+  for (let i = 1; i <= 10; i++)
     c.zone(
       { x: e.x + dir.x * i * 66, y: e.y + dir.y * i * 66 },
       37,
@@ -123,10 +124,7 @@ function boss(c: Combat, e: Enemy, dt: number) {
   }
   if (e.timer > 0) return;
   e.phase++;
-  e.timer = Math.max(
-    2.6,
-    (second ? 4.2 : 5.8) - Math.min(0.8, Math.floor(s.time / 1800) * 0.15),
-  );
+  e.timer = bossAttackInterval(s.time, second);
   c.effect(e, "warning", 90);
   if (e.kind === "crystalQueen") {
     const a = random(s) * Math.PI * 2;
@@ -175,11 +173,11 @@ function boss(c: Combat, e: Enemy, dt: number) {
     if (owned < ENV_RULES.summons)
       childSpawn(c, e, "splitter", { x: e.x + 60, y: e.y });
     c.zone({ ...p }, 80, e.damage, "candyTrap", true, 1.3, 0.3, e.kind);
-    if (second) ring(c, e, 10, e.phase * 0.2);
+    if (second) ring(c, e, 20, e.phase * 0.2);
   } else if (e.kind === "eclipseSaint") {
     // Broken ring leaves a visible exit; collision radii reduce its safe angle.
-    for (let i = 0; i < 6; i++) {
-      const a = e.phase * 0.45 + (i * Math.PI) / 4;
+    for (let i = 0; i < 9; i++) {
+      const a = e.phase * 0.45 + (i * Math.PI) / 6;
       c.zone(
         { x: p.x + Math.cos(a) * 210, y: p.y + Math.sin(a) * 210 },
         65,
@@ -238,7 +236,7 @@ function boss(c: Combat, e: Enemy, dt: number) {
           e.kind,
         );
     }
-    if (second) ring(c, e, 8, e.phase * 0.25);
+    if (second) ring(c, e, 16, e.phase * 0.25);
   }
 }
 export function advancedAI(c: Combat, e: Enemy, dt: number) {
@@ -342,14 +340,14 @@ export function advancedAI(c: Combat, e: Enemy, dt: number) {
         vx = vy = 0;
         c.effect(pos, "warning", 40);
       }
-      e.timer = 5;
+      e.timer = 5 / difficulty(s.time).attackRate;
     }
   }
   if (e.kind === "mirror") {
     if (e.timer <= 0) {
       b.reflecting = 2.2;
       b.warning = 0.7;
-      e.timer = 5;
+      e.timer = 5 / difficulty(s.time).attackRate;
       c.effect(e, "warning", 50);
     }
     b.warning = Math.max(0, b.warning - dt);
@@ -376,7 +374,7 @@ export function advancedAI(c: Combat, e: Enemy, dt: number) {
           .length < ENV_RULES.summons
       )
         childSpawn(c, e, "crawler", { x: e.x + 55, y: e.y });
-      e.timer = 7;
+      e.timer = 7 / Math.sqrt(difficulty(s.time).attackRate);
     }
   }
   if (e.kind === "hexer") {
@@ -388,8 +386,8 @@ export function advancedAI(c: Combat, e: Enemy, dt: number) {
       const status = (["slow", "curseHaste", "curseCooldown"] as const)[
         e.phase++ % 3
       ];
-      c.shoot(e, n, 8, "enemy", "hexer", true, { status });
-      e.timer = 3.8;
+      c.shoot(e, n, e.damage, "enemy", "hexer", true, { status });
+      e.timer = 3.8 / difficulty(s.time).attackRate;
       c.effect(e, "warning", 30);
     }
   }
@@ -414,7 +412,7 @@ export function advancedAI(c: Combat, e: Enemy, dt: number) {
       boost = 3.7;
     } else {
       e.charge = null;
-      e.timer = 3.8;
+      e.timer = 3.8 / difficulty(s.time).attackRate;
     }
   }
   // Preserve local obstacle steering for the new behaviors as well as legacy AI.
