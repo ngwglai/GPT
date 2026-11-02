@@ -25,7 +25,8 @@ export default defineConfig({
       ],
     },
     screenshot: "only-on-failure",
-    trace: "retain-on-failure",
+    // DOM/network diagnostics need no continuous GPU readback on software CI.
+    trace: { mode: "retain-on-failure", screenshots: false },
   },
   webServer: {
     command: "npm run preview -- --port 4174 --strictPort",
