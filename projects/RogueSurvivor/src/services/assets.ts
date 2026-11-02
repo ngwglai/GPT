@@ -1,6 +1,7 @@
+import { VISUALS } from "../data/visuals";
 import { CHARACTERS, ENEMIES, SKILLS, WEAPONS } from "../data/content";
 import { read, write } from "./storage";
-export const ASSET_IDS = [
+const LEGACY_ASSET_IDS = [
   ...CHARACTERS.map((c) => ({
     id: `player.${c.id}`,
     name: c.name,
@@ -26,6 +27,36 @@ export const ASSET_IDS = [
   { id: "map.ground", name: "地表", group: "地图" },
   { id: "ui.gem", name: "经验星晶", group: "界面" },
   { id: "ui.panel", name: "面板背景", group: "界面" },
+];
+export const ASSET_IDS = [
+  ...LEGACY_ASSET_IDS,
+  ...Object.keys(VISUALS)
+    .filter((id) => !LEGACY_ASSET_IDS.some((a) => a.id === id))
+    .map((id) => ({
+      id,
+      name: id.startsWith("portrait.")
+        ? "角色立绘 · " + CHARACTERS.find((c) => id.endsWith(c.id))?.name
+        : id.startsWith("avatar.")
+          ? "角色头像 · " + CHARACTERS.find((c) => id.endsWith(c.id))?.name
+          : (
+              {
+                "map.tree": "星光小树",
+                "map.obelisk": "魔法石碑",
+                "ui.world": "魔法世界背景",
+                "card.shuffle": "命运洗牌插画",
+                "card.negative": "恶作剧卡面",
+                "card.treasure": "惊喜礼盒",
+                "card.lucky": "幸运星卡面",
+                "card.common": "普通卡面",
+                "card.rare": "稀有卡面",
+                "card.epic": "史诗卡面",
+                "card.mechanism": "机制卡面",
+                "effect.bloom": "花朵领域",
+                "effect.ward": "魔法结界",
+              } as Record<string, string>
+            )[id] || id,
+      group: "星光美术",
+    })),
 ];
 export interface Asset {
   data: string;

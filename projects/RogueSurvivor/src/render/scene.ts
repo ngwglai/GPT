@@ -1,3 +1,4 @@
+import { VISUALS, artUrl } from "../data/visuals";
 import Phaser from "phaser";
 import type { Settings, Input, Vec } from "../core/types";
 import { World } from "../core/world";
@@ -13,6 +14,9 @@ export class GameScene extends Phaser.Scene {
   needsPaint = true;
   onFrame?: (dt: number) => void;
   onPause?: () => void;
+  private ground?: Phaser.GameObjects.TileSprite;
+  private decoded = new Map<string, Promise<HTMLImageElement>>();
+  private builtins?: Promise<void>;
   private background!: Phaser.GameObjects.Graphics;
   private graphics!: Phaser.GameObjects.Graphics;
   private sprites: Phaser.GameObjects.Sprite[] = [];
@@ -61,7 +65,33 @@ export class GameScene extends Phaser.Scene {
   async reloadAssets() {
     this.needsPaint = true;
     if (!this.ready) return;
+    this.builtins ??= Promise.all(
+      Object.keys(VISUALS)
+        .filter(
+          (id) =>
+            !id.startsWith("portrait.") &&
+            !id.startsWith("avatar.") &&
+            !id.startsWith("card.") &&
+            id !== "ui.world" &&
+            !id.startsWith("skill."),
+        )
+        .map(async (id) => {
+          try {
+            const url = artUrl(id)!;
+            if (!this.decoded.has(url)) this.decoded.set(url, decodeImage(url));
+            const image = await this.decoded.get(url)!;
+            if (!this.textures.exists("builtin:" + id))
+              this.textures.addImage("builtin:" + id, image);
+          } catch {
+            /* Original vector fallback remains available. */
+          }
+        }),
+    ).then(() => {
+      this.needsPaint = true;
+    });
+    await this.builtins;
     const rev = ++this.assetRevision;
+    this.ground?.setVisible(false).setTexture("map.ground");
     for (const sprite of this.sprites)
       sprite.setVisible(false).setTexture("ui.gem");
     for (const a of ASSET_IDS) {
@@ -116,7 +146,11 @@ export class GameScene extends Phaser.Scene {
       return;
     const custom = assetPack.assets[id],
       key =
-        custom && this.textures.exists("custom:" + id) ? "custom:" + id : id;
+        custom && this.textures.exists("custom:" + id)
+          ? "custom:" + id
+          : this.textures.exists("builtin:" + id)
+            ? "builtin:" + id
+            : id;
     let sprite = this.sprites[this.used];
     if (!sprite) {
       sprite = this.add.sprite(0, 0, key);
@@ -130,7 +164,10 @@ export class GameScene extends Phaser.Scene {
       .setDisplaySize(size * (custom?.scale || 1), size * (custom?.scale || 1))
       .setRotation(angle)
       .setAlpha(alpha)
-      .setDepth(2 + p.y / 10000);
+      .setDepth(id.startsWith("map.") ? -0.5 : 2 + p.y / 10000);
+    sprite.setFlipX(
+      id.startsWith("player.") && this.keys.A.isDown && !this.keys.D.isDown,
+    );
     sprite.clearTint();
     if (tint) sprite.setTint(tint);
     if (custom?.frames && key.startsWith("custom:"))
@@ -207,11 +244,28 @@ export class GameScene extends Phaser.Scene {
     g.clear();
     const sx = (x: number) => x - this.cx + W / 2,
       sy = (y: number) => y - this.cy + H / 2;
-    this.background.clear().fillStyle(0x17332e).fillRect(0, 0, W, H);
-    if (assetPack.assets["map.ground"]) {
-      this.sprite("map.ground", p, Math.max(W, H));
-      this.sprites[this.used - 1]?.setDepth(-1);
-    }
+    this.background.clear().fillStyle(0xcddfc8).fillRect(0, 0, W, H);
+    const groundKey = this.textures.exists("custom:map.ground")
+      ? "custom:map.ground"
+      : this.textures.exists("builtin:map.ground")
+        ? "builtin:map.ground"
+        : undefined;
+    if (groundKey) {
+      this.ground ??= this.add
+        .tileSprite(0, 0, W, H, groundKey)
+        .setOrigin(0)
+        .setDepth(-1);
+      this.ground.setVisible(true);
+      if (this.ground.texture.key !== groundKey)
+        this.ground.setTexture(groundKey);
+      if (this.ground.width !== W || this.ground.height !== H)
+        this.ground.setSize(W, H);
+      this.ground.setTileScale(assetPack.assets["map.ground"]?.scale || 1);
+      this.ground.tilePositionX =
+        this.cx - W / 2 - (assetPack.assets["map.ground"]?.x || 0);
+      this.ground.tilePositionY =
+        this.cy - H / 2 - (assetPack.assets["map.ground"]?.y || 0);
+    } else this.ground?.setVisible(false);
     g.lineStyle(1, 0x779c80, 0.055);
     for (
       let x = Math.floor((this.cx - W / 2) / 100) * 100;
@@ -244,7 +298,15 @@ export class GameScene extends Phaser.Scene {
           g.lineBetween(sx(x), sy(y), sx(x + 3), sy(y - 8));
           g.lineBetween(sx(x + 3), sy(y - 8), sx(x + 8), sy(y - 2));
           if (hash > 0.85)
-            this.sprite("map.flower", { x: x + 36, y: y + 25 }, 28);
+            this.sprite(
+              hash > 0.96
+                ? "map.tree"
+                : hash > 0.92
+                  ? "map.obelisk"
+                  : "map.flower",
+              { x: x + 36, y: y + 25 },
+              hash > 0.92 ? 44 : 28,
+            );
         }
       }
     g.lineStyle(8, 0x7e9f80, 0.8);
@@ -279,6 +341,8 @@ export class GameScene extends Phaser.Scene {
       }
       if (!z.enemy && assetPack.assets["skill." + z.kind])
         this.sprite("skill." + z.kind, z, z.r * 2, 0, 0.6);
+      else if (!z.enemy && (z.kind === "bloom" || z.kind === "ward"))
+        this.sprite("effect." + z.kind, z, z.r * 2, 0, 0.25);
     }
     for (const e of s.enemies) {
       const bob =
@@ -331,8 +395,15 @@ export class GameScene extends Phaser.Scene {
       }
     }
     if (p.shield > 0) {
+      this.sprite(
+        assetPack.assets["skill.ward"] ? "skill.ward" : "effect.ward",
+        p,
+        94,
+        s.time * 0.08,
+        0.23,
+      );
       g.lineStyle(2, 0xa3e4ef, 0.6);
-      g.strokeCircle(W / 2, H / 2, 29 + Math.sin(s.time * 3) * 2);
+      g.strokeCircle(W / 2, H / 2, 43 + Math.sin(s.time * 3) * 2);
     }
     if (p.dash > 0) {
       g.lineStyle(14, 0xa7ead6, 0.3);
@@ -341,7 +412,7 @@ export class GameScene extends Phaser.Scene {
     this.sprite(
       "player." + s.character,
       p,
-      66 * (1 + Math.sin(s.time * 7) * 0.025),
+      80 * (1 + Math.sin(s.time * 7) * 0.025),
       0,
       p.invincible > 0 && Math.floor(s.time * 20) % 2 ? 0.55 : 1,
     );
@@ -369,13 +440,17 @@ export class GameScene extends Phaser.Scene {
         : b.kind === "fragment"
           ? "bow"
           : b.kind === "lance"
-            ? "ember"
+            ? "lance"
             : b.kind;
       this.sprite(
         "projectile." + id,
         b,
         b.r * 3 + 5,
-        Math.atan2(b.vy, b.vx) + Math.PI / 2,
+        Math.atan2(b.vy, b.vx) +
+          (this.textures.exists("builtin:projectile." + id) &&
+          !assetPack.assets["projectile." + id]
+            ? 0
+            : Math.PI / 2),
       );
     }
     const limit = low ? 25 : 90;

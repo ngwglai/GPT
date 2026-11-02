@@ -160,7 +160,7 @@ test("死亡结算、历史记录和重新开始", async ({ page }) => {
   await page.getByRole("button", { name: "← 返回" }).click();
   await page.getByRole("button", { name: "再启远征" }).click();
   await expect(
-    page.getByRole("heading", { name: "选择你的行路人" }),
+    page.getByRole("heading", { name: "选择你的星光伙伴" }),
   ).toBeVisible();
 });
 test("设置保存且重新打开后保留", async ({ page }) => {
@@ -227,7 +227,7 @@ test("图片上传、变换、精灵图、导出、恢复默认和导入", async
   await page.getByRole("button", { name: "导出资源包" }).click();
   expect((await download).suggestedFilename()).toContain("资源包");
   await page.getByRole("button", { name: "恢复默认", exact: true }).click();
-  await expect(page.locator(".asset-editor")).toContainText("默认矢量美术");
+  await expect(page.locator(".asset-editor")).toContainText("原创二次元美术");
   await page.locator("#pack-file").setInputFiles({
     name: "pack.json",
     mimeType: "application/json",
@@ -602,7 +602,7 @@ test("v1.1 重抽、遗忘与属性落盘", async ({ page }) => {
 
 fateTest("v1.2 三类图鉴、当前构筑合并层数及独立刷新", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".version")).toContainText("v1.2");
+  await expect(page.locator(".version")).toContainText("v1.3");
   await page.getByRole("button", { name: "远征图鉴", exact: true }).click();
   await expect(page.locator(".codex-card")).toHaveCount(70);
   await page.getByRole("button", { name: "技能图鉴", exact: true }).click();

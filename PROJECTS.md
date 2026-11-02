@@ -16,7 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| 星烬远征 RogueSurvivor | [projects/RogueSurvivor](projects/RogueSurvivor/) | Completed | 浏览器俯视角动作肉鸽：自动攻击、主动技能、标准/无尽、存档与资源工坊 | v1.2 卡牌与命运：统一70项卡牌、构筑/三类图鉴、无限数值、独立刷新、正负掉落队列与等量洗牌；独立浏览器/profile验收；验证、兼容和限制见 V1.2.md，远端状态见 Actions |
+| 星烬远征 RogueSurvivor | [projects/RogueSurvivor](projects/RogueSurvivor/) | Completed | 浏览器俯视角动作肉鸽：自动攻击、主动技能、标准/无尽、存档与资源工坊 | v1.3 原创二次元美术：三少女立绘/头像/Q版、十种怪物、地图、武器/技能、卡面和UI；规则/存档保持v1.2，验证与限制见V1.3.md，远端状态见Actions |
 | RogueLab | [projects/roguelab](projects/roguelab/) | Completed | Godot 4 三职业卡组肉鸽：三幕路线、遗物构筑、随机事件与首领；Web / Windows | PR #24；独立 Linux/Windows 验收通过，Web / 下载入口见 README；v1.1 完整简体中文；后续玩家反馈 |
 | CompilerLab | [projects/compilerlab](projects/compilerlab/) | Completed | 本地微型编译流水线、独立解释器与栈式 VM 语义对照 | PR #23；最终修复头253单元/14生产E2E、Linux/Windows与CI required已35/35通过；最新验收记录仍需完整CI成功，不部署 |
 | CalibrationLab | [projects/calibrationlab](projects/calibrationlab/) | Completed | 本地概率预测、独立样本校准与可靠性图 | PR #22；最终121单元/13生产E2E；初始功能头Linux/Windows与CI required全通过，数值修复头仍须完整CI，不部署 |
@@ -355,3 +355,9 @@
 
 - RogueSurvivor：接入用户提供的六首战斗音乐，自动循环轮播，设置增加独立音乐开关，复用音量与持久化设置。
 - 发布检查：11个使用ESLint的项目通过overrides统一minimatch 11.0.3并更新锁文件，修复GHSA-g3hv-75wg-m249；本地安装、审计和lint均通过，未修改业务功能。
+
+## 星烬远征 v1.3「星光少女与魔法世界」
+
+- 内置image_gen实际生成并接入三名少女立绘/头像/Q版、十怪物、环境/技能/武器/卡面/UI；54个图片ID/45张成品与八张母图，55个可替换资源ID，保留矢量回退。
+- 138单元、27生产Chromium E2E、本地构建/审计通过；两组7201秒压力与独占浏览器对照、截图及限制见项目V1.3.md。未修改战斗核心、卡牌参数、存档/随机数。
+- 高密度软件渲染有开销：持续147敌人夹具新版5–10FPS，基线7–11FPS，不承诺60FPS。保留程序变换动画，不冒充逐帧全方向动作；远端CI/部署以PR与Actions为准。
