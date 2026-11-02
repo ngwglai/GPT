@@ -1,0 +1,83 @@
+{
+  "environment": "Linux system Chromium, headless SwiftShader, 1440x900, sole benchmark browser",
+  "requestedEnemies": 160,
+  "initialEnemies": 147,
+  "wallSeconds": 61.015,
+  "samples": [
+    {
+      "seconds": 10.011,
+      "panel": "FPS 10 ｜ 敌人 147/150 ｜ 弹道 105/360 ｜ 特效 65 ｜ 完整画面",
+      "heap": 31650965
+    },
+    {
+      "seconds": 20.078,
+      "panel": "FPS 6 ｜ 敌人 147/150 ｜ 弹道 128/360 ｜ 特效 44 ｜ 完整画面",
+      "heap": 28846766
+    },
+    {
+      "seconds": 30.114,
+      "panel": "FPS 5 ｜ 敌人 147/150 ｜ 弹道 104/360 ｜ 特效 16 ｜ 完整画面",
+      "heap": 18814729
+    },
+    {
+      "seconds": 40.134,
+      "panel": "FPS 6 ｜ 敌人 147/150 ｜ 弹道 85/360 ｜ 特效 51 ｜ 完整画面",
+      "heap": 44412397
+    },
+    {
+      "seconds": 50.19,
+      "panel": "FPS 6 ｜ 敌人 147/150 ｜ 弹道 82/360 ｜ 特效 66 ｜ 完整画面",
+      "heap": 27861554
+    },
+    {
+      "seconds": 60.206,
+      "panel": "FPS 5 ｜ 敌人 147/150 ｜ 弹道 94/360 ｜ 特效 62 ｜ 完整画面",
+      "heap": 29127168
+    }
+  ],
+  "imageRequests": {
+    "characters/ranger-full.webp": 2,
+    "enemies/crawler.webp": 2,
+    "enemies/archer.webp": 2,
+    "maps/rock.webp": 2,
+    "maps/flower.webp": 2,
+    "ui/world.webp": 2,
+    "characters/ranger-battle.webp": 2,
+    "characters/knight-battle.webp": 2,
+    "characters/mage-battle.webp": 2,
+    "enemies/runner.webp": 2,
+    "enemies/seer.webp": 2,
+    "enemies/shaman.webp": 2,
+    "enemies/guard.webp": 2,
+    "enemies/bomber.webp": 2,
+    "enemies/warden.webp": 2,
+    "enemies/witch.webp": 2,
+    "enemies/titan.webp": 2,
+    "weapons/bow.webp": 2,
+    "weapons/blade.webp": 2,
+    "weapons/ember.webp": 2,
+    "weapons/orbit.webp": 2,
+    "weapons/drone.webp": 2,
+    "ui/gem.webp": 2,
+    "maps/tree.webp": 2,
+    "maps/obelisk.webp": 2,
+    "effects/bow.webp": 2,
+    "effects/ember.webp": 2,
+    "effects/drone.webp": 2,
+    "effects/enemy.webp": 2,
+    "effects/bloom.webp": 2,
+    "effects/ward.webp": 2,
+    "maps/grass.webp": 2,
+    "characters/knight-full.webp": 1,
+    "characters/mage-full.webp": 1,
+    "effects/storm.webp": 2,
+    "characters/mage-avatar.webp": 2,
+    "effects/lance.webp": 2,
+    "effects/ice.webp": 1,
+    "cards/lucky.webp": 1,
+    "cards/treasure.webp": 1,
+    "cards/negative.webp": 1,
+    "cards/shuffle.webp": 1
+  },
+  "errors": []
+}

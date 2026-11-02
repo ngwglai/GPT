@@ -1,3 +1,4 @@
+import { artUrl, cardArt } from "../data/visuals";
 import { ENEMY_RULES, ENEMY_BEHAVIORS } from "../data/enemies";
 import { skillLevelText } from "../data/skills";
 import { UPGRADES, RARITIES, WEAPONS, SKILLS, ENEMIES } from "../data/content";
@@ -89,7 +90,11 @@ export function nextEffect(s: Run, id: string) {
   recalculate(draft);
   return `当前：${effectSummary(s, id)} 下一层：${effectSummary(draft, id)}`;
 }
-export function cardBrowser(s: Run, owned = false) {
+export function cardBrowser(
+  s: Run,
+  owned = false,
+  image?: (id: string, cls?: string) => string,
+) {
   ensureDeck(s);
   const cards = UPGRADES.filter(
     (u) => !owned || (s.player.upgrades[u.id] || 0) > 0,
@@ -102,7 +107,7 @@ export function cardBrowser(s: Run, owned = false) {
             "、",
           )}；基础技能：${s.player.skills.map((id) => `${SKILLS[id].name} Lv.${ensureDeck(s).baseSkills[id]}`).join("、")}。</p><p>当前最大生命 ${fmt(s.player.maxHp)} · 伤害系数 ${fmt(s.player.attack)} · 暴击 ${fmt(s.player.crit * 100)}% · 移速 ${fmt(s.player.speed)} · 每秒回复 ${fmt(s.player.regen)} · 冷却系数 ${fmt(s.player.cooldown)}</p>`
       : ""
-  }<label>搜索卡牌<input id="card-search" placeholder="输入名称、类型或效果"></label><div class="codex-grid">${cards.map((u) => `<article class="codex-card polarity-${u.polarity}" data-search="${u.name} ${u.type} ${u.desc}"><small>${u.type} · ${RARITIES[u.rarity]} · ${u.polarity === "negative" ? "纯负面" : u.polarity === "mixed" ? "混合风险" : "纯正面"}</small><h3>${u.name} ${owned ? `×${s.player.upgrades[u.id]}` : ""}</h3><p>单层：${u.desc}</p>${owned ? `<p>${effectSummary(s, u.id)}</p>` : ""}<small>上限 ${u.maxStacks === null ? "∞" : u.maxStacks}；角色等级≥${u.conditions.minLevel}；${u.requires ? "前置 " + (UPGRADES.find((x) => x.id === u.requires)?.name || u.requires) : "无前置"}；${u.excludes ? "互斥 " + UPGRADES.find((x) => x.id === u.excludes)?.name : "无互斥"}；${u.cleanseable ? "可净化" : u.forgettable ? "可遗忘" : "不适用净化/遗忘"}${u.effects.source ? "；需装备对应武器/技能" : ""}；洗牌替换池：${u.shuffleReward ? "是" : "否"}</small></article>`).join("")}</div>`;
+  }<label>搜索卡牌<input id="card-search" placeholder="输入名称、类型或效果"></label><div class="codex-grid">${cards.map((u) => `<article class="codex-card rarity-${u.rarity} polarity-${u.polarity} ${u.id === "shuffle" ? "destiny-card" : ""}" data-search="${u.name} ${u.type} ${u.desc}"><small>${u.type} · ${RARITIES[u.rarity]} · ${u.polarity === "negative" ? "纯负面" : u.polarity === "mixed" ? "混合风险" : "纯正面"}</small>${image ? image(cardArt(u), "card-illustration") : `<img class="card-illustration" src="${artUrl(cardArt(u))}" alt="" loading="lazy">`}<h3>${u.name} ${owned ? `×${s.player.upgrades[u.id]}` : ""}</h3><p>单层：${u.desc}</p>${owned ? `<p>${effectSummary(s, u.id)}</p>` : ""}<small>上限 ${u.maxStacks === null ? "∞" : u.maxStacks}；角色等级≥${u.conditions.minLevel}；${u.requires ? "前置 " + (UPGRADES.find((x) => x.id === u.requires)?.name || u.requires) : "无前置"}；${u.excludes ? "互斥 " + UPGRADES.find((x) => x.id === u.excludes)?.name : "无互斥"}；${u.cleanseable ? "可净化" : u.forgettable ? "可遗忘" : "不适用净化/遗忘"}${u.effects.source ? "；需装备对应武器/技能" : ""}；洗牌替换池：${u.shuffleReward ? "是" : "否"}</small></article>`).join("")}</div>`;
 }
 export function enemyBrowser(img: (id: string) => string) {
   return `<p>显示基础数值；实战随时间变化。精英：生命×${ENEMY_RULES.elite.hp}、伤害×${ENEMY_RULES.elite.damage}、速度×${ENEMY_RULES.elite.speed}、体型×${ENEMY_RULES.elite.r}，经验×${ENEMY_RULES.elite.xp}。首领生命低于${ENEMY_RULES.bossPhaseHp * 100}%进入强化阶段。岩甲承伤系数${ENEMY_RULES.guardDamageFactor}。</p><div class="codex-grid">${Object.entries(

@@ -1,0 +1,41 @@
+{
+  "environment": "Linux system Chromium, headless SwiftShader, 1440x900, sole benchmark browser",
+  "requestedEnemies": 160,
+  "initialEnemies": 147,
+  "wallSeconds": 60.988,
+  "samples": [
+    {
+      "seconds": 10.053,
+      "panel": "FPS 11 ｜ 敌人 147/150 ｜ 弹道 90/360 ｜ 特效 64 ｜ 完整画面",
+      "heap": 25925530
+    },
+    {
+      "seconds": 20.08,
+      "panel": "FPS 7 ｜ 敌人 147/150 ｜ 弹道 112/360 ｜ 特效 60 ｜ 完整画面",
+      "heap": 24471646
+    },
+    {
+      "seconds": 30.152,
+      "panel": "FPS 7 ｜ 敌人 147/150 ｜ 弹道 89/360 ｜ 特效 61 ｜ 完整画面",
+      "heap": 12883123
+    },
+    {
+      "seconds": 40.176,
+      "panel": "FPS 7 ｜ 敌人 147/150 ｜ 弹道 99/360 ｜ 特效 61 ｜ 完整画面",
+      "heap": 14460633
+    },
+    {
+      "seconds": 50.202,
+      "panel": "FPS 7 ｜ 敌人 147/150 ｜ 弹道 85/360 ｜ 特效 59 ｜ 完整画面",
+      "heap": 13875082
+    },
+    {
+      "seconds": 60.255,
+      "panel": "FPS 7 ｜ 敌人 147/150 ｜ 弹道 80/360 ｜ 特效 60 ｜ 完整画面",
+      "heap": 31034962
+    }
+  ],
+  "imageRequests": {},
+  "errors": [],
+  "sourceCommit": "02fe2117a38693afa35f65c13ecfef22d2c38946"
+}
