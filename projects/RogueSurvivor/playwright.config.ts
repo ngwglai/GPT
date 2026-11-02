@@ -25,8 +25,9 @@ export default defineConfig({
       ],
     },
     screenshot: "only-on-failure",
-    // DOM/network diagnostics need no continuous GPU readback on software CI.
-    trace: { mode: "retain-on-failure", screenshots: false },
+    // Keep API/network/console diagnostics. Windows software rendering can spend
+    // 16s per action capturing DOM/CSS snapshots, outside the actual operation.
+    trace: { mode: "retain-on-failure", screenshots: false, snapshots: false },
   },
   webServer: {
     command: "npm run preview -- --port 4174 --strictPort",
