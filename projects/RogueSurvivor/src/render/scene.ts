@@ -456,6 +456,8 @@ export class GameScene extends Phaser.Scene {
           !assetPack.assets["projectile." + id]
             ? 0
             : Math.PI / 2),
+        1,
+        b.enemy && !assetPack.assets["projectile.enemy"] ? 0xff6677 : undefined,
       );
     }
     const limit = low ? 25 : 90;
