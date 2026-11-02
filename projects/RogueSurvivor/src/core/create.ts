@@ -1,3 +1,6 @@
+import { MAPS } from "../data/maps";
+import { initializeMap } from "./environment";
+import type { MapId } from "../data/maps";
 import type { Run, Mode, SkillId } from "./types";
 import { CHARACTERS, LIMITS } from "../data/content";
 import { random } from "./math";
@@ -7,10 +10,11 @@ export function createRun(
   seed = Date.now() >>> 0,
   primary?: SkillId,
   secondary: SkillId = "ward",
+  map: MapId = "forest",
 ): Run {
   const c = CHARACTERS.find((c) => c.id === character) || CHARACTERS[0];
   const s: Run = {
-    version: 1,
+    version: 2,
     seed,
     rng: seed,
     mode,
@@ -68,14 +72,18 @@ export function createRun(
     nextEvent: 90,
     victoryClaimed: false,
   };
-  for (let y = 320; y < LIMITS.world - 200; y += 380)
-    for (let x = 300; x < LIMITS.world - 200; x += 390) {
+  const terrain = MAPS[map].obstacles;
+  for (let y = 320; y < LIMITS.world - 200; y += terrain.stepY)
+    for (let x = 300; x < LIMITS.world - 200; x += terrain.stepX) {
       if (Math.hypot(x - 1800, y - 1800) < 390) continue;
       s.rocks.push({
-        x: x + random(s) * 90,
-        y: y + random(s) * 90,
-        r: 25 + random(s) * 25,
+        x: x + random(s) * terrain.jitter,
+        y: y + random(s) * terrain.jitter,
+        r:
+          terrain.minRadius +
+          random(s) * (terrain.maxRadius - terrain.minRadius),
       });
     }
+  initializeMap(s, map);
   return s;
 }

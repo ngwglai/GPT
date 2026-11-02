@@ -1,3 +1,5 @@
+import { environment } from "../core/environment";
+import { MAPS } from "../data/maps";
 import { VISUALS, artUrl } from "../data/visuals";
 import Phaser from "phaser";
 import type { Settings, Input, Vec } from "../core/types";
@@ -76,7 +78,8 @@ export class GameScene extends Phaser.Scene {
             !id.startsWith("avatar.") &&
             !id.startsWith("card.") &&
             id !== "ui.world" &&
-            !id.startsWith("skill."),
+            !id.startsWith("skill.") &&
+            !id.endsWith(".preview"),
         )
         .map(async (id) => {
           try {
@@ -116,6 +119,7 @@ export class GameScene extends Phaser.Scene {
         /* Default key remains. */
       }
     }
+    this.needsPaint = true;
   }
   inputState(): Input {
     const k = this.keys,
@@ -250,11 +254,17 @@ export class GameScene extends Phaser.Scene {
     const sx = (x: number) => x - this.cx + W / 2,
       sy = (y: number) => y - this.cy + H / 2;
     this.background.clear().fillStyle(0xcddfc8).fillRect(0, 0, W, H);
-    const groundKey = this.textures.exists("custom:map.ground")
-      ? "custom:map.ground"
-      : this.textures.exists("builtin:map.ground")
-        ? "builtin:map.ground"
-        : undefined;
+    const env = environment(s),
+      map = MAPS[env.mapId];
+    const groundId = map.ground,
+      customGroundId = assetPack.assets[groundId] ? groundId : "map.ground";
+    const groundKey = this.textures.exists("custom:" + customGroundId)
+      ? "custom:" + customGroundId
+      : this.textures.exists("builtin:" + groundId)
+        ? "builtin:" + groundId
+        : this.textures.exists("builtin:map.ground")
+          ? "builtin:map.ground"
+          : undefined;
     if (groundKey) {
       this.ground ??= this.add
         .tileSprite(0, 0, W, H, groundKey)
@@ -265,11 +275,11 @@ export class GameScene extends Phaser.Scene {
         this.ground.setTexture(groundKey);
       if (this.ground.width !== W || this.ground.height !== H)
         this.ground.setSize(W, H);
-      this.ground.setTileScale(assetPack.assets["map.ground"]?.scale || 1);
+      this.ground.setTileScale(assetPack.assets[customGroundId]?.scale || 1);
       this.ground.tilePositionX =
-        this.cx - W / 2 - (assetPack.assets["map.ground"]?.x || 0);
+        this.cx - W / 2 - (assetPack.assets[customGroundId]?.x || 0);
       this.ground.tilePositionY =
-        this.cy - H / 2 - (assetPack.assets["map.ground"]?.y || 0);
+        this.cy - H / 2 - (assetPack.assets[customGroundId]?.y || 0);
     } else this.ground?.setVisible(false);
     g.lineStyle(1, 0x779c80, 0.055);
     for (
@@ -305,10 +315,10 @@ export class GameScene extends Phaser.Scene {
           if (hash > 0.85)
             this.sprite(
               hash > 0.96
-                ? "map.tree"
+                ? map.decor[0]
                 : hash > 0.92
-                  ? "map.obelisk"
-                  : "map.flower",
+                  ? map.decor[1]
+                  : map.decor[2],
               { x: x + 36, y: y + 25 },
               hash > 0.92 ? 44 : 28,
             );
@@ -316,7 +326,85 @@ export class GameScene extends Phaser.Scene {
       }
     g.lineStyle(8, 0x7e9f80, 0.8);
     g.strokeRect(sx(0), sy(0), LIMITS.world, LIMITS.world);
-    for (const rock of s.rocks) this.sprite("map.rock", rock, rock.r * 2.7);
+    for (const rock of s.rocks) {
+      const crystal =
+        rock.crystalId && env.crystals.find((x) => x.id === rock.crystalId);
+      this.sprite(
+        crystal ? "map.cavern.crystal" : map.rock,
+        rock,
+        rock.r * 2.7,
+        0,
+        1,
+        crystal
+          ? crystal.type === "xp"
+            ? 0xffe7a0
+            : crystal.type === "blast"
+              ? 0xffa6c7
+              : undefined
+          : undefined,
+      );
+      if (crystal) {
+        g.lineStyle(
+          2,
+          crystal.type === "xp"
+            ? 0xffe173
+            : crystal.type === "blast"
+              ? 0xff7999
+              : 0x88daff,
+          0.85,
+        );
+        g.strokeCircle(sx(rock.x), sy(rock.y), rock.r + 4);
+      }
+    }
+    for (const candy of env.candies) {
+      this.sprite("map.candy." + candy.kind, candy, 35);
+      this.label(
+        (
+          {
+            speed: "移速+",
+            haste: "攻速+",
+            heal: "回复",
+            xp: "经验",
+            slow: "减速",
+            weak: "伤害−",
+          } as Record<string, string>
+        )[candy.kind] || "糖果",
+        candy.x - 16,
+        candy.y - 32,
+        candy.kind === "slow" || candy.kind === "weak" ? "#ffabd5" : "#fff0b0",
+        12,
+      );
+    }
+    for (const f of env.fields) {
+      const color =
+        f.kind === "eclipse"
+          ? 0xff687f
+          : f.kind === "shield"
+            ? 0x79d8ff
+            : 0xffd896;
+      this.sprite(
+        "map.magicCircle",
+        f,
+        f.r * 2,
+        s.time * 0.1,
+        f.delay > 0 ? 0.13 : 0.3,
+      );
+      g.fillStyle(color, f.delay > 0 ? 0.07 : 0.14);
+      g.fillCircle(sx(f.x), sy(f.y), f.r);
+      g.lineStyle(3, color, 0.8);
+      g.strokeCircle(sx(f.x), sy(f.y), f.r);
+      this.label(
+        f.kind === "eclipse"
+          ? "⚠ 月蚀"
+          : f.kind === "shield"
+            ? "星辉护盾"
+            : "月光强化",
+        f.x - 30,
+        f.y - f.r - 16,
+        f.kind === "eclipse" ? "#ffb3c1" : "#f9edca",
+        12,
+      );
+    }
     for (const gem of s.gems)
       this.sprite("ui.gem", gem, gem.value > 40 ? 22 : 14);
     for (const drop of s.rewardDrops || []) {
@@ -344,6 +432,8 @@ export class GameScene extends Phaser.Scene {
         g.lineStyle(2, 0xffd4a1, 0.8);
         g.strokeCircle(x, y, z.r * Math.max(0.05, 1 - z.delay / 1.6));
       }
+      if (z.kind === "crystalBeam" && z.delay <= 0)
+        this.sprite("projectile.crystal", z, 50, 0, 0.8);
       if (!z.enemy && assetPack.assets["skill." + z.kind])
         this.sprite("skill." + z.kind, z, z.r * 2, 0, 0.6);
       else if (!z.enemy && (z.kind === "bloom" || z.kind === "ward"))
@@ -353,10 +443,16 @@ export class GameScene extends Phaser.Scene {
       const bob =
         Math.sin(s.time * (e.kind === "runner" ? 12 : 5) + e.id) * 0.04;
       this.sprite(
-        "enemy." + e.kind,
+        e.kind === "mimic" && !e.behavior?.awakened
+          ? "enemy.mimicDormant"
+          : "enemy." + e.kind,
         e,
         e.r * 2.7 * (1 + bob),
-        e.charge ? Math.sin(s.time * 35) * 0.06 : 0,
+        e.kind === "crab"
+          ? (e.behavior?.facing || 0) - Math.PI / 2
+          : e.charge
+            ? Math.sin(s.time * 35) * 0.06
+            : 0,
         e.hit > 0 ? 0.55 : 1,
         e.hit > 0
           ? 0xffffff
@@ -373,6 +469,37 @@ export class GameScene extends Phaser.Scene {
           0.75,
         );
         g.strokeCircle(sx(e.x), sy(e.y), e.r + 2);
+      }
+      if (e.kind === "mimic" && !e.behavior?.awakened) {
+        g.fillStyle(0xeb8ca7, 0.9);
+        g.fillCircle(sx(e.x) + e.r + 12, sy(e.y) - e.r - 8, 3);
+      }
+      if (e.behavior) {
+        const b = e.behavior;
+        if (b.target && b.warning > 0) {
+          g.lineStyle(3, 0xff8da5, 0.85);
+          g.strokeCircle(
+            sx(b.target.x),
+            sy(b.target.y),
+            e.kind === "ghost" ? 40 : 175,
+          );
+        }
+        if (b.shield > 0 || b.reflecting > 0) {
+          g.lineStyle(3, b.shield > 0 ? 0x86dfff : 0xe492ff, 0.9);
+          g.strokeCircle(sx(e.x), sy(e.y), e.r + 8);
+        }
+        if (e.kind === "crab") {
+          g.lineStyle(5, 0xffc474, 0.9);
+          g.beginPath();
+          g.arc(
+            sx(e.x),
+            sy(e.y),
+            e.r + 8,
+            b.facing - Math.PI / 3,
+            b.facing + Math.PI / 3,
+          );
+          g.strokePath();
+        }
       }
       if (e.elite) {
         g.lineStyle(2, 0xffd285, 0.85);
@@ -457,12 +584,17 @@ export class GameScene extends Phaser.Scene {
             ? 0
             : Math.PI / 2),
         1,
-        b.enemy && !assetPack.assets["projectile.enemy"] ? 0xff6677 : undefined,
+        b.enemy && !assetPack.assets["projectile.enemy"]
+          ? b.status
+            ? 0x83e5a3
+            : 0xff6677
+          : undefined,
       );
     }
     const limit = low ? 25 : 90;
     for (const e of w.effects.slice(-limit)) {
       const a = e.life / e.maxLife;
+      if (e.kind === "heal") this.sprite("effect.heal", e, 32, 0, a * 0.8);
       if (e.text) {
         this.label(
           e.text,

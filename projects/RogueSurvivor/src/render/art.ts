@@ -1,6 +1,7 @@
 import { ENEMIES, SKILLS, WEAPONS } from "../data/content";
 import type { EnemyId, SkillId, WeaponId } from "../core/types";
 export function defaultArt(id: string): HTMLCanvasElement {
+  if (id === "enemy.mimicDormant") id = "enemy.mimic";
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = 128;
   const c = canvas.getContext("2d")!;

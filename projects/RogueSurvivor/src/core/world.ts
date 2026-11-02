@@ -1,3 +1,6 @@
+import { environment, tickEnvironment, temporary } from "./environment";
+import { childSpawn } from "./creatureAI";
+import { MAPS, ENV_RULES } from "../data/maps";
 import { ENEMY_RULES } from "../data/enemies";
 import { ensureDeck } from "./deckState";
 import { rollDrops, collectDrops } from "./drops";
@@ -33,6 +36,8 @@ export class World extends Combat {
       p = s.player;
     s.time = Math.min(LIMITS.number, s.time + dt);
     this.tickEffects(dt);
+    tickEnvironment(this, dt);
+    if (s.phase === "dead") return;
     p.invincible = Math.max(0, p.invincible - dt);
     p.dashCd = Math.max(0, p.dashCd - dt);
     p.cooldowns = p.cooldowns.map((cd) => Math.max(0, cd - dt));
@@ -62,14 +67,14 @@ export class World extends Combat {
     }
     move(
       p,
-      nx * p.speed * dt * (p.dash > 0 ? 4 : 1),
-      ny * p.speed * dt * (p.dash > 0 ? 4 : 1),
+      nx * p.speed * temporary(s, "speed") * dt * (p.dash > 0 ? 4 : 1),
+      ny * p.speed * temporary(s, "speed") * dt * (p.dash > 0 ? 4 : 1),
       16,
       s.rocks,
     );
     director(this, dt);
     ai(this, dt);
-    if (s.phase === "dead") {
+    if ((s.phase as string) === "dead") {
       s.enemies = s.enemies.filter((e) => e.hp > 0);
       return;
     }
@@ -87,15 +92,25 @@ export class World extends Combat {
       if (e.hp > 0) continue;
       s.stats.kills = Math.min(LIMITS.number, s.stats.kills + 1);
       const def = ENEMIES[e.kind];
-      rollDrops(s, e, def.boss ? "boss" : e.elite ? "elite" : "normal");
+      if (e.kind === "splitter" && !e.behavior?.child) {
+        for (let i = 0; i < ENV_RULES.children; i++)
+          childSpawn(this, e, "splitter", {
+            x: e.x + (i * 2 - 1) * 28,
+            y: e.y,
+          });
+      }
+      if (!e.behavior?.rewardless)
+        rollDrops(s, e, def.boss ? "boss" : e.elite ? "elite" : "normal");
       if (p.upgrades.harvest) this.heal(0.3);
       const value = def.xp * (e.elite ? ENEMY_RULES.elite.xp : 1);
-      if (s.gems.length < LIMITS.gems) s.gems.push({ x: e.x, y: e.y, value });
-      else {
-        let g = s.gems[0];
-        for (const other of s.gems)
-          if (distance(e, other) < distance(e, g)) g = other;
-        g.value = Math.min(LIMITS.number, g.value + value);
+      if (!e.behavior?.rewardless) {
+        if (s.gems.length < LIMITS.gems) s.gems.push({ x: e.x, y: e.y, value });
+        else {
+          let g = s.gems[0];
+          for (const other of s.gems)
+            if (distance(e, other) < distance(e, g)) g = other;
+          g.value = Math.min(LIMITS.number, g.value + value);
+        }
       }
       if (e.burn > 0 && p.upgrades.wildfire) {
         for (const other of this.grid.nearby(e, 145)) {
@@ -108,12 +123,17 @@ export class World extends Combat {
         }
       }
       if (def.boss) {
+        if (e.kind === "candyWitch") environment(s).rule = 0;
         s.stats.bosses++;
         p.xp += value * modifier(s, "xp");
         this.heal(p.maxHp * 0.3);
         s.event = "首领已击破";
         s.eventUntil = s.time + 5;
-        if (s.mode === "standard" && s.bossIndex >= 4 && e.kind === "titan") {
+        if (
+          s.mode === "standard" &&
+          s.bossIndex >= 4 &&
+          e.kind === MAPS[environment(s).mapId].bosses[3]
+        ) {
           s.phase = "victory";
           s.victoryClaimed = true;
         }

@@ -38,3 +38,8 @@ test("all cards select a real icon and destiny and negative art stay distinct", 
   for (const u of UPGRADES.filter((u) => u.polarity === "negative"))
     expect(cardArt(u)).toBe("card.negative");
 });
+test("asset manifest matches the actual runtime mapping", () => {
+  expect(
+    JSON.parse(readFileSync("public/assets/manifest.json", "utf8")).assets,
+  ).toEqual(VISUALS);
+});

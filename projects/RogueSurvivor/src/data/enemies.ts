@@ -1,3 +1,4 @@
+import { NEW_ENEMIES, NEW_BEHAVIORS } from "./creatures";
 import type { EnemyId, SkillId, WeaponId } from "../core/types";
 export const ENEMIES: Record<
   EnemyId,
@@ -12,6 +13,7 @@ export const ENEMIES: Record<
     boss?: boolean;
   }
 > = {
+  ...NEW_ENEMIES,
   crawler: {
     name: "苔团",
     hp: 40,
@@ -113,6 +115,7 @@ export const ENEMY_RULES = {
   bossPhaseHp: 0.45,
 };
 export const ENEMY_BEHAVIORS: Record<EnemyId, string> = {
+  ...NEW_BEHAVIORS,
   crawler: "持续追击并造成接触伤害",
   runner: "停顿预警后朝锁定方向突进",
   archer: "保持距离发射弹道，后期改为扇形多发",

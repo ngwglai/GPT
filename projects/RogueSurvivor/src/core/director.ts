@@ -1,3 +1,6 @@
+import { advancedAI, tickDefense } from "./creatureAI";
+import { environment } from "./environment";
+import { MAPS } from "../data/maps";
 import { ENEMY_RULES } from "../data/enemies";
 import type { EnemyId, Vec } from "./types";
 import { ENEMIES, LIMITS, difficulty } from "../data/content";
@@ -7,6 +10,11 @@ export function spawn(c: Combat, kind: EnemyId, position?: Vec, elite = false) {
   const s = c.s,
     def = ENEMIES[kind];
   if (s.enemies.length >= (def.boss ? LIMITS.enemies : LIMITS.enemies - 3))
+    return;
+  if (
+    kind === "butterfly" &&
+    s.enemies.filter((e) => e.hp > 0 && e.kind === kind).length >= 12
+  )
     return;
   const angle = random(s) * Math.PI * 2;
   const p = position || {
@@ -19,6 +27,7 @@ export function spawn(c: Combat, kind: EnemyId, position?: Vec, elite = false) {
   const d = difficulty(s.time);
   const hp =
     def.hp *
+    MAPS[environment(s).mapId].difficulty *
     (def.boss ? 1 + Math.max(0, s.time / 60 - 5) * 0.065 : d.hp) *
     (elite ? ENEMY_RULES.elite.hp : 1);
   const e = {
@@ -52,24 +61,24 @@ export function director(c: Combat, dt: number) {
   if (s.spawnTimer <= 0) {
     s.spawnTimer =
       d.spawn * (s.event === "兽潮来袭" && s.time < s.eventUntil ? 0.6 : 1);
-    const pool: EnemyId[] = ["crawler", "crawler", "runner"];
-    if (s.time > 70) pool.push("archer");
-    if (s.time > 150) pool.push("guard", "bomber");
-    if (s.time > 240) pool.push("seer");
-    if (s.time > 400) pool.push("shaman");
-    spawn(
-      c,
-      pool[Math.floor(random(s) * pool.length)],
-      undefined,
-      random(s) < d.elite,
-    );
+    const map = MAPS[environment(s).mapId];
+    const pool = map.spawns.filter((x) => s.time >= x.after);
+    let roll = random(s) * pool.reduce((n, x) => n + x.weight, 0);
+    const chosen = pool.find((x) => (roll -= x.weight) < 0) || pool[0];
+    const elite = random(s) < d.elite;
+    const kind =
+      elite && s.time > 300 && random(s) < 0.3
+        ? map.elite[Math.floor(random(s) * map.elite.length)]
+        : chosen.kind;
+    spawn(c, kind, undefined, elite);
   }
   if (s.time >= s.nextBoss && !s.enemies.some((e) => ENEMIES[e.kind].boss)) {
-    const kinds: EnemyId[] =
-      s.mode === "standard"
-        ? ["warden", "witch", "warden", "titan"]
-        : ["warden", "witch", "titan"];
-    const kind = kinds[s.bossIndex % kinds.length];
+    const map = MAPS[environment(s).mapId];
+    const kinds = map.bosses;
+    const kind =
+      s.mode === "endless" && s.bossIndex >= 4 && s.bossIndex % 3 === 2
+        ? "mirrorMaiden"
+        : kinds[s.bossIndex % kinds.length];
     spawn(c, kind);
     s.bossIndex++;
     s.nextBoss += 300;
@@ -131,6 +140,7 @@ export function ai(c: Combat, dt: number) {
     p = s.player;
   for (const e of s.enemies) {
     if (e.hp <= 0) continue;
+    tickDefense(s, e, dt);
     e.hit = Math.max(0, e.hit - dt);
     e.freeze = Math.max(0, e.freeze - dt);
     e.slow = Math.max(0, e.slow - dt);
@@ -139,6 +149,7 @@ export function ai(c: Combat, dt: number) {
       c.damage(e, e.burnPower * dt, e.burnSource, false);
     }
     if (e.hp <= 0 || e.freeze > 0) continue;
+    if (advancedAI(c, e, dt)) continue;
     const def = ENEMIES[e.kind];
     const d = distance(e, p),
       n = unit(p.x - e.x, p.y - e.y);

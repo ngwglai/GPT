@@ -1,3 +1,5 @@
+import { emptyEnvironment } from "../core/environmentTypes";
+import { MAPS, ENV_RULES } from "../data/maps";
 import { ensureDeck } from "../core/deckState";
 import { recalculate } from "../core/fate";
 import { DROP_RULES } from "../core/drops";
@@ -63,8 +65,19 @@ function obj(v: unknown): v is Record<string, unknown> {
   return !!v && typeof v === "object" && !Array.isArray(v);
 }
 // Validate all numerical leaves, collection budgets, required structures, identifiers and cross references.
-export function validateRun(value: unknown): Run {
-  assert(obj(value) && value.version === 1);
+export function migrateRun(value: unknown): unknown {
+  if (obj(value) && value.version === 1) {
+    const migrated = structuredClone(value);
+    migrated.version = 2;
+    if (migrated.environment === undefined)
+      migrated.environment = emptyEnvironment("forest");
+    return migrated;
+  }
+  return value;
+}
+export function validateRun(input: unknown): Run {
+  const value = migrateRun(input);
+  assert(obj(value) && value.version === 2);
   const s = value as unknown as Run;
   const visit = (v: unknown, depth = 0) => {
     assert(depth < 12);
@@ -414,6 +427,158 @@ export function validateRun(value: unknown): Run {
         s.rewardDrops.filter((d) => d.kind === kind).length <=
           DROP_RULES.perKindObjects,
       );
+  }
+  const env = s.environment;
+  assert(obj(env) && env.schema === 1 && Object.hasOwn(MAPS, env.mapId));
+  assert(
+    Array.isArray(env.crystals) && env.crystals.length <= ENV_RULES.crystals,
+  );
+  assert(
+    Array.isArray(env.destroyed) &&
+      env.destroyed.length <= 128 &&
+      env.destroyed.every(Number.isInteger),
+  );
+  assert(Array.isArray(env.candies) && env.candies.length <= ENV_RULES.candies);
+  assert(Array.isArray(env.fields) && env.fields.length <= ENV_RULES.fields);
+  assert(
+    obj(env.targets) &&
+      Object.entries(env.targets).every(
+        ([id, n]) =>
+          Object.hasOwn(WEAPONS, id) && Number.isInteger(n) && n >= 0,
+      ),
+  );
+  const buffKinds = [
+    "speed",
+    "haste",
+    "heal",
+    "xp",
+    "slow",
+    "weak",
+    "curseHaste",
+    "curseCooldown",
+    "moon",
+  ];
+  assert(
+    Array.isArray(env.buffs) &&
+      env.buffs.length <= 9 &&
+      new Set(env.buffs.map((b) => b.kind)).size === env.buffs.length,
+  );
+  assert(
+    env.buffs.every(
+      (b) => buffKinds.includes(b.kind) && b.life > 0 && b.life <= 30,
+    ),
+  );
+  assert(
+    typeof env.hint === "boolean" &&
+      typeof env.rule === "number" &&
+      env.rule >= 0 &&
+      env.rule <= 1,
+  );
+  assert(
+    typeof env.nextCandy === "number" &&
+      env.nextCandy >= -1 &&
+      env.nextCandy <= 30 &&
+      typeof env.nextField === "number" &&
+      env.nextField >= -1 &&
+      env.nextField <= 30,
+  );
+  for (const x of env.crystals) {
+    point(x);
+    assert(
+      Number.isInteger(x.id) &&
+        x.hp > 0 &&
+        x.hp <= ENV_RULES.crystalHp &&
+        ["blast", "xp", "ice"].includes(x.type) &&
+        !env.destroyed.includes(x.id),
+    );
+    assert(
+      s.rocks.some((r) => r.crystalId === x.id && r.x === x.x && r.y === x.y),
+    );
+  }
+  assert(new Set(env.crystals.map((x) => x.id)).size === env.crystals.length);
+  assert(
+    s.rocks.every(
+      (r) =>
+        r.crystalId === undefined ||
+        env.crystals.some((x) => x.id === r.crystalId),
+    ),
+  );
+  for (const x of env.candies) {
+    point(x);
+    assert(
+      Number.isInteger(x.id) &&
+        buffKinds.includes(x.kind) &&
+        x.life > 0 &&
+        x.life <= 30,
+    );
+  }
+  for (const f of env.fields) {
+    point(f);
+    assert(
+      Number.isInteger(f.id) &&
+        ["moon", "eclipse", "shield"].includes(f.kind) &&
+        f.r === ENV_RULES.fieldRadius &&
+        f.delay >= -0.1 &&
+        f.delay <= 3 &&
+        f.life > 0 &&
+        f.life <= ENV_RULES.fieldLife &&
+        typeof f.tick === "number",
+    );
+  }
+  for (const e of s.enemies)
+    if (e.behavior) {
+      const b = e.behavior;
+      assert(
+        typeof b.facing === "number" &&
+          typeof b.shield === "number" &&
+          b.shield >= 0 &&
+          b.shield <= ENV_RULES.shieldCapacity,
+      );
+      assert(
+        typeof b.shieldTime === "number" &&
+          b.shieldTime >= 0 &&
+          b.shieldTime <= ENV_RULES.shieldTime,
+      );
+      assert(
+        [b.summonOwner, b.shieldOwner].every(
+          (n) => Number.isInteger(n) && n >= 0,
+        ),
+      );
+      assert(
+        [b.child, b.rewardless, b.awakened].every(
+          (x) => typeof x === "boolean",
+        ),
+      );
+      assert(
+        typeof b.warning === "number" &&
+          b.warning >= -1 &&
+          b.warning <= 3 &&
+          typeof b.reflecting === "number" &&
+          b.reflecting >= 0 &&
+          b.reflecting <= 3 &&
+          typeof b.healUntil === "number",
+      );
+      assert(b.target === null || obj(b.target));
+      if (b.target) point(b.target);
+      assert(
+        Array.isArray(b.copied) &&
+          b.copied.length <= 5 &&
+          new Set(b.copied).size === b.copied.length &&
+          b.copied.every((k) => Object.hasOwn(WEAPONS, k)),
+      );
+    }
+  for (const z of s.zones)
+    assert(
+      z.anchor === undefined ||
+        (Number.isInteger(z.anchor) &&
+          env.crystals.some((x) => x.id === z.anchor)),
+    );
+  for (const b of s.bullets) {
+    assert(b.reflected === undefined || typeof b.reflected === "boolean");
+    assert(
+      b.status === undefined ||
+        ["slow", "curseHaste", "curseCooldown"].includes(b.status),
+    );
   }
   const result = structuredClone(s),
     d = ensureDeck(result),

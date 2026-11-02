@@ -10,10 +10,9 @@ export default defineConfig({
     viewport: { width: 1440, height: 900 },
     headless: true,
     launchOptions: {
-      // Full Chromium's modern headless mode avoids Windows legacy Shell
+      // Full Chromium's modern headless mode avoids legacy Shell
       // context/Skia mailbox failures; keep the same WebGL and media coverage.
-      ...(process.platform === "win32" &&
-      !process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
+      ...(!process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
         ? { channel: "chromium" }
         : {}),
       ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
@@ -26,6 +25,9 @@ export default defineConfig({
       ],
     },
     screenshot: "only-on-failure",
+    // Keep API/network/console diagnostics. Windows software rendering can spend
+    // 16s per action capturing DOM/CSS snapshots, outside the actual operation.
+    trace: { mode: "retain-on-failure", screenshots: false, snapshots: false },
   },
   webServer: {
     command: "npm run preview -- --port 4174 --strictPort",

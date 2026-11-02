@@ -1,3 +1,5 @@
+import { temporary, hitCrystals, environment, addBuff } from "./environment";
+import { selectTarget, frontalFactor } from "./targeting";
 import { ENEMY_RULES } from "../data/enemies";
 import { skillStats } from "../data/skills";
 import { weaponStats } from "../data/weapons";
@@ -25,7 +27,7 @@ export class Combat {
     if (this.effects.length < LIMITS.effects)
       this.effects.push({ ...p, kind, r, text, life: 0.45, maxLife: 0.45 });
   }
-  damage(e: Enemy, amount: number, source: string, crit = true) {
+  damage(e: Enemy, amount: number, source: string, crit = true, origin?: Vec) {
     if (e.hp <= 0) return;
     const p = this.s.player;
     const critical = crit && random(this.s) < p.crit;
@@ -37,6 +39,8 @@ export class Combat {
       LIMITS.number,
       amount *
         damageMultiplier(this.s) *
+        temporary(this.s, "damage") *
+        frontalFactor(e, origin) *
         modifier(this.s, "damage", source) *
         synergy *
         (p.upgrades.execution && e.hp / e.maxHp < 0.25 ? 1.4 : 1) *
@@ -46,8 +50,14 @@ export class Combat {
         (critical ? 2 : 1) *
         (e.kind === "guard" ? ENEMY_RULES.guardDamageFactor : 1),
     );
-    const actual = Math.min(e.hp, value);
-    e.hp -= value;
+    const shield = e.behavior?.shield || 0,
+      absorbed = Math.min(shield, value);
+    if (e.behavior) e.behavior.shield -= absorbed;
+    const actual = Math.min(e.hp, value - absorbed);
+    e.hp -= value - absorbed;
+    if (e.hp <= 0)
+      for (const x of this.s.enemies)
+        if (x.behavior?.shieldOwner === e.id) x.behavior.shield = 0;
     e.hit = 0.1;
     this.s.stats.damage = Math.min(LIMITS.number, this.s.stats.damage + actual);
     this.s.stats.bySource[source] = Math.min(
@@ -91,6 +101,15 @@ export class Combat {
   }
   area(p: Vec, r: number, damage: number, kind: string, source: string) {
     this.effect(p, kind, r);
+    hitCrystals(
+      this,
+      p,
+      r,
+      damage *
+        damageMultiplier(this.s) *
+        modifier(this.s, "damage", source) *
+        temporary(this.s, "damage"),
+    );
     for (const e of this.grid.nearby(p, r + 64)) {
       if (e.hp <= 0 || distance(p, e) > r + e.r) continue;
       this.damage(e, damage, source);
@@ -118,6 +137,8 @@ export class Combat {
       return false;
     const n = unit(dir.x, dir.y);
     const b = this.bulletPool.pop() || ({} as Bullet);
+    delete b.status;
+    delete b.reflected;
     Object.assign(
       b,
       {
@@ -165,6 +186,7 @@ export class Combat {
       tick: 0,
       source,
     });
+    return this.s.zones.at(-1)!;
   }
   cast(slot: number, aim: Vec) {
     const p = this.s.player;
@@ -203,7 +225,8 @@ export class Combat {
       return false;
     }
     const stats = skillStats(id, lv);
-    p.cooldowns[slot] = SKILLS[id].cooldown * p.cooldown;
+    p.cooldowns[slot] =
+      SKILLS[id].cooldown * p.cooldown * temporary(this.s, "cooldown");
     this.lastSound = "cast";
     if (id === "fire") {
       this.zone(
@@ -300,8 +323,25 @@ export class Combat {
         mult = weaponStats(key, lv).damage / w.damage;
       p.weaponTimers[key] =
         w.interval /
-        ((1 + (lv - 1) * 0.08) * modifier(this.s, "interval", key));
-      const target = closest(p, this.s.enemies, w.range);
+        ((1 + (lv - 1) * 0.08) *
+          modifier(this.s, "interval", key) *
+          temporary(this.s, "interval"));
+      const enemy = selectTarget(
+        this.s,
+        key,
+        w.range,
+        environment(this.s).targets[key],
+      );
+      if (enemy) environment(this.s).targets[key] = enemy.id;
+      const target =
+        enemy ||
+        environment(this.s).crystals.find(
+          (x) =>
+            distance(p, x) < w.range &&
+            !this.s.rocks.some(
+              (r) => r.crystalId !== x.id && segmentDistance(r, p, x) < r.r + 3,
+            ),
+        );
       if (key === "blade") {
         this.area(
           p,
@@ -391,9 +431,30 @@ export class Combat {
       b.y += b.vy * dt;
       if (b.x < 0 || b.y < 0 || b.x > LIMITS.world || b.y > LIMITS.world)
         b.life = 0;
+      if (!b.enemy && b.kind !== "lance") {
+        const rock = s.rocks.find(
+          (r) => segmentDistance(r, before, b) < r.r + b.r,
+        );
+        if (rock) {
+          if (rock.crystalId)
+            hitCrystals(
+              this,
+              rock,
+              2,
+              b.damage *
+                damageMultiplier(s) *
+                modifier(s, "damage", b.source) *
+                temporary(s, "damage"),
+            );
+          b.life = 0;
+          continue;
+        }
+      }
       if (b.enemy) {
         if (segmentDistance(s.player, before, b) < b.r + 16) {
+          const vulnerable = s.player.invincible <= 0 && s.player.hp > 0;
           this.hurt(b.damage);
+          if (b.status && vulnerable) addBuff(s, b.status, 5);
           b.life = 0;
         }
         continue;
@@ -406,7 +467,27 @@ export class Combat {
         )
           continue;
         b.hits.push(e.id);
-        this.damage(e, b.damage, b.source);
+        if (
+          e.kind === "mirror" &&
+          (e.behavior?.reflecting || 0) > 0 &&
+          (e.behavior?.warning || 0) <= 0 &&
+          !b.reflected &&
+          b.kind !== "lance"
+        ) {
+          b.reflected = true;
+          b.enemy = true;
+          b.homing = false;
+          b.split = false;
+          b.pierce = 0;
+          b.damage = Math.min(12, b.damage * 0.3);
+          b.vx *= -0.65;
+          b.vy *= -0.65;
+          b.life = Math.min(1.5, b.life);
+          b.source = "mirror";
+          this.effect(e, "reflect", 40);
+          break;
+        }
+        this.damage(e, b.damage, b.source, true, before);
         if (b.kind === "ember") {
           this.burn(e, b.damage * 0.18, b.source);
           this.area(
@@ -445,6 +526,7 @@ export class Combat {
     }
     s.bullets.length = write;
     for (const z of s.zones) {
+      if (z.life <= 0) continue;
       if (z.delay > 0) {
         z.delay -= dt;
         continue;

@@ -1,5 +1,7 @@
+import { WORLD_VISUALS } from "./worldVisuals";
 /** Original generated art, independent of all collision and rule data. */
 export const VISUALS: Record<string, string> = {
+  ...WORLD_VISUALS,
   "portrait.ranger": "characters/ranger-full.webp",
   "player.ranger": "characters/ranger-battle.webp",
   "avatar.ranger": "characters/ranger-avatar.webp",
