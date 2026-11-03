@@ -361,8 +361,27 @@ export function bossPatterns(
   }
   // Same bounded contact/steering rules; no new permanent terrain or economy.
   if (decrement) {
-    if (!e.dashPattern)
-      move(e, n.x * e.speed * dt, n.y * e.speed * dt, e.r, c.s.rocks);
+    if (!e.dashPattern) {
+      let vx = n.x,
+        vy = n.y;
+      for (const rock of c.s.rocks)
+        if (Math.hypot(e.x - rock.x, e.y - rock.y) < e.r + rock.r + 52) {
+          const away = unit(e.x - rock.x, e.y - rock.y);
+          if (vx * away.x + vy * away.y < 0.2) {
+            const side = n.x * -away.y + n.y * away.x >= 0 ? 1 : -1;
+            vx += (-away.y * side + away.x) * 1.4;
+            vy += (away.x * side + away.y) * 1.4;
+          }
+        }
+      const direction = unit(vx, vy);
+      move(
+        e,
+        direction.x * e.speed * dt,
+        direction.y * e.speed * dt,
+        e.r,
+        c.s.rocks,
+      );
+    }
     if (Math.hypot(e.x - p.x, e.y - p.y) < e.r + 16) c.hurt(e.damage);
   }
 }

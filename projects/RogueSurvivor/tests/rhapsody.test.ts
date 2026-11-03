@@ -99,3 +99,11 @@ it("waiting bullets cannot hurt; finite tracking locks off and dead-owner schedu
   w.projectiles(0.1);
   expect(w.s.bullets).toHaveLength(0);
 });
+it("original boss steering still makes progress around a boulder", () => {
+  const w = new World(createRun("endless"));
+  w.s.rocks = [{ x: 1900, y: 1800, r: 45 }];
+  w.s.player.invincible = 999;
+  const e = spawn(w, "warden", { x: 2100, y: 1800 })!;
+  for (let i = 0; i < 240; i++) bossPatterns(w, e, 0.05);
+  expect(Math.hypot(e.x - 1800, e.y - 1800)).toBeLessThan(180);
+});
