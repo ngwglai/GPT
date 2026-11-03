@@ -76,6 +76,7 @@ it("bar and sector hit tests match the drawn directional shape instead of a circ
   };
   expect(zoneContains(z, { x: 180, y: 0 }, 0)).toBe(true);
   expect(zoneContains(z, { x: 0, y: 50 }, 0)).toBe(false);
+  expect(zoneContains(z,{x:210,y:30},10)).toBe(false);
   z.r = 200;
   z.shape.kind = "fan";
   expect(zoneContains(z, { x: 150, y: 0 }, 0)).toBe(true);
@@ -107,3 +108,44 @@ it("original boss steering still makes progress around a boulder", () => {
   for (let i = 0; i < 240; i++) bossPatterns(w, e, 0.05);
   expect(Math.hypot(e.x - 1800, e.y - 1800)).toBeLessThan(180);
 });
+it.each(Object.keys(BOSS_MOVES) as (keyof typeof ENEMIES)[])(
+  "%s has three mechanically distinct slot signatures",
+  (kind) => {
+    const signatures = [];
+    for (let slot = 0; slot < 3; slot++) {
+      const w = new World(createRun("endless"));
+      const e = spawn(w, kind, { x: 2100, y: 1800 })!;
+      e.phase = slot;
+      e.timer = 0;
+      if (["warden", "witch", "titan"].includes(kind)) bossPatterns(w, e, 0.05);
+      else advancedAI(w, e, 0.05);
+      signatures.push(
+        JSON.stringify({
+          zones: [
+            ...new Set(
+              w.s.zones.map((z) =>
+                [
+                  z.kind,
+                  z.shape?.kind,
+                  !!z.shape?.omega,
+                  !!z.shape?.vx || !!z.shape?.vy,
+                ].join(":"),
+              ),
+            ),
+          ].sort(),
+          bullets: [
+            ...new Set(
+              w.s.bullets.map((b) =>
+                [!!b.motion?.turn, !!b.motion?.track, !!b.motion?.bounces].join(
+                  ":",
+                ),
+              ),
+            ),
+          ].sort(),
+          dash: !!e.dashPattern,
+        }),
+      );
+    }
+    expect(new Set(signatures).size).toBe(3);
+  },
+);
