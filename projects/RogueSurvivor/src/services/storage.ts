@@ -529,6 +529,12 @@ export function validateRun(input: unknown): Run {
     if (e.behavior) {
       const b = e.behavior;
       assert(
+        b.copyShots === undefined ||
+          (Number.isInteger(b.copyShots) &&
+            b.copyShots >= 0 &&
+            b.copyShots < 1000000),
+      );
+      assert(
         typeof b.facing === "number" &&
           typeof b.shield === "number" &&
           b.shield >= 0 &&
@@ -580,6 +586,70 @@ export function validateRun(input: unknown): Run {
         ["slow", "curseHaste", "curseCooldown"].includes(b.status),
     );
   }
+  for (const e of s.enemies)
+    if (e.dashPattern) {
+      const d = e.dashPattern;
+      assert(
+        [d.wait, d.time, d.left, d.dx, d.dy].every(
+          (x) => typeof x === "number",
+        ),
+      );
+      assert(
+        d.wait >= -1 &&
+          d.wait <= 1 &&
+          d.time >= -1 &&
+          d.time <= 0.5 &&
+          Number.isInteger(d.left) &&
+          d.left >= 1 &&
+          d.left <= 2 &&
+          Math.abs(d.dx) <= 1 &&
+          Math.abs(d.dy) <= 1,
+      );
+    }
+  for (const b of s.bullets)
+    if (b.motion) {
+      const m = b.motion;
+      assert(
+        [m.wait, m.track, m.turn, m.bounces, m.owner].every(
+          (x) => typeof x === "number",
+        ),
+      );
+      assert(
+        m.wait >= -1 &&
+          m.wait <= 2 &&
+          m.track >= 0 &&
+          m.track <= 2 &&
+          Math.abs(m.turn) <= 2 &&
+          Number.isInteger(m.bounces) &&
+          m.bounces >= 0 &&
+          m.bounces <= 2 &&
+          Number.isInteger(m.owner) &&
+          m.owner > 0 &&
+          (m.bounceIn === undefined || (m.bounceIn >= -1 && m.bounceIn <= 1)),
+      );
+    }
+  for (const z of s.zones)
+    if (z.shape) {
+      const h = z.shape;
+      assert(
+        [h.angle, h.length, h.halfAngle, h.omega, h.vx, h.vy, h.owner].every(
+          (x) => typeof x === "number",
+        ),
+      );
+      assert(
+        ["bar", "fan"].includes(h.kind) &&
+          typeof h.angle === "number" &&
+          h.length > 0 &&
+          h.length <= 1200 &&
+          h.halfAngle > 0 &&
+          h.halfAngle <= Math.PI &&
+          Math.abs(h.omega) <= 2 &&
+          Math.abs(h.vx) <= 600 &&
+          Math.abs(h.vy) <= 600 &&
+          Number.isInteger(h.owner) &&
+          h.owner > 0,
+      );
+    }
   const result = structuredClone(s),
     d = ensureDeck(result),
     revision = d.revision;

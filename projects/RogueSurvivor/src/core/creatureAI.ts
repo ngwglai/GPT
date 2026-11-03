@@ -1,3 +1,4 @@
+import { bossPatterns } from "./bossPatterns";
 import type { Enemy, Run, Vec } from "./types";
 import type { Combat } from "./combat";
 import { spawn } from "./director";
@@ -28,6 +29,7 @@ export function behavior(e: Enemy) {
     reflecting: 0,
     awakened: false,
     copied: [],
+    copyShots: 0,
     healUntil: 0,
   });
 }
@@ -201,8 +203,9 @@ function boss(c: Combat, e: Enemy, dt: number) {
     );
     const next = available.find((k) => !b.copied.includes(k));
     if (next && b.copied.length < 5) b.copied.push(next);
-    const copied =
-      b.copied[(e.phase - 1) % Math.max(1, b.copied.length)] || "bow";
+    const copyIndex = b.copyShots ?? 0;
+    const copied = b.copied[copyIndex % Math.max(1, b.copied.length)] || "bow";
+    b.copyShots = (copyIndex + 1) % 1000000;
     if (copied === "blade")
       c.zone(e, 140, e.damage, "mirrorSlash", true, 1.1, 0.3, e.kind);
     else if (copied === "orbit") {
@@ -262,7 +265,7 @@ export function advancedAI(c: Combat, e: Enemy, dt: number) {
     e.kind === "eclipseSaint" ||
     e.kind === "mirrorMaiden"
   )
-    boss(c, e, dt);
+    bossPatterns(c, e, dt, () => boss(c, e, dt), false);
   if (e.kind === "fairy" || e.kind === "protector") {
     if (d < 260) {
       vx = -n.y * 0.7 - n.x * 0.3;

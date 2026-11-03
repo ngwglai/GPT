@@ -1,3 +1,4 @@
+import { zoneContains } from "./attackGeometry";
 import { temporary, hitCrystals, environment, addBuff } from "./environment";
 import { selectTarget, frontalFactor } from "./targeting";
 import { ENEMY_RULES } from "../data/enemies";
@@ -137,6 +138,7 @@ export class Combat {
       return false;
     const n = unit(dir.x, dir.y);
     const b = this.bulletPool.pop() || ({} as Bullet);
+    delete b.motion;
     delete b.status;
     delete b.reflected;
     Object.assign(
@@ -415,6 +417,56 @@ export class Combat {
   projectiles(dt: number) {
     const s = this.s;
     for (const b of s.bullets) {
+      if (b.motion) {
+        const m = b.motion;
+        if (!s.enemies.some((e) => e.id === m.owner && e.hp > 0)) {
+          b.life = 0;
+          continue;
+        }
+        if (m.wait > 0) {
+          m.wait -= dt;
+          continue;
+        }
+        if (m.bounces > 0 && m.bounceIn !== undefined) {
+          m.bounceIn -= dt;
+          if (m.bounceIn <= 0) {
+            b.vy = -b.vy;
+            m.bounces--;
+            m.bounceIn = 0.8;
+          }
+        }
+        const speed = Math.hypot(b.vx, b.vy);
+        if (m.track > 0) {
+          const desired = Math.atan2(s.player.y - b.y, s.player.x - b.x),
+            current = Math.atan2(b.vy, b.vx);
+          const delta = Math.atan2(
+            Math.sin(desired - current),
+            Math.cos(desired - current),
+          );
+          const a = current + Math.max(-dt * 1.5, Math.min(dt * 1.5, delta));
+          b.vx = Math.cos(a) * speed;
+          b.vy = Math.sin(a) * speed;
+          m.track = Math.max(0, m.track - dt);
+        }
+        if (m.turn) {
+          const a = Math.atan2(b.vy, b.vx) + m.turn * dt;
+          b.vx = Math.cos(a) * speed;
+          b.vy = Math.sin(a) * speed;
+        }
+        if (
+          m.bounces > 0 &&
+          (b.x + b.vx * dt < b.r ||
+            b.x + b.vx * dt > LIMITS.world - b.r ||
+            b.y + b.vy * dt < b.r ||
+            b.y + b.vy * dt > LIMITS.world - b.r)
+        ) {
+          if (b.x + b.vx * dt < b.r || b.x + b.vx * dt > LIMITS.world - b.r)
+            b.vx = -b.vx;
+          if (b.y + b.vy * dt < b.r || b.y + b.vy * dt > LIMITS.world - b.r)
+            b.vy = -b.vy;
+          m.bounces--;
+        }
+      }
       b.life -= dt;
       if (b.life <= 0) continue;
       const before = { x: b.x, y: b.y };
@@ -527,16 +579,31 @@ export class Combat {
     s.bullets.length = write;
     for (const z of s.zones) {
       if (z.life <= 0) continue;
+      if (z.shape) {
+        if (!s.enemies.some((e) => e.id === z.shape!.owner && e.hp > 0)) {
+          z.life = 0;
+          continue;
+        }
+        if (z.delay <= 0) {
+          z.shape.angle += z.shape.omega * dt;
+          z.x += z.shape.vx * dt;
+          z.y += z.shape.vy * dt;
+        }
+      }
       if (z.delay > 0) {
         z.delay -= dt;
         continue;
       }
       z.life -= dt;
+      if (z.enemy && z.shape) {
+        if (zoneContains(z, s.player)) this.hurt(z.damage);
+        continue;
+      }
       z.tick -= dt;
       if (z.tick > 0) continue;
       z.tick = 0.5;
       if (z.enemy) {
-        if (distance(z, s.player) < z.r + 16) this.hurt(z.damage);
+        if (zoneContains(z, s.player)) this.hurt(z.damage);
       } else {
         this.area(z, z.r, z.damage, z.kind, z.source);
         if (z.kind === "bloom" && distance(z, s.player) < z.r) this.heal(4);

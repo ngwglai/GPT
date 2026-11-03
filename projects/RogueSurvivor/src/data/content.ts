@@ -21,8 +21,7 @@ function milestone(time: number, values: readonly number[]) {
   for (let i = 1; i < MILESTONES.length; i++) {
     if (m <= MILESTONES[i]) {
       const amount =
-        (m - MILESTONES[i - 1]) /
-        (MILESTONES[i] - MILESTONES[i - 1]);
+        (m - MILESTONES[i - 1]) / (MILESTONES[i] - MILESTONES[i - 1]);
       return values[i - 1] + (values[i] - values[i - 1]) * amount;
     }
   }
@@ -35,8 +34,8 @@ export function difficulty(time: number) {
     damage: milestone(time, [1, 1.8, 3, 5, 10, 25, 150]),
     attackRate: milestone(time, [1, 1.5, 2, 3, 4, 6, 12]),
     speed: 1 + Math.min(0.6, m * 0.012),
-    spawn: milestone(time, [0.85, 0.55, 0.4, 0.32, 0.28, 0.2, 0.15]),
-    pack: Math.round(milestone(time, [2, 3, 4, 6, 8, 12, 16])),
+    spawn: 2 / milestone(time, [2, 4, 6, 9, 12, 18, 25]),
+    pack: 2,
     elite: milestone(time, [0.03, 0.06, 0.1, 0.16, 0.23, 0.32, 0.48]),
     tier: Math.floor(m / 5),
   };

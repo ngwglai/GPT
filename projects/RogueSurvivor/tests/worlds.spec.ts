@@ -443,3 +443,129 @@ for (const map of ["forest", "cavern", "garden", "eclipse"] as const)
     });
     expect(errors).toEqual([]);
   });
+
+for (const [kind, map] of [
+  ["warden", "forest"],
+  ["witch", "forest"],
+  ["titan", "forest"],
+  ["crystalQueen", "cavern"],
+  ["candyWitch", "garden"],
+  ["eclipseSaint", "eclipse"],
+  ["mirrorMaiden", "eclipse"],
+] as const)
+  test(`v1.4.2 ${kind} distinct phase-two attacks, pause and save`, async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    const w = new World(
+      createRun("endless", "ranger", 412, undefined, undefined, map),
+    );
+    w.s.time = 1200;
+    w.s.nextBoss = 9999;
+    w.s.nextEvent = 9999;
+    w.s.spawnTimer = 10;
+    w.s.player.invincible = 999;
+    const e = spawn(w, kind, { x: 2100, y: 1800 })!;
+    e.hp = e.maxHp * 0.3;
+    e.timer = 0;
+    e.phase = 1;
+    await resume(page, w.s);
+    await expect(page.locator("#clock")).toBeVisible();
+    await page.waitForTimeout(1000);
+    await page.screenshot({
+      path: `validation/v1.4.2/${kind}.jpg`,
+      type: "jpeg",
+      quality: 85,
+    });
+    await save(page);
+    const s = await get(page);
+    expect(s.enemies.some((x: any) => x.kind === kind && x.phase >= 3)).toBe(
+      true,
+    );
+    expect(s.bullets.length + s.zones.length).toBeGreaterThan(0);
+    await page.reload();
+    await page.getByRole("button", { name: /继续旅程/ }).click();
+    await expect(page.locator("#clock")).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+for (const count of [50, 150, 300])
+  test(`v1.4.2 high quality keeps decorations at ${count} enemies and 230 bullets`, async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const draw = CanvasRenderingContext2D.prototype.drawImage;
+      (window as any).decorDraws = 0;
+      CanvasRenderingContext2D.prototype.drawImage = function (
+        img: any,
+        ...args: any[]
+      ) {
+        if (
+          img?.src?.includes("/maps/flower.webp") ||
+          img?.src?.includes("/maps/mushroom.webp")
+        )
+          (window as any).decorDraws++;
+        return (draw as any).call(this, img, ...args);
+      };
+    });
+    const w = new World(createRun("endless"));
+    w.s.spawnTimer = 10;
+    w.s.player.invincible = 999;
+    for (let i = 0; i < count; i++)
+      spawn(w, "crawler", {
+        x: 2300 + (i % 8) * 10,
+        y: 1600 + Math.floor(i / 8) * 10,
+      });
+    for (let i = 0; i < 230; i++)
+      w.shoot({ x: 2300, y: 1700 }, { x: 1, y: 0 }, 1, "enemy", "enemy", true);
+    await resume(page, w.s);
+    await expect
+      .poll(() => page.evaluate(() => (window as any).decorDraws))
+      .toBeGreaterThan(0);
+  });
+
+for (const [primary, secondary] of [
+  ["fire", "ice"],
+  ["lance", "ward"],
+  ["bloom", "fire"],
+] as const)
+  test(`v1.4.2 five weapons and ${primary}/${secondary}/storm have independent outlines`, async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const stroke = CanvasRenderingContext2D.prototype.stroke;
+      (window as any).allyOutline = false;
+      CanvasRenderingContext2D.prototype.stroke = function (...args: any[]) {
+        if (
+          String(this.strokeStyle) === "#123b60" ||
+          String(this.strokeStyle).includes("18, 59, 96")
+        )
+          (window as any).allyOutline = true;
+        return (stroke as any).apply(this, args);
+      };
+    });
+    const w = new World(createRun("endless", "ranger", 92, primary, secondary));
+    w.s.player.level = 100;
+    w.s.player.invincible = 999;
+    w.s.spawnTimer = 10;
+    for (const id of ["bow", "blade", "ember", "orbit", "drone"])
+      for (let i = 0; i < 5; i++) grant(w.s, "weapon_" + id);
+    for (let i = 0; i < 8; i++) {
+      const a = (i * Math.PI) / 4,
+        e = spawn(w, "crawler", {
+          x: 1800 + Math.cos(a) * 110,
+          y: 1800 + Math.sin(a) * 110,
+        })!;
+      e.hp = e.maxHp = 1e7;
+    }
+    await resume(page, w.s);
+    for (const [key, index] of ["q", "e", "r"].entries()) {
+      await page.keyboard.press(index);
+      await expect(page.locator("#cd-" + key)).not.toBeEmpty();
+    }
+    await expect
+      .poll(() => page.evaluate(() => (window as any).allyOutline))
+      .toBe(true);
+    const s = await save(page);
+    expect(Object.keys(s.player.weapons)).toHaveLength(5);
+  });

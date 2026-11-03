@@ -1,3 +1,4 @@
+import { BOSS_MOVES } from "../core/bossPatterns";
 import { MAPS } from "../data/maps";
 import { artUrl, cardArt } from "../data/visuals";
 import { ENEMY_RULES, ENEMY_BEHAVIORS } from "../data/enemies";
@@ -116,7 +117,7 @@ export function enemyBrowser(img: (id: string) => string) {
   )
     .map(
       ([id, e]) =>
-        `<article class="codex-card">${img("enemy." + id)}<small>${e.boss ? "阶段首领 / 无尽循环首领" : "普通 / 精英"}</small><h3>${e.name}</h3><p>基础生命${e.hp}；伤害${e.damage}；速度${e.speed}；碰撞半径${e.r}；经验${e.xp}。</p><p>${ENEMY_BEHAVIORS[id as EnemyId]}</p><p>出没：${
+        `<article class="codex-card">${img("enemy." + id)}<small>${e.boss ? "阶段首领 / 无尽循环首领" : "普通 / 精英"}</small><h3>${e.name}</h3><p>基础生命${e.hp}；伤害${e.damage}；速度${e.speed}；碰撞半径${e.r}；经验${e.xp}。</p><p>${BOSS_MOVES[id] ? `招式：${BOSS_MOVES[id].join(" / ")}。暖色空心弹为待发射预警；追踪方框消失后沿最终方向飞行。` : ENEMY_BEHAVIORS[id as EnemyId]}</p><p>出没：${
           Object.values(MAPS)
             .filter(
               (m) =>
