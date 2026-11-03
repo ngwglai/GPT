@@ -2,7 +2,7 @@ import { environment } from "../core/environment";
 import { MAPS } from "../data/maps";
 import { VISUALS, artUrl } from "../data/visuals";
 import Phaser from "phaser";
-import type { Settings, Input, Vec } from "../core/types";
+import type { Settings, Input, Vec, Zone } from "../core/types";
 import { World } from "../core/world";
 import { ASSET_IDS, assetPack, decodeImage } from "../services/assets";
 import { defaultArt } from "./art";
@@ -250,6 +250,36 @@ export class GameScene extends Phaser.Scene {
     }
     this.onFrame?.(dt);
   }
+  private zonePath(
+    g: Phaser.GameObjects.Graphics,
+    z: Zone,
+    x: number,
+    y: number,
+  ) {
+    const h = z.shape;
+    if (h?.kind === "bar") {
+      const ca = Math.cos(h.angle),
+        sa = Math.sin(h.angle);
+      for (const [i, [a, b]] of [
+        [-1, -1],
+        [1, -1],
+        [1, 1],
+        [-1, 1],
+      ].entries()) {
+        const px = x + ((a * h.length) / 2) * ca - b * z.r * sa,
+          py = y + ((a * h.length) / 2) * sa + b * z.r * ca;
+        if (i === 0) g.moveTo(px, py);
+        else g.lineTo(px, py);
+      }
+    } else if (h?.kind === "fan") {
+      g.moveTo(x, y);
+      g.arc(x, y, z.r, h.angle - h.halfAngle, h.angle + h.halfAngle, false);
+    } else {
+      g.moveTo(x + z.r, y);
+      g.arc(x, y, z.r, 0, Math.PI * 2, false);
+    }
+    g.closePath();
+  }
   private draw() {
     const w = this.world!,
       s = w.s,
@@ -257,10 +287,8 @@ export class GameScene extends Phaser.Scene {
       g = this.graphics,
       W = this.scale.width,
       H = this.scale.height;
-    const low =
-      this.settings.quality === "low" ||
-      s.enemies.length > 110 ||
-      s.bullets.length > 220;
+    const low = this.settings.quality === "low";
+    const busy = low || s.enemies.length > 110 || s.bullets.length > 220;
     this.used = 0;
     this.textUsed = 0;
     g.clear();
@@ -453,7 +481,7 @@ export class GameScene extends Phaser.Scene {
           : SKILLS[z.kind as keyof typeof SKILLS]?.color || 0xa0eac8;
       g.fillStyle(color, z.delay > 0 ? 0.09 : 0.18);
       g.fillCircle(x, y, z.r);
-      g.lineStyle(z.enemy ? 3 : 2, color, z.delay > 0 ? 0.7 : 0.4);
+      g.lineStyle(4, 0xb7eaff, z.delay > 0 ? 0.85 : 0.65);
       g.strokeCircle(x, y, z.r);
       if (z.enemy && z.delay > 0) {
         g.lineStyle(2, 0xffd4a1, 0.8);
@@ -627,7 +655,24 @@ export class GameScene extends Phaser.Scene {
       if (!b.enemy) {
         const x = sx(b.x),
           y = sy(b.y);
-        this.friendly.lineStyle(1.5, 0xaafaff, 0.65);
+        const speed = Math.max(1, Math.hypot(b.vx, b.vy));
+        this.friendly.lineStyle(5, 0x123b60, 1);
+        this.friendly.lineBetween(
+          x,
+          y,
+          x - (b.vx / speed) * 14,
+          y - (b.vy / speed) * 14,
+        );
+        this.friendly.lineStyle(2.5, 0x50e9ff, 1);
+        this.friendly.lineBetween(
+          x,
+          y,
+          x - (b.vx / speed) * 14,
+          y - (b.vy / speed) * 14,
+        );
+        this.friendly.lineStyle(5, 0x123b60, 1);
+        this.friendly.strokeCircle(x, y, b.r + 1);
+        this.friendly.lineStyle(2, 0x50e9ff, 1);
         this.friendly.strokeCircle(x, y, b.r + 1);
         this.friendly.fillStyle(0xf1ffff, 0.85);
         this.friendly.fillCircle(x, y, Math.max(1.5, b.r * 0.4));
@@ -642,9 +687,7 @@ export class GameScene extends Phaser.Scene {
         if (z.enemy && z.delay > 0 === warning) {
           const x = sx(z.x),
             y = sy(z.y);
-          danger.moveTo(x + z.r, y);
-          danger.arc(x, y, z.r, 0, Math.PI * 2, false);
-          danger.closePath();
+          this.zonePath(danger, z, x, y);
         }
       danger.fillPath();
     }
@@ -654,10 +697,18 @@ export class GameScene extends Phaser.Scene {
           y = sy(z.y);
 
         danger.lineStyle(6, 0x351426, 0.95);
-        danger.strokeCircle(x, y, z.r);
+        danger.beginPath();
+        this.zonePath(danger, z, x, y);
+        danger.strokePath();
         danger.lineStyle(3, z.delay > 0 ? 0xffb32c : 0xff4828, 1);
-        danger.strokeCircle(x, y, z.r);
-        if (z.delay > 0) {
+        danger.beginPath();
+        this.zonePath(danger, z, x, y);
+        danger.strokePath();
+        if (z.shape && (z.shape.vx || z.shape.vy)) {
+          danger.lineStyle(2, 0xffe7a5, 0.8);
+          danger.lineBetween(x, y, x + z.shape.vx * 0.6, y + z.shape.vy * 0.6);
+        }
+        if (z.delay > 0 && !z.shape) {
           danger.lineStyle(2, 0xfff1bc, 0.9);
           danger.strokeCircle(x, y, z.r * Math.max(0.06, 1 - z.delay / 1.6));
         }
@@ -667,6 +718,22 @@ export class GameScene extends Phaser.Scene {
         const x = sx(b.x),
           y = sy(b.y),
           r = Math.max(3, b.r);
+        if (b.motion && b.motion.wait > 0) {
+          const speed = Math.max(1, Math.hypot(b.vx, b.vy));
+          danger.lineStyle(3, 0xffbd58, 0.85);
+          danger.strokeCircle(x, y, r + 5);
+          danger.lineBetween(
+            x,
+            y,
+            x + (b.vx / speed) * 65,
+            y + (b.vy / speed) * 65,
+          );
+          continue;
+        }
+        if (b.motion && b.motion.track > 0) {
+          danger.lineStyle(2, 0xffeeb0, 1);
+          danger.strokeRect(x - r - 3, y - r - 3, (r + 3) * 2, (r + 3) * 2);
+        }
         danger.fillStyle(0x321122, 1);
         danger.fillCircle(x, y, r + 3);
         danger.fillStyle(0xff4820, 1);
@@ -691,7 +758,7 @@ export class GameScene extends Phaser.Scene {
       }
     danger.lineStyle(2, 0xffffe5, 0.85);
     danger.strokeCircle(sx(p.x), sy(p.y), 21);
-    const limit = low ? 25 : 90;
+    const limit = busy ? 25 : 90;
     for (const e of w.effects.slice(-limit)) {
       const a = e.life / e.maxLife;
       if (e.kind === "heal") this.sprite("effect.heal", e, 32, 0, a * 0.8);

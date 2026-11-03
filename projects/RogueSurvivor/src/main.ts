@@ -118,7 +118,7 @@ function notify(message: string) {
   toastTimer = window.setTimeout(() => toast.classList.remove("show"), 4500);
 }
 function header() {
-  return `<header><a href="#" data-action="home" class="brand"><span class="brand-star">✦</span><span>星烬远征<small>ROGUE SURVIVOR</small></span></a><nav>${button("codex", "远征图鉴")}${button("records", "远征记录")}${button("assets", "资源工坊")}${button("settings", "设置", "nav-setting")}</nav><span class="version">离线单人 · v1.4.1</span></header>`;
+  return `<header><a href="#" data-action="home" class="brand"><span class="brand-star">✦</span><span>星烬远征<small>ROGUE SURVIVOR</small></span></a><nav>${button("codex", "远征图鉴")}${button("records", "远征记录")}${button("assets", "资源工坊")}${button("settings", "设置", "nav-setting")}</nav><span class="version">离线单人 · v1.4.2</span></header>`;
 }
 function shell(content: string, cls = "") {
   document.documentElement.style.setProperty(

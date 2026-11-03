@@ -53,6 +53,13 @@ export interface Player extends Vec {
   upgrades: Record<string, number>;
 }
 export interface Enemy extends Vec {
+  dashPattern?: {
+    wait: number;
+    time: number;
+    left: number;
+    dx: number;
+    dy: number;
+  };
   behavior?: {
     facing: number;
     shield: number;
@@ -87,6 +94,14 @@ export interface Enemy extends Vec {
   charge: Vec | null;
 }
 export interface Bullet extends Vec {
+  motion?: {
+    wait: number;
+    turn: number;
+    track: number;
+    bounces: number;
+    bounceIn?: number;
+    owner: number;
+  };
   id: number;
   vx: number;
   vy: number;
@@ -104,6 +119,16 @@ export interface Bullet extends Vec {
   status?: "slow" | "curseHaste" | "curseCooldown";
 }
 export interface Zone extends Vec {
+  shape?: {
+    kind: "bar" | "fan";
+    angle: number;
+    length: number;
+    halfAngle: number;
+    omega: number;
+    vx: number;
+    vy: number;
+    owner: number;
+  };
   anchor?: number;
   id: number;
   r: number;

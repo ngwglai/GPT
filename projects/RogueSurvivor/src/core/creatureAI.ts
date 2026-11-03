@@ -1,3 +1,4 @@
+import { bossPatterns } from "./bossPatterns";
 import type { Enemy, Run, Vec } from "./types";
 import type { Combat } from "./combat";
 import { spawn } from "./director";
@@ -262,7 +263,7 @@ export function advancedAI(c: Combat, e: Enemy, dt: number) {
     e.kind === "eclipseSaint" ||
     e.kind === "mirrorMaiden"
   )
-    boss(c, e, dt);
+    bossPatterns(c, e, dt, () => boss(c, e, dt), false);
   if (e.kind === "fairy" || e.kind === "protector") {
     if (d < 260) {
       vx = -n.y * 0.7 - n.x * 0.3;

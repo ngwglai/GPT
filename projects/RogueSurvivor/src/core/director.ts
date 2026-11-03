@@ -1,11 +1,16 @@
+import { bossPatterns } from "./bossPatterns";
 import { advancedAI, tickDefense } from "./creatureAI";
 import { environment } from "./environment";
 import { MAPS } from "../data/maps";
 import { ENEMY_RULES } from "../data/enemies";
 import type { EnemyId, Vec } from "./types";
 import {
-  ENEMIES, LIMITS, difficulty,
-  bossHpMultiplier, bossDamageMultiplier, bossAttackInterval,
+  ENEMIES,
+  LIMITS,
+  difficulty,
+  bossHpMultiplier,
+  bossDamageMultiplier,
+  bossAttackInterval,
 } from "../data/content";
 import { clamp, distance, move, random, unit } from "./math";
 import { Combat } from "./combat";
@@ -64,8 +69,9 @@ export function director(c: Combat, dt: number) {
   const s = c.s,
     d = difficulty(s.time);
   s.spawnTimer -= dt;
-  if (s.spawnTimer <= 0) {
-    s.spawnTimer =
+  let waves = 0;
+  while (s.spawnTimer <= 0 && waves++ < 32) {
+    s.spawnTimer +=
       d.spawn * (s.event === "兽潮来袭" && s.time < s.eventUntil ? 0.6 : 1);
     const map = MAPS[environment(s).mapId];
     const pool = map.spawns.filter((x) => s.time >= x.after);
@@ -158,6 +164,10 @@ export function ai(c: Combat, dt: number) {
       c.damage(e, e.burnPower * dt, e.burnSource, false);
     }
     if (e.hp <= 0 || e.freeze > 0) continue;
+    if (["warden", "witch", "titan"].includes(e.kind)) {
+      bossPatterns(c, e, dt);
+      continue;
+    }
     if (advancedAI(c, e, dt)) continue;
     const def = ENEMIES[e.kind];
     const d = distance(e, p),
@@ -231,63 +241,6 @@ export function ai(c: Combat, dt: number) {
         for (let i = 0; i < 2; i++)
           spawn(c, "crawler", { x: e.x + (i * 2 - 1) * 50, y: e.y });
         e.timer = 7 / Math.sqrt(difficulty(s.time).attackRate);
-      }
-      if (def.boss && e.timer <= 0) {
-        const phase = e.hp / e.maxHp < ENEMY_RULES.bossPhaseHp ? 2 : 1,
-          level = Math.min(5, Math.floor(s.time / 1200));
-        e.phase++;
-        e.timer = bossAttackInterval(s.time, phase === 2);
-        if (e.kind === "warden") {
-          for (let i = 0; i < 6 + phase * 2 + level * 2; i++) {
-            const a = (i * Math.PI * 2) / (6 + phase * 2 + level * 2);
-            c.zone(
-              { x: p.x + Math.cos(a) * 120, y: p.y + Math.sin(a) * 120 },
-              67,
-              e.damage,
-              "roots",
-              true,
-              1.25,
-              0.6,
-            );
-          }
-          if (phase === 2) c.zone(p, 75, e.damage, "roots", true, 1.5, 0.2);
-        }
-        if (e.kind === "witch") {
-          const count = 18 + phase * 6 + level * 4;
-          for (let i = 0; i < count; i++) {
-            const a = (i * Math.PI * 2) / count + e.phase * 0.33;
-            c.shoot(
-              e,
-              { x: Math.cos(a), y: Math.sin(a) },
-              e.damage,
-              "enemy",
-              "witch",
-              true,
-              { life: 5 },
-            );
-          }
-          if (phase === 2)
-            c.zone({ ...p }, 85, e.damage, "meteor", true, 1.3, 0.2);
-        }
-        if (e.kind === "titan") {
-          if (e.phase % 2 === 0) {
-            e.charge = n;
-            e.timer = Math.max(0.6, Math.min(1.1, bossAttackInterval(s.time, phase === 2)));
-          } else
-            for (let i = 0; i < 8 + phase * 3 + level * 2; i++)
-              c.zone(
-                {
-                  x: p.x + (random(s) - 0.5) * 550,
-                  y: p.y + (random(s) - 0.5) * 420,
-                },
-                90,
-                e.damage,
-                "meteor",
-                true,
-                1 + i * 0.12,
-                0.3,
-              );
-        }
       }
     }
     // Local steering around sparse, separated circular obstacles; sliding prevents dead ends.
