@@ -523,3 +523,49 @@ for (const count of [50, 150, 300])
       .poll(() => page.evaluate(() => (window as any).decorDraws))
       .toBeGreaterThan(0);
   });
+
+for (const [primary, secondary] of [
+  ["fire", "ice"],
+  ["lance", "ward"],
+  ["bloom", "fire"],
+] as const)
+  test(`v1.4.2 five weapons and ${primary}/${secondary}/storm have independent outlines`, async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const stroke = CanvasRenderingContext2D.prototype.stroke;
+      (window as any).allyOutline = false;
+      CanvasRenderingContext2D.prototype.stroke = function (...args: any[]) {
+        if (
+          String(this.strokeStyle) === "#123b60" ||
+          String(this.strokeStyle).includes("18, 59, 96")
+        )
+          (window as any).allyOutline = true;
+        return (stroke as any).apply(this, args);
+      };
+    });
+    const w = new World(createRun("endless", "ranger", 92, primary, secondary));
+    w.s.player.level = 100;
+    w.s.player.invincible = 999;
+    w.s.spawnTimer = 10;
+    for (const id of ["bow", "blade", "ember", "orbit", "drone"])
+      for (let i = 0; i < 5; i++) grant(w.s, "weapon_" + id);
+    for (let i = 0; i < 8; i++) {
+      const a = (i * Math.PI) / 4,
+        e = spawn(w, "crawler", {
+          x: 1800 + Math.cos(a) * 110,
+          y: 1800 + Math.sin(a) * 110,
+        })!;
+      e.hp = e.maxHp = 1e7;
+    }
+    await resume(page, w.s);
+    for (const [key, index] of ["q", "e", "r"].entries()) {
+      await page.keyboard.press(index);
+      await expect(page.locator("#cd-" + key)).not.toBeEmpty();
+    }
+    await expect
+      .poll(() => page.evaluate(() => (window as any).allyOutline))
+      .toBe(true);
+    const s = await save(page);
+    expect(Object.keys(s.player.weapons)).toHaveLength(5);
+  });

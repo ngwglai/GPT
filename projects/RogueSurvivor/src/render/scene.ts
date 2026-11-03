@@ -651,6 +651,26 @@ export class GameScene extends Phaser.Scene {
     const danger = this.danger;
     danger.clear();
     this.friendly.clear();
+    for (const z of s.zones)
+      if (!z.enemy) {
+        this.friendly.lineStyle(4, 0x123b60, 0.8);
+        this.friendly.strokeCircle(sx(z.x), sy(z.y), z.r);
+        this.friendly.lineStyle(2, 0xb7efff, 0.95);
+        this.friendly.strokeCircle(sx(z.x), sy(z.y), z.r);
+      }
+    for (const effect of w.effects)
+      if (
+        !effect.text &&
+        ["slash", "orbit", "fire", "ice", "ward", "bloom", "storm"].includes(
+          effect.kind,
+        )
+      ) {
+        const alpha = effect.life / effect.maxLife;
+        this.friendly.lineStyle(3, 0x123b60, alpha * 0.7);
+        this.friendly.strokeCircle(sx(effect.x), sy(effect.y), effect.r);
+        this.friendly.lineStyle(1.5, 0xc6f8ff, alpha * 0.8);
+        this.friendly.strokeCircle(sx(effect.x), sy(effect.y), effect.r);
+      }
     for (const b of s.bullets)
       if (!b.enemy) {
         const x = sx(b.x),
