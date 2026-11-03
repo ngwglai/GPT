@@ -595,6 +595,10 @@ export class Combat {
         continue;
       }
       z.life -= dt;
+      if (z.enemy && z.shape) {
+        if (zoneContains(z, s.player)) this.hurt(z.damage);
+        continue;
+      }
       z.tick -= dt;
       if (z.tick > 0) continue;
       z.tick = 0.5;

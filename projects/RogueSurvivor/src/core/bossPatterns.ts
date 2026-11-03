@@ -105,13 +105,14 @@ export function bossPatterns(
   // even while another slot is playing. The legacy handler checks its own timer.
   if (legacy && e.kind === "crystalQueen" && behavior(e).target && e.timer > 0)
     legacy();
+  const speed = e.speed * (e.slow > 0 ? 0.48 : 1);
   const n = unit(p.x - e.x, p.y - e.y),
     a = Math.atan2(n.y, n.x);
   if (e.dashPattern) {
     const d = e.dashPattern;
     if (d.wait > 0) d.wait -= dt;
     else if (d.time > 0) {
-      move(e, d.dx * e.speed * 4 * dt, d.dy * e.speed * 4 * dt, e.r, c.s.rocks);
+      move(e, d.dx * speed * 4 * dt, d.dy * speed * 4 * dt, e.r, c.s.rocks);
       d.time -= dt;
     } else if (--d.left > 0) {
       d.wait = 0.65;
@@ -376,8 +377,8 @@ export function bossPatterns(
       const direction = unit(vx, vy);
       move(
         e,
-        direction.x * e.speed * dt,
-        direction.y * e.speed * dt,
+        direction.x * speed * dt,
+        direction.y * speed * dt,
         e.r,
         c.s.rocks,
       );

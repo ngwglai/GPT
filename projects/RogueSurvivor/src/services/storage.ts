@@ -529,6 +529,12 @@ export function validateRun(input: unknown): Run {
     if (e.behavior) {
       const b = e.behavior;
       assert(
+        b.copyShots === undefined ||
+          (Number.isInteger(b.copyShots) &&
+            b.copyShots >= 0 &&
+            b.copyShots < 1000000),
+      );
+      assert(
         typeof b.facing === "number" &&
           typeof b.shield === "number" &&
           b.shield >= 0 &&

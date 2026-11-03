@@ -73,6 +73,7 @@ export interface Enemy extends Vec {
     reflecting: number;
     awakened: boolean;
     copied: string[];
+    copyShots?: number;
     healUntil: number;
   };
   id: number;

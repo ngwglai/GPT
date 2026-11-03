@@ -76,7 +76,7 @@ it("bar and sector hit tests match the drawn directional shape instead of a circ
   };
   expect(zoneContains(z, { x: 180, y: 0 }, 0)).toBe(true);
   expect(zoneContains(z, { x: 0, y: 50 }, 0)).toBe(false);
-  expect(zoneContains(z,{x:210,y:30},10)).toBe(false);
+  expect(zoneContains(z, { x: 210, y: 30 }, 10)).toBe(false);
   z.r = 200;
   z.shape.kind = "fan";
   expect(zoneContains(z, { x: 150, y: 0 }, 0)).toBe(true);
@@ -149,3 +149,58 @@ it.each(Object.keys(BOSS_MOVES) as (keyof typeof ENEMIES)[])(
     expect(new Set(signatures).size).toBe(3);
   },
 );
+it("slow still scales normal and dash movement of the original bosses", () => {
+  for (const dash of [false, true]) {
+    const distances = [];
+    for (const slow of [0, 4]) {
+      const w = new World(createRun("endless"));
+      w.s.rocks = [];
+      const e = spawn(w, "titan", { x: 2200, y: 1800 })!;
+      e.timer = 10;
+      e.slow = slow;
+      if (dash) e.dashPattern = { wait: 0, time: 0.42, left: 1, dx: -1, dy: 0 };
+      const x = e.x;
+      bossPatterns(w, e, 0.05);
+      distances.push(Math.abs(e.x - x));
+    }
+    expect(distances[1] / distances[0]).toBeCloseTo(0.48);
+  }
+});
+it("mirror copy rotation is independent of three-slot attack phase and survives save", () => {
+  const w = new World(createRun("endless"));
+  w.s.player.weapons = { bow: 1, blade: 1, ember: 1 };
+  const e = spawn(w, "mirrorMaiden", { x: 2100, y: 1800 })!;
+  const seen = new Set<string>();
+  for (let i = 0; i < 12; i++) {
+    e.timer = 0;
+    advancedAI(w, e, 0.05);
+    for (const z of w.s.zones) seen.add(z.kind);
+  }
+  expect(seen.has("mirrorArrow")).toBe(true);
+  expect(seen.has("mirrorSlash")).toBe(true);
+  expect(seen.has("mirrorFire")).toBe(true);
+  expect(
+    validateRun(w.s).enemies.find((x) => x.id === e.id)?.behavior?.copyShots,
+  ).toBe(4);
+});
+it("a rotating beam hits during its crossing rather than skipping half-second gaps", () => {
+  const w = new World(createRun("endless"));
+  const e = spawn(w, "crystalQueen", { x: 1800, y: 1800 })!;
+  w.s.player.x = 1800 + Math.cos(0.12) * 480;
+  w.s.player.y = 1800 + Math.sin(0.12) * 480;
+  w.s.player.invincible = 0;
+  const z = w.zone(e, 20, 10, "bossShape", true, 0, 1.2)!;
+  z.shape = {
+    kind: "bar",
+    angle: 0,
+    length: 1000,
+    halfAngle: Math.PI / 4,
+    omega: 0.45,
+    vx: 0,
+    vy: 0,
+    owner: e.id,
+  };
+  const hp = w.s.player.hp;
+  for (let i = 0; i < 5; i++) w.projectiles(0.05);
+  expect(w.s.player.hp).toBeLessThan(hp);
+});
