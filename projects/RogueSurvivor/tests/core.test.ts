@@ -295,7 +295,7 @@ describe("director, enemies and victory", () => {
   });
   it("spawn caps reserve boss capacity and never remove living enemies", () => {
     const w = make();
-    for (let i = 0; i < 500; i++) spawn(w, "crawler");
+    for (let i = 0; i < LIMITS.enemies + 10; i++) spawn(w, "crawler");
     const ids = w.s.enemies.map((e) => e.id);
     expect(ids.length).toBe(LIMITS.enemies - 3);
     w.s.time = 300;
@@ -383,7 +383,11 @@ describe("persistence and adversarial inputs", () => {
   );
   it("rejects oversized collections, unknown content, invalid levels and prototypes", () => {
     const a = createRun("standard");
-    a.gems = Array.from({ length: 181 }, () => ({ x: 0, y: 0, value: 1 }));
+    a.gems = Array.from({ length: LIMITS.gems + 1 }, () => ({
+      x: 0,
+      y: 0,
+      value: 1,
+    }));
     expect(() => validateRun(a)).toThrow();
     const b = createRun("standard");
     (b.player.skills as string[])[0] = "script";
@@ -434,7 +438,7 @@ describe("persistence and adversarial inputs", () => {
 describe("resource budgets", () => {
   it("caps projectiles, zones, particles and reuses dead projectile objects", () => {
     const w = make();
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < LIMITS.bullets + LIMITS.zones; i++) {
       w.shoot(w.s.player, { x: 1, y: 0 }, 1, "bow", "bow");
       w.zone(w.s.player, 1, 1, "ice", false);
       w.effect(w.s.player, "fire");
@@ -466,7 +470,7 @@ describe("resource budgets", () => {
   });
   it("gem cap merges experience without deleting reward value", () => {
     const w = make();
-    w.s.gems = Array.from({ length: 180 }, (_, i) => ({
+    w.s.gems = Array.from({ length: LIMITS.gems }, (_, i) => ({
       x: 10 + i,
       y: 10,
       value: 1,
@@ -474,8 +478,8 @@ describe("resource budgets", () => {
     const e = enemy(w, "crawler", 2300);
     w.damage(e, 1000, "bow");
     w.step(0.05, input);
-    expect(w.s.gems.length).toBe(180);
-    expect(w.s.gems.reduce((n, g) => n + g.value, 0)).toBe(185);
+    expect(w.s.gems.length).toBe(LIMITS.gems);
+    expect(w.s.gems.reduce((n, g) => n + g.value, 0)).toBe(LIMITS.gems + 5);
   });
 });
 
@@ -490,7 +494,7 @@ describe("defensive regression checks", () => {
   });
   it("reserves hostile projectile and zone budgets for player actions", () => {
     const w = make();
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < LIMITS.bullets + LIMITS.zones; i++) {
       w.shoot(w.s.player, { x: 1, y: 0 }, 1, "enemy", "enemy", true);
       w.zone(w.s.player, 30, 10, "meteor", true);
     }

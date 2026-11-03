@@ -84,7 +84,7 @@ export function validateRun(input: unknown): Run {
     if (typeof v === "number")
       assert(Number.isFinite(v) && Math.abs(v) <= LIMITS.number);
     else if (Array.isArray(v)) {
-      assert(v.length <= 1000);
+      assert(v.length <= Math.max(1000, LIMITS.bullets));
       v.forEach((x) => visit(x, depth + 1));
     } else if (obj(v)) {
       assert(Object.keys(v).length <= 150);

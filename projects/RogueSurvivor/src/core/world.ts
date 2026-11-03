@@ -1,3 +1,4 @@
+import { addExperienceGem } from "./gems";
 import { environment, tickEnvironment, temporary } from "./environment";
 import { childSpawn } from "./creatureAI";
 import { MAPS, ENV_RULES } from "../data/maps";
@@ -104,15 +105,8 @@ export class World extends Combat {
       if (p.upgrades.harvest) this.heal(0.3);
       const value = def.xp * (e.elite ? ENEMY_RULES.elite.xp : 1);
       if (!e.behavior?.rewardless) {
-        const nearby = s.gems.find(g => distance(e, g) < 40 && g.value + value <= LIMITS.number);
-        if (nearby) nearby.value += value;
-        else if (s.gems.length < LIMITS.gems) s.gems.push({ x: e.x, y: e.y, value });
-        else {
-          let g = s.gems[0];
-          for (const other of s.gems)
-            if (distance(e, other) < distance(e, g)) g = other;
-          g.value = Math.min(LIMITS.number, g.value + value);
-        }
+        const overflow = addExperienceGem(s, e, value);
+        if (overflow) p.xp += overflow * modifier(s, "xp");
       }
       if (e.burn > 0 && p.upgrades.wildfire) {
         for (const other of this.grid.nearby(e, 145)) {
@@ -152,6 +146,7 @@ export class World extends Combat {
       }
       if (distance(g, p) < 22) {
         p.xp = Math.min(LIMITS.number, p.xp + g.value * modifier(s, "xp"));
+        this.effect(p, "pickup", 18);
         g.value = 0;
       }
     }
