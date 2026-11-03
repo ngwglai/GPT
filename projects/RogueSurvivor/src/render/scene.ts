@@ -22,6 +22,7 @@ export class GameScene extends Phaser.Scene {
   private background!: Phaser.GameObjects.Graphics;
   private graphics!: Phaser.GameObjects.Graphics;
   private danger!: Phaser.GameObjects.Graphics;
+  private friendly!: Phaser.GameObjects.Graphics;
   private sprites: Phaser.GameObjects.Sprite[] = [];
   private labels: Phaser.GameObjects.Text[] = [];
   private used = 0;
@@ -43,6 +44,7 @@ export class GameScene extends Phaser.Scene {
     this.background = this.add.graphics().setDepth(-2);
     this.graphics = this.add.graphics().setDepth(0);
     this.danger = this.add.graphics().setDepth(12);
+    this.friendly = this.add.graphics().setDepth(5);
     this.keys = this.input.keyboard!.addKeys(
       "W,A,S,D,Q,E,R,SPACE,ESC",
     ) as Record<string, Phaser.Input.Keyboard.Key>;
@@ -620,13 +622,37 @@ export class GameScene extends Phaser.Scene {
     }
     const danger = this.danger;
     danger.clear();
+    this.friendly.clear();
+    for (const b of s.bullets)
+      if (!b.enemy) {
+        const x = sx(b.x),
+          y = sy(b.y);
+        this.friendly.lineStyle(1.5, 0xaafaff, 0.65);
+        this.friendly.strokeCircle(x, y, b.r + 1);
+        this.friendly.fillStyle(0xf1ffff, 0.85);
+        this.friendly.fillCircle(x, y, Math.max(1.5, b.r * 0.4));
+      }
 
+    // Canvas fills each stage as one nonzero path: overlapping hazards must
+    // not accumulate opacity and conceal the player or the remaining gaps.
+    for (const warning of [true, false]) {
+      danger.fillStyle(0xff4020, warning ? 0.035 : 0.1);
+      danger.beginPath();
+      for (const z of s.zones)
+        if (z.enemy && z.delay > 0 === warning) {
+          const x = sx(z.x),
+            y = sy(z.y);
+          danger.moveTo(x + z.r, y);
+          danger.arc(x, y, z.r, 0, Math.PI * 2, false);
+          danger.closePath();
+        }
+      danger.fillPath();
+    }
     for (const z of s.zones)
       if (z.enemy) {
         const x = sx(z.x),
           y = sy(z.y);
-        danger.fillStyle(0xff4020, z.delay > 0 ? 0.05 : 0.12);
-        danger.fillCircle(x, y, z.r);
+
         danger.lineStyle(6, 0x351426, 0.95);
         danger.strokeCircle(x, y, z.r);
         danger.lineStyle(3, z.delay > 0 ? 0xffb32c : 0xff4828, 1);

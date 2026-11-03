@@ -267,7 +267,7 @@ function pause() {
   screen = "pause";
   const d = difficulty(world.s.time);
   modal(
-    `<div class="eyebrow">呼吸片刻，再向前</div><h2>远征已暂停</h2><details><summary>极限星潮 · 当前难度</summary><p>当前时间 ${time(world.s.time)}<br>普通怪生命 ×${d.hp.toFixed(2)} · 伤害 ×${d.damage.toFixed(2)} · 攻击频率 ×${d.attackRate.toFixed(2)}<br>Boss生命 ×${bossHpMultiplier(world.s.time).toFixed(2)} · 伤害 ×${bossDamageMultiplier(world.s.time).toFixed(2)}<br>Boss基础攻击间隔 ${bossAttackInterval(world.s.time, false).toFixed(2)}秒 / 二阶段 ${bossAttackInterval(world.s.time, true).toFixed(2)}秒（技能独立间隔以技能为准）<br>${
+    `<div class="eyebrow">呼吸片刻，再向前</div><h2>远征已暂停</h2><details><summary>极限星潮 · 当前难度</summary><p>倍率用于当前新生成单位，相对基础属性，不含精英加成；已生成单位保留出生属性。<br>当前时间 ${time(world.s.time)}<br>普通怪生命 ×${d.hp.toFixed(2)} · 伤害 ×${d.damage.toFixed(2)} · 攻击频率 ×${d.attackRate.toFixed(2)}<br>Boss生命 ×${bossHpMultiplier(world.s.time).toFixed(2)} · 伤害 ×${bossDamageMultiplier(world.s.time).toFixed(2)}<br>Boss基础攻击间隔 ${bossAttackInterval(world.s.time, false).toFixed(2)}秒 / 二阶段 ${bossAttackInterval(world.s.time, true).toFixed(2)}秒（技能独立间隔以技能为准）<br>${
       world.s.enemies
         .filter((e) => ENEMIES[e.kind].boss)
         .map(
