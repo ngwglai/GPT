@@ -21,6 +21,8 @@ export class GameScene extends Phaser.Scene {
   private builtins?: Promise<void>;
   private background!: Phaser.GameObjects.Graphics;
   private graphics!: Phaser.GameObjects.Graphics;
+  private danger!: Phaser.GameObjects.Graphics;
+  private friendly!: Phaser.GameObjects.Graphics;
   private sprites: Phaser.GameObjects.Sprite[] = [];
   private labels: Phaser.GameObjects.Text[] = [];
   private used = 0;
@@ -41,6 +43,8 @@ export class GameScene extends Phaser.Scene {
       this.textures.addCanvas(id, defaultArt(id));
     this.background = this.add.graphics().setDepth(-2);
     this.graphics = this.add.graphics().setDepth(0);
+    this.danger = this.add.graphics().setDepth(12);
+    this.friendly = this.add.graphics().setDepth(5);
     this.keys = this.input.keyboard!.addKeys(
       "W,A,S,D,Q,E,R,SPACE,ESC",
     ) as Record<string, Phaser.Input.Keyboard.Key>;
@@ -173,7 +177,15 @@ export class GameScene extends Phaser.Scene {
       .setDisplaySize(size * (custom?.scale || 1), size * (custom?.scale || 1))
       .setRotation(angle)
       .setAlpha(alpha)
-      .setDepth(id.startsWith("map.") ? -0.5 : 2 + p.y / 10000);
+      .setDepth(
+        id === "ui.gem"
+          ? -0.1
+          : id.startsWith("map.")
+            ? -0.5
+            : id.startsWith("player.")
+              ? 10
+              : 2 + p.y / 10000,
+      );
     sprite.setFlipX(
       id.startsWith("player.") && this.keys.A.isDown && !this.keys.D.isDown,
     );
@@ -212,7 +224,8 @@ export class GameScene extends Phaser.Scene {
       )
       .setColor(color)
       .setFontSize(size)
-      .setDepth(8);
+      .setDepth(8)
+      .setAlpha(0.85);
   }
   update(_time: number, delta: number) {
     if (!this.ready) return;
@@ -405,8 +418,21 @@ export class GameScene extends Phaser.Scene {
         12,
       );
     }
-    for (const gem of s.gems)
-      this.sprite("ui.gem", gem, gem.value > 40 ? 22 : 14);
+    for (const gem of s.gems) {
+      if (assetPack.assets["ui.gem"])
+        this.sprite("ui.gem", gem, gem.value > 40 ? 22 : 14, 0, 0.6);
+      const x = sx(gem.x),
+        y = sy(gem.y),
+        r = gem.value > 40 ? 7 : 4;
+      g.fillStyle(0xdfff38, 0.18 + 0.08 * Math.sin(s.time * 3 + gem.x));
+      g.fillCircle(x, y, r + 5);
+      g.fillStyle(0x24301a, 1);
+      g.fillCircle(x, y, r + 2);
+      g.fillStyle(0xe2ff40, 1);
+      g.fillCircle(x, y, r);
+      g.fillStyle(0xffffdf, 1);
+      g.fillCircle(x - 1, y - 1, 1.5);
+    }
     for (const drop of s.rewardDrops || []) {
       const x = sx(drop.x),
         y = sy(drop.y),
@@ -419,6 +445,7 @@ export class GameScene extends Phaser.Scene {
       if (drop.kind === "positive") g.lineBetween(x, y - 7, x, y + 7);
     }
     for (const z of s.zones) {
+      if (z.enemy) continue;
       const x = sx(z.x),
         y = sy(z.y),
         color = z.enemy
@@ -583,14 +610,87 @@ export class GameScene extends Phaser.Scene {
           !assetPack.assets["projectile." + id]
             ? 0
             : Math.PI / 2),
-        1,
-        b.enemy && !assetPack.assets["projectile.enemy"]
-          ? b.status
-            ? 0x83e5a3
-            : 0xff6677
-          : undefined,
+        b.enemy ? 1 : 0.75,
+        !b.enemy
+          ? 0xdbffff
+          : b.enemy && !assetPack.assets["projectile.enemy"]
+            ? b.status
+              ? 0xff6633
+              : 0xff6677
+            : undefined,
       );
     }
+    const danger = this.danger;
+    danger.clear();
+    this.friendly.clear();
+    for (const b of s.bullets)
+      if (!b.enemy) {
+        const x = sx(b.x),
+          y = sy(b.y);
+        this.friendly.lineStyle(1.5, 0xaafaff, 0.65);
+        this.friendly.strokeCircle(x, y, b.r + 1);
+        this.friendly.fillStyle(0xf1ffff, 0.85);
+        this.friendly.fillCircle(x, y, Math.max(1.5, b.r * 0.4));
+      }
+
+    // Canvas fills each stage as one nonzero path: overlapping hazards must
+    // not accumulate opacity and conceal the player or the remaining gaps.
+    for (const warning of [true, false]) {
+      danger.fillStyle(0xff4020, warning ? 0.035 : 0.1);
+      danger.beginPath();
+      for (const z of s.zones)
+        if (z.enemy && z.delay > 0 === warning) {
+          const x = sx(z.x),
+            y = sy(z.y);
+          danger.moveTo(x + z.r, y);
+          danger.arc(x, y, z.r, 0, Math.PI * 2, false);
+          danger.closePath();
+        }
+      danger.fillPath();
+    }
+    for (const z of s.zones)
+      if (z.enemy) {
+        const x = sx(z.x),
+          y = sy(z.y);
+
+        danger.lineStyle(6, 0x351426, 0.95);
+        danger.strokeCircle(x, y, z.r);
+        danger.lineStyle(3, z.delay > 0 ? 0xffb32c : 0xff4828, 1);
+        danger.strokeCircle(x, y, z.r);
+        if (z.delay > 0) {
+          danger.lineStyle(2, 0xfff1bc, 0.9);
+          danger.strokeCircle(x, y, z.r * Math.max(0.06, 1 - z.delay / 1.6));
+        }
+      }
+    for (const b of s.bullets)
+      if (b.enemy) {
+        const x = sx(b.x),
+          y = sy(b.y),
+          r = Math.max(3, b.r);
+        danger.fillStyle(0x321122, 1);
+        danger.fillCircle(x, y, r + 3);
+        danger.fillStyle(0xff4820, 1);
+        danger.fillCircle(x, y, r + 1);
+        danger.fillStyle(0xfff4ad, 1);
+        danger.fillCircle(x, y, Math.max(1.5, r * 0.45));
+        danger.lineStyle(2, 0xffab38, 1);
+        const speed = Math.max(1, Math.hypot(b.vx, b.vy));
+        danger.lineBetween(
+          x - (b.vx / speed) * (r + 3),
+          y - (b.vy / speed) * (r + 3),
+          x - (b.vx / speed) * (r + 7),
+          y - (b.vy / speed) * (r + 7),
+        );
+      }
+    for (const f of env.fields)
+      if (f.kind === "eclipse") {
+        danger.lineStyle(6, 0x351426, 1);
+        danger.strokeCircle(sx(f.x), sy(f.y), f.r);
+        danger.lineStyle(3, f.delay > 0 ? 0xffb32c : 0xff4828, 1);
+        danger.strokeCircle(sx(f.x), sy(f.y), f.r);
+      }
+    danger.lineStyle(2, 0xffffe5, 0.85);
+    danger.strokeCircle(sx(p.x), sy(p.y), 21);
     const limit = low ? 25 : 90;
     for (const e of w.effects.slice(-limit)) {
       const a = e.life / e.maxLife;
@@ -614,7 +714,7 @@ export class GameScene extends Phaser.Scene {
             : e.kind === "ice"
               ? 0xa9dfff
               : 0xbcebd1,
-        a * 0.8,
+        a * 0.35,
       );
       g.strokeCircle(sx(e.x), sy(e.y), e.r * (1 - a * 0.4));
     }

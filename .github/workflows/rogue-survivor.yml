@@ -1,7 +1,16 @@
 name: RogueSurvivor
 on:
   workflow_call:
+    inputs:
+      full_simulations:
+        type: boolean
+        default: false
   workflow_dispatch:
+    inputs:
+      full_simulations:
+        description: '执行原有完整平衡与120分钟压力模拟（耗时）'
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -30,8 +39,11 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run simulate
+        if: inputs.full_simulations
       - run: npm run simulate:worlds
+        if: inputs.full_simulations
       - run: npm run simulate -- --stress
+        if: inputs.full_simulations
   browser:
     name: RogueSurvivor browser (${{ matrix.os }})
     runs-on: ${{ matrix.os }}

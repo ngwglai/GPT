@@ -1,3 +1,9 @@
+import {
+  difficulty,
+  bossHpMultiplier,
+  bossDamageMultiplier,
+  bossAttackInterval,
+} from "./data/content";
 import { MAPS, type MapId } from "./data/maps";
 import { environment } from "./core/environment";
 import { musicState } from "./services/musicPolicy";
@@ -112,7 +118,7 @@ function notify(message: string) {
   toastTimer = window.setTimeout(() => toast.classList.remove("show"), 4500);
 }
 function header() {
-  return `<header><a href="#" data-action="home" class="brand"><span class="brand-star">✦</span><span>星烬远征<small>ROGUE SURVIVOR</small></span></a><nav>${button("codex", "远征图鉴")}${button("records", "远征记录")}${button("assets", "资源工坊")}${button("settings", "设置", "nav-setting")}</nav><span class="version">离线单人 · v1.4</span></header>`;
+  return `<header><a href="#" data-action="home" class="brand"><span class="brand-star">✦</span><span>星烬远征<small>ROGUE SURVIVOR</small></span></a><nav>${button("codex", "远征图鉴")}${button("records", "远征记录")}${button("assets", "资源工坊")}${button("settings", "设置", "nav-setting")}</nav><span class="version">离线单人 · v1.4.1</span></header>`;
 }
 function shell(content: string, cls = "") {
   document.documentElement.style.setProperty(
@@ -259,8 +265,17 @@ function pause() {
   document.querySelector(".overlay")?.remove();
   audio.update(0, "paused");
   screen = "pause";
+  const d = difficulty(world.s.time);
   modal(
-    `<div class="eyebrow">呼吸片刻，再向前</div><h2>远征已暂停</h2><p>你的旅程停留在 ${time(world.s.time)}。怪物与冷却也已暂停。</p><p>${
+    `<div class="eyebrow">呼吸片刻，再向前</div><h2>远征已暂停</h2><details><summary>极限星潮 · 当前难度</summary><p>倍率用于当前新生成单位，相对基础属性，不含精英加成；已生成单位保留出生属性。<br>当前时间 ${time(world.s.time)}<br>普通怪生命 ×${d.hp.toFixed(2)} · 伤害 ×${d.damage.toFixed(2)} · 攻击频率 ×${d.attackRate.toFixed(2)}<br>Boss生命 ×${bossHpMultiplier(world.s.time).toFixed(2)} · 伤害 ×${bossDamageMultiplier(world.s.time).toFixed(2)}<br>Boss基础攻击间隔 ${bossAttackInterval(world.s.time, false).toFixed(2)}秒 / 二阶段 ${bossAttackInterval(world.s.time, true).toFixed(2)}秒（技能独立间隔以技能为准）<br>${
+      world.s.enemies
+        .filter((e) => ENEMIES[e.kind].boss)
+        .map(
+          (e) =>
+            `${ENEMIES[e.kind].name}：实际调度倒计时 ${Math.max(0, e.timer).toFixed(2)}秒`,
+        )
+        .join("<br>") || "当前无首领"
+    }<br>场上怪物 ${world.s.enemies.length}/${LIMITS.enemies} · 弹幕 ${world.s.bullets.length}/${LIMITS.bullets}</p></details><p>你的旅程停留在 ${time(world.s.time)}。怪物与冷却也已暂停。</p><p>${
       Object.entries(world.s.fate?.curses || {})
         .filter(([, n]) => n)
         .map(

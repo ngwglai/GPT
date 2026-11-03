@@ -377,3 +377,69 @@ test("v1.4 upgrade-settings focus loss returns through explicit pause and restor
   await page.waitForTimeout(400);
   expect(await audioTime(page)).toBeGreaterThan(t);
 });
+
+for (const map of ["forest", "cavern", "garden", "eclipse"] as const)
+  test(`v1.4.1 ${map} seven boss warnings and dense rewards remain visible`, async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    const w = new World(
+      createRun("endless", "ranger", 331, undefined, undefined, map),
+    );
+    w.s.time = 1200;
+    w.s.nextBoss = 9999;
+    w.s.nextEvent = 9999;
+    w.s.spawnTimer = 10;
+    w.s.player.invincible = 999;
+    w.s.player.level = 100;
+    const kinds = [
+      "warden",
+      "witch",
+      "titan",
+      "crystalQueen",
+      "candyWitch",
+      "eclipseSaint",
+      "mirrorMaiden",
+    ] as const;
+    kinds.forEach((kind, i) => {
+      const angle = (i * Math.PI * 2) / 7;
+      const e = spawn(w, kind, {
+        x: 1800 + Math.cos(angle) * 260,
+        y: 1800 + Math.sin(angle) * 220,
+      })!;
+      e.hp = e.maxHp * 0.4;
+      e.timer = 0;
+      w.zone({ x: e.x, y: e.y }, 75, 10, "meteor", true, 0.8);
+    });
+    for (let i = 0; i < 100; i++) {
+      w.s.gems.push({
+        x: 1500 + (i % 20) * 30,
+        y: 1650 + Math.floor(i / 20) * 50,
+        value: i % 3 ? 5 : 80,
+      });
+      w.shoot(
+        { x: 1450 + (i % 20) * 30, y: 1600 + Math.floor(i / 20) * 70 },
+        { x: 1, y: 0 },
+        10,
+        "enemy",
+        "enemy",
+        true,
+      );
+    }
+    await resume(page, w.s);
+    await expect(page.locator("#clock")).toBeVisible();
+    await page.waitForTimeout(700);
+    await page.keyboard.press("Escape");
+    await expect(page.getByText("极限星潮 · 当前难度")).toBeVisible();
+    await page.locator("details summary").click();
+    await expect(page.locator("details")).toContainText("800");
+    await expect(page.locator("details")).toContainText("1200");
+    await page.getByRole("button", { name: "继续远征", exact: true }).click();
+    await page.screenshot({
+      path: `validation/v1.4.1/${map}.jpg`,
+      type: "jpeg",
+      quality: 85,
+    });
+    expect(errors).toEqual([]);
+  });
