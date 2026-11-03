@@ -104,7 +104,9 @@ export class World extends Combat {
       if (p.upgrades.harvest) this.heal(0.3);
       const value = def.xp * (e.elite ? ENEMY_RULES.elite.xp : 1);
       if (!e.behavior?.rewardless) {
-        if (s.gems.length < LIMITS.gems) s.gems.push({ x: e.x, y: e.y, value });
+        const nearby = s.gems.find(g => distance(e, g) < 40 && g.value + value <= LIMITS.number);
+        if (nearby) nearby.value += value;
+        else if (s.gems.length < LIMITS.gems) s.gems.push({ x: e.x, y: e.y, value });
         else {
           let g = s.gems[0];
           for (const other of s.gems)

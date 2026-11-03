@@ -1,3 +1,4 @@
+import { difficulty, bossHpMultiplier, bossDamageMultiplier, bossAttackInterval } from "./data/content";
 import { MAPS, type MapId } from "./data/maps";
 import { environment } from "./core/environment";
 import { musicState } from "./services/musicPolicy";
@@ -259,8 +260,9 @@ function pause() {
   document.querySelector(".overlay")?.remove();
   audio.update(0, "paused");
   screen = "pause";
+  const d = difficulty(world.s.time);
   modal(
-    `<div class="eyebrow">呼吸片刻，再向前</div><h2>远征已暂停</h2><p>你的旅程停留在 ${time(world.s.time)}。怪物与冷却也已暂停。</p><p>${
+    `<div class="eyebrow">呼吸片刻，再向前</div><h2>远征已暂停</h2><details><summary>极限星潮 · 当前难度</summary><p>当前时间 ${time(world.s.time)}<br>普通怪生命 ×${d.hp.toFixed(2)} · 伤害 ×${d.damage.toFixed(2)} · 攻击频率 ×${d.attackRate.toFixed(2)}<br>Boss生命 ×${bossHpMultiplier(world.s.time).toFixed(2)} · 伤害 ×${bossDamageMultiplier(world.s.time).toFixed(2)}<br>Boss基础攻击间隔 ${bossAttackInterval(world.s.time, false).toFixed(2)}秒 / 二阶段 ${bossAttackInterval(world.s.time, true).toFixed(2)}秒（技能独立间隔以技能为准）<br>场上怪物 ${world.s.enemies.length}/${LIMITS.enemies} · 弹幕 ${world.s.bullets.length}/${LIMITS.bullets}</p></details><p>你的旅程停留在 ${time(world.s.time)}。怪物与冷却也已暂停。</p><p>${
       Object.entries(world.s.fate?.curses || {})
         .filter(([, n]) => n)
         .map(

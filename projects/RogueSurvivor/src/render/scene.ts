@@ -21,6 +21,7 @@ export class GameScene extends Phaser.Scene {
   private builtins?: Promise<void>;
   private background!: Phaser.GameObjects.Graphics;
   private graphics!: Phaser.GameObjects.Graphics;
+  private danger!: Phaser.GameObjects.Graphics;
   private sprites: Phaser.GameObjects.Sprite[] = [];
   private labels: Phaser.GameObjects.Text[] = [];
   private used = 0;
@@ -41,6 +42,7 @@ export class GameScene extends Phaser.Scene {
       this.textures.addCanvas(id, defaultArt(id));
     this.background = this.add.graphics().setDepth(-2);
     this.graphics = this.add.graphics().setDepth(0);
+    this.danger = this.add.graphics().setDepth(12);
     this.keys = this.input.keyboard!.addKeys(
       "W,A,S,D,Q,E,R,SPACE,ESC",
     ) as Record<string, Phaser.Input.Keyboard.Key>;
@@ -173,7 +175,7 @@ export class GameScene extends Phaser.Scene {
       .setDisplaySize(size * (custom?.scale || 1), size * (custom?.scale || 1))
       .setRotation(angle)
       .setAlpha(alpha)
-      .setDepth(id.startsWith("map.") ? -0.5 : 2 + p.y / 10000);
+      .setDepth(id.startsWith("map.") ? -0.5 : id.startsWith("player.") ? 10 : 2 + p.y / 10000);
     sprite.setFlipX(
       id.startsWith("player.") && this.keys.A.isDown && !this.keys.D.isDown,
     );
@@ -405,8 +407,13 @@ export class GameScene extends Phaser.Scene {
         12,
       );
     }
-    for (const gem of s.gems)
-      this.sprite("ui.gem", gem, gem.value > 40 ? 22 : 14);
+    for (const gem of s.gems) {
+      const x = sx(gem.x), y = sy(gem.y), r = gem.value > 40 ? 7 : 4;
+      g.fillStyle(0xdfff38, 0.18 + 0.08 * Math.sin(s.time * 3 + gem.x)); g.fillCircle(x, y, r + 5);
+      g.fillStyle(0x24301a, 1); g.fillCircle(x, y, r + 2);
+      g.fillStyle(0xe2ff40, 1); g.fillCircle(x, y, r);
+      g.fillStyle(0xffffdf, 1); g.fillCircle(x - 1, y - 1, 1.5);
+    }
     for (const drop of s.rewardDrops || []) {
       const x = sx(drop.x),
         y = sy(drop.y),
@@ -590,6 +597,26 @@ export class GameScene extends Phaser.Scene {
             : 0xff6677
           : undefined,
       );
+    }
+    const danger = this.danger;
+    danger.clear();
+    for (const z of s.zones) if (z.enemy) {
+      const x = sx(z.x), y = sy(z.y);
+      danger.fillStyle(0xff4020, z.delay > 0 ? 0.05 : 0.12);
+      danger.fillCircle(x, y, z.r);
+      danger.lineStyle(6, 0x351426, 0.95); danger.strokeCircle(x, y, z.r);
+      danger.lineStyle(3, z.delay > 0 ? 0xffb32c : 0xff4828, 1); danger.strokeCircle(x, y, z.r);
+      if (z.delay > 0) {
+        danger.lineStyle(2, 0xfff1bc, 0.9);
+        danger.strokeCircle(x, y, z.r * Math.max(0.06, 1 - z.delay / 1.6));
+      }
+    }
+    for (const b of s.bullets) if (b.enemy) {
+      const x = sx(b.x), y = sy(b.y), r = Math.max(3, b.r);
+      danger.fillStyle(0x321122, 1); danger.fillCircle(x, y, r + 3);
+      danger.fillStyle(0xff4820, 1); danger.fillCircle(x, y, r + 1);
+      danger.fillStyle(0xfff4ad, 1); danger.fillCircle(x, y, Math.max(1.5, r * 0.45));
+      danger.lineStyle(2, 0xffab38, 1); danger.lineBetween(x, y - r - 4, x, y - r - 7);
     }
     const limit = low ? 25 : 90;
     for (const e of w.effects.slice(-limit)) {
