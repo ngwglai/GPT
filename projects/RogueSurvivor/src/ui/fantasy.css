@@ -514,3 +514,44 @@ th {
   width: 100%;
   height: 160px;
 }
+
+/* Wave status stays outside the central combat area. */
+#wave-hud {
+  position: absolute;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 14px;
+  border: 1px solid #70618c;
+  border-radius: 18px;
+  background: #251e38ed;
+  color: #f4e9ff;
+  font-size: 12px;
+  text-align: center;
+  max-width: 80vw;
+  pointer-events: none;
+}
+#wave-hud.boss-wave {
+  border-color: #f1a571;
+  color: #ffe1a6;
+}
+
+#boss-hud {
+  top: 135px;
+}
+#event {
+  top: 190px;
+}
+#wave-hud.wave-entry {
+  animation: wave-arrival 0.5s ease-out;
+}
+@keyframes wave-arrival {
+  from {
+    opacity: 0.35;
+    margin-top: -5px;
+  }
+  to {
+    opacity: 1;
+    margin-top: 0;
+  }
+}

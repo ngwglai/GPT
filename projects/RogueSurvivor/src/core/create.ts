@@ -1,3 +1,4 @@
+import { newWave } from "./waves";
 import { MAPS } from "../data/maps";
 import { initializeMap } from "./environment";
 import type { MapId } from "../data/maps";
@@ -14,7 +15,8 @@ export function createRun(
 ): Run {
   const c = CHARACTERS.find((c) => c.id === character) || CHARACTERS[0];
   const s: Run = {
-    version: 2,
+    version: 3,
+    wave: newWave(1, 0),
     seed,
     rng: seed,
     mode,

@@ -604,7 +604,7 @@ test("v1.1 重抽、遗忘与属性落盘", async ({ page }) => {
 
 fateTest("v1.2 三类图鉴、当前构筑合并层数及独立刷新", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".version")).toContainText("v1.4");
+  await expect(page.locator(".version")).toContainText("v1.5");
   await page.getByRole("button", { name: "远征图鉴", exact: true }).click();
   await expect(page.locator(".codex-card")).toHaveCount(70);
   await page.getByRole("button", { name: "技能图鉴", exact: true }).click();

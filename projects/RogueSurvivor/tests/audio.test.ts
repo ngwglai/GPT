@@ -107,3 +107,57 @@ test("card modals retain progress, next song plays and only one media element ex
   expect(m.currentTime).toBe(0);
   expect(m.paused).toBe(true);
 });
+
+test.each(["forest", "cavern", "garden", "eclipse"] as const)(
+  "%s playlist loops locally and keeps one element across restore",
+  async (map) => {
+    const { MAP_PLAYLISTS } = await import("../src/data/audio");
+    vi.stubGlobal("Audio", Track);
+    const a = new AudioEngine({
+      music: 0.3,
+      sfx: 0.5,
+      quality: "high",
+      shake: false,
+      showStats: false,
+    });
+    a.setMap(map);
+    a.unlock();
+    a.update(0, "playing");
+    const media = Track.current;
+    const expected = MAP_PLAYLISTS[map];
+    for (let i = 0; i < expected.length * 2; i++) {
+      expect(media.src).toContain(
+        `battle-${expected[i % expected.length]}.mp3`,
+      );
+      media.dispatchEvent(new Event("ended"));
+    }
+    a.setMap(map);
+    expect(Track.current).toBe(media);
+    a.update(0, "paused");
+    expect(media.paused).toBe(true);
+    a.update(0, "playing");
+  },
+);
+test("switching maps resets only its playlist and failure scope", () => {
+  vi.stubGlobal("Audio", Track);
+  const a = new AudioEngine({
+    music: 0.3,
+    sfx: 0.5,
+    quality: "high",
+    shake: false,
+    showStats: false,
+  });
+  a.setMap("cavern");
+  a.unlock();
+  a.update(0, "paused");
+  const media = Track.current;
+  media.dispatchEvent(new Event("error"));
+  media.dispatchEvent(new Event("error"));
+  a.update(0, "playing");
+  expect(media.paused).toBe(true);
+  a.setMap("garden");
+  a.update(0, "playing");
+  expect(media.src).toContain("battle-6.mp3");
+  expect(media.paused).toBe(false);
+  expect(Track.current).toBe(media);
+});

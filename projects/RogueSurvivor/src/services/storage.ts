@@ -1,3 +1,4 @@
+import { migrateWaves, WAVE_RULES } from "../core/waves";
 import { emptyEnvironment } from "../core/environmentTypes";
 import { MAPS, ENV_RULES } from "../data/maps";
 import { ensureDeck } from "../core/deckState";
@@ -66,18 +67,28 @@ function obj(v: unknown): v is Record<string, unknown> {
 }
 // Validate all numerical leaves, collection budgets, required structures, identifiers and cross references.
 export function migrateRun(value: unknown): unknown {
-  if (obj(value) && value.version === 1) {
+  if (obj(value) && (value.version === 1 || value.version === 2)) {
     const migrated = structuredClone(value);
-    migrated.version = 2;
-    if (migrated.environment === undefined)
+    if (migrated.version === 1 && migrated.environment === undefined)
       migrated.environment = emptyEnvironment("forest");
+    // Do not inspect unvalidated legacy structures; the normal validator reports corruption.
+    if (
+      typeof migrated.time === "number" &&
+      Number.isFinite(migrated.time) &&
+      typeof migrated.bossIndex === "number" &&
+      Number.isFinite(migrated.bossIndex) &&
+      Array.isArray(migrated.enemies) &&
+      migrated.enemies.every((e) => obj(e) && typeof e.kind === "string")
+    )
+      migrated.wave = migrateWaves(migrated as unknown as Run);
+    migrated.version = 3;
     return migrated;
   }
   return value;
 }
 export function validateRun(input: unknown): Run {
   const value = migrateRun(input);
-  assert(obj(value) && value.version === 2);
+  assert(obj(value) && value.version === 3);
   const s = value as unknown as Run;
   const visit = (v: unknown, depth = 0) => {
     assert(depth < 12);
@@ -175,6 +186,42 @@ export function validateRun(input: unknown): Run {
       s.spawnTimer <= 10,
   );
   assert(Number.isInteger(s.rng) && Number.isInteger(s.nextId));
+  const w = s.wave;
+  assert(
+    obj(w) &&
+      w.schema === 1 &&
+      Number.isInteger(w.number) &&
+      w.number >= 1 &&
+      w.number <= WAVE_RULES.maxNumber &&
+      typeof w.startedAt === "number" &&
+      w.startedAt >= 0 &&
+      w.startedAt <= s.time &&
+      typeof w.duration === "number" &&
+      w.duration > 0 &&
+      w.duration <= 90 &&
+      Number.isInteger(w.budget) &&
+      w.budget >= 1 &&
+      w.budget <= WAVE_RULES.maxBudget &&
+      [w.processed, w.spawned, w.skipped].every(
+        (n) => Number.isInteger(n) && n >= 0,
+      ) &&
+      w.processed <= w.budget &&
+      w.spawned + w.skipped === w.processed &&
+      ["entering", "active"].includes(w.status) &&
+      (w.status === "active") === (w.processed === w.budget) &&
+      typeof w.boss === "boolean" &&
+      typeof w.announced === "boolean",
+  );
+  assert(Number.isInteger(s.bossIndex) && s.bossIndex >= 0);
+  for (const e of s.enemies)
+    if (e.bossOrdinal !== undefined)
+      assert(
+        ENEMIES[e.kind]?.boss &&
+          Number.isInteger(e.bossOrdinal) &&
+          e.bossOrdinal >= 1 &&
+          e.bossOrdinal <= s.bossIndex,
+      );
+
   assert(
     Array.isArray(p.skills) &&
       p.skills.length === 3 &&

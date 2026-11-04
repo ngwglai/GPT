@@ -1,79 +1,67 @@
+import { MAP_PLAYLISTS } from "../data/audio";
+import type { MapId } from "../data/maps";
+import { SfxMixer } from "./sfx";
 import type { MusicState } from "./musicPolicy";
 import type { Settings } from "../core/types";
 export class AudioEngine {
   private ctx?: AudioContext;
   private music?: HTMLAudioElement;
   private track = 0;
+  private map?: MapId;
+  private mixer?: SfxMixer;
+  private tracks = [1, 2, 3, 4, 5, 6].map(
+    (id) => `${import.meta.env.BASE_URL}audio/battle-${id}.mp3`,
+  );
   private unlocked = false;
   private failed = new Set<number>();
   private pending = false;
   private active = false;
-  private readonly tracks = Array.from(
-    { length: 6 },
-    (_, i) => `${import.meta.env.BASE_URL}audio/battle-${i + 1}.mp3`,
-  );
-  private nextTrack() {
-    this.track = (this.track + 1) % this.tracks.length;
+  setMap(map: MapId, reset = false) {
+    if (this.map === map && !reset) return;
+    this.map = map;
+    this.tracks = MAP_PLAYLISTS[map].map(
+      (id) => `${import.meta.env.BASE_URL}audio/battle-${id}.mp3`,
+    );
+    this.track = 0;
+    this.failed.clear();
     if (this.music) this.music.src = this.tracks[this.track];
   }
-  private last = 0;
+  private nextTrack() {
+    for (let i = 0; i < this.tracks.length; i++) {
+      this.track = (this.track + 1) % this.tracks.length;
+      if (!this.failed.has(this.track)) break;
+    }
+    if (this.music) this.music.src = this.tracks[this.track];
+  }
   constructor(public settings: Settings) {}
   unlock() {
     this.unlocked = true;
     try {
       this.ctx ??= new AudioContext();
+      if (!this.mixer) {
+        this.mixer = new SfxMixer(this.ctx);
+        this.mixer.setVolume(this.settings.sfx);
+        void this.mixer.preload();
+      }
       void this.ctx.resume().catch(() => {});
     } catch {
       /* Audio is optional. */
     }
   }
-  tone(
-    frequency: number,
-    duration: number,
-    volume: number,
-    type: OscillatorType = "sine",
-  ) {
-    try {
-      const ctx = this.ctx;
-      if (!ctx || ctx.state !== "running" || volume <= 0) return;
-      const osc = ctx.createOscillator(),
-        gain = ctx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(frequency, ctx.currentTime);
-      gain.gain.setValueAtTime(volume * 0.15, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(
-        0.0001,
-        ctx.currentTime + duration,
-      );
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + duration);
-      osc.onended = () => {
-        osc.disconnect();
-        gain.disconnect();
-      };
-    } catch {
-      /* No gameplay dependency. */
-    }
+  setSfxVolume(volume: number) {
+    this.settings = { ...this.settings, sfx: volume };
+    this.mixer?.setVolume(volume);
   }
   effect(kind: string) {
-    if (performance.now() - this.last < 60) return;
-    this.last = performance.now();
-    this.tone(
-      kind === "hurt"
-        ? 100
-        : kind === "cast"
-          ? 660
-          : kind === "level"
-            ? 880
-            : 330,
-      0.18,
-      this.settings.sfx,
-      kind === "hurt" ? "triangle" : "sine",
-    );
+    this.mixer?.setVolume(this.settings.sfx);
+    this.mixer?.play(kind);
+  }
+  effects(kinds: Iterable<string>) {
+    this.mixer?.setVolume(this.settings.sfx);
+    this.mixer?.batch(kinds);
   }
   update(_dt: number, state: boolean | MusicState) {
+    this.mixer?.setVolume(this.settings.sfx);
     const playing = state === true || state === "playing";
     this.active =
       playing &&

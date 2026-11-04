@@ -1,3 +1,4 @@
+import { ensureWaves, waveRemaining, bossesDue } from "./core/waves";
 import {
   difficulty,
   bossHpMultiplier,
@@ -118,7 +119,7 @@ function notify(message: string) {
   toastTimer = window.setTimeout(() => toast.classList.remove("show"), 4500);
 }
 function header() {
-  return `<header><a href="#" data-action="home" class="brand"><span class="brand-star">✦</span><span>星烬远征<small>ROGUE SURVIVOR</small></span></a><nav>${button("codex", "远征图鉴")}${button("records", "远征记录")}${button("assets", "资源工坊")}${button("settings", "设置", "nav-setting")}</nav><span class="version">离线单人 · v1.4.2</span></header>`;
+  return `<header><a href="#" data-action="home" class="brand"><span class="brand-star">✦</span><span>星烬远征<small>ROGUE SURVIVOR</small></span></a><nav>${button("codex", "远征图鉴")}${button("records", "远征记录")}${button("assets", "资源工坊")}${button("settings", "设置", "nav-setting")}</nav><span class="version">离线单人 · v1.5</span></header>`;
 }
 function shell(content: string, cls = "") {
   document.documentElement.style.setProperty(
@@ -148,7 +149,7 @@ function home() {
   demo.s.player.y = 1800;
   scene.setWorld(demo);
   shell(
-    `<main class="landing"><section class="hero-copy"><div class="eyebrow"><span></span> 弹幕狂想曲 · 读懂招式，穿行星潮</div><h1>于星烬中<br>再赴<span>远征。</span></h1><p class="intro">跟随星光少女，走进森林、洞窟、糖果庭院与月光遗迹。<br>收集卡牌、闪避危险，让每一次相遇都成为新的冒险。</p><div class="mode-grid"><button data-action="mode-standard" class="mode-card ${mode === "standard" ? "selected" : ""}"><span class="mode-symbol">◈</span><span><b>星林远征</b><small>标准模式 · 20 分钟最终战</small></span><i>${mode === "standard" ? "●" : "○"}</i></button><button data-action="mode-endless" class="mode-card ${mode === "endless" ? "selected" : ""}"><span class="mode-symbol">∞</span><span><b>无尽星夜</b><small>无尽模式 · 挑战生存纪录</small></span><i>${mode === "endless" ? "●" : "○"}</i></button></div><div class="start-row">${button("select", "开启远征 <span>↗</span>", "primary start")}${saved && ["playing", "upgrade"].includes(saved.phase) ? button("continue", `继续旅程 <small>${time(saved.time)} · 等级 ${saved.player.level}</small>`, "continue") : ""}</div>${saveError ? `<p class="error">${esc(saveError)}</p>${button("backup", "恢复上次备份", "text-button")}` : ""}<div class="controls-line"><kbd>W A S D</kbd> 移动 <span>·</span> <kbd>Q E R</kbd> 技能 <span>·</span> <kbd>空格</kbd> 闪避</div></section><section class="hero-art" aria-label="原创星光少女探索魔法森林的插画"><div class="orbit o1"></div><div class="orbit o2"></div><div class="moon">✧</div><div class="star s1">✦</div><div class="star s2">✧</div><div class="star s3">✦</div><svg class="landscape" viewBox="0 0 600 500" aria-hidden="true"><ellipse cx="300" cy="350" rx="245" ry="110" fill="#173c37"/><ellipse cx="300" cy="346" rx="211" ry="92" fill="#285244"/><path d="M90 340 172 293 289 360 403 307 527 355 417 415 263 435 123 391Z" fill="#39644d"/><path d="m98 300 20-145 29 134m-18 19 42-201 40 192m273 11-29-161-36 171m60-4 29-208 30 231" fill="#20483e" stroke="#4d7957" stroke-width="3"/><path d="m165 365 87-36 120 72" fill="none" stroke="#739374" stroke-width="8" opacity=".25"/><g fill="#a4d5a6"><circle cx="97" cy="351" r="3"/><circle cx="433" cy="389" r="3"/><circle cx="337" cy="330" r="3"/></g></svg>${img("portrait.ranger", "hero-ranger")}${img("enemy.crawler", "hero-enemy enemy-a")}${img("enemy.archer", "hero-enemy enemy-b")}${img("map.rock", "hero-rock")}${img("map.flower", "hero-flower")}<div class="art-label"><span class="live-dot"></span> 第一章 · 微光之森<small>在黑夜降临之前，找到属于你的星光。</small></div></section></main><section class="home-bottom"><div><span>01 / 自由战斗</span><b>自动出击，专注走位</b></div><div><span>02 / 随机构筑</span><b>每一次升级，新的可能</b></div><div><span>03 / 无尽挑战</span><b>活得更久，走得更远</b></div><div class="best"><small>最长生存纪录</small><strong>${time(profile.best)}</strong></div></section>`,
+    `<main class="landing"><section class="hero-copy"><div class="eyebrow"><span></span> 波次远征 · 清怪前行，迎战星潮</div><h1>于星烬中<br>再赴<span>远征。</span></h1><p class="intro">跟随星光少女，走进森林、洞窟、糖果庭院与月光遗迹。<br>收集卡牌、闪避危险，让每一次相遇都成为新的冒险。</p><div class="mode-grid"><button data-action="mode-standard" class="mode-card ${mode === "standard" ? "selected" : ""}"><span class="mode-symbol">◈</span><span><b>星林远征</b><small>标准模式 · 第 20 波最终战</small></span><i>${mode === "standard" ? "●" : "○"}</i></button><button data-action="mode-endless" class="mode-card ${mode === "endless" ? "selected" : ""}"><span class="mode-symbol">∞</span><span><b>无尽星夜</b><small>无尽模式 · 挑战生存纪录</small></span><i>${mode === "endless" ? "●" : "○"}</i></button></div><div class="start-row">${button("select", "开启远征 <span>↗</span>", "primary start")}${saved && ["playing", "upgrade"].includes(saved.phase) ? button("continue", `继续旅程 <small>${time(saved.time)} · 等级 ${saved.player.level}</small>`, "continue") : ""}</div>${saveError ? `<p class="error">${esc(saveError)}</p>${button("backup", "恢复上次备份", "text-button")}` : ""}<div class="controls-line"><kbd>W A S D</kbd> 移动 <span>·</span> <kbd>Q E R</kbd> 技能 <span>·</span> <kbd>空格</kbd> 闪避</div></section><section class="hero-art" aria-label="原创星光少女探索魔法森林的插画"><div class="orbit o1"></div><div class="orbit o2"></div><div class="moon">✧</div><div class="star s1">✦</div><div class="star s2">✧</div><div class="star s3">✦</div><svg class="landscape" viewBox="0 0 600 500" aria-hidden="true"><ellipse cx="300" cy="350" rx="245" ry="110" fill="#173c37"/><ellipse cx="300" cy="346" rx="211" ry="92" fill="#285244"/><path d="M90 340 172 293 289 360 403 307 527 355 417 415 263 435 123 391Z" fill="#39644d"/><path d="m98 300 20-145 29 134m-18 19 42-201 40 192m273 11-29-161-36 171m60-4 29-208 30 231" fill="#20483e" stroke="#4d7957" stroke-width="3"/><path d="m165 365 87-36 120 72" fill="none" stroke="#739374" stroke-width="8" opacity=".25"/><g fill="#a4d5a6"><circle cx="97" cy="351" r="3"/><circle cx="433" cy="389" r="3"/><circle cx="337" cy="330" r="3"/></g></svg>${img("portrait.ranger", "hero-ranger")}${img("enemy.crawler", "hero-enemy enemy-a")}${img("enemy.archer", "hero-enemy enemy-b")}${img("map.rock", "hero-rock")}${img("map.flower", "hero-flower")}<div class="art-label"><span class="live-dot"></span> 第一章 · 微光之森<small>在黑夜降临之前，找到属于你的星光。</small></div></section></main><section class="home-bottom"><div><span>01 / 自由战斗</span><b>自动出击，专注走位</b></div><div><span>02 / 随机构筑</span><b>每一次升级，新的可能</b></div><div><span>03 / 无尽挑战</span><b>活得更久，走得更远</b></div><div class="best"><small>最长生存纪录</small><strong>${time(profile.best)}</strong></div></section>`,
     "home",
   );
 }
@@ -171,7 +172,7 @@ function hud() {
   scene.showWorld = true;
   scene.needsPaint = true;
   screen = "game";
-  app.innerHTML = `<div class="hud"><div class="hud-top"><div class="player-hud">${img("avatar." + world!.s.character)}<div><div class="player-name">${CHARACTERS.find((c) => c.id === world!.s.character)!.name} <span id="level"></span></div><div class="health"><div id="health-fill"></div><span id="health-label"></span></div><small id="shield"></small></div></div><div class="run-clock"><b id="clock">00:00</b><span>${MAPS[environment(world!.s).mapId].name} · ${world!.s.mode === "standard" ? "标准远征" : "无尽星夜"}</span></div><div class="hud-actions"><span id="kills"></span>${button("build", "当前构筑", "hud-button")}${button("pause", "Ⅱ 暂停", "hud-button")}</div></div><div class="xp"><div id="xp-fill"></div></div><div id="boss-hud"></div><div id="event"></div><div class="hud-bottom"><div id="weapons" class="weapon-hud"></div><div class="skills">${world!.s.player.skills.map((id, i) => `<div class="skill-slot" title="${SKILLS[id].desc}">${img("skill." + id)}<div class="cooldown-shade" id="shade-${i}"></div><kbd>${["Q", "E", "R"][i]}</kbd><b id="cd-${i}"></b><span>${SKILLS[id].name}</span></div>`).join("")}<div class="skill-slot dash-slot"><span class="dash-icon">➶</span><kbd>空格</kbd><b id="dash-cd"></b><span>闪避</span></div></div><div class="hint">鼠标瞄准 · 自动攻击<br><span id="budget"></span></div></div><div id="performance"></div></div>`;
+  app.innerHTML = `<div class="hud"><div class="hud-top"><div class="player-hud">${img("avatar." + world!.s.character)}<div><div class="player-name">${CHARACTERS.find((c) => c.id === world!.s.character)!.name} <span id="level"></span></div><div class="health"><div id="health-fill"></div><span id="health-label"></span></div><small id="shield"></small></div></div><div class="run-clock"><b id="clock">00:00</b><span>${MAPS[environment(world!.s).mapId].name} · ${world!.s.mode === "standard" ? "标准远征" : "无尽星夜"}</span></div><div class="hud-actions"><span id="kills"></span>${button("build", "当前构筑", "hud-button")}${button("pause", "Ⅱ 暂停", "hud-button")}</div></div><div class="xp"><div id="xp-fill"></div></div><div id="wave-hud" aria-live="polite"></div><div id="boss-hud"></div><div id="event"></div><div class="hud-bottom"><div id="weapons" class="weapon-hud"></div><div class="skills">${world!.s.player.skills.map((id, i) => `<div class="skill-slot" title="${SKILLS[id].desc}">${img("skill." + id)}<div class="cooldown-shade" id="shade-${i}"></div><kbd>${["Q", "E", "R"][i]}</kbd><b id="cd-${i}"></b><span>${SKILLS[id].name}</span></div>`).join("")}<div class="skill-slot dash-slot"><span class="dash-icon">➶</span><kbd>空格</kbd><b id="dash-cd"></b><span>闪避</span></div></div><div class="hint">鼠标瞄准 · 自动攻击<br><span id="budget"></span></div></div><div id="performance"></div></div>`;
   updateHud();
 }
 function updateHud() {
@@ -192,6 +193,17 @@ function updateHud() {
   document.getElementById("xp-fill")!.style.width =
     `${Math.min(100, (p.xp / xpNeeded(p.level)) * 100)}%`;
   set("clock", time(s.time));
+  const wave = ensureWaves(s),
+    queued = Math.max(0, bossesDue(s) - s.bossIndex);
+  set(
+    "wave-hud",
+    `第 ${wave.number} 波 · ${wave.boss ? "首领降临" : "星潮来袭"} ｜ 下一波 ${time(Math.ceil(waveRemaining(s)))}${wave.status === "entering" ? " · 入场中" : " · 清场可提前推进"}${queued ? ` · 待出场首领 ${queued}` : ""}${!wave.boss && wave.number % 5 === 4 && (s.mode === "endless" || wave.number < 20) ? " · 下一波首领战" : ""}`,
+  );
+  document.getElementById("wave-hud")?.classList.toggle("boss-wave", wave.boss);
+  document
+    .getElementById("wave-hud")
+    ?.classList.toggle("wave-entry", s.time - wave.startedAt < 1.2);
+
   set(
     "kills",
     `✧ 击败 ${s.stats.kills} · 待领 +${ensureDeck(s).pending.positive} / −${ensureDeck(s).pending.negative}`,
@@ -223,7 +235,7 @@ function updateHud() {
   set(
     "budget",
     s.enemies.length >= LIMITS.enemies - 3
-      ? "怪潮密集：新增敌人暂缓入场"
+      ? "怪潮已满：本波未入场名额取消，存活怪物保留"
       : s.enemies.length > 110 || s.bullets.length > 220
         ? "高密度战斗：自动精简特效"
         : "每 30 秒自动保存",
@@ -267,7 +279,7 @@ function pause() {
   screen = "pause";
   const d = difficulty(world.s.time);
   modal(
-    `<div class="eyebrow">呼吸片刻，再向前</div><h2>远征已暂停</h2><details><summary>极限星潮 · 当前难度</summary><p>倍率用于当前新生成单位，相对基础属性，不含精英加成；已生成单位保留出生属性。<br>当前时间 ${time(world.s.time)}<br>普通怪生命 ×${d.hp.toFixed(2)} · 伤害 ×${d.damage.toFixed(2)} · 攻击频率 ×${d.attackRate.toFixed(2)}<br>Boss生命 ×${bossHpMultiplier(world.s.time).toFixed(2)} · 伤害 ×${bossDamageMultiplier(world.s.time).toFixed(2)}<br>Boss基础攻击间隔 ${bossAttackInterval(world.s.time, false).toFixed(2)}秒 / 二阶段 ${bossAttackInterval(world.s.time, true).toFixed(2)}秒（技能独立间隔以技能为准）<br>${
+    `<div class="eyebrow">呼吸片刻，再向前</div><h2>远征已暂停</h2><details><summary>极限星潮 · 当前难度</summary><p>倍率用于当前新生成单位，相对基础属性，不含精英加成；已生成单位保留出生属性。<br>当前时间 ${time(world.s.time)} · 第 ${ensureWaves(world.s).number} 波，剩余 ${time(Math.ceil(waveRemaining(world.s)))}<br>普通怪生命 ×${d.hp.toFixed(2)} · 伤害 ×${d.damage.toFixed(2)} · 攻击频率 ×${d.attackRate.toFixed(2)}<br>Boss生命 ×${bossHpMultiplier(world.s.time).toFixed(2)} · 伤害 ×${bossDamageMultiplier(world.s.time).toFixed(2)}<br>Boss基础攻击间隔 ${bossAttackInterval(world.s.time, false).toFixed(2)}秒 / 二阶段 ${bossAttackInterval(world.s.time, true).toFixed(2)}秒（技能独立间隔以技能为准）<br>${
       world.s.enemies
         .filter((e) => ENEMIES[e.kind].boss)
         .map(
@@ -283,7 +295,7 @@ function pause() {
             `${CURSES[k as keyof typeof CURSES].name}×${n}：${CURSES[k as keyof typeof CURSES].desc}`,
         )
         .join("；") || "当前没有诅咒"
-    }</p><p>${world.s.fate?.log.join("<br>") || "尚无奇遇记录"}</p><div class="pause-actions">${button("resume", "继续远征", "primary")}${button("save", "保存当前进度")}${button("build", "当前构筑")}${button("codex", "远征图鉴")}${button("settings", "游戏设置")}${button("assets", "资源工坊")}${button("save-home", "保存并返回营地", "subtle")}</div><div class="help"><b>行路指南</b><p>WASD 移动 · Q / E / R 技能 · 空格闪避<br>鼠标指定落点或方向 · 1 / 2 / 3 选择升级<br>躲开红色预警；拾取绿色星晶升级。<br>金色+牌：额外正面抽卡；紫色−牌：强制负面三选一。<br>第 5、10、15 分钟迎战首领，第 20 分钟迎来最终战。</p></div>`,
+    }</p><p>${world.s.fate?.log.join("<br>") || "尚无奇遇记录"}</p><div class="pause-actions">${button("resume", "继续远征", "primary")}${button("save", "保存当前进度")}${button("build", "当前构筑")}${button("codex", "远征图鉴")}${button("settings", "游戏设置")}${button("assets", "资源工坊")}${button("save-home", "保存并返回营地", "subtle")}</div><div class="help"><b>行路指南</b><p>WASD 移动 · Q / E / R 技能 · 空格闪避<br>鼠标指定落点或方向 · 1 / 2 / 3 选择升级<br>躲开红色预警；拾取绿色星晶升级。<br>金色+牌：额外正面抽卡；紫色−牌：强制负面三选一。<br>第 5、10、15、20 波迎战首领。清场提前推进；倒计时结束，旧怪保留并进入下一波。</p></div>`,
     "small",
   );
   void saveCurrent(false);
@@ -336,6 +348,7 @@ function start(s: Run) {
   lastSave = s.time;
   hud();
   if (s.phase === "upgrade") upgrade();
+  audio.setMap(environment(s).mapId, true);
   audio.unlock();
 }
 async function record() {
@@ -371,6 +384,7 @@ function results() {
     won = s.phase === "victory";
   screen = "result";
   audio.update(0, "stopped");
+  audio.effect(won ? "victory" : "failure");
   scene.paused = true;
   shell(
     `<main class="page result"><div class="eyebrow">${won ? "星林重归宁静" : "星火未熄，旅程未尽"}</div><div class="result-star">${won ? "✦" : "✧"}</div><h1>${won ? "远征告捷" : "此行落幕"}</h1><p>${won ? "你守护了这片魔法世界。前方，仍有无尽的星夜。" : "将这次领悟带往下一场远征。"}</p><div class="stat-grid"><div><small>生存时间</small><b>${time(s.time)}</b></div><div><small>击败敌人</small><b>${s.stats.kills}</b></div><div><small>角色等级</small><b>${s.player.level}</b></div><div><small>总伤害</small><b>${Math.round(s.stats.damage).toLocaleString()}</b></div></div><div class="result-details"><section><h3>本局构筑</h3><div class="build-chips">${Object.entries(
@@ -405,7 +419,7 @@ function settingsPage() {
   screen = "settings";
   scene.paused = true;
   shell(
-    `<main class="page narrow"><div class="page-heading"><div><div class="eyebrow">调整你的旅途</div><h2>游戏设置</h2></div>${button("back", "← 返回")}</div><div class="settings-panel"><label class="check"><input id="musicEnabled" type="checkbox" ${settings.musicEnabled !== false ? "checked" : ""}>战斗音乐开关 · 六首自动循环</label><label>背景音乐 <output id="music-value">${Math.round(settings.music * 100)}%</output><input id="music" type="range" min="0" max="1" step=".01" value="${settings.music}"></label><label>音效音量 <output id="sfx-value">${Math.round(settings.sfx * 100)}%</output><input id="sfx" type="range" min="0" max="1" step=".01" value="${settings.sfx}"></label><label>画面效果<select id="quality"><option value="high" ${settings.quality === "high" ? "selected" : ""}>完整 · 植被与全部特效</option><option value="low" ${settings.quality === "low" ? "selected" : ""}>简约 · 降低装饰与特效预算</option></select></label><label class="check"><input id="shake" type="checkbox" ${settings.shake ? "checked" : ""}>命中屏幕震动</label><label class="check"><input id="showStats" type="checkbox" ${settings.showStats ? "checked" : ""}>显示性能统计（FPS、敌人、投射物、特效）</label><p>画面降级仅减少装饰与特效，不改变攻击判定。<br>失去焦点会自动暂停。进度与图片只保存在本浏览器。</p>${button("apply-settings", "保存设置", "primary")}</div></main>`,
+    `<main class="page narrow"><div class="page-heading"><div><div class="eyebrow">调整你的旅途</div><h2>游戏设置</h2></div>${button("back", "← 返回")}</div><div class="settings-panel"><label class="check"><input id="musicEnabled" type="checkbox" ${settings.musicEnabled !== false ? "checked" : ""}>战斗音乐开关 · 按地图歌单循环</label><label>背景音乐 <output id="music-value">${Math.round(settings.music * 100)}%</output><input id="music" type="range" min="0" max="1" step=".01" value="${settings.music}"></label><label>音效音量 <output id="sfx-value">${Math.round(settings.sfx * 100)}%</output><input id="sfx" type="range" min="0" max="1" step=".01" value="${settings.sfx}"></label><label>画面效果<select id="quality"><option value="high" ${settings.quality === "high" ? "selected" : ""}>完整 · 植被与全部特效</option><option value="low" ${settings.quality === "low" ? "selected" : ""}>简约 · 降低装饰与特效预算</option></select></label><label class="check"><input id="shake" type="checkbox" ${settings.shake ? "checked" : ""}>命中屏幕震动</label><label class="check"><input id="showStats" type="checkbox" ${settings.showStats ? "checked" : ""}>显示性能统计（FPS、敌人、投射物、特效）</label><p>画面降级仅减少装饰与特效，不改变攻击判定。<br>失去焦点会自动暂停。进度与图片只保存在本浏览器。</p>${button("apply-settings", "保存设置", "primary")}</div></main>`,
   );
 }
 function assetManager() {
@@ -491,13 +505,14 @@ function mapBrowser() {
   return `<div class="map-grid">${Object.values(MAPS)
     .map(
       (m) =>
-        `<article class="codex-card">${img(m.preview, "map-preview")}<h3>${m.name}</h3><p>${m.description}</p><p>${m.mechanic}</p><p>首领：${m.bosses.map((id) => ENEMIES[id].name).join(" → ")}</p><p>逐步出现：${m.spawns.map((x) => `${ENEMIES[x.kind].name}（${x.after}秒起）`).join("、")}</p></article>`,
+        `<article class="codex-card">${img(m.preview, "map-preview")}<h3>${m.name}</h3><p>${m.description}</p><p>${m.mechanic}</p><p>首领：${m.bosses.map((id) => ENEMIES[id].name).join(" → ")}</p><p>逐步出现：${m.spawns.map((x) => `${ENEMIES[x.kind].name}（第${Math.ceil(x.after / 60) + 1}波或${x.after}秒起）`).join("、")}</p></article>`,
     )
     .join("")}</div>`;
 }
 async function action(id: string) {
   audio.unlock();
   if (busy) return;
+  audio.effect("ui");
   if (id.startsWith("codex-")) {
     codexTab = id.slice(6);
     collectionPage();
@@ -537,7 +552,16 @@ async function action(id: string) {
     return;
   }
   if (id.startsWith("upgrade-")) {
+    const chests = world?.s.fate?.chests || 0;
     if (world?.choose(id.slice(8))) {
+      const u = UPGRADES.find((x) => x.id === id.slice(8));
+      audio.effect(
+        (world.s.fate?.chests || 0) > chests
+          ? "chest"
+          : (u?.rarity || 0) > 0
+            ? "rare"
+            : "card",
+      );
       if (world.s.phase === "upgrade") upgrade();
       else {
         hud();
@@ -709,6 +733,7 @@ app.addEventListener("input", (e) => {
   const el = e.target as HTMLInputElement;
   if (el.id === "music")
     audio.settings = { ...audio.settings, music: Number(el.value) };
+  if (el.id === "sfx") audio.setSfxVolume(Number(el.value));
   if (el.id === "musicEnabled")
     audio.settings = { ...audio.settings, musicEnabled: el.checked };
   if (["music", "sfx"].includes(el.id))
@@ -815,6 +840,8 @@ async function boot() {
       ),
     );
     if (!world) return;
+    audio.effects(world.sounds);
+    world.sounds.clear();
     if (world.lastSound) {
       audio.effect(world.lastSound);
       world.lastSound = "";

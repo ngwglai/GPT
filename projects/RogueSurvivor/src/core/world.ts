@@ -1,3 +1,4 @@
+import { ensureWaves } from "./waves";
 import { addExperienceGem } from "./gems";
 import { environment, tickEnvironment, temporary } from "./environment";
 import { childSpawn } from "./creatureAI";
@@ -16,6 +17,7 @@ export class World extends Combat {
   constructor(s: Run) {
     super(s);
     ensureDeck(s);
+    ensureWaves(s);
     this.grid.rebuild(s.enemies);
   }
   choose(id: string) {
@@ -26,7 +28,6 @@ export class World extends Combat {
     this.s.mode = "endless";
     this.s.phase = "playing";
     this.s.victoryClaimed = true;
-    this.s.nextBoss = this.s.time + 300;
     this.s.player.hp = this.s.player.maxHp;
     checkLevel(this.s);
   }
@@ -60,7 +61,7 @@ export class World extends Combat {
       p.invincible = 0.3;
       p.dashCd = Math.max(1.3, 2.7 - (p.upgrades.stride || 0) * 0.2);
       this.effect(p, "dash", 45);
-      this.lastSound = "dash";
+      this.sound("dash");
     }
     if (p.dash > 0) {
       nx = p.dx;
@@ -93,6 +94,7 @@ export class World extends Combat {
       if (e.hp > 0) continue;
       s.stats.kills = Math.min(LIMITS.number, s.stats.kills + 1);
       const def = ENEMIES[e.kind];
+      this.sound(def.boss ? "bossDefeat" : "death");
       if (e.kind === "splitter" && !e.behavior?.child) {
         for (let i = 0; i < ENV_RULES.children; i++)
           childSpawn(this, e, "splitter", {
@@ -127,7 +129,8 @@ export class World extends Combat {
         s.eventUntil = s.time + 5;
         if (
           s.mode === "standard" &&
-          s.bossIndex >= 4 &&
+          (e.bossOrdinal === 4 ||
+            (e.bossOrdinal === undefined && s.bossIndex >= 4)) &&
           e.kind === MAPS[environment(s).mapId].bosses[3]
         ) {
           s.phase = "victory";
@@ -147,6 +150,7 @@ export class World extends Combat {
       if (distance(g, p) < 22) {
         p.xp = Math.min(LIMITS.number, p.xp + g.value * modifier(s, "xp"));
         this.effect(p, "pickup", 18);
+        this.sound("pickup");
         g.value = 0;
       }
     }
