@@ -1,3 +1,4 @@
+import { newWave } from "../src/core/waves";
 import { describe, it, expect } from "vitest";
 import { createRun } from "../src/core/create";
 import { World } from "../src/core/world";
@@ -299,14 +300,16 @@ describe("director, enemies and victory", () => {
     const ids = w.s.enemies.map((e) => e.id);
     expect(ids.length).toBe(LIMITS.enemies - 3);
     w.s.time = 300;
+    w.s.wave = newWave(5, w.s.time);
     director(w, 0.05);
     expect(w.s.enemies.some((e) => ENEMIES[e.kind].boss)).toBe(true);
     expect(ids.every((id) => w.s.enemies.some((e) => e.id === id))).toBe(true);
   });
-  it("four standard bosses at 5,10,15,20 minutes lead to victory then endless", () => {
+  it("four standard bosses at waves 5,10,15,20 lead to victory then endless", () => {
     const w = make();
     for (let i = 1; i <= 4; i++) {
       w.s.time = i * 300;
+      w.s.wave = newWave(i * 5, w.s.time);
       director(w, 0.05);
       const boss = w.s.enemies.find((e) => ENEMIES[e.kind].boss)!;
       expect(boss).toBeDefined();
@@ -321,12 +324,13 @@ describe("director, enemies and victory", () => {
     expect(w.s.mode).toBe("endless");
     while (w.s.phase === "upgrade") w.choose(w.s.choices[0]);
     expect(w.s.phase).toBe("playing");
-    expect(w.s.nextBoss).toBeGreaterThan(w.s.time);
+    expect(w.s.wave!.number).toBeGreaterThanOrEqual(20);
   });
   it("endless cycles boss families and increases composition without unbounded speed", () => {
     const w = new World(createRun("endless"));
     for (let i = 1; i <= 8; i++) {
       w.s.time = i * 300;
+      w.s.wave = newWave(i * 5, w.s.time);
       director(w, 0.05);
       expect(w.s.enemies.some((e) => ENEMIES[e.kind].boss)).toBe(true);
       w.s.enemies = [];
@@ -551,6 +555,8 @@ describe("review combat regressions", () => {
       e.burn = 1;
       e.burnPower = 10;
       e.timer = 0;
+      w.s.wave!.processed = 2;
+      w.s.wave!.spawned = 2;
       const before = { x: e.x, y: e.y };
       w.step(0.05, input);
       expect(w.s.phase).toBe("playing");

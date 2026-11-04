@@ -1,3 +1,4 @@
+import { tickWaves } from "./waves";
 import { bossPatterns } from "./bossPatterns";
 import { advancedAI, tickDefense } from "./creatureAI";
 import { environment } from "./environment";
@@ -68,38 +69,7 @@ export function spawn(c: Combat, kind: EnemyId, position?: Vec, elite = false) {
 export function director(c: Combat, dt: number) {
   const s = c.s,
     d = difficulty(s.time);
-  s.spawnTimer -= dt;
-  let waves = 0;
-  while (s.spawnTimer <= 0 && waves++ < 32) {
-    s.spawnTimer +=
-      d.spawn * (s.event === "兽潮来袭" && s.time < s.eventUntil ? 0.6 : 1);
-    const map = MAPS[environment(s).mapId];
-    const pool = map.spawns.filter((x) => s.time >= x.after);
-    // Spawn a whole wave each cycle, while retaining room for bosses.
-    for (let i = 0; i < d.pack && s.enemies.length < LIMITS.enemies - 3; i++) {
-      let roll = random(s) * pool.reduce((n, x) => n + x.weight, 0);
-      const chosen = pool.find((x) => (roll -= x.weight) < 0) || pool[0];
-      const elite = random(s) < d.elite;
-      const kind =
-        elite && s.time > 300 && random(s) < 0.3
-          ? map.elite[Math.floor(random(s) * map.elite.length)]
-          : chosen.kind;
-      spawn(c, kind, undefined, elite);
-    }
-  }
-  if (s.time >= s.nextBoss && !s.enemies.some((e) => ENEMIES[e.kind].boss)) {
-    const map = MAPS[environment(s).mapId];
-    const kinds = map.bosses;
-    const kind =
-      s.mode === "endless" && s.bossIndex >= 4 && s.bossIndex % 3 === 2
-        ? "mirrorMaiden"
-        : kinds[s.bossIndex % kinds.length];
-    spawn(c, kind);
-    s.bossIndex++;
-    s.nextBoss += 300;
-    s.event = `首领降临 · ${ENEMIES[kind].name}`;
-    s.eventUntil = s.time + 8;
-  }
+  tickWaves(c, dt, spawn);
   if (s.time >= s.nextEvent) {
     s.nextEvent += 90;
     const events = ["兽潮来袭", "流星雨", "生命潮汐", "月蚀弹幕"];

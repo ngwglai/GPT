@@ -1,3 +1,4 @@
+import { newWave } from "../src/core/waves";
 import { describe, it, expect } from "vitest";
 import { createRun } from "../src/core/create";
 import { World } from "../src/core/world";
@@ -42,9 +43,10 @@ describe("four deterministic worlds and explicit migration", () => {
       expect(c.s.environment?.mapId).toBe(map);
       c.s.nextBoss = c.s.nextEvent = 1e9;
       c.s.time = 500;
+      c.s.bossIndex = 1;
       const seen = new Set<string>();
       for (let i = 0; i < 120; i++) {
-        c.s.spawnTimer = 0;
+        c.s.wave = newWave(9, c.s.time);
         director(c, 0.05);
         seen.add(c.s.enemies.at(-1)!.kind);
         c.s.enemies = [];
@@ -77,7 +79,7 @@ describe("four deterministic worlds and explicit migration", () => {
       const oldRng = s.rng,
         oldCards = { ...s.player.upgrades };
       const restored = validateRun(s);
-      expect(restored.version).toBe(2);
+      expect(restored.version).toBe(3);
       expect(restored.environment!.mapId).toBe("forest");
       expect(restored.rng).toBe(oldRng);
       for (const [id, n] of Object.entries(oldCards))

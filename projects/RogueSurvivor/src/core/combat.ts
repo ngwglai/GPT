@@ -23,6 +23,10 @@ export class Combat {
   grid = new SpatialHash<Enemy>();
   shake = 0;
   lastSound = "";
+  sounds = new Set<string>();
+  sound(kind: string) {
+    if (this.sounds.size < 24) this.sounds.add(kind);
+  }
   constructor(public s: Run) {}
   effect(p: Vec, kind: string, r = 30, text?: string) {
     if (this.effects.length < LIMITS.effects)
@@ -84,7 +88,7 @@ export class Combat {
     p.invincible = 0.65;
     this.s.stats.taken = Math.min(LIMITS.number, this.s.stats.taken + amount);
     this.shake = 0.15;
-    this.lastSound = "hurt";
+    this.sound("hurt");
     this.effect(p, "hurt", 35);
     if (p.hp <= 0) this.s.phase = "dead";
   }
@@ -229,7 +233,7 @@ export class Combat {
     const stats = skillStats(id, lv);
     p.cooldowns[slot] =
       SKILLS[id].cooldown * p.cooldown * temporary(this.s, "cooldown");
-    this.lastSound = "cast";
+    this.sound("cast-" + p.skills[slot]);
     if (id === "fire") {
       this.zone(
         target,
@@ -344,6 +348,7 @@ export class Combat {
               (r) => r.crystalId !== x.id && segmentDistance(r, p, x) < r.r + 3,
             ),
         );
+      if (target) this.sound(lv >= 5 ? "attackStrong" : "attack");
       if (key === "blade") {
         this.area(
           p,

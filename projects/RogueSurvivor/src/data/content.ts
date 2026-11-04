@@ -34,6 +34,7 @@ export function difficulty(time: number) {
     damage: milestone(time, [1, 1.8, 3, 5, 10, 25, 150]),
     attackRate: milestone(time, [1, 1.5, 2, 3, 4, 6, 12]),
     speed: 1 + Math.min(0.6, m * 0.012),
+    // Legacy rate metadata for v1.4.2 tools; v1.5 director uses finite waves.
     spawn: 2 / milestone(time, [2, 4, 6, 9, 12, 18, 25]),
     pack: 2,
     elite: milestone(time, [0.03, 0.06, 0.1, 0.16, 0.23, 0.32, 0.48]),

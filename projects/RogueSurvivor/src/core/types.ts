@@ -53,6 +53,7 @@ export interface Player extends Vec {
   upgrades: Record<string, number>;
 }
 export interface Enemy extends Vec {
+  bossOrdinal?: number;
   dashPattern?: {
     wait: number;
     time: number;
@@ -169,7 +170,8 @@ export interface Run {
   fate?: import("./fate").Fate;
   deck?: import("./deckState").DeckState;
   rewardDrops?: import("./drops").RewardDrop[];
-  version: 1 | 2;
+  version: 1 | 2 | 3;
+  wave?: import("./waves").WaveState;
   environment?: import("./environmentTypes").EnvironmentState;
   seed: number;
   rng: number;

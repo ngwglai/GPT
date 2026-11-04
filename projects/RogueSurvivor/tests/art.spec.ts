@@ -31,7 +31,7 @@ test("v1.3 original background, three consistent portraits and card art actually
     } as any;
   });
   await page.goto("/");
-  await expect(page.locator(".version")).toContainText("v1.4");
+  await expect(page.locator(".version")).toContainText("v1.5");
   expect(
     await page.evaluate(() => (window as any).fallbackCanvases),
   ).toBeLessThan(15);

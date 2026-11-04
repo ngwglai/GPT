@@ -1,3 +1,4 @@
+import { entryWindow } from "../src/core/waves";
 import { it, expect } from "vitest";
 import {
   difficulty,
@@ -25,21 +26,24 @@ it("interpolates actual pack/interval rates and preserves combat growth", () => 
   expect(bossAttackInterval(3600, true)).toBeCloseTo(0.16);
   expect(LIMITS.enemies).toBe(800);
 });
-it("director accumulates fractional intervals without discarding frame remainder", () => {
+it("director admits exactly one finite budget across fractional timesteps", () => {
   const w = new World(createRun("endless"));
-  w.s.time = 3600;
-  w.s.nextBoss = 9999;
   w.s.nextEvent = 9999;
-  w.s.spawnTimer = 0.08;
-  // Remove only spawned units to measure the uncapped ordinary generator.
   let count = 0;
   for (let i = 0; i < 200; i++) {
+    w.s.time += 0.05;
     director(w, 0.05);
-    count += w.s.enemies.length;
-    w.s.enemies = [];
   }
-  expect(count).toBeGreaterThanOrEqual(248);
-  expect(count).toBeLessThanOrEqual(250);
+  count = w.s.enemies.length;
+  expect(count).toBe(w.s.wave!.budget);
+  expect(w.s.wave!.processed).toBe(count);
+  expect(w.s.time).toBeGreaterThan(entryWindow(w.s.wave!) - 0.8);
+  const ids = w.s.enemies.map((e) => e.id);
+  for (let i = 0; i < 200; i++) {
+    w.s.time += 0.05;
+    director(w, 0.05);
+  }
+  expect(w.s.enemies.map((e) => e.id)).toEqual(ids);
 });
 it.each(Object.keys(BOSS_MOVES) as (keyof typeof ENEMIES)[])(
   "%s cycles distinct slots with valid stage-two saved state and bounded schedules",

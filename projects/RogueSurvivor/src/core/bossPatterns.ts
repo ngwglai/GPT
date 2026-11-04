@@ -120,6 +120,7 @@ export function bossPatterns(
     } else delete e.dashPattern;
   }
   if (e.timer <= 0) {
+    c.sound("warning");
     const mode = e.phase % 3;
     if (legacy && mode === 0) legacy();
     else {
