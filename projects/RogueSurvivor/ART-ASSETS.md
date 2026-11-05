@@ -1,6 +1,20 @@
 # 美术资源清单
 
-当前v1.4新增资源见 [ART-ASSETS-v1.4.md](ART-ASSETS-v1.4.md)。下表保留v1.3原始映射；全部当前ID以public/assets/manifest.json为准。
+当前v1.6角色资源、逐帧动画来源与处理见 [V1.6.md](V1.6.md)。当前共114项图片映射、115个资源工坊ID（含既有UI面板配置）。v1.4地图／怪物见 [ART-ASSETS-v1.4.md](ART-ASSETS-v1.4.md)。下表保留v1.3历史映射；全部当前ID以`public/assets/manifest.json`和`src/data/visuals.ts`为准。
+
+## v1.6角色替换
+
+三角色ID为`ranger`、`knight`、`mage`，每个角色的资源目录为`public/assets/v1.6/characters/<角色>/`。
+
+| 稳定ID | 文件／帧尺寸 |
+| --- | --- |
+| `portrait.<角色>` | `portrait.webp`，透明全身立绘；分别499×1031、559×1041、538×1019 |
+| `avatar.<角色>` | `avatar.webp`，256×256头像 |
+| `player.<角色>` | `fallback.webp`，192×192静态回退，旧自定义根图仍优先 |
+| `animation.<角色>.idle/run/dash/cast/hurt/defeat/revive` | 各同名WebP，1536×192横条，8个192×192帧 |
+
+21个同名GIF仅供预览，不用于运行时解码。旧v1.3静态图片文件保留。每个动作均可独立在资源工坊替换为静图或精灵图，不改变角色判定。默认动画、帧率和优先级统一由`data/characterAnimations.ts`配置；缺失动作图使用静态角色回退。
+
 
 # v1.3 美术资源清单
 

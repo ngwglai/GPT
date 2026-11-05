@@ -437,36 +437,53 @@ test("暂停中替换角色资源，恢复战斗后纹理有效且碰撞数据�
 
 for (const size of [32, 256]) {
   test(`静态 ${size} 像素图片调整缩放偏移后不被裁切`, async ({ page }) => {
-    await page.goto("/");
-    await page.getByRole("button", { name: "资源工坊", exact: true }).click();
-    const data = await page.evaluate((size) => {
-      const c = document.createElement("canvas");
-      c.width = c.height = size;
-      const g = c.getContext("2d")!;
-      g.fillStyle = "#ec8648";
-      g.fillRect(0, 0, size, size);
-      g.fillStyle = "#82d8aa";
-      g.fillRect(size / 2, size / 2, size / 2, size / 2);
-      return c.toDataURL();
-    }, size);
-    await page.locator("#asset-file").setInputFiles({
-      name: "static.png",
-      mimeType: "image/png",
-      buffer: Buffer.from(data.split(",")[1], "base64"),
+    let release!: () => void;
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
     });
-    await expect(page.locator(".asset-editor")).toContainText(
-      "已使用本地自定义图片",
-    );
-    await page.locator("#asset-scale").fill("1.5");
-    await page.locator("#asset-x").fill("7");
-    await page.getByRole("button", { name: "应用配置" }).click();
-    await expect(page.locator("#toast")).toContainText("资源配置已应用");
-    const a = (await get(page, "assets")).assets["player.ranger"];
-    expect(a.frames).toBeUndefined();
-    expect(a.frameWidth).toBeUndefined();
-    expect(a.scale).toBe(1.5);
-    expect(a.x).toBe(7);
-    expect(a.data).toBe(data);
+    if (size === 32)
+      await page.route(
+        "**/assets/v1.6/characters/ranger/idle.webp",
+        async (route) => {
+          await held;
+          await route.continue();
+        },
+      );
+    try {
+      await page.goto("/");
+      await page.getByRole("button", { name: "资源工坊", exact: true }).click();
+      const data = await page.evaluate((size) => {
+        const c = document.createElement("canvas");
+        c.width = c.height = size;
+        const g = c.getContext("2d")!;
+        g.fillStyle = "#ec8648";
+        g.fillRect(0, 0, size, size);
+        g.fillStyle = "#82d8aa";
+        g.fillRect(size / 2, size / 2, size / 2, size / 2);
+        return c.toDataURL();
+      }, size);
+      await page.locator("#asset-file").setInputFiles({
+        name: "static.png",
+        mimeType: "image/png",
+        buffer: Buffer.from(data.split(",")[1], "base64"),
+      });
+      await expect(page.locator(".asset-editor")).toContainText(
+        "已使用本地自定义图片",
+      );
+      await page.locator("#asset-scale").fill("1.5");
+      await page.locator("#asset-x").fill("7");
+      await page.getByRole("button", { name: "应用配置" }).click();
+      await expect(page.locator("#toast")).toContainText("资源配置已应用");
+      const a = (await get(page, "assets")).assets["player.ranger"];
+      expect(a.frames).toBeUndefined();
+      expect(a.frameWidth).toBeUndefined();
+      expect(a.scale).toBe(1.5);
+      expect(a.x).toBe(7);
+      expect(a.data).toBe(data);
+    } finally {
+      release();
+      await page.unrouteAll({ behavior: "wait" });
+    }
   });
 }
 
@@ -604,7 +621,7 @@ test("v1.1 重抽、遗忘与属性落盘", async ({ page }) => {
 
 fateTest("v1.2 三类图鉴、当前构筑合并层数及独立刷新", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".version")).toContainText("v1.5");
+  await expect(page.locator(".version")).toContainText("v1.6");
   await page.getByRole("button", { name: "远征图鉴", exact: true }).click();
   await expect(page.locator(".codex-card")).toHaveCount(70);
   await page.getByRole("button", { name: "技能图鉴", exact: true }).click();
@@ -645,8 +662,11 @@ fateTest("v1.2 掉落触发负面抽卡，读取后奖励队列不丢失", async
   await expect(
     page.getByRole("button", { name: /刷新 · 剩余/ }),
   ).toBeDisabled();
-  const saved = await get(page, "run");
-  expect(saved.deck.pending).toEqual({ negative: 1, positive: 1 });
+  // The UI opens before the queued IndexedDB checkpoint commits. Assert the
+  // exact durable reward counts, rather than racing the initial pre-pickup save.
+  await expect
+    .poll(async () => (await get(page, "run")).deck.pending)
+    .toEqual({ negative: 1, positive: 1 });
   await page.reload();
   await page.getByRole("button", { name: /继续旅程/ }).click();
   await page.locator(".upgrade-card").first().click();

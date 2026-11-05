@@ -190,7 +190,7 @@ it.each([1, 2] as const)(
     old.version = version;
     delete old.wave;
     const s = validateRun(old);
-    expect(s.version).toBe(3);
+    expect(s.version).toBe(4);
     expect(s.wave!.number).toBe(11);
     expect(s.wave!.status).toBe("active");
     expect(s.wave!.startedAt).toBe(601);

@@ -555,3 +555,68 @@ th {
     margin-top: 0;
   }
 }
+
+#spark-count {
+  color: #80551b;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.presentation-caption {
+  position: fixed;
+  bottom: 165px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffe9bd;
+  background: #382447df;
+  border-radius: 20px;
+  padding: 10px 22px;
+  pointer-events: none;
+}
+.overlay:has(.revival-choice) {
+  background: #15122d50;
+  align-items: end;
+  padding-bottom: 30px;
+}
+.revival-choice {
+  max-width: 550px;
+  background: #fff8f2f2;
+}
+.character-preview {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 110px;
+  height: 110px;
+  border-radius: 24px;
+  background: radial-gradient(ellipse, #fffaf3e0, #fffaf300);
+  max-width: 100%;
+  display: block;
+  overflow: hidden;
+  margin: 0;
+}
+.character-preview .preview-static {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.character-preview .idle-sheet {
+  width: calc(var(--frames) * 100%);
+  height: 100%;
+  max-width: none;
+  object-fit: fill;
+  animation: actor-idle var(--duration) steps(var(--frames), end) infinite;
+}
+@keyframes actor-idle {
+  to {
+    transform: translateX(-100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .character-preview .idle-sheet {
+    animation: none;
+  }
+}
+.overlay:has(.revival-choice) {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}

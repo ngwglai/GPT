@@ -1,0 +1,170 @@
+[
+  {
+    "character": "ranger",
+    "action": "idle",
+    "frames": 8,
+    "fps": 8,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 6.21
+  },
+  {
+    "character": "ranger",
+    "action": "run",
+    "frames": 8,
+    "fps": 12,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 6.15
+  },
+  {
+    "character": "ranger",
+    "action": "dash",
+    "frames": 8,
+    "fps": 16,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 6.04
+  },
+  {
+    "character": "ranger",
+    "action": "cast",
+    "frames": 8,
+    "fps": 12,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 6.24
+  },
+  {
+    "character": "ranger",
+    "action": "hurt",
+    "frames": 8,
+    "fps": 20,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 6.11
+  },
+  {
+    "character": "ranger",
+    "action": "defeat",
+    "frames": 8,
+    "fps": 6,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.97
+  },
+  {
+    "character": "ranger",
+    "action": "revive",
+    "frames": 8,
+    "fps": 8,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 6.1
+  },
+  {
+    "character": "knight",
+    "action": "idle",
+    "frames": 8,
+    "fps": 8,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.67
+  },
+  {
+    "character": "knight",
+    "action": "run",
+    "frames": 8,
+    "fps": 12,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.66
+  },
+  {
+    "character": "knight",
+    "action": "dash",
+    "frames": 8,
+    "fps": 16,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.63
+  },
+  {
+    "character": "knight",
+    "action": "cast",
+    "frames": 8,
+    "fps": 12,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.74
+  },
+  {
+    "character": "knight",
+    "action": "hurt",
+    "frames": 8,
+    "fps": 20,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.68
+  },
+  {
+    "character": "knight",
+    "action": "defeat",
+    "frames": 8,
+    "fps": 6,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.59
+  },
+  {
+    "character": "knight",
+    "action": "revive",
+    "frames": 8,
+    "fps": 8,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.83
+  },
+  {
+    "character": "mage",
+    "action": "idle",
+    "frames": 8,
+    "fps": 8,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.92
+  },
+  {
+    "character": "mage",
+    "action": "run",
+    "frames": 8,
+    "fps": 12,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.94
+  },
+  {
+    "character": "mage",
+    "action": "dash",
+    "frames": 8,
+    "fps": 16,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.93
+  },
+  {
+    "character": "mage",
+    "action": "cast",
+    "frames": 8,
+    "fps": 12,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.98
+  },
+  {
+    "character": "mage",
+    "action": "hurt",
+    "frames": 8,
+    "fps": 20,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.97
+  },
+  {
+    "character": "mage",
+    "action": "defeat",
+    "frames": 8,
+    "fps": 6,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.76
+  },
+  {
+    "character": "mage",
+    "action": "revive",
+    "frames": 8,
+    "fps": 8,
+    "distinctFrames": 8,
+    "opaqueColorMeanAbsoluteError": 5.95
+  }
+]

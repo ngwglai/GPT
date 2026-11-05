@@ -1,3 +1,11 @@
+import {
+  ensureRevival,
+  acceptRevival,
+  declineRevival,
+  tickRevival,
+  rewardBossLife,
+  REVIVAL_RULES,
+} from "./revival";
 import { ensureWaves } from "./waves";
 import { addExperienceGem } from "./gems";
 import { environment, tickEnvironment, temporary } from "./environment";
@@ -18,7 +26,33 @@ export class World extends Combat {
     super(s);
     ensureDeck(s);
     ensureWaves(s);
+    ensureRevival(s);
     this.grid.rebuild(s.enemies);
+  }
+  advancePresentation(dt: number) {
+    const changed = tickRevival(this.s, dt);
+    if (changed && this.s.phase === "playing") {
+      this.effect(this.s.player, "revive", REVIVAL_RULES.clearRadius);
+      this.sound("revived");
+      checkLevel(this.s);
+    }
+    return changed;
+  }
+  revive() {
+    if (!acceptRevival(this.s)) return false;
+    const kept = [];
+    for (const b of this.s.bullets) {
+      if (b.enemy && distance(b, this.s.player) <= REVIVAL_RULES.clearRadius) {
+        if (this.bulletPool.length < LIMITS.bullets) this.bulletPool.push(b);
+      } else kept.push(b);
+    }
+    this.s.bullets = kept;
+    this.effect(this.s.player, "revive", REVIVAL_RULES.clearRadius);
+    this.sound("revive");
+    return true;
+  }
+  declineRevival() {
+    return declineRevival(this.s);
   }
   choose(id: string) {
     return applyUpgrade(this.s, id);
@@ -39,7 +73,10 @@ export class World extends Combat {
     s.time = Math.min(LIMITS.number, s.time + dt);
     this.tickEffects(dt);
     tickEnvironment(this, dt);
-    if (s.phase === "dead") return;
+    if (s.phase !== "playing") {
+      this.settleDeaths();
+      return;
+    }
     p.invincible = Math.max(0, p.invincible - dt);
     p.dashCd = Math.max(0, p.dashCd - dt);
     p.cooldowns = p.cooldowns.map((cd) => Math.max(0, cd - dt));
@@ -58,10 +95,11 @@ export class World extends Combat {
     }
     if (input.dash && p.dashCd <= 0) {
       p.dash = 0.18;
-      p.invincible = 0.3;
+      p.invincible = Math.max(p.invincible, 0.3);
       p.dashCd = Math.max(1.3, 2.7 - (p.upgrades.stride || 0) * 0.2);
       this.effect(p, "dash", 45);
       this.sound("dash");
+      this.poseEvents.dash++;
     }
     if (p.dash > 0) {
       nx = p.dx;
@@ -76,8 +114,8 @@ export class World extends Combat {
     );
     director(this, dt);
     ai(this, dt);
-    if ((s.phase as string) === "dead") {
-      s.enemies = s.enemies.filter((e) => e.hp > 0);
+    if ((s.phase as string) !== "playing") {
+      this.settleDeaths();
       return;
     }
     this.grid.rebuild(s.enemies);
@@ -86,10 +124,35 @@ export class World extends Combat {
     });
     this.auto(dt);
     this.projectiles(dt);
-    if ((s.phase as string) === "dead") {
-      s.enemies = s.enemies.filter((e) => e.hp > 0);
+    if ((s.phase as string) !== "playing") {
+      this.settleDeaths();
       return;
     }
+    this.settleDeaths();
+    for (const g of s.gems) {
+      const d = distance(g, p);
+      if (d < p.magnet) {
+        const n = unit(p.x - g.x, p.y - g.y),
+          speed = Math.min(d, 460 * dt);
+        g.x += n.x * speed;
+        g.y += n.y * speed;
+      }
+      if (distance(g, p) < 22) {
+        p.xp = Math.min(LIMITS.number, p.xp + g.value * modifier(s, "xp"));
+        this.effect(p, "pickup", 18);
+        this.sound("pickup");
+        g.value = 0;
+      }
+    }
+    s.gems = s.gems.filter((g) => g.value > 0);
+    collectDrops(s, dt);
+    checkLevel(s);
+    s.stats.peakEnemies = Math.max(s.stats.peakEnemies, s.enemies.length);
+    s.stats.peakBullets = Math.max(s.stats.peakBullets, s.bullets.length);
+  }
+  private settleDeaths() {
+    const s = this.s,
+      p = s.player;
     for (const e of s.enemies) {
       if (e.hp > 0) continue;
       s.stats.kills = Math.min(LIMITS.number, s.stats.kills + 1);
@@ -125,7 +188,9 @@ export class World extends Combat {
         s.stats.bosses++;
         p.xp += value * modifier(s, "xp");
         this.heal(p.maxHp * 0.3);
-        s.event = "首领已击破";
+        const life = rewardBossLife(s, e);
+        if (life) this.sound("spark");
+        s.event = life ? "首领已击破 · 获得星火 × 1" : "首领已击破";
         s.eventUntil = s.time + 5;
         if (
           s.mode === "standard" &&
@@ -139,25 +204,5 @@ export class World extends Combat {
       }
     }
     s.enemies = s.enemies.filter((e) => e.hp > 0);
-    for (const g of s.gems) {
-      const d = distance(g, p);
-      if (d < p.magnet) {
-        const n = unit(p.x - g.x, p.y - g.y),
-          speed = Math.min(d, 460 * dt);
-        g.x += n.x * speed;
-        g.y += n.y * speed;
-      }
-      if (distance(g, p) < 22) {
-        p.xp = Math.min(LIMITS.number, p.xp + g.value * modifier(s, "xp"));
-        this.effect(p, "pickup", 18);
-        this.sound("pickup");
-        g.value = 0;
-      }
-    }
-    s.gems = s.gems.filter((g) => g.value > 0);
-    collectDrops(s, dt);
-    checkLevel(s);
-    s.stats.peakEnemies = Math.max(s.stats.peakEnemies, s.enemies.length);
-    s.stats.peakBullets = Math.max(s.stats.peakBullets, s.bullets.length);
   }
 }

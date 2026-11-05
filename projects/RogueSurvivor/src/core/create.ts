@@ -1,3 +1,4 @@
+import { initialRevival } from "./revival";
 import { newWave } from "./waves";
 import { MAPS } from "../data/maps";
 import { initializeMap } from "./environment";
@@ -15,7 +16,8 @@ export function createRun(
 ): Run {
   const c = CHARACTERS.find((c) => c.id === character) || CHARACTERS[0];
   const s: Run = {
-    version: 3,
+    version: 4,
+    revival: initialRevival(),
     wave: newWave(1, 0),
     seed,
     rng: seed,

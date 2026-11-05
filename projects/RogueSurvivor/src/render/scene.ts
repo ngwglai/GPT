@@ -1,3 +1,11 @@
+import { CharacterAnimation, MovementPose } from "./characterAnimation";
+import {
+  animationId,
+  CHARACTER_SHEETS,
+  CHARACTER_ACTIONS,
+  FRAME_SIZE,
+} from "../data/characterAnimations";
+import { ensureRevival, inPresentation, REVIVAL_RULES } from "../core/revival";
 import { environment } from "../core/environment";
 import { MAPS } from "../data/maps";
 import { VISUALS, artUrl } from "../data/visuals";
@@ -16,9 +24,14 @@ export class GameScene extends Phaser.Scene {
   needsPaint = true;
   onFrame?: (dt: number) => void;
   onPause?: () => void;
+  readonly characterAnimation = new CharacterAnimation();
+  private movementPose = new MovementPose();
+  private lastPosition = { x: 1800, y: 1800 };
   private ground?: Phaser.GameObjects.TileSprite;
   private decoded = new Map<string, Promise<HTMLImageElement>>();
   private builtins?: Promise<void>;
+  private characterSheets = new Map<string, Promise<void>>();
+  private characterReady = new Set<string>();
   private background!: Phaser.GameObjects.Graphics;
   private graphics!: Phaser.GameObjects.Graphics;
   private danger!: Phaser.GameObjects.Graphics;
@@ -52,7 +65,7 @@ export class GameScene extends Phaser.Scene {
       const tag = (e.target as HTMLElement)?.tagName;
       if (["INPUT", "SELECT", "TEXTAREA"].includes(tag)) return;
       if (e.code === "Escape" && !e.repeat) this.onPause?.();
-      if (this.paused) return;
+      if (this.paused || this.world?.s.phase !== "playing") return;
       if (e.code === "Space") this.queued.dash = true;
       const i = ["KeyQ", "KeyE", "KeyR"].indexOf(e.code);
       if (i >= 0 && !e.repeat) this.queued.skills[i] = true;
@@ -66,6 +79,10 @@ export class GameScene extends Phaser.Scene {
   setWorld(w: World) {
     this.needsPaint = true;
     this.world = w;
+    void this.loadCharacterSheets(w.s.character);
+    this.characterAnimation.reset();
+    this.movementPose.reset();
+    this.lastPosition = { x: w.s.player.x, y: w.s.player.y };
     this.cx = w.s.player.x;
     this.cy = w.s.player.y;
     this.accumulator = 0;
@@ -78,6 +95,7 @@ export class GameScene extends Phaser.Scene {
       Object.keys(VISUALS)
         .filter(
           (id) =>
+            !id.startsWith("animation.") &&
             !id.startsWith("portrait.") &&
             !id.startsWith("avatar.") &&
             !id.startsWith("card.") &&
@@ -90,8 +108,15 @@ export class GameScene extends Phaser.Scene {
             const url = artUrl(id)!;
             if (!this.decoded.has(url)) this.decoded.set(url, decodeImage(url));
             const image = await this.decoded.get(url)!;
-            if (!this.textures.exists("builtin:" + id))
-              this.textures.addImage("builtin:" + id, image);
+            if (!this.textures.exists("builtin:" + id)) {
+              if (CHARACTER_SHEETS[id])
+                this.textures.addSpriteSheet("builtin:" + id, image, {
+                  frameWidth: FRAME_SIZE,
+                  frameHeight: FRAME_SIZE,
+                  endFrame: 7,
+                });
+              else this.textures.addImage("builtin:" + id, image);
+            }
           } catch {
             /* Original vector fallback remains available. */
           }
@@ -99,7 +124,8 @@ export class GameScene extends Phaser.Scene {
     ).then(() => {
       this.needsPaint = true;
     });
-    await this.builtins;
+    // Custom edits are independent of unrelated default-image downloads.
+    if (this.world) void this.loadCharacterSheets(this.world.s.character);
     const rev = ++this.assetRevision;
     this.ground?.setVisible(false).setTexture("map.ground");
     for (const sprite of this.sprites)
@@ -125,6 +151,38 @@ export class GameScene extends Phaser.Scene {
     }
     this.needsPaint = true;
   }
+  private loadCharacterSheets(character: string) {
+    if (!this.ready) return Promise.resolve();
+    if (!this.characterSheets.has(character))
+      this.characterSheets.set(
+        character,
+        Promise.all(
+          Object.keys(CHARACTER_SHEETS)
+            .filter((id) => id.startsWith(`animation.${character}.`))
+            .map(async (id) => {
+              try {
+                const url = artUrl(id)!;
+                if (!this.decoded.has(url))
+                  this.decoded.set(url, decodeImage(url));
+                const image = await this.decoded.get(url)!;
+                const key = "builtin:" + id;
+                if (!this.textures.exists(key))
+                  this.textures.addSpriteSheet(key, image, {
+                    frameWidth: FRAME_SIZE,
+                    frameHeight: FRAME_SIZE,
+                    endFrame: 7,
+                  });
+              } catch {
+                /* Keep the usable static character. */
+              }
+            }),
+        ).then(() => {
+          this.characterReady.add(character);
+          this.needsPaint = true;
+        }),
+      );
+    return this.characterSheets.get(character)!;
+  }
   inputState(): Input {
     const k = this.keys,
       ptr = this.input.activePointer;
@@ -145,6 +203,8 @@ export class GameScene extends Phaser.Scene {
     angle = 0,
     alpha = 1,
     tint?: number,
+    frame?: number,
+    flip?: boolean,
   ) {
     const x = p.x - this.cx + this.scale.width / 2,
       y = p.y - this.cy + this.scale.height / 2;
@@ -182,16 +242,22 @@ export class GameScene extends Phaser.Scene {
           ? -0.1
           : id.startsWith("map.")
             ? -0.5
-            : id.startsWith("player.")
+            : id.startsWith("player.") || id.startsWith("animation.")
               ? 10
               : 2 + p.y / 10000,
       );
     sprite.setFlipX(
-      id.startsWith("player.") && this.keys.A.isDown && !this.keys.D.isDown,
+      flip ??
+        (id.startsWith("player.") && this.keys.A.isDown && !this.keys.D.isDown),
     );
     sprite.clearTint();
     if (tint) sprite.setTint(tint);
-    if (custom?.frames && key.startsWith("custom:"))
+    if (
+      frame !== undefined &&
+      ((key.startsWith("builtin:") && CHARACTER_SHEETS[id]) || custom?.frames)
+    )
+      sprite.setFrame(frame);
+    else if (custom?.frames && key.startsWith("custom:"))
       sprite.setFrame(
         Math.floor((this.world?.s.time || 0) * (custom.fps || 8)) %
           custom.frames,
@@ -230,17 +296,44 @@ export class GameScene extends Phaser.Scene {
   update(_time: number, delta: number) {
     if (!this.ready) return;
     const dt = Math.min(delta / 1000, 0.1);
+    let simulated = false;
+    if (
+      this.world &&
+      !this.paused &&
+      ["dying", "reviving"].includes(this.world.s.phase) &&
+      (this.characterReady.has(this.world.s.character) ||
+        this.textures.exists("custom:player." + this.world.s.character))
+    )
+      this.world.advancePresentation(Math.min(delta / 1000, 0.25));
     if (this.world && !this.paused && this.world.s.phase === "playing") {
       this.accumulator += dt;
       let steps = 0;
       while (this.accumulator >= 1 / 60 && steps++ < 6) {
         this.world.step(1 / 60, this.inputState());
+        simulated = true;
         this.queued = { dash: false, skills: [false, false, false] };
         this.accumulator -= 1 / 60;
       }
     } else {
       this.accumulator = 0;
       this.queued = { dash: false, skills: [false, false, false] };
+    }
+    if (this.world) {
+      const s = this.world.s,
+        p = s.player;
+      const dx = p.x - this.lastPosition.x,
+        dy = p.y - this.lastPosition.y;
+      this.movementPose.observe(dx, dy, simulated);
+      if (!this.paused || inPresentation(s) || s.phase === "dead")
+        this.characterAnimation.update(
+          this.paused ? 0 : dt,
+          s.phase,
+          ensureRevival(s).elapsed,
+          this.movementPose.moving,
+          this.movementPose.x,
+          this.world.poseEvents,
+        );
+      this.lastPosition = { x: p.x, y: p.y };
     }
     if (this.world && this.showWorld && (!this.paused || this.needsPaint)) {
       this.cx = this.world.s.player.x;
@@ -596,13 +689,44 @@ export class GameScene extends Phaser.Scene {
       g.lineStyle(14, 0xa7ead6, 0.3);
       g.lineBetween(W / 2, H / 2, W / 2 - p.dx * 60, H / 2 - p.dy * 60);
     }
-    this.sprite(
-      "player." + s.character,
-      p,
-      80 * (1 + Math.sin(s.time * 7) * 0.025),
-      0,
-      p.invincible > 0 && Math.floor(s.time * 20) % 2 ? 0.55 : 1,
+    const actor = this.characterAnimation;
+    const actionId = animationId(s.character, actor.action);
+    const rootId = "player." + s.character;
+    const hasAction =
+      (assetPack.assets[actionId] &&
+        this.textures.exists("custom:" + actionId)) ||
+      this.textures.exists("builtin:" + actionId);
+    const id = assetPack.assets[rootId]
+      ? rootId
+      : hasAction
+        ? actionId
+        : rootId;
+    const custom = assetPack.assets[id];
+    const frames = custom ? custom.frames || 1 : id === actionId ? 8 : 1;
+    const frame = actor.frame(
+      frames,
+      custom?.fps || CHARACTER_ACTIONS[actor.action].fps,
     );
+    this.sprite(
+      id,
+      p,
+      id === actionId ? 96 : 80,
+      0,
+      s.phase === "playing" && p.invincible > 0 && Math.floor(s.time * 20) % 2
+        ? 0.55
+        : 1,
+      undefined,
+      frame,
+      actor.facing < 0,
+    );
+    this.game.canvas.dataset.characterAction = actor.action;
+    this.game.canvas.dataset.characterFrame = String(frame);
+    this.game.canvas.dataset.characterTexture = id;
+    if (s.phase === "reviving") {
+      const radius = 35 + ensureRevival(s).elapsed * 160;
+      g.lineStyle(4, 0xffe3a6, 0.85);
+      g.strokeCircle(W / 2, H / 2, radius);
+    }
     for (const key of ["orbit", "drone"] as const) {
       if (!p.weapons[key]) continue;
       const count =

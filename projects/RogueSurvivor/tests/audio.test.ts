@@ -161,3 +161,40 @@ test("switching maps resets only its playlist and failure scope", () => {
   expect(media.paused).toBe(false);
   expect(Track.current).toBe(media);
 });
+test("defeat/revival ducking keeps the same track, volume restores without restart", async () => {
+  class Media extends Track {
+    currentTime = 29;
+  }
+  vi.stubGlobal("Audio", Media);
+  const a = new AudioEngine({
+    music: 0.6,
+    sfx: 0.5,
+    quality: "high",
+    shake: false,
+    showStats: false,
+  });
+  a.unlock();
+  a.update(0, "playing");
+  await Promise.resolve();
+  const media = Track.current as Media;
+  a.update(0, "playing", 0.35);
+  expect(media.volume).toBeCloseTo(0.21);
+  expect(media.currentTime).toBe(29);
+  a.update(0, "playing", 1);
+  expect(media.volume).toBe(0.6);
+  expect(Track.current).toBe(media);
+});
+test.each(["dying", "revive", "reviving"] as const)(
+  "%s music continues softly unless explicitly paused or hidden",
+  async (phase) => {
+    const { musicState } = await import("../src/services/musicPolicy");
+    const { createRun } = await import("../src/core/create");
+    const s = createRun("endless");
+    s.phase = phase;
+    expect(musicState(s, phase, false, false)).toBe("playing");
+    expect(musicState(s, phase, true, false)).toBe("paused");
+    expect(musicState(s, phase, false, true)).toBe("paused");
+    s.phase = "dead";
+    expect(musicState(s, "result", false, false)).toBe("stopped");
+  },
+);

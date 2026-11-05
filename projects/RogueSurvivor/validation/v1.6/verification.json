@@ -1,0 +1,73 @@
+{
+  "version": "1.6.0",
+  "date": "2026-11-05",
+  "environment": {
+    "os": "Linux",
+    "node": "24",
+    "browser": "Chromium 154",
+    "renderer": "Phaser Canvas",
+    "viewport": [
+      1440,
+      900
+    ]
+  },
+  "unit": {
+    "passed": 276,
+    "failed": 0
+  },
+  "build": "passed (TypeScript + Vite)",
+  "auditVulnerabilities": 0,
+  "browser": {
+    "firstFull": {
+      "total": 72,
+      "passed": 70,
+      "failed": 2,
+      "causes": [
+        "selection locator changed with artwork",
+        "fixture attempted to save an already-dead boss"
+      ]
+    },
+    "finalArtAndRevival": {
+      "passed": 13,
+      "failed": 0
+    },
+    "finalLegacyMenuAndDelayedSettlement": {
+      "passed": 2,
+      "failed": 0
+    },
+    "finalRemoteFullSuite": "See PR Actions; 74 cases configured"
+  },
+  "art": {
+    "nativeGifModelOutputs": 0,
+    "generatedPoseAtlases": 3,
+    "convertedGifs": 21,
+    "runtimeSpriteSheets": 21,
+    "drawnFrameSlots": 168,
+    "gifCheck": "passed"
+  },
+  "denseCombatSample": {
+    "fps": 14,
+    "enemies": 151,
+    "bullets": 233,
+    "effects": 53,
+    "quality": "high",
+    "pageErrors": 0,
+    "note": "Single cloud software-rendering sample, not a balance or performance limit"
+  },
+  "longStressExecuted": false,
+  "highRefreshRegressionHz": [
+    60,
+    120,
+    144
+  ],
+  "loadingRegression": {
+    "delayedCharacterSheetsMs": 1200,
+    "unrelatedDefaultImageHeld": true,
+    "bothCasesFailedBeforeFix": true,
+    "imageTimeoutMs": 8000,
+    "afterFixTargetedBrowser": {
+      "passed": 17,
+      "failed": 0
+    }
+  }
+}

@@ -1,3 +1,7 @@
+import {
+  ACTION_NAMES,
+  type CharacterAction,
+} from "../data/characterAnimations";
 import { WORLD_ASSET_NAMES } from "../data/worldVisuals";
 import { VISUALS } from "../data/visuals";
 import { CHARACTERS, ENEMIES, SKILLS, WEAPONS } from "../data/content";
@@ -36,6 +40,9 @@ export const ASSET_IDS = [
     .map((id) => ({
       id,
       name:
+        (id.startsWith("animation.")
+          ? `角色动作 · ${CHARACTERS.find((c) => c.id === id.split(".")[1])?.name} · ${ACTION_NAMES[id.split(".")[2] as CharacterAction]}`
+          : undefined) ||
         WORLD_ASSET_NAMES[id] ||
         (id.startsWith("portrait.")
           ? "角色立绘 · " + CHARACTERS.find((c) => id.endsWith(c.id))?.name
@@ -103,10 +110,17 @@ export function validateMeta(a: Asset) {
   )
     throw new Error("动画配置无效：最多 64 帧，帧率 1–30。");
 }
+export const IMAGE_LOAD_TIMEOUT_MS = 8_000;
 export function decodeImage(data: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
+    const timeout = setTimeout(() => {
+      image.onload = image.onerror = null;
+      image.removeAttribute("src");
+      reject(new Error("图片加载超时，已保留默认资源。"));
+    }, IMAGE_LOAD_TIMEOUT_MS);
     image.onload = () => {
+      clearTimeout(timeout);
       if (
         image.width < 1 ||
         image.height < 1 ||
@@ -118,7 +132,10 @@ export function decodeImage(data: string): Promise<HTMLImageElement> {
       }
       resolve(image);
     };
-    image.onerror = () => reject(new Error("图片解码失败，已保留默认资源。"));
+    image.onerror = () => {
+      clearTimeout(timeout);
+      reject(new Error("图片解码失败，已保留默认资源。"));
+    };
     image.src = data;
   });
 }

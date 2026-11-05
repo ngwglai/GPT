@@ -1,3 +1,4 @@
+import { beginDefeat } from "./revival";
 import { zoneContains } from "./attackGeometry";
 import { temporary, hitCrystals, environment, addBuff } from "./environment";
 import { selectTarget, frontalFactor } from "./targeting";
@@ -22,6 +23,7 @@ export class Combat {
   bulletPool: Bullet[] = [];
   grid = new SpatialHash<Enemy>();
   shake = 0;
+  poseEvents = { cast: 0, hurt: 0, dash: 0 };
   lastSound = "";
   sounds = new Set<string>();
   sound(kind: string) {
@@ -79,7 +81,7 @@ export class Combat {
   }
   hurt(amount: number) {
     const p = this.s.player;
-    if (p.invincible > 0 || p.hp <= 0) return;
+    if (this.s.phase !== "playing" || p.invincible > 0 || p.hp <= 0) return;
     amount *= modifier(this.s, "taken");
     const absorbed = Math.min(p.shield, amount);
     p.shield -= absorbed;
@@ -89,11 +91,13 @@ export class Combat {
     this.s.stats.taken = Math.min(LIMITS.number, this.s.stats.taken + amount);
     this.shake = 0.15;
     this.sound("hurt");
+    this.poseEvents.hurt++;
     this.effect(p, "hurt", 35);
-    if (p.hp <= 0) this.s.phase = "dead";
+    if (p.hp <= 0 && beginDefeat(this.s)) this.sound("defeatPlayer");
   }
   heal(amount: number) {
     const p = this.s.player;
+    if (p.hp <= 0) return;
     const n = Math.min(amount, p.maxHp - p.hp);
     p.hp += n;
     this.s.stats.healed = Math.min(LIMITS.number, this.s.stats.healed + n);
@@ -234,6 +238,7 @@ export class Combat {
     p.cooldowns[slot] =
       SKILLS[id].cooldown * p.cooldown * temporary(this.s, "cooldown");
     this.sound("cast-" + p.skills[slot]);
+    this.poseEvents.cast++;
     if (id === "fire") {
       this.zone(
         target,
@@ -320,6 +325,7 @@ export class Combat {
     return true;
   }
   auto(dt: number) {
+    if (this.s.phase !== "playing") return;
     const p = this.s.player;
     for (const key of Object.keys(p.weapons) as (keyof typeof WEAPONS)[]) {
       p.weaponTimers[key] -= dt;
@@ -422,6 +428,7 @@ export class Combat {
   projectiles(dt: number) {
     const s = this.s;
     for (const b of s.bullets) {
+      if (s.phase !== "playing") break;
       if (b.motion) {
         const m = b.motion;
         if (!s.enemies.some((e) => e.id === m.owner && e.hp > 0)) {
@@ -583,6 +590,7 @@ export class Combat {
     }
     s.bullets.length = write;
     for (const z of s.zones) {
+      if (s.phase !== "playing") break;
       if (z.life <= 0) continue;
       if (z.shape) {
         if (!s.enemies.some((e) => e.id === z.shape!.owner && e.hp > 0)) {

@@ -1,17 +1,19 @@
+import { CHARACTER_SHEETS } from "./characterAnimations";
 import { WORLD_VISUALS } from "./worldVisuals";
 /** Original generated art, independent of all collision and rule data. */
 export const VISUALS: Record<string, string> = {
   ...WORLD_VISUALS,
-  "portrait.ranger": "characters/ranger-full.webp",
-  "player.ranger": "characters/ranger-battle.webp",
-  "avatar.ranger": "characters/ranger-avatar.webp",
+  ...CHARACTER_SHEETS,
+  "portrait.ranger": "v1.6/characters/ranger/portrait.webp",
+  "player.ranger": "v1.6/characters/ranger/fallback.webp",
+  "avatar.ranger": "v1.6/characters/ranger/avatar.webp",
   "enemy.crawler": "enemies/crawler.webp",
-  "portrait.knight": "characters/knight-full.webp",
-  "player.knight": "characters/knight-battle.webp",
-  "avatar.knight": "characters/knight-avatar.webp",
-  "portrait.mage": "characters/mage-full.webp",
-  "player.mage": "characters/mage-battle.webp",
-  "avatar.mage": "characters/mage-avatar.webp",
+  "portrait.knight": "v1.6/characters/knight/portrait.webp",
+  "player.knight": "v1.6/characters/knight/fallback.webp",
+  "avatar.knight": "v1.6/characters/knight/avatar.webp",
+  "portrait.mage": "v1.6/characters/mage/portrait.webp",
+  "player.mage": "v1.6/characters/mage/fallback.webp",
+  "avatar.mage": "v1.6/characters/mage/avatar.webp",
   "enemy.runner": "enemies/runner.webp",
   "enemy.archer": "enemies/archer.webp",
   "enemy.seer": "enemies/seer.webp",

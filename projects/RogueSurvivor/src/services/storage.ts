@@ -1,3 +1,4 @@
+import { migrateRevival, REVIVAL_RULES } from "../core/revival";
 import { migrateWaves, WAVE_RULES } from "../core/waves";
 import { emptyEnvironment } from "../core/environmentTypes";
 import { MAPS, ENV_RULES } from "../data/maps";
@@ -5,7 +6,7 @@ import { ensureDeck } from "../core/deckState";
 import { recalculate } from "../core/fate";
 import { DROP_RULES } from "../core/drops";
 import { CURSES } from "../core/fate";
-import type { Run, Settings, Profile } from "../core/types";
+import type { Run, Settings, Profile, RecordEntry } from "../core/types";
 import { createRun } from "../core/create";
 import {
   CHARACTERS,
@@ -67,11 +68,10 @@ function obj(v: unknown): v is Record<string, unknown> {
 }
 // Validate all numerical leaves, collection budgets, required structures, identifiers and cross references.
 export function migrateRun(value: unknown): unknown {
-  if (obj(value) && (value.version === 1 || value.version === 2)) {
+  if (obj(value) && [1, 2, 3].includes(value.version as number)) {
     const migrated = structuredClone(value);
     if (migrated.version === 1 && migrated.environment === undefined)
       migrated.environment = emptyEnvironment("forest");
-    // Do not inspect unvalidated legacy structures; the normal validator reports corruption.
     if (
       typeof migrated.time === "number" &&
       Number.isFinite(migrated.time) &&
@@ -79,16 +79,19 @@ export function migrateRun(value: unknown): unknown {
       Number.isFinite(migrated.bossIndex) &&
       Array.isArray(migrated.enemies) &&
       migrated.enemies.every((e) => obj(e) && typeof e.kind === "string")
-    )
-      migrated.wave = migrateWaves(migrated as unknown as Run);
-    migrated.version = 3;
+    ) {
+      if (migrated.version !== 3)
+        migrated.wave = migrateWaves(migrated as unknown as Run);
+      migrated.revival = migrateRevival(migrated as unknown as Run);
+    }
+    migrated.version = 4;
     return migrated;
   }
   return value;
 }
 export function validateRun(input: unknown): Run {
   const value = migrateRun(input);
-  assert(obj(value) && value.version === 3);
+  assert(obj(value) && value.version === 4);
   const s = value as unknown as Run;
   const visit = (v: unknown, depth = 0) => {
     assert(depth < 12);
@@ -154,7 +157,15 @@ export function validateRun(input: unknown): Run {
   }
   assert(
     ["standard", "endless"].includes(s.mode) &&
-      ["playing", "upgrade", "dead", "victory"].includes(s.phase) &&
+      [
+        "playing",
+        "upgrade",
+        "dead",
+        "victory",
+        "dying",
+        "revive",
+        "reviving",
+      ].includes(s.phase) &&
       CHARACTERS.some((c) => c.id === s.character),
   );
   assert(obj(s.player) && obj(s.stats));
@@ -186,6 +197,43 @@ export function validateRun(input: unknown): Run {
       s.spawnTimer <= 10,
   );
   assert(Number.isInteger(s.rng) && Number.isInteger(s.nextId));
+  const life = s.revival;
+  assert(
+    obj(life) &&
+      [
+        life.remaining,
+        life.earned,
+        life.used,
+        life.rewardedBoss,
+        life.deaths,
+      ].every((n) => Number.isSafeInteger(n) && n >= 0) &&
+      life.remaining + life.used === life.earned &&
+      life.rewardedBoss <= s.bossIndex &&
+      typeof life.elapsed === "number" &&
+      life.elapsed >= 0 &&
+      life.elapsed <=
+        REVIVAL_RULES.defeatDuration + REVIVAL_RULES.defeatHold + 0.25,
+  );
+  if (["dying", "revive", "reviving"].includes(s.phase)) assert(p.hp === 0);
+  if (s.phase === "revive")
+    assert(life.remaining > 0 && life.elapsed >= REVIVAL_RULES.defeatDuration);
+  if (s.phase === "reviving")
+    assert(
+      life.used > 0 && life.elapsed <= REVIVAL_RULES.reviveDuration + 0.25,
+    );
+  assert(
+    s.recordId === undefined ||
+      (typeof s.recordId === "string" &&
+        /^[a-zA-Z0-9-]{1,80}$/.test(s.recordId)),
+  );
+  assert(
+    s.recorded === undefined ||
+      (Array.isArray(s.recorded) &&
+        s.recorded.length <= 2 &&
+        new Set(s.recorded).size === s.recorded.length &&
+        s.recorded.every((m) => ["standard", "endless"].includes(m))),
+  );
+
   const w = s.wave;
   assert(
     obj(w) &&
@@ -723,6 +771,72 @@ export function saveRun(run: Run) {
   saveQueue = task;
   return task;
 }
+/** Run termination and profile entry commit together. Stable IDs make refresh/retry idempotent. */
+export function finishRun(run: Run, entry: RecordEntry) {
+  const snapshot = validateRun(run);
+  if (!snapshot.recordId || !["dead", "victory"].includes(snapshot.phase))
+    return Promise.reject(new Error("远征尚未结束，无法保存结算。"));
+  const task = saveQueue
+    .catch(() => {})
+    .then(async () => {
+      const d = await db();
+      return new Promise<{ run: Run; profile: Profile }>((resolve, reject) => {
+        const tx = d.transaction("kv", "readwrite"),
+          store = tx.objectStore("kv");
+        const previous = store.get("run"),
+          profileRequest = store.get("profile");
+        let result: { run: Run; profile: Profile };
+        profileRequest.onsuccess = () => {
+          const raw = profileRequest.result;
+          const profile: Profile = validProfile(raw)
+            ? structuredClone(raw)
+            : structuredClone(DEFAULT_PROFILE);
+          const sameRun = previous.result?.recordId === snapshot.recordId;
+          const modes = new Set(snapshot.recorded || []);
+          if (sameRun && Array.isArray(previous.result.recorded))
+            for (const mode of previous.result.recorded)
+              if (mode === "standard" || mode === "endless") modes.add(mode);
+          const id = `${snapshot.recordId}-${snapshot.mode}`;
+          if (
+            !modes.has(snapshot.mode) &&
+            !profile.records.some((r) => r.id === id)
+          )
+            profile.records.unshift({ ...entry, id });
+          modes.add(snapshot.mode);
+          snapshot.recorded = [...modes];
+          profile.records = profile.records.slice(0, 30);
+          profile.best = Math.max(profile.best, snapshot.time);
+          for (const [condition, name] of [
+            [snapshot.stats.bosses > 0, "首领猎人"],
+            [snapshot.phase === "victory", "星林守护者"],
+            [snapshot.time >= 3600, "长夜行者"],
+          ] as const)
+            if (condition && !profile.unlocks.includes(name))
+              profile.unlocks.push(name);
+          if (sameRun || !previous.result) {
+            if (previous.result) {
+              try {
+                store.put(validateRun(previous.result), "backup");
+              } catch {
+                /* keep valid backup */
+              }
+            }
+            store.put(snapshot, "run");
+          }
+          store.put(profile, "profile");
+          result = { run: snapshot, profile };
+        };
+        tx.oncomplete = () => resolve(result);
+        tx.onabort = tx.onerror = () =>
+          reject(new Error("结算保存失败，请检查本地存储空间并重试。"));
+      });
+    });
+  saveQueue = task.then(
+    () => {},
+    () => {},
+  );
+  return task;
+}
 export async function loadRun(backup = false) {
   const data = await read<unknown>(backup ? "backup" : "run");
   return data === undefined ? undefined : validateRun(data);
@@ -749,28 +863,35 @@ export async function loadSettings() {
   }
   return { ...DEFAULT_SETTINGS };
 }
+function validProfile(p: unknown): p is Profile {
+  if (
+    !obj(p) ||
+    p.version !== 1 ||
+    !Array.isArray(p.records) ||
+    p.records.length > 30 ||
+    !Array.isArray(p.unlocks) ||
+    !p.unlocks.every((x) => typeof x === "string" && x.length < 80) ||
+    typeof p.best !== "number" ||
+    !Number.isFinite(p.best)
+  )
+    return false;
+  return p.records.every(
+    (r) =>
+      obj(r) &&
+      [r.time, r.kills, r.level].every(
+        (n) => typeof n === "number" && Number.isFinite(n),
+      ) &&
+      CHARACTERS.some((c) => c.id === r.character) &&
+      ["standard", "endless"].includes(r.mode as string) &&
+      typeof r.date === "string" &&
+      r.date.length < 40 &&
+      (r.id === undefined || (typeof r.id === "string" && r.id.length < 100)),
+  );
+}
 export async function loadProfile() {
   try {
-    const p = await read<Profile>("profile");
-    if (
-      p?.version === 1 &&
-      Array.isArray(p.records) &&
-      p.records.length <= 30 &&
-      p.records.every(
-        (r) =>
-          Number.isFinite(r.time) &&
-          Number.isFinite(r.kills) &&
-          Number.isFinite(r.level) &&
-          CHARACTERS.some((c) => c.id === r.character) &&
-          ["standard", "endless"].includes(r.mode) &&
-          typeof r.date === "string" &&
-          r.date.length < 40,
-      ) &&
-      Array.isArray(p.unlocks) &&
-      p.unlocks.every((x) => typeof x === "string") &&
-      Number.isFinite(p.best)
-    )
-      return p;
+    const p = await read<unknown>("profile");
+    if (validProfile(p)) return p;
   } catch {
     /* Defaults. */
   }
