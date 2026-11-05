@@ -169,6 +169,28 @@ test("零星火完整战败后结算，刷新或重试不会重复记录", async
   expect(await records()).toHaveLength(1);
 });
 test("刷新已扣次的复活动画只完成一次，不重新扣次", async ({ page }) => {
+  // Observe rendered frames in-page: the remaining clip is shorter than a slow
+  // runner's test-process round trip, so a later current-state query can miss it.
+  await page.addInitScript(() => {
+    (window as any).reviveFrames = [];
+    new MutationObserver((records) => {
+      for (const record of records) {
+        const el = record.target;
+        if (
+          el instanceof HTMLCanvasElement &&
+          el.dataset.characterAction === "revive"
+        ) {
+          const frame = Number(el.dataset.characterFrame);
+          const frames = (window as any).reviveFrames as number[];
+          if (!frames.includes(frame)) frames.push(frame);
+        }
+      }
+    }).observe(document, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-character-action"],
+    });
+  });
   const w = new World(createRun("endless", "knight", 1605));
   w.s.revival!.earned = 2;
   w.s.revival!.remaining = 1;
@@ -181,11 +203,9 @@ test("刷新已扣次的复活动画只完成一次，不重新扣次", async ({
   w.s.player.regen = 0;
   w.s.fate!.base.regen = 0;
   await resume(page, w.s);
-  await expect(page.locator(".presentation-caption")).toContainText("星火汇聚");
-  await expect(page.locator("canvas")).toHaveAttribute(
-    "data-character-action",
-    "revive",
-  );
+  await expect
+    .poll(() => page.evaluate(() => (window as any).reviveFrames.length))
+    .toBeGreaterThanOrEqual(2);
   await expect(page.locator(".presentation-caption")).toHaveCount(0);
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "保存当前进度", exact: true }).click();
