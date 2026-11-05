@@ -373,7 +373,10 @@ function start(s: Run) {
   secondary = s.player.skills[1];
   manualPaused = false;
   focusBlocked = document.hidden;
-  s.recordId ||= crypto.randomUUID();
+  // getRandomValues also works on LAN HTTP development pages; randomUUID requires HTTPS.
+  s.recordId ||= Array.from(crypto.getRandomValues(new Uint32Array(4)), (n) =>
+    n.toString(16).padStart(8, "0"),
+  ).join("");
   ++saveRevision;
   world = new World(s);
   scene.setWorld(world);

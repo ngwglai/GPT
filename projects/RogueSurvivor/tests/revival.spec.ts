@@ -195,10 +195,18 @@ test("刷新已扣次的复活动画只完成一次，不重新扣次", async ({
 test("动作表能循环、主动施法、冲刺与移动切换，暂停不会推进帧", async ({
   page,
 }) => {
+  // LAN HTTP can expose getRandomValues without the secure-context UUID API.
+  await page.addInitScript(() =>
+    Object.defineProperty(crypto, "randomUUID", { value: undefined }),
+  );
   const w = new World(createRun("endless", "ranger", 1606));
   w.s.player.invincible = 999;
   w.s.player.level = 100;
   await resume(page, w.s);
+  expect(await page.evaluate(() => typeof crypto.randomUUID)).toBe("undefined");
+  await expect
+    .poll(async () => (await saved(page)).recordId)
+    .toMatch(/^[0-9a-f]{32}$/);
   const canvas = page.locator("canvas");
   await expect(canvas).toHaveAttribute(
     "data-character-texture",
