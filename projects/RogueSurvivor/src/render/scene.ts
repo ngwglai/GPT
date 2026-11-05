@@ -1,4 +1,4 @@
-import { CharacterAnimation } from "./characterAnimation";
+import { CharacterAnimation, MovementPose } from "./characterAnimation";
 import {
   animationId,
   CHARACTER_SHEETS,
@@ -25,6 +25,7 @@ export class GameScene extends Phaser.Scene {
   onFrame?: (dt: number) => void;
   onPause?: () => void;
   readonly characterAnimation = new CharacterAnimation();
+  private movementPose = new MovementPose();
   private lastPosition = { x: 1800, y: 1800 };
   private ground?: Phaser.GameObjects.TileSprite;
   private decoded = new Map<string, Promise<HTMLImageElement>>();
@@ -79,6 +80,7 @@ export class GameScene extends Phaser.Scene {
     this.world = w;
     void this.loadCharacterSheets(w.s.character);
     this.characterAnimation.reset();
+    this.movementPose.reset();
     this.lastPosition = { x: w.s.player.x, y: w.s.player.y };
     this.cx = w.s.player.x;
     this.cy = w.s.player.y;
@@ -292,6 +294,7 @@ export class GameScene extends Phaser.Scene {
   update(_time: number, delta: number) {
     if (!this.ready) return;
     const dt = Math.min(delta / 1000, 0.1);
+    let simulated = false;
     if (
       this.world &&
       !this.paused &&
@@ -303,6 +306,7 @@ export class GameScene extends Phaser.Scene {
       let steps = 0;
       while (this.accumulator >= 1 / 60 && steps++ < 6) {
         this.world.step(1 / 60, this.inputState());
+        simulated = true;
         this.queued = { dash: false, skills: [false, false, false] };
         this.accumulator -= 1 / 60;
       }
@@ -315,13 +319,14 @@ export class GameScene extends Phaser.Scene {
         p = s.player;
       const dx = p.x - this.lastPosition.x,
         dy = p.y - this.lastPosition.y;
+      this.movementPose.observe(dx, dy, simulated);
       if (!this.paused || inPresentation(s) || s.phase === "dead")
         this.characterAnimation.update(
           this.paused ? 0 : dt,
           s.phase,
           ensureRevival(s).elapsed,
-          Math.hypot(dx, dy) > 0.001,
-          dx,
+          this.movementPose.moving,
+          this.movementPose.x,
           this.world.poseEvents,
         );
       this.lastPosition = { x: p.x, y: p.y };

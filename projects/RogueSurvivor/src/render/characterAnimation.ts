@@ -86,3 +86,18 @@ export class CharacterAnimation {
         );
   }
 }
+
+/** Keep the last physical observation between fixed updates on high refresh displays. */
+export class MovementPose {
+  moving = false;
+  x = 0;
+  observe(dx: number, dy: number, simulated: boolean) {
+    if (!simulated) return;
+    this.moving = Math.hypot(dx, dy) > 0.001;
+    this.x = dx;
+  }
+  reset() {
+    this.moving = false;
+    this.x = 0;
+  }
+}

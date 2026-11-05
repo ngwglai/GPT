@@ -12,7 +12,7 @@
     ]
   },
   "unit": {
-    "passed": 272,
+    "passed": 275,
     "failed": 0
   },
   "build": "passed (TypeScript + Vite)",
@@ -54,5 +54,10 @@
     "pageErrors": 0,
     "note": "Single cloud software-rendering sample, not a balance or performance limit"
   },
-  "longStressExecuted": false
+  "longStressExecuted": false,
+  "highRefreshRegressionHz": [
+    60,
+    120,
+    144
+  ]
 }

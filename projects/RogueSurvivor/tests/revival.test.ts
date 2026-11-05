@@ -9,7 +9,10 @@ import {
   rewardBossLife,
 } from "../src/core/revival";
 import { validateRun } from "../src/services/storage";
-import { CharacterAnimation } from "../src/render/characterAnimation";
+import {
+  CharacterAnimation,
+  MovementPose,
+} from "../src/render/characterAnimation";
 import {
   CHARACTER_ACTIONS,
   actionDuration,
@@ -285,3 +288,41 @@ it("auto attacks never request casting; active casts do", () => {
   expect(w.cast(0, { x: 2100, y: 1800 })).toBe(true);
   expect(w.poseEvents.cast).toBe(1);
 });
+
+it.each([60, 120, 144])(
+  "%s Hz rendering preserves continuous run frames between 60 Hz physical steps",
+  (fps) => {
+    const motion = new MovementPose(),
+      animation = new CharacterAnimation();
+    const frames = new Set<number>();
+    const events = { cast: 0, dash: 0, hurt: 0 };
+    let accumulator = 0,
+      x = 0,
+      lastX = 0;
+    for (let frame = 0; frame < fps * 2; frame++) {
+      accumulator += 1 / fps;
+      let simulated = false;
+      while (accumulator >= 1 / 60) {
+        x += 4;
+        accumulator -= 1 / 60;
+        simulated = true;
+      }
+      motion.observe(x - lastX, 0, simulated);
+      lastX = x;
+      animation.update(1 / fps, "playing", 0, motion.moving, motion.x, events);
+      if (frame > fps / 2) {
+        expect(animation.action).toBe("run");
+        frames.add(animation.frame());
+      }
+    }
+    expect(frames.size).toBe(8);
+    motion.observe(0, 0, false);
+    expect(motion.moving).toBe(true);
+    motion.observe(0, 0, true);
+    expect(motion.moving).toBe(false);
+    animation.update(1 / fps, "playing", 0, motion.moving, motion.x, events);
+    expect(animation.action).toBe("idle");
+    motion.reset();
+    expect(motion.x).toBe(0);
+  },
+);
