@@ -31,6 +31,7 @@ export class GameScene extends Phaser.Scene {
   private decoded = new Map<string, Promise<HTMLImageElement>>();
   private builtins?: Promise<void>;
   private characterSheets = new Map<string, Promise<void>>();
+  private characterReady = new Set<string>();
   private background!: Phaser.GameObjects.Graphics;
   private graphics!: Phaser.GameObjects.Graphics;
   private danger!: Phaser.GameObjects.Graphics;
@@ -123,8 +124,8 @@ export class GameScene extends Phaser.Scene {
     ).then(() => {
       this.needsPaint = true;
     });
-    await this.builtins;
-    if (this.world) await this.loadCharacterSheets(this.world.s.character);
+    // Custom edits are independent of unrelated default-image downloads.
+    if (this.world) void this.loadCharacterSheets(this.world.s.character);
     const rev = ++this.assetRevision;
     this.ground?.setVisible(false).setTexture("map.ground");
     for (const sprite of this.sprites)
@@ -176,6 +177,7 @@ export class GameScene extends Phaser.Scene {
               }
             }),
         ).then(() => {
+          this.characterReady.add(character);
           this.needsPaint = true;
         }),
       );
@@ -298,7 +300,9 @@ export class GameScene extends Phaser.Scene {
     if (
       this.world &&
       !this.paused &&
-      ["dying", "reviving"].includes(this.world.s.phase)
+      ["dying", "reviving"].includes(this.world.s.phase) &&
+      (this.characterReady.has(this.world.s.character) ||
+        this.textures.exists("custom:player." + this.world.s.character))
     )
       this.world.advancePresentation(Math.min(delta / 1000, 0.25));
     if (this.world && !this.paused && this.world.s.phase === "playing") {

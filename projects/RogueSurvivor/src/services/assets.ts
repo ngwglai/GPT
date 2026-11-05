@@ -110,10 +110,17 @@ export function validateMeta(a: Asset) {
   )
     throw new Error("动画配置无效：最多 64 帧，帧率 1–30。");
 }
+export const IMAGE_LOAD_TIMEOUT_MS = 8_000;
 export function decodeImage(data: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
+    const timeout = setTimeout(() => {
+      image.onload = image.onerror = null;
+      image.removeAttribute("src");
+      reject(new Error("图片加载超时，已保留默认资源。"));
+    }, IMAGE_LOAD_TIMEOUT_MS);
     image.onload = () => {
+      clearTimeout(timeout);
       if (
         image.width < 1 ||
         image.height < 1 ||
@@ -125,7 +132,10 @@ export function decodeImage(data: string): Promise<HTMLImageElement> {
       }
       resolve(image);
     };
-    image.onerror = () => reject(new Error("图片解码失败，已保留默认资源。"));
+    image.onerror = () => {
+      clearTimeout(timeout);
+      reject(new Error("图片解码失败，已保留默认资源。"));
+    };
     image.src = data;
   });
 }

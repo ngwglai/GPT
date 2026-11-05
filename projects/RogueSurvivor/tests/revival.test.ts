@@ -1,4 +1,4 @@
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
 import { createRun } from "../src/core/create";
 import { World } from "../src/core/world";
 import { spawn, director } from "../src/core/director";
@@ -326,3 +326,25 @@ it.each([60, 120, 144])(
     expect(motion.x).toBe(0);
   },
 );
+
+it("a stalled image request times out and releases its source for fallback", async () => {
+  const { decodeImage, IMAGE_LOAD_TIMEOUT_MS } =
+    await import("../src/services/assets");
+  const remove = vi.fn();
+  class HangingImage {
+    src = "";
+    removeAttribute = remove;
+  }
+  vi.useFakeTimers();
+  vi.stubGlobal("Image", HangingImage);
+  try {
+    const promise = decodeImage("https://example.invalid/late.webp");
+    const result = expect(promise).rejects.toThrow("图片加载超时");
+    await vi.advanceTimersByTimeAsync(IMAGE_LOAD_TIMEOUT_MS);
+    await result;
+    expect(remove).toHaveBeenCalledWith("src");
+  } finally {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  }
+});

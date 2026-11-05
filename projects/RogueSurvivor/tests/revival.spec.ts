@@ -191,6 +191,15 @@ test("刷新已扣次的复活动画只完成一次，不重新扣次", async ({
       attributeFilter: ["data-character-action"],
     });
   });
+  await page.route("**/assets/v1.6/characters/knight/*.webp", async (route) => {
+    if (
+      /\/(idle|run|dash|cast|hurt|defeat|revive)\.webp$/.test(
+        route.request().url(),
+      )
+    )
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+    await route.continue();
+  });
   const w = new World(createRun("endless", "knight", 1605));
   w.s.revival!.earned = 2;
   w.s.revival!.remaining = 1;
@@ -280,6 +289,10 @@ test("七张动作贴图加载失败时回退静态角色，战斗仍运行", as
     "run",
   );
   await page.keyboard.up("KeyD");
+  w.s.player.invincible = 0;
+  w.hurt(1e9);
+  await resume(page, w.s);
+  await expect(page.getByRole("heading", { name: "此行落幕" })).toBeVisible();
 });
 test("正式首领奖励一次星火，放弃复活与旧检查点重放不重复结算", async ({
   page,

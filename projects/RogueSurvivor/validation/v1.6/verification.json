@@ -12,7 +12,7 @@
     ]
   },
   "unit": {
-    "passed": 275,
+    "passed": 276,
     "failed": 0
   },
   "build": "passed (TypeScript + Vite)",
@@ -59,5 +59,15 @@
     60,
     120,
     144
-  ]
+  ],
+  "loadingRegression": {
+    "delayedCharacterSheetsMs": 1200,
+    "unrelatedDefaultImageHeld": true,
+    "bothCasesFailedBeforeFix": true,
+    "imageTimeoutMs": 8000,
+    "afterFixTargetedBrowser": {
+      "passed": 17,
+      "failed": 0
+    }
+  }
 }
