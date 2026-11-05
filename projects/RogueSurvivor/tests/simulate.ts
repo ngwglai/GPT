@@ -58,6 +58,14 @@ export function simulate(
     w.s.phase !== "dead" &&
     w.s.phase !== "victory"
   ) {
+    if (w.s.phase === "dying" || w.s.phase === "reviving") {
+      w.advancePresentation(0.05);
+      continue;
+    }
+    if (w.s.phase === "revive") {
+      w.revive();
+      continue;
+    }
     if (
       shuffleAt !== undefined &&
       w.s.phase === "playing" &&

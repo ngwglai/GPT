@@ -8,7 +8,7 @@ export const CHARACTERS = [
     hp: 110,
     speed: 230,
     skill: "fire" as SkillId,
-    desc: "温柔灵动的森林精灵。花藤弓自动锁敌，以灵巧走位守护伙伴。",
+    desc: "活泼轻盈的逐星少女。金色月弓自动锁敌，以灵巧走位守护伙伴。",
     color: "#a9eccb",
   },
   {
@@ -19,7 +19,7 @@ export const CHARACTERS = [
     hp: 155,
     speed: 205,
     skill: "ice" as SkillId,
-    desc: "勇敢的珊瑚星剑士。挥动缎带星剑，以宽幅斩击和额外生命迎战怪潮。",
+    desc: "温柔可靠的星盾骑士。挥动银色短剑，以宽幅斩击和额外生命迎战怪潮。",
     color: "#ffc383",
   },
   {

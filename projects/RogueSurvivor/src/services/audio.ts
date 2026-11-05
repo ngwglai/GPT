@@ -60,7 +60,7 @@ export class AudioEngine {
     this.mixer?.setVolume(this.settings.sfx);
     this.mixer?.batch(kinds);
   }
-  update(_dt: number, state: boolean | MusicState) {
+  update(_dt: number, state: boolean | MusicState, duck = 1) {
     this.mixer?.setVolume(this.settings.sfx);
     const playing = state === true || state === "playing";
     this.active =
@@ -78,7 +78,10 @@ export class AudioEngine {
     }
     const music = this.music;
     if (!music) return;
-    music.volume = Math.max(0, Math.min(1, this.settings.music));
+    music.volume = Math.max(
+      0,
+      Math.min(1, this.settings.music * Math.max(0, Math.min(1, duck))),
+    );
     if (!this.active) {
       music.pause();
       if (state === "stopped") {

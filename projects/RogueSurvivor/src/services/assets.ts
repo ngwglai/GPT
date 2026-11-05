@@ -1,3 +1,7 @@
+import {
+  ACTION_NAMES,
+  type CharacterAction,
+} from "../data/characterAnimations";
 import { WORLD_ASSET_NAMES } from "../data/worldVisuals";
 import { VISUALS } from "../data/visuals";
 import { CHARACTERS, ENEMIES, SKILLS, WEAPONS } from "../data/content";
@@ -36,6 +40,9 @@ export const ASSET_IDS = [
     .map((id) => ({
       id,
       name:
+        (id.startsWith("animation.")
+          ? `角色动作 · ${CHARACTERS.find((c) => c.id === id.split(".")[1])?.name} · ${ACTION_NAMES[id.split(".")[2] as CharacterAction]}`
+          : undefined) ||
         WORLD_ASSET_NAMES[id] ||
         (id.startsWith("portrait.")
           ? "角色立绘 · " + CHARACTERS.find((c) => id.endsWith(c.id))?.name

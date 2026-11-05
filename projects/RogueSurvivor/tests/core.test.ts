@@ -352,9 +352,12 @@ describe("director, enemies and victory", () => {
     const w = make();
     w.s.player.invincible = 0;
     w.hurt(999);
-    expect(w.s.phase).toBe("dead");
+    expect(w.s.phase).toBe("dying");
     const t = w.s.time;
     w.step(0.05, input);
+    expect(w.s.time).toBe(t);
+    for (let i = 0; i < 40; i++) w.advancePresentation(0.05);
+    expect(w.s.phase).toBe("dead");
     expect(w.s.time).toBe(t);
   });
 });

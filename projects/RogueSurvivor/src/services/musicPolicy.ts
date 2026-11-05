@@ -15,7 +15,15 @@ export function musicState(
   )
     return "stopped";
   if (manual || hidden) return "paused";
-  return ["game", "upgrade", "build", "codex"].includes(screen)
+  return [
+    "game",
+    "upgrade",
+    "build",
+    "codex",
+    "dying",
+    "revive",
+    "reviving",
+  ].includes(screen)
     ? "playing"
     : "paused";
 }

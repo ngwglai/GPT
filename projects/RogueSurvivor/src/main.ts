@@ -1,3 +1,5 @@
+import { ensureRevival, inPresentation } from "./core/revival";
+import { CHARACTER_ACTIONS, animationId } from "./data/characterAnimations";
 import { ensureWaves, waveRemaining, bossesDue } from "./core/waves";
 import {
   difficulty,
@@ -48,6 +50,7 @@ import type {
 import {
   loadRun,
   saveRun,
+  finishRun,
   loadSettings,
   loadProfile,
   write,
@@ -118,8 +121,19 @@ function notify(message: string) {
   clearTimeout(toastTimer);
   toastTimer = window.setTimeout(() => toast.classList.remove("show"), 4500);
 }
+function characterPreview(id: string) {
+  if (assetPack.assets["player." + id])
+    return `<div class="character-preview">${img("player." + id, "preview-static")}</div>`;
+  const sheet = animationId(id, "idle"),
+    custom = assetPack.assets[sheet];
+  if (custom && !custom.frames)
+    return `<div class="character-preview">${img(sheet, "preview-static")}</div>`;
+  const frames = custom?.frames || 8,
+    fps = custom?.fps || 8;
+  return `<div class="character-preview" style="--frames:${frames};--duration:${frames / fps}s">${img(sheet, "idle-sheet")}</div>`;
+}
 function header() {
-  return `<header><a href="#" data-action="home" class="brand"><span class="brand-star">✦</span><span>星烬远征<small>ROGUE SURVIVOR</small></span></a><nav>${button("codex", "远征图鉴")}${button("records", "远征记录")}${button("assets", "资源工坊")}${button("settings", "设置", "nav-setting")}</nav><span class="version">离线单人 · v1.5</span></header>`;
+  return `<header><a href="#" data-action="home" class="brand"><span class="brand-star">✦</span><span>星烬远征<small>ROGUE SURVIVOR</small></span></a><nav>${button("codex", "远征图鉴")}${button("records", "远征记录")}${button("assets", "资源工坊")}${button("settings", "设置", "nav-setting")}</nav><span class="version">离线单人 · v1.6</span></header>`;
 }
 function shell(content: string, cls = "") {
   document.documentElement.style.setProperty(
@@ -149,14 +163,14 @@ function home() {
   demo.s.player.y = 1800;
   scene.setWorld(demo);
   shell(
-    `<main class="landing"><section class="hero-copy"><div class="eyebrow"><span></span> 波次远征 · 清怪前行，迎战星潮</div><h1>于星烬中<br>再赴<span>远征。</span></h1><p class="intro">跟随星光少女，走进森林、洞窟、糖果庭院与月光遗迹。<br>收集卡牌、闪避危险，让每一次相遇都成为新的冒险。</p><div class="mode-grid"><button data-action="mode-standard" class="mode-card ${mode === "standard" ? "selected" : ""}"><span class="mode-symbol">◈</span><span><b>星林远征</b><small>标准模式 · 第 20 波最终战</small></span><i>${mode === "standard" ? "●" : "○"}</i></button><button data-action="mode-endless" class="mode-card ${mode === "endless" ? "selected" : ""}"><span class="mode-symbol">∞</span><span><b>无尽星夜</b><small>无尽模式 · 挑战生存纪录</small></span><i>${mode === "endless" ? "●" : "○"}</i></button></div><div class="start-row">${button("select", "开启远征 <span>↗</span>", "primary start")}${saved && ["playing", "upgrade"].includes(saved.phase) ? button("continue", `继续旅程 <small>${time(saved.time)} · 等级 ${saved.player.level}</small>`, "continue") : ""}</div>${saveError ? `<p class="error">${esc(saveError)}</p>${button("backup", "恢复上次备份", "text-button")}` : ""}<div class="controls-line"><kbd>W A S D</kbd> 移动 <span>·</span> <kbd>Q E R</kbd> 技能 <span>·</span> <kbd>空格</kbd> 闪避</div></section><section class="hero-art" aria-label="原创星光少女探索魔法森林的插画"><div class="orbit o1"></div><div class="orbit o2"></div><div class="moon">✧</div><div class="star s1">✦</div><div class="star s2">✧</div><div class="star s3">✦</div><svg class="landscape" viewBox="0 0 600 500" aria-hidden="true"><ellipse cx="300" cy="350" rx="245" ry="110" fill="#173c37"/><ellipse cx="300" cy="346" rx="211" ry="92" fill="#285244"/><path d="M90 340 172 293 289 360 403 307 527 355 417 415 263 435 123 391Z" fill="#39644d"/><path d="m98 300 20-145 29 134m-18 19 42-201 40 192m273 11-29-161-36 171m60-4 29-208 30 231" fill="#20483e" stroke="#4d7957" stroke-width="3"/><path d="m165 365 87-36 120 72" fill="none" stroke="#739374" stroke-width="8" opacity=".25"/><g fill="#a4d5a6"><circle cx="97" cy="351" r="3"/><circle cx="433" cy="389" r="3"/><circle cx="337" cy="330" r="3"/></g></svg>${img("portrait.ranger", "hero-ranger")}${img("enemy.crawler", "hero-enemy enemy-a")}${img("enemy.archer", "hero-enemy enemy-b")}${img("map.rock", "hero-rock")}${img("map.flower", "hero-flower")}<div class="art-label"><span class="live-dot"></span> 第一章 · 微光之森<small>在黑夜降临之前，找到属于你的星光。</small></div></section></main><section class="home-bottom"><div><span>01 / 自由战斗</span><b>自动出击，专注走位</b></div><div><span>02 / 随机构筑</span><b>每一次升级，新的可能</b></div><div><span>03 / 无尽挑战</span><b>活得更久，走得更远</b></div><div class="best"><small>最长生存纪录</small><strong>${time(profile.best)}</strong></div></section>`,
+    `<main class="landing"><section class="hero-copy"><div class="eyebrow"><span></span> 星火重燃 · 倒下之后，仍可再次启程</div><h1>于星烬中<br>再赴<span>远征。</span></h1><p class="intro">跟随星光少女，走进森林、洞窟、糖果庭院与月光遗迹。<br>收集卡牌、闪避危险，让每一次相遇都成为新的冒险。</p><div class="mode-grid"><button data-action="mode-standard" class="mode-card ${mode === "standard" ? "selected" : ""}"><span class="mode-symbol">◈</span><span><b>星林远征</b><small>标准模式 · 第 20 波最终战</small></span><i>${mode === "standard" ? "●" : "○"}</i></button><button data-action="mode-endless" class="mode-card ${mode === "endless" ? "selected" : ""}"><span class="mode-symbol">∞</span><span><b>无尽星夜</b><small>无尽模式 · 挑战生存纪录</small></span><i>${mode === "endless" ? "●" : "○"}</i></button></div><div class="start-row">${button("select", "开启远征 <span>↗</span>", "primary start")}${saved && ["playing", "upgrade", "dying", "revive", "reviving"].includes(saved.phase) ? button("continue", `继续旅程 <small>${time(saved.time)} · 等级 ${saved.player.level}</small>`, "continue") : ""}</div>${saveError ? `<p class="error">${esc(saveError)}</p>${button("backup", "恢复上次备份", "text-button")}` : ""}<div class="controls-line"><kbd>W A S D</kbd> 移动 <span>·</span> <kbd>Q E R</kbd> 技能 <span>·</span> <kbd>空格</kbd> 闪避</div></section><section class="hero-art" aria-label="原创星光少女探索魔法森林的插画"><div class="orbit o1"></div><div class="orbit o2"></div><div class="moon">✧</div><div class="star s1">✦</div><div class="star s2">✧</div><div class="star s3">✦</div><svg class="landscape" viewBox="0 0 600 500" aria-hidden="true"><ellipse cx="300" cy="350" rx="245" ry="110" fill="#173c37"/><ellipse cx="300" cy="346" rx="211" ry="92" fill="#285244"/><path d="M90 340 172 293 289 360 403 307 527 355 417 415 263 435 123 391Z" fill="#39644d"/><path d="m98 300 20-145 29 134m-18 19 42-201 40 192m273 11-29-161-36 171m60-4 29-208 30 231" fill="#20483e" stroke="#4d7957" stroke-width="3"/><path d="m165 365 87-36 120 72" fill="none" stroke="#739374" stroke-width="8" opacity=".25"/><g fill="#a4d5a6"><circle cx="97" cy="351" r="3"/><circle cx="433" cy="389" r="3"/><circle cx="337" cy="330" r="3"/></g></svg>${img("portrait.ranger", "hero-ranger")}${img("enemy.crawler", "hero-enemy enemy-a")}${img("enemy.archer", "hero-enemy enemy-b")}${img("map.rock", "hero-rock")}${img("map.flower", "hero-flower")}<div class="art-label"><span class="live-dot"></span> 第一章 · 微光之森<small>在黑夜降临之前，找到属于你的星光。</small></div></section></main><section class="home-bottom"><div><span>01 / 自由战斗</span><b>自动出击，专注走位</b></div><div><span>02 / 随机构筑</span><b>每一次升级，新的可能</b></div><div><span>03 / 无尽挑战</span><b>活得更久，走得更远</b></div><div class="best"><small>最长生存纪录</small><strong>${time(profile.best)}</strong></div></section>`,
     "home",
   );
 }
 function selection() {
   screen = "select";
   shell(
-    `<main class="page"><div class="page-heading"><div><div class="eyebrow">准备出发 / ${mode === "standard" ? "星林远征" : "无尽星夜"}</div><h2>选择你的星光伙伴</h2><p>武器自动攻击。主动技能与闪避的时机，由你决定。</p></div>${button("home", "← 返回", "subtle")}</div><div class="character-grid">${CHARACTERS.map((c) => `<button data-action="character-${c.id}" class="character-card ${character === c.id ? "selected" : ""}"><div class="portrait">${img("portrait." + c.id, "portrait-img")}<span>${character === c.id ? "已选择" : "选择角色"}</span></div><small>${c.role}</small><h3>${c.name}</h3><p>${c.desc}</p><div class="character-meta">生命 ${c.hp}<span>初始 · ${WEAPONS[c.weapon].name}</span></div></button>`).join("")}</div><div class="loadout"><div><label for="primary-skill">Q · 主动攻击</label><select id="primary-skill">${(["fire", "ice", "lance"] as SkillId[]).map((k) => `<option value="${k}" ${primary === k ? "selected" : ""}>${SKILLS[k].name} — ${SKILLS[k].desc}</option>`).join("")}</select></div><div><label for="secondary-skill">E · 生存技能</label><select id="secondary-skill">${(["ward", "bloom"] as SkillId[]).map((k) => `<option value="${k}" ${secondary === k ? "selected" : ""}>${SKILLS[k].name} — ${SKILLS[k].desc}</option>`).join("")}</select></div><div class="ultimate">${img("skill.storm")}<span><b>R · 星落终章</b><small>大范围连环星爆 · 清除弹幕</small></span></div></div><section class="map-selection"><h3>选择冒险地图</h3><div class="map-grid">${Object.values(
+    `<main class="page"><div class="page-heading"><div><div class="eyebrow">准备出发 / ${mode === "standard" ? "星林远征" : "无尽星夜"}</div><h2>选择你的星光伙伴</h2><p>武器自动攻击。主动技能与闪避的时机，由你决定。</p></div>${button("home", "← 返回", "subtle")}</div><div class="character-grid">${CHARACTERS.map((c) => `<button data-action="character-${c.id}" class="character-card ${character === c.id ? "selected" : ""}"><div class="portrait">${img("portrait." + c.id, "portrait-img")}${characterPreview(c.id)}<span>${character === c.id ? "已选择" : "选择角色"}</span></div><small>${c.role}</small><h3>${c.name}</h3><p>${c.desc}</p><div class="character-meta">生命 ${c.hp}<span>初始 · ${WEAPONS[c.weapon].name}</span></div></button>`).join("")}</div><div class="loadout"><div><label for="primary-skill">Q · 主动攻击</label><select id="primary-skill">${(["fire", "ice", "lance"] as SkillId[]).map((k) => `<option value="${k}" ${primary === k ? "selected" : ""}>${SKILLS[k].name} — ${SKILLS[k].desc}</option>`).join("")}</select></div><div><label for="secondary-skill">E · 生存技能</label><select id="secondary-skill">${(["ward", "bloom"] as SkillId[]).map((k) => `<option value="${k}" ${secondary === k ? "selected" : ""}>${SKILLS[k].name} — ${SKILLS[k].desc}</option>`).join("")}</select></div><div class="ultimate">${img("skill.storm")}<span><b>R · 星落终章</b><small>大范围连环星爆 · 清除弹幕</small></span></div></div><section class="map-selection"><h3>选择冒险地图</h3><div class="map-grid">${Object.values(
       MAPS,
     )
       .map(
@@ -165,14 +179,14 @@ function selection() {
       )
       .join(
         "",
-      )}</div></section><div class="launch-row"><p>${saved && ["playing", "upgrade"].includes(saved.phase) ? "开始新远征将替换当前继续存档，并保留一份备份。" : "推荐佩戴耳机。按 ESC 可随时暂停、设置与保存。"}</p>${button("launch", mapId === "forest" ? "踏入星林 →" : `前往${MAPS[mapId].name} →`, "primary")}</div></main>`,
+      )}</div></section><div class="launch-row"><p>${saved && ["playing", "upgrade", "dying", "revive", "reviving"].includes(saved.phase) ? "开始新远征将替换当前继续存档，并保留一份备份。" : "推荐佩戴耳机。按 ESC 可随时暂停、设置与保存。"}</p>${button("launch", mapId === "forest" ? "踏入星林 →" : `前往${MAPS[mapId].name} →`, "primary")}</div></main>`,
   );
 }
 function hud() {
   scene.showWorld = true;
   scene.needsPaint = true;
   screen = "game";
-  app.innerHTML = `<div class="hud"><div class="hud-top"><div class="player-hud">${img("avatar." + world!.s.character)}<div><div class="player-name">${CHARACTERS.find((c) => c.id === world!.s.character)!.name} <span id="level"></span></div><div class="health"><div id="health-fill"></div><span id="health-label"></span></div><small id="shield"></small></div></div><div class="run-clock"><b id="clock">00:00</b><span>${MAPS[environment(world!.s).mapId].name} · ${world!.s.mode === "standard" ? "标准远征" : "无尽星夜"}</span></div><div class="hud-actions"><span id="kills"></span>${button("build", "当前构筑", "hud-button")}${button("pause", "Ⅱ 暂停", "hud-button")}</div></div><div class="xp"><div id="xp-fill"></div></div><div id="wave-hud" aria-live="polite"></div><div id="boss-hud"></div><div id="event"></div><div class="hud-bottom"><div id="weapons" class="weapon-hud"></div><div class="skills">${world!.s.player.skills.map((id, i) => `<div class="skill-slot" title="${SKILLS[id].desc}">${img("skill." + id)}<div class="cooldown-shade" id="shade-${i}"></div><kbd>${["Q", "E", "R"][i]}</kbd><b id="cd-${i}"></b><span>${SKILLS[id].name}</span></div>`).join("")}<div class="skill-slot dash-slot"><span class="dash-icon">➶</span><kbd>空格</kbd><b id="dash-cd"></b><span>闪避</span></div></div><div class="hint">鼠标瞄准 · 自动攻击<br><span id="budget"></span></div></div><div id="performance"></div></div>`;
+  app.innerHTML = `<div class="hud"><div class="hud-top"><div class="player-hud">${img("avatar." + world!.s.character)}<div><div class="player-name">${CHARACTERS.find((c) => c.id === world!.s.character)!.name} <span id="level"></span></div><div class="health"><div id="health-fill"></div><span id="health-label"></span></div><small id="shield"></small></div></div><div class="run-clock"><b id="clock">00:00</b><span>${MAPS[environment(world!.s).mapId].name} · ${world!.s.mode === "standard" ? "标准远征" : "无尽星夜"}</span></div><div class="hud-actions"><span id="spark-count"></span><span id="kills"></span>${button("build", "当前构筑", "hud-button")}${button("pause", "Ⅱ 暂停", "hud-button")}</div></div><div class="xp"><div id="xp-fill"></div></div><div id="wave-hud" aria-live="polite"></div><div id="boss-hud"></div><div id="event"></div><div class="hud-bottom"><div id="weapons" class="weapon-hud"></div><div class="skills">${world!.s.player.skills.map((id, i) => `<div class="skill-slot" title="${SKILLS[id].desc}">${img("skill." + id)}<div class="cooldown-shade" id="shade-${i}"></div><kbd>${["Q", "E", "R"][i]}</kbd><b id="cd-${i}"></b><span>${SKILLS[id].name}</span></div>`).join("")}<div class="skill-slot dash-slot"><span class="dash-icon">➶</span><kbd>空格</kbd><b id="dash-cd"></b><span>闪避</span></div></div><div class="hint">鼠标瞄准 · 自动攻击<br><span id="budget"></span></div></div><div id="performance"></div></div>`;
   updateHud();
 }
 function updateHud() {
@@ -193,6 +207,7 @@ function updateHud() {
   document.getElementById("xp-fill")!.style.width =
     `${Math.min(100, (p.xp / xpNeeded(p.level)) * 100)}%`;
   set("clock", time(s.time));
+  set("spark-count", `✦ 星火 × ${ensureRevival(s).remaining}`);
   const wave = ensureWaves(s),
     queued = Math.max(0, bossesDue(s) - s.bossIndex);
   set(
@@ -272,7 +287,19 @@ function pause() {
     results();
     return;
   }
-  if (!world || !["game", "upgrade", "build", "codex"].includes(screen)) return;
+  if (
+    !world ||
+    ![
+      "game",
+      "upgrade",
+      "build",
+      "codex",
+      "dying",
+      "revive",
+      "reviving",
+    ].includes(screen)
+  )
+    return;
   manualPaused = true;
   document.querySelector(".overlay")?.remove();
   audio.update(0, "paused");
@@ -339,24 +366,27 @@ async function saveCurrent(show = true) {
   }
 }
 function start(s: Run) {
+  mode = s.mode;
+  character = s.character;
+  mapId = environment(s).mapId;
+  primary = s.player.skills[0];
+  secondary = s.player.skills[1];
   manualPaused = false;
   focusBlocked = document.hidden;
+  s.recordId ||= crypto.randomUUID();
+  ++saveRevision;
   world = new World(s);
   scene.setWorld(world);
   scene.paused = false;
   lastPhase = "playing";
   lastSave = s.time;
-  hud();
-  if (s.phase === "upgrade") upgrade();
+  showRunState();
+  void saveCurrent(false);
   audio.setMap(environment(s).mapId, true);
   audio.unlock();
 }
-async function record() {
-  if (!world) return;
-  const s = world.s;
-  const terminalSave = saveCurrent(false);
-  profile.best = Math.max(profile.best, s.time);
-  profile.records.unshift({
+function recordEntry(s: Run) {
+  return {
     mode: s.mode,
     time: s.time,
     kills: s.stats.kills,
@@ -364,27 +394,64 @@ async function record() {
     victory: s.phase === "victory",
     date: new Date().toISOString().slice(0, 10),
     character: s.character,
-  });
-  profile.records = profile.records.slice(0, 30);
-  if (s.stats.bosses && !profile.unlocks.includes("首领猎人"))
-    profile.unlocks.push("首领猎人");
-  if (s.phase === "victory" && !profile.unlocks.includes("星林守护者"))
-    profile.unlocks.push("星林守护者");
-  if (s.time >= 3600 && !profile.unlocks.includes("长夜行者"))
-    profile.unlocks.push("长夜行者");
+  };
+}
+async function record() {
+  if (!world) return;
+  const snapshot = structuredClone(world.s),
+    revision = ++saveRevision;
+  saved = snapshot;
   try {
-    await write("profile", profile);
+    const result = await finishRun(snapshot, recordEntry(snapshot));
+    profile = result.profile;
+    if (revision === saveRevision && world?.s.recordId === snapshot.recordId) {
+      world.s.recorded = result.run.recorded;
+      saved = result.run;
+    }
   } catch (e) {
     notify((e as Error).message);
   }
-  await terminalSave;
 }
+function showRunState() {
+  if (!world) return;
+  lastPhase = world.s.phase;
+  if (lastPhase === "upgrade") {
+    upgrade();
+    return;
+  }
+  if (lastPhase === "dead" || lastPhase === "victory") {
+    results();
+    return;
+  }
+  hud();
+  if (manualPaused || focusBlocked || document.hidden) {
+    pause();
+    return;
+  }
+  scene.paused = false;
+  if (inPresentation(world.s)) {
+    screen = world.s.phase;
+    if (screen === "revive") {
+      modal(
+        `<div class="eyebrow">仍有一缕星光，等待你的回应</div><h2>星火尚未熄灭</h2><p>剩余复活次数：<strong>${ensureRevival(world.s).remaining}</strong></p><p>恢复50%生命，保留本波与构筑；动画结束后获得3秒保护。</p><div class="result-actions">${button("revive-confirm", "重新点燃星火", "primary")}${button("revive-decline", "结束本次远征", "subtle")}</div>`,
+        "revival-choice",
+      );
+    } else {
+      app.insertAdjacentHTML(
+        "beforeend",
+        `<div class="presentation-caption">${screen === "dying" ? "星光渐息……" : "星火汇聚，重新启程。"}</div>`,
+      );
+    }
+  }
+}
+
 function results() {
   const s = world!.s,
     won = s.phase === "victory";
+  const life = ensureRevival(s);
   screen = "result";
   audio.update(0, "stopped");
-  audio.effect(won ? "victory" : "failure");
+  if (won || !life.deaths) audio.effect(won ? "victory" : "failure");
   scene.paused = true;
   shell(
     `<main class="page result"><div class="eyebrow">${won ? "星林重归宁静" : "星火未熄，旅程未尽"}</div><div class="result-star">${won ? "✦" : "✧"}</div><h1>${won ? "远征告捷" : "此行落幕"}</h1><p>${won ? "你守护了这片魔法世界。前方，仍有无尽的星夜。" : "将这次领悟带往下一场远征。"}</p><div class="stat-grid"><div><small>生存时间</small><b>${time(s.time)}</b></div><div><small>击败敌人</small><b>${s.stats.kills}</b></div><div><small>角色等级</small><b>${s.player.level}</b></div><div><small>总伤害</small><b>${Math.round(s.stats.damage).toLocaleString()}</b></div></div><div class="result-details"><section><h3>本局构筑</h3><div class="build-chips">${Object.entries(
@@ -405,7 +472,7 @@ function results() {
       )
       .join(
         "",
-      )}<p>首领 ${s.stats.bosses} · 承受伤害 ${Math.round(s.stats.taken)} · 恢复 ${Math.round(s.stats.healed)}</p></section></div><div class="result-actions">${won ? button("endless", "继续无尽星夜", "primary") : button("retry", "再启远征", "primary")}${button("home", "返回营地")}</div></main>`,
+      )}<p>星火：获得 ${life.earned} · 使用 ${life.used} · 剩余 ${life.remaining}</p><p>首领 ${s.stats.bosses} · 承受伤害 ${Math.round(s.stats.taken)} · 恢复 ${Math.round(s.stats.healed)}</p></section></div><div class="result-actions">${won ? button("endless", "继续无尽星夜", "primary") : button("retry", "再启远征", "primary")}${button("home", "返回营地")}</div></main>`,
   );
 }
 function records() {
@@ -444,6 +511,10 @@ function assetManager() {
   );
 }
 function back() {
+  if (world && inPresentation(world.s) && !manualPaused) {
+    showRunState();
+    return;
+  }
   if (world && (world.s.phase === "dead" || world.s.phase === "victory")) {
     results();
     return;
@@ -513,6 +584,32 @@ async function action(id: string) {
   audio.unlock();
   if (busy) return;
   audio.effect("ui");
+  if (id === "revive-confirm" || id === "revive-decline") {
+    if (!world || world.s.phase !== "revive") return;
+    busy = true;
+    try {
+      const previous = structuredClone(world.s);
+      const changed =
+        id === "revive-confirm" ? world.revive() : world.declineRevival();
+      if (!changed) return;
+      scene.paused = true;
+      if (!(await saveCurrent(false))) {
+        world.s = previous;
+        saved = previous;
+        world.bulletPool = [];
+        world.effects = [];
+        world.sounds.clear();
+        world.grid.rebuild(previous.enemies);
+        showRunState();
+        return;
+      }
+      showRunState();
+      if (id === "revive-decline") void record();
+    } finally {
+      busy = false;
+    }
+    return;
+  }
   if (id.startsWith("codex-")) {
     codexTab = id.slice(6);
     collectionPage();
@@ -602,7 +699,11 @@ async function action(id: string) {
     case "backup": {
       const backup = await loadRun(true);
       if (!backup) throw new Error("没有可恢复的备份，可重新开启远征。");
-      if (!["playing", "upgrade"].includes(backup.phase))
+      if (
+        !["playing", "upgrade", "dying", "revive", "reviving"].includes(
+          backup.phase,
+        )
+      )
         throw new Error("备份为已结束远征，请重新开始。");
       saved = backup;
       saveError = "";
@@ -620,11 +721,7 @@ async function action(id: string) {
       }
       manualPaused = false;
       focusBlocked = document.hidden;
-      if (world?.s.phase === "upgrade") upgrade();
-      else {
-        hud();
-        scene.paused = false;
-      }
+      showRunState();
       break;
     case "save":
       await saveCurrent();
@@ -774,9 +871,25 @@ window.addEventListener("keydown", (e) => {
 function loseFocus() {
   focusBlocked = true;
   audio?.update(0, "paused");
-  if (world && ["playing", "upgrade"].includes(world.s.phase)) {
+  if (
+    world &&
+    ["playing", "upgrade", "dying", "revive", "reviving"].includes(
+      world.s.phase,
+    )
+  ) {
     manualPaused = true;
-    if (["game", "upgrade", "build", "codex"].includes(screen)) pause();
+    if (
+      [
+        "game",
+        "upgrade",
+        "build",
+        "codex",
+        "dying",
+        "revive",
+        "reviving",
+      ].includes(screen)
+    )
+      pause();
   }
 }
 window.addEventListener("blur", loseFocus);
@@ -795,6 +908,13 @@ async function boot() {
   scene.settings = settings;
   try {
     saved = await loadRun();
+    // Complete a terminal checkpoint interrupted between the saved choice and profile commit.
+    // Legacy terminal saves lack a stable ID and must not duplicate pre-v1.6 history.
+    if (saved?.recordId && ["dead", "victory"].includes(saved.phase)) {
+      const result = await finishRun(saved, recordEntry(saved));
+      saved = result.run;
+      profile = result.profile;
+    }
   } catch (e) {
     saveError = (e as Error).message;
   }
@@ -814,7 +934,18 @@ async function boot() {
     banner: false,
   });
   scene.onPause = () => {
-    if (["game", "upgrade", "build", "codex"].includes(screen)) pause();
+    if (
+      [
+        "game",
+        "upgrade",
+        "build",
+        "codex",
+        "dying",
+        "revive",
+        "reviving",
+      ].includes(screen)
+    )
+      pause();
     else if (screen === "pause") {
       if (world && (world.s.phase === "dead" || world.s.phase === "victory")) {
         results();
@@ -822,11 +953,7 @@ async function boot() {
       }
       manualPaused = false;
       focusBlocked = document.hidden;
-      if (world?.s.phase === "upgrade") upgrade();
-      else {
-        hud();
-        scene.paused = false;
-      }
+      showRunState();
     }
   };
   scene.onFrame = (dt) => {
@@ -838,6 +965,7 @@ async function boot() {
         manualPaused,
         focusBlocked || document.hidden,
       ),
+      world && inPresentation(world.s) ? 0.35 : 1,
     );
     if (!world) return;
     audio.effects(world.sounds);
@@ -851,13 +979,11 @@ async function boot() {
       updateHud();
       hudTimer = 0;
     }
-    if (world.s.phase !== lastPhase) {
-      lastPhase = world.s.phase;
-      if (lastPhase === "upgrade") upgrade();
-      if (lastPhase === "dead" || lastPhase === "victory") {
-        results();
-        void record();
-      }
+    if (world.s.phase !== lastPhase && !busy) {
+      const phase = world.s.phase;
+      showRunState();
+      if (phase === "dead" || phase === "victory") void record();
+      else if (phase !== "upgrade") void saveCurrent(false);
     }
     if (world.s.time - lastSave >= 30 && screen === "game") {
       lastSave = world.s.time;
@@ -882,9 +1008,16 @@ document.addEventListener(
       !el.dataset.fallback
     ) {
       el.dataset.fallback = "true";
-      el.src = defaultArt(
-        el.dataset.art.replace(/^(portrait|avatar)\./, "player."),
-      ).toDataURL();
+      const id = el.dataset.art;
+      if (id.startsWith("animation.")) {
+        el.classList.remove("idle-sheet");
+        el.style.width = "100%";
+        el.style.animation = "none";
+        el.src = art("player." + id.split(".")[1]);
+      } else
+        el.src = defaultArt(
+          id.replace(/^(portrait|avatar)\./, "player."),
+        ).toDataURL();
     }
   },
   true,

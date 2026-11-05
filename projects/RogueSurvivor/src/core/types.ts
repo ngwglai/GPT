@@ -27,7 +27,8 @@ export type EnemyId =
   | "candyWitch"
   | "eclipseSaint"
   | "mirrorMaiden";
-export type Phase = "playing" | "upgrade" | "dead" | "victory";
+export type Phase =
+  "playing" | "upgrade" | "dead" | "victory" | "dying" | "revive" | "reviving";
 export interface Player extends Vec {
   hp: number;
   maxHp: number;
@@ -170,7 +171,10 @@ export interface Run {
   fate?: import("./fate").Fate;
   deck?: import("./deckState").DeckState;
   rewardDrops?: import("./drops").RewardDrop[];
-  version: 1 | 2 | 3;
+  version: 1 | 2 | 3 | 4;
+  revival?: import("./revival").RevivalState;
+  recordId?: string;
+  recorded?: Mode[];
   wave?: import("./waves").WaveState;
   environment?: import("./environmentTypes").EnvironmentState;
   seed: number;
@@ -212,6 +216,7 @@ export interface Settings {
   showStats: boolean;
 }
 export interface RecordEntry {
+  id?: string;
   mode: Mode;
   time: number;
   kills: number;

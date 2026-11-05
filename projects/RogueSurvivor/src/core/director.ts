@@ -124,6 +124,7 @@ export function ai(c: Combat, dt: number) {
   const s = c.s,
     p = s.player;
   for (const e of s.enemies) {
+    if (s.phase !== "playing") break;
     if (e.hp <= 0) continue;
     tickDefense(s, e, dt);
     e.hit = Math.max(0, e.hit - dt);

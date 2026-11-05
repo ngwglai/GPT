@@ -31,7 +31,7 @@ test("v1.3 original background, three consistent portraits and card art actually
     } as any;
   });
   await page.goto("/");
-  await expect(page.locator(".version")).toContainText("v1.5");
+  await expect(page.locator(".version")).toContainText("v1.6");
   expect(
     await page.evaluate(() => (window as any).fallbackCanvases),
   ).toBeLessThan(15);
@@ -67,6 +67,12 @@ test("v1.3 original background, three consistent portraits and card art actually
     .locator(".portrait-img")
     .evaluateAll((es) => es.map((e) => (e as HTMLImageElement).src));
   expect(new Set(srcs).size).toBe(3);
+  await expect(page.locator(".character-preview .idle-sheet")).toHaveCount(3);
+  await page.screenshot({
+    path: "validation/v1.6/selection.jpg",
+    type: "jpeg",
+    quality: 85,
+  });
   await page.getByRole("button", { name: "踏入星林" }).click();
   await expect(page.locator("canvas")).toBeVisible();
   await page.keyboard.press("Escape");
@@ -79,8 +85,12 @@ test("v1.3 original background, three consistent portraits and card art actually
 test("missing generated portrait falls back and combat remains playable", async ({
   page,
 }) => {
-  await page.route("**/assets/characters/ranger-full.webp", (r) => r.abort());
-  await page.route("**/assets/characters/ranger-battle.webp", (r) => r.abort());
+  await page.route("**/assets/v1.6/characters/ranger/portrait.webp", (r) =>
+    r.abort(),
+  );
+  await page.route("**/assets/v1.6/characters/ranger/fallback.webp", (r) =>
+    r.abort(),
+  );
   await page.goto("/");
   await expect
     .poll(() => page.locator(".hero-ranger").getAttribute("src"))

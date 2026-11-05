@@ -51,6 +51,10 @@ export const SFX: Record<string, SfxDefinition> = {
   warning: sound("warning", 0.65, 0.35, 10),
   bossDefeat: sound("defeat", 0.8, 0.5, 9),
   victory: sound("victory", 0.85, 0.5, 10),
+  defeatPlayer: sound("failure", 0.65, 0.5, 10),
+  revive: sound("bloom", 0.75, 0.5, 10),
+  revived: sound("rare", 0.65, 0.5, 9),
+  spark: sound("pickup", 0.6, 0.3, 8),
   failure: sound("failure", 0.7, 0.5, 10),
   ui: sound("ui", 0.35, 0.07, 3),
 };
