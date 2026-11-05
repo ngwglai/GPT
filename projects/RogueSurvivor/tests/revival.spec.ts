@@ -73,6 +73,8 @@ for (const character of ["ranger", "knight", "mage"])
       "data-character-texture",
       new RegExp(`animation.${character}.defeat`),
     );
+    // Ignore the initial living checkpoint until the lethal transition is durable.
+    await expect.poll(async () => (await saved(page))?.revival.deaths).toBe(1);
     const before = await saved(page);
     await expect(
       page.getByRole("heading", { name: "星火尚未熄灭" }),
@@ -86,6 +88,7 @@ for (const character of ["ranger", "knight", "mage"])
       type: "jpeg",
       quality: 82,
     });
+    await expect.poll(async () => (await saved(page))?.phase).toBe("revive");
     const offered = await saved(page);
     expect(offered.time).toBe(before.time);
     expect(offered.wave).toEqual(before.wave);

@@ -645,8 +645,11 @@ fateTest("v1.2 掉落触发负面抽卡，读取后奖励队列不丢失", async
   await expect(
     page.getByRole("button", { name: /刷新 · 剩余/ }),
   ).toBeDisabled();
-  const saved = await get(page, "run");
-  expect(saved.deck.pending).toEqual({ negative: 1, positive: 1 });
+  // The UI opens before the queued IndexedDB checkpoint commits. Assert the
+  // exact durable reward counts, rather than racing the initial pre-pickup save.
+  await expect
+    .poll(async () => (await get(page, "run")).deck.pending)
+    .toEqual({ negative: 1, positive: 1 });
   await page.reload();
   await page.getByRole("button", { name: /继续旅程/ }).click();
   await page.locator(".upgrade-card").first().click();
