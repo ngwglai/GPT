@@ -143,6 +143,10 @@ const time = (s: number) =>
     .toString()
     .padStart(2, "0")}`;
 const artCache = new Map<string, string>();
+const weaponHudCache = new WeakMap<
+  HTMLElement,
+  { key: string; assets: typeof assetPack.assets }
+>();
 function art(id: string) {
   if (assetPack.assets[id]) return assetPack.assets[id].data;
   if (artUrl(id)) return artUrl(id)!;
@@ -309,12 +313,24 @@ function updateHud() {
         ? "高密度战斗：自动精简特效"
         : "每 30 秒自动保存",
   );
-  document.getElementById("weapons")!.innerHTML = Object.entries(p.weapons)
-    .map(
-      ([k, lv]) =>
-        `<button class="weapon-mini" data-action="combat-help" aria-label="查看${WEAPONS[k as WeaponId].name}说明" title="${WEAPONS[k as WeaponId].name}">${img("weapon." + k)}<span>${lv === 5 ? "✦ 进化" : "★".repeat(lv)}</span></button>`,
-    )
-    .join("");
+  const weaponHost = document.getElementById("weapons")!,
+    weaponKey = JSON.stringify(p.weapons),
+    cachedWeapons = weaponHudCache.get(weaponHost);
+  if (
+    cachedWeapons?.key !== weaponKey ||
+    cachedWeapons.assets !== assetPack.assets
+  ) {
+    weaponHost.innerHTML = Object.entries(p.weapons)
+      .map(
+        ([k, lv]) =>
+          `<button class="weapon-mini" data-action="combat-help" aria-label="查看${WEAPONS[k as WeaponId].name}说明" title="${WEAPONS[k as WeaponId].name}">${img("weapon." + k)}<span>${lv === 5 ? "✦ 进化" : "★".repeat(lv)}</span></button>`,
+      )
+      .join("");
+    weaponHudCache.set(weaponHost, {
+      key: weaponKey,
+      assets: assetPack.assets,
+    });
+  }
   const boss = s.enemies.find((e) => ENEMIES[e.kind].boss);
   document.getElementById("boss-hud")!.innerHTML = boss
     ? `<div class="boss-name">${ENEMIES[boss.kind].name} <small>${boss.hp / boss.maxHp < ENEMY_RULES.bossPhaseHp ? "狂暴阶段" : "第一阶段"}</small></div><div class="boss-bar"><i style="width:${Math.max(0, (boss.hp / boss.maxHp) * 100)}%"></i></div>`
@@ -372,7 +388,7 @@ function pause() {
   screen = "pause";
   const d = difficulty(world.s.time);
   modal(
-    `<div class="eyebrow">呼吸片刻，再向前</div><h2>远征已暂停</h2><details><summary>极限星潮 · 当前难度</summary><p>倍率用于当前新生成单位，相对基础属性，不含精英加成；已生成单位保留出生属性。<br>当前时间 ${time(world.s.time)} · 第 ${ensureWaves(world.s).number} 波，剩余 ${time(Math.ceil(waveRemaining(world.s)))}<br>普通怪生命 ×${d.hp.toFixed(2)} · 伤害 ×${d.damage.toFixed(2)} · 攻击频率 ×${d.attackRate.toFixed(2)}<br>Boss生命 ×${bossHpMultiplier(world.s.time).toFixed(2)} · 伤害 ×${bossDamageMultiplier(world.s.time).toFixed(2)}<br>Boss基础攻击间隔 ${bossAttackInterval(world.s.time, false).toFixed(2)}秒 / 二阶段 ${bossAttackInterval(world.s.time, true).toFixed(2)}秒（技能独立间隔以技能为准）<br>${
+    `<div class="eyebrow">呼吸片刻，再向前</div><h2>远征已暂停</h2><details id="difficulty-info"><summary>极限星潮 · 当前难度</summary><p>倍率用于当前新生成单位，相对基础属性，不含精英加成；已生成单位保留出生属性。<br>当前时间 ${time(world.s.time)} · 第 ${ensureWaves(world.s).number} 波，剩余 ${time(Math.ceil(waveRemaining(world.s)))}<br>普通怪生命 ×${d.hp.toFixed(2)} · 伤害 ×${d.damage.toFixed(2)} · 攻击频率 ×${d.attackRate.toFixed(2)}<br>Boss生命 ×${bossHpMultiplier(world.s.time).toFixed(2)} · 伤害 ×${bossDamageMultiplier(world.s.time).toFixed(2)}<br>Boss基础攻击间隔 ${bossAttackInterval(world.s.time, false).toFixed(2)}秒 / 二阶段 ${bossAttackInterval(world.s.time, true).toFixed(2)}秒（技能独立间隔以技能为准）<br>${
       world.s.enemies
         .filter((e) => ENEMIES[e.kind].boss)
         .map(

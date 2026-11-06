@@ -260,7 +260,7 @@ test("v1.4 new boss second phase, map state and five weapons resume", async ({
   await resume(page, w.s);
   await expect(page.locator("#boss-hud")).toContainText("水晶女王");
   await expect(page.locator("#boss-hud")).toContainText("狂暴阶段");
-  await expect(page.locator(".weapon-hud>div")).toHaveCount(5);
+  await expect(page.locator(".weapon-hud>button.weapon-mini")).toHaveCount(5);
   await expect
     .poll(() => page.locator("#clock").textContent())
     .not.toBe("20:01");
@@ -432,9 +432,9 @@ for (const map of ["forest", "cavern", "garden", "eclipse"] as const)
     await page.waitForTimeout(700);
     await page.keyboard.press("Escape");
     await expect(page.getByText("极限星潮 · 当前难度")).toBeVisible();
-    await page.locator("details summary").click();
-    await expect(page.locator("details")).toContainText("800");
-    await expect(page.locator("details")).toContainText("1200");
+    await page.locator("#difficulty-info summary").click();
+    await expect(page.locator("#difficulty-info")).toContainText("800");
+    await expect(page.locator("#difficulty-info")).toContainText("1200");
     await page.getByRole("button", { name: "继续远征", exact: true }).click();
     await page.screenshot({
       path: `validation/v1.4.1/${map}.jpg`,

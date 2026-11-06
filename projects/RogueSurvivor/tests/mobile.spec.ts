@@ -162,6 +162,23 @@ test.describe("触屏战斗", () => {
     hasTouch: true,
     isMobile: true,
   });
+  test("装备说明按钮跨HUD刷新保留焦点并可轻触打开", async ({ page }) => {
+    await resume(page);
+    const weapon = await page.locator(".weapon-mini").first().elementHandle();
+    await weapon!.focus();
+    await page.waitForTimeout(350);
+    expect(
+      await weapon!.evaluate(
+        (el) => el.isConnected && document.activeElement === el,
+      ),
+    ).toBe(true);
+    await weapon!.tap();
+    await expect(
+      page.getByRole("heading", { name: "远征已暂停" }),
+    ).toBeVisible();
+    await expect(page.locator("#combat-help")).toHaveAttribute("open", "");
+    await expect(page.locator("#combat-help")).toContainText("追星弓");
+  });
   test("独立指针：斜向移动与技能、冷却防重复、取消和暂停清理", async ({
     page,
   }) => {
