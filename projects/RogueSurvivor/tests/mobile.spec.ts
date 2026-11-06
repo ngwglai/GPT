@@ -383,6 +383,8 @@ test.describe("移动端完整菜单流程", () => {
     await page.getByRole("button", { name: "游戏设置", exact: true }).tap();
     await page.locator("#touch-controls").selectOption("off");
     await page.getByRole("button", { name: "保存设置" }).tap();
+    await expect(page.locator("#toast")).toContainText("设置已保存");
+    await expect(page.locator("html")).not.toHaveClass(/touch-controls/);
     await page.reload();
     await page.getByRole("button", { name: /继续旅程/ }).tap();
     await expect(page.locator("[data-joystick]")).toBeHidden();
@@ -390,6 +392,7 @@ test.describe("移动端完整菜单流程", () => {
     await page.getByRole("button", { name: "游戏设置", exact: true }).tap();
     await page.locator("#touch-controls").selectOption("on");
     await page.getByRole("button", { name: "保存设置" }).tap();
+    await expect(page.locator("#toast")).toContainText("设置已保存");
     await page.getByRole("button", { name: "← 返回" }).tap();
     await page.getByRole("button", { name: "继续远征", exact: true }).tap();
     await expect(page.locator("[data-joystick]")).toBeVisible();
