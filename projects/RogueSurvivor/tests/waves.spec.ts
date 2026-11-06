@@ -70,7 +70,7 @@ for (const map of Object.keys(MAPS) as MapId[]) {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
     await page.goto("/");
-    await expect(page.locator(".version")).toContainText("v1.6");
+    await expect(page.locator(".version")).toContainText("v1.7");
     await page.getByRole("button", { name: "开启远征" }).click();
     await page.locator(`[data-action="map-${map}"]`).click();
     await page.locator('[data-action="launch"]').click();

@@ -1,0 +1,423 @@
+/* Shared buttons; touch-only restrictions stay inside the combat surface. */
+.skill-slot {
+  padding: 0;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.skill-slot > * {
+  pointer-events: none;
+}
+.skill-slot.pressed {
+  transform: scale(0.93);
+  box-shadow: 0 0 14px #ffeaa8;
+}
+.skill-slot[aria-disabled="true"] {
+  border-style: dashed;
+}
+.skill-slot.unavailable {
+  filter: saturate(0.55);
+}
+.weapon-mini {
+  padding: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.joystick,
+.touch-aim,
+.rotate-hint {
+  display: none;
+}
+#game {
+  inset: auto;
+  top: 0;
+  left: 0;
+  width: var(--view-w, 100vw);
+  height: var(--view-h, 100dvh);
+}
+body:has(.hud) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.hud {
+  inset: auto;
+  top: 0;
+  left: 0;
+  width: var(--view-w, 100vw);
+  height: var(--view-h, 100dvh);
+}
+.touch-controls:has(.hud) #game canvas {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.touch-controls .joystick {
+  display: block;
+  position: absolute;
+  pointer-events: auto;
+  left: calc(env(safe-area-inset-left, 0px) + 20px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+  width: 122px;
+  height: 122px;
+  border-radius: 50%;
+  border: 2px solid #d7c1e4b0;
+  background: radial-gradient(circle, #fff4f040, #6c52794a);
+  box-shadow: inset 0 0 20px #fff4f03a;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.stick-cross {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff4e7a0;
+  font-size: 32px;
+}
+.stick-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  margin: -24px;
+  border-radius: 50%;
+  border: 2px solid #fff9edc0;
+  background: #cca5dd9c;
+  box-shadow: 0 3px 12px #42275260;
+  transform: translate(var(--stick-x, 0px), var(--stick-y, 0px));
+  pointer-events: none;
+}
+.touch-controls .touch-aim {
+  display: block;
+  position: absolute;
+  pointer-events: auto;
+  right: calc(env(safe-area-inset-right, 0px) + 14px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 178px);
+  max-width: 170px;
+  min-height: 44px;
+  padding: 6px 9px;
+  font-size: 10px;
+  color: #fff8ef;
+  background: #59416be0;
+  touch-action: manipulation;
+}
+.touch-input-inactive .joystick,
+.touch-input-inactive .touch-aim {
+  visibility: hidden;
+}
+.touch-controls .skills {
+  left: auto;
+  right: calc(env(safe-area-inset-right, 0px) + 16px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 38px);
+  transform: none;
+  display: grid;
+  grid-template-columns: repeat(2, 58px);
+  gap: 22px 12px;
+}
+.touch-controls .skill-slot {
+  width: 58px;
+  height: 58px;
+}
+.touch-controls .hint {
+  display: none;
+}
+.touch-controls .weapon-hud {
+  position: absolute;
+  left: calc(env(safe-area-inset-left, 0px) + 14px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 166px);
+  flex-direction: row;
+  gap: 4px;
+}
+.touch-controls .weapon-mini {
+  font-size: 9px;
+  border: 0;
+  min-width: 28px;
+}
+.touch-controls .weapon-mini img {
+  width: 28px;
+  height: 28px;
+}
+.touch-controls .hud-top {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 10px);
+  padding-left: calc(env(safe-area-inset-left, 0px) + 12px);
+  padding-right: calc(env(safe-area-inset-right, 0px) + 12px);
+}
+@media (max-width: 1000px) {
+  .touch-controls .hud-actions [data-action="build"],
+  .touch-controls #kills {
+    display: none;
+  }
+  .touch-controls .hud-actions {
+    gap: 6px;
+  }
+  .touch-controls .hud-button {
+    min-width: 48px;
+    min-height: 44px;
+    padding: 8px;
+  }
+  .touch-controls .player-hud {
+    width: min(50vw, 240px);
+  }
+  .touch-controls .player-hud > img {
+    width: 32px;
+    height: 32px;
+  }
+  .touch-controls .player-name {
+    font-size: 10px;
+    margin-bottom: 3px;
+  }
+  .touch-controls .player-name > span {
+    margin-left: 2px;
+    font-size: 9px;
+  }
+  .touch-controls .player-hud small {
+    font-size: 9px;
+  }
+  .touch-controls .health {
+    height: 14px;
+  }
+  .touch-controls #spark-count {
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  .touch-controls #event {
+    font-size: 10px;
+    max-width: 70vw;
+    max-height: 36px;
+    overflow: hidden;
+    top: calc(env(safe-area-inset-top, 0px) + 154px);
+  }
+  .touch-controls #performance {
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 224px);
+    left: 12px;
+    font-size: 8px;
+  }
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .touch-controls .hud-top {
+    height: 58px;
+    align-items: flex-start;
+  }
+  .touch-controls .run-clock {
+    top: calc(env(safe-area-inset-top, 0px) + 59px);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .touch-controls .run-clock b {
+    font-size: 17px;
+  }
+  .touch-controls .run-clock > span {
+    font-size: 9px;
+  }
+  .touch-controls #wave-hud {
+    top: calc(env(safe-area-inset-top, 0px) + 87px);
+    font-size: 10px;
+    max-width: calc(100% - 20px);
+    padding: 5px 8px;
+  }
+  .touch-controls #boss-hud {
+    top: calc(env(safe-area-inset-top, 0px) + 128px);
+    width: 75vw;
+  }
+  .touch-controls .skills {
+    grid-template-columns: repeat(2, 54px);
+    gap: 22px 10px;
+  }
+  .touch-controls .skill-slot {
+    width: 54px;
+    height: 54px;
+  }
+  .touch-controls .rotate-hint {
+    display: block;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+    font-size: 9px;
+    color: #fff8e7;
+    text-shadow: 0 1px 3px #231c31;
+  }
+  .touch-controls .touch-aim {
+    max-width: 160px;
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .touch-controls .hud-top {
+    height: 50px;
+  }
+  .touch-controls .run-clock {
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+  }
+  .touch-controls .run-clock b {
+    font-size: 19px;
+  }
+  .touch-controls .run-clock span {
+    font-size: 9px;
+  }
+  .touch-controls #wave-hud {
+    top: calc(env(safe-area-inset-top, 0px) + 54px);
+    padding: 3px 10px;
+    font-size: 10px;
+    max-width: 70vw;
+  }
+  .touch-controls #boss-hud {
+    top: calc(env(safe-area-inset-top, 0px) + 86px);
+    width: 52vw;
+  }
+  .touch-controls #event {
+    top: calc(env(safe-area-inset-top, 0px) + 116px);
+    max-width: 55vw;
+  }
+  .touch-controls .joystick {
+    width: 104px;
+    height: 104px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  }
+  .touch-controls .skills {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 28px);
+    grid-template-columns: repeat(2, 52px);
+    gap: 19px 10px;
+  }
+  .touch-controls .skill-slot {
+    width: 52px;
+    height: 52px;
+  }
+  .touch-controls .touch-aim {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 164px);
+    max-width: 150px;
+  }
+  .touch-controls .weapon-hud {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 136px);
+  }
+  .touch-controls .overlay:has(.revival-choice) {
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .touch-controls .revival-choice {
+    width: min(380px, calc(50vw - 38px));
+  }
+}
+/* Menus remain scrollable/zoomable; only dialogs contain their own scroll. */
+@media (max-width: 1000px), (max-height: 500px) {
+  .shell {
+    padding-left: calc(env(safe-area-inset-left, 0px) + 12px);
+    padding-right: calc(env(safe-area-inset-right, 0px) + 12px);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    max-width: 100%;
+  }
+  .overlay {
+    width: var(--view-w, 100vw);
+    height: var(--view-h, 100dvh);
+    padding: calc(env(safe-area-inset-top, 0px) + 8px)
+      calc(env(safe-area-inset-right, 0px) + 8px)
+      calc(env(safe-area-inset-bottom, 0px) + 8px)
+      calc(env(safe-area-inset-left, 0px) + 8px);
+  }
+  .dialog {
+    max-height: calc(
+      var(--view-h, 100dvh) - env(safe-area-inset-top, 0px) -
+        env(safe-area-inset-bottom, 0px) - 16px
+    );
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    min-width: 0;
+  }
+  .dialog button,
+  .pause-actions button,
+  .result-actions button,
+  .draw-toolbar button {
+    min-height: 44px;
+  }
+  .dialog h2 {
+    font-size: 22px;
+  }
+  .dialog p {
+    line-height: 1.5;
+  }
+  .settings-panel,
+  .asset-layout,
+  .asset-browser,
+  .loadout > div {
+    min-width: 0;
+  }
+  .record-table {
+    overflow-x: auto;
+  }
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .upgrade-grid {
+    grid-template-columns: 1fr;
+  }
+  .upgrade-card {
+    min-height: 0;
+    padding: 12px;
+  }
+  .upgrade-card .reward-icon {
+    width: 46px;
+    height: 46px;
+    float: right;
+  }
+  .upgrade-card p {
+    font-size: 12px;
+  }
+  .pause-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .touch-controls .skill-slot > span:last-child {
+    font-size: 9px;
+    bottom: -18px;
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .dialog {
+    padding: 12px;
+  }
+  .dialog h2 {
+    margin: 6px 0;
+    font-size: 20px;
+  }
+  .dialog > p {
+    margin: 6px 0;
+    font-size: 12px;
+  }
+  .upgrade-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .upgrade-card {
+    min-height: 180px;
+    padding: 9px;
+  }
+  .upgrade-card .reward-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .upgrade-card p {
+    font-size: 11px;
+  }
+  .upgrade-card h3 {
+    font-size: 14px;
+  }
+  .presentation-caption {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  }
+}
+/* Explicit top alignment keeps 44px buttons inside short landscape headers. */
+.touch-controls .hud-top {
+  align-items: flex-start;
+}
+.touch-controls .hud-actions {
+  align-self: flex-start;
+}

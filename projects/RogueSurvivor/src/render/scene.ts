@@ -1,3 +1,5 @@
+import type { TouchControls } from "../input/touchControls";
+import { clampAim } from "../input/touchState";
 import { CharacterAnimation, MovementPose } from "./characterAnimation";
 import {
   animationId,
@@ -17,9 +19,11 @@ import { defaultArt } from "./art";
 import { ENEMIES, SKILLS, LIMITS } from "../data/content";
 export class GameScene extends Phaser.Scene {
   world?: World;
+  touch?: TouchControls;
   settings!: Settings;
   paused = true;
   ready = false;
+  onReady?: () => void;
   showWorld = false;
   needsPaint = true;
   onFrame?: (dt: number) => void;
@@ -66,7 +70,10 @@ export class GameScene extends Phaser.Scene {
       if (["INPUT", "SELECT", "TEXTAREA"].includes(tag)) return;
       if (e.code === "Escape" && !e.repeat) this.onPause?.();
       if (this.paused || this.world?.s.phase !== "playing") return;
-      if (e.code === "Space") this.queued.dash = true;
+      if (e.code === "Space") {
+        e.preventDefault();
+        this.queued.dash = true;
+      }
       const i = ["KeyQ", "KeyE", "KeyR"].indexOf(e.code);
       if (i >= 0 && !e.repeat) this.queued.skills[i] = true;
     });
@@ -74,6 +81,7 @@ export class GameScene extends Phaser.Scene {
       this.needsPaint = true;
     });
     this.ready = true;
+    this.onReady?.();
     void this.reloadAssets();
   }
   setWorld(w: World) {
@@ -185,15 +193,26 @@ export class GameScene extends Phaser.Scene {
   }
   inputState(): Input {
     const k = this.keys,
-      ptr = this.input.activePointer;
-    return {
+      ptr = this.input.mousePointer;
+    const keyboard = {
       x: Number(k.D.isDown) - Number(k.A.isDown),
       y: Number(k.S.isDown) - Number(k.W.isDown),
+    };
+    const touch = this.world && this.touch?.consume(this.world.s);
+    return {
+      x: keyboard.x || keyboard.y ? keyboard.x : touch?.x || 0,
+      y: keyboard.x || keyboard.y ? keyboard.y : touch?.y || 0,
       aim: {
         x: ptr.x - this.scale.width / 2 + this.cx,
         y: ptr.y - this.scale.height / 2 + this.cy,
       },
-      ...this.queued,
+      skills: this.queued.skills.map(
+        (pressed, i) => pressed || !!touch?.skills[i],
+      ),
+      skillAims: this.queued.skills.map((pressed, i) =>
+        pressed ? undefined : touch?.skillAims[i],
+      ),
+      dash: this.queued.dash || !!touch?.dash,
     };
   }
   private sprite(
@@ -822,6 +841,18 @@ export class GameScene extends Phaser.Scene {
         this.friendly.fillCircle(x, y, Math.max(1.5, b.r * 0.4));
       }
 
+    if (this.touch?.enabled && this.touch.state.target) {
+      const point = clampAim(p, this.touch.state.target),
+        x = sx(point.x),
+        y = sy(point.y);
+      this.friendly.lineStyle(3, 0x123b60, 0.95);
+      this.friendly.strokeCircle(x, y, 14);
+      this.friendly.lineStyle(1.5, 0xffeab3, 1);
+      this.friendly.strokeCircle(x, y, 12);
+      this.friendly.lineBetween(x - 19, y, x + 19, y);
+      this.friendly.lineBetween(x, y - 19, x, y + 19);
+    }
+
     // Canvas fills each stage as one nonzero path: overlapping hazards must
     // not accumulate opacity and conceal the player or the remaining gaps.
     for (const warning of [true, false]) {
@@ -931,24 +962,25 @@ export class GameScene extends Phaser.Scene {
     }
     // A minimal minimap always shows boundaries and living bosses.
     if (W > 700) {
-      const mx = W - 158,
-        my = 100;
+      const size = this.touch?.enabled && H < 500 ? 72 : 130,
+        mx = W - size - 28,
+        my = this.touch?.enabled && H < 500 ? 70 : 100;
       g.fillStyle(0x0b2028, 0.75);
-      g.fillRoundedRect(mx, my, 130, 130, 12);
+      g.fillRoundedRect(mx, my, size, size, 12);
       g.lineStyle(1, 0x8eb49b, 0.25);
-      g.strokeRoundedRect(mx, my, 130, 130, 12);
+      g.strokeRoundedRect(mx, my, size, size, 12);
       g.fillStyle(0xb5efce);
       g.fillCircle(
-        mx + 7 + (p.x / LIMITS.world) * 116,
-        my + 7 + (p.y / LIMITS.world) * 116,
+        mx + 7 + (p.x / LIMITS.world) * (size - 14),
+        my + 7 + (p.y / LIMITS.world) * (size - 14),
         3,
       );
       for (const e of s.enemies)
         if (ENEMIES[e.kind].boss) {
           g.fillStyle(0xffb289);
           g.fillCircle(
-            mx + 7 + (e.x / LIMITS.world) * 116,
-            my + 7 + (e.y / LIMITS.world) * 116,
+            mx + 7 + (e.x / LIMITS.world) * (size - 14),
+            my + 7 + (e.y / LIMITS.world) * (size - 14),
             4,
           );
         }

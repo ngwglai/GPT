@@ -120,7 +120,7 @@ export class World extends Combat {
     }
     this.grid.rebuild(s.enemies);
     input.skills?.forEach((pressed, i) => {
-      if (pressed) this.cast(i, input.aim);
+      if (pressed) this.cast(i, input.skillAims?.[i] || input.aim);
     });
     this.auto(dt);
     this.projectiles(dt);
