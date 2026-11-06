@@ -206,10 +206,12 @@ export interface Input {
   aim: Vec;
   dash?: boolean;
   skills?: boolean[];
+  skillAims?: (Vec | undefined)[];
 }
 export interface Settings {
   music: number;
   musicEnabled?: boolean;
+  touchControls?: "auto" | "on" | "off";
   sfx: number;
   quality: "high" | "low";
   shake: boolean;

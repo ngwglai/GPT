@@ -11,7 +11,7 @@ export const SKILLS: Record<
 > = {
   fire: {
     name: "陨火",
-    desc: "鼠标位置落下陨火，爆炸并燃烧敌人。",
+    desc: "选定位置落下陨火，爆炸并燃烧敌人。",
     cooldown: 7,
     color: 0xff9d73,
     aim: "area",
@@ -25,7 +25,7 @@ export const SKILLS: Record<
   },
   lance: {
     name: "星贯",
-    desc: "向鼠标方向发射高速贯穿光矛。",
+    desc: "向瞄准方向发射高速贯穿光矛。",
     cooldown: 5,
     color: 0xd6c1ff,
     aim: "direction",

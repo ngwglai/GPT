@@ -1,6 +1,6 @@
 {
   "name": "rogue-survivor",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,8 @@
     "simulate": "tsx tests/simulate.ts",
     "docs:cards": "tsx tools/card-docs.ts",
     "simulate:shuffle": "tsx tests/simulate.ts --shuffle",
-    "simulate:worlds": "tsx tools/world-check.ts"
+    "simulate:worlds": "tsx tools/world-check.ts",
+    "test:mobile:webkit": "playwright test -c playwright.mobile.config.ts"
   },
   "dependencies": {
     "phaser": "^3.90.0"

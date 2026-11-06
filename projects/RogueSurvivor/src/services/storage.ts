@@ -17,6 +17,7 @@ import {
   WEAPONS,
 } from "../data/content";
 export const DEFAULT_SETTINGS: Settings = {
+  touchControls: "auto",
   music: 0.22,
   sfx: 0.4,
   quality: "high",
@@ -855,6 +856,9 @@ export async function loadSettings() {
       return {
         ...DEFAULT_SETTINGS,
         ...v,
+        touchControls: ["auto", "on", "off"].includes(v.touchControls || "")
+          ? v.touchControls!
+          : "auto",
         music: Math.max(0, Math.min(1, v.music)),
         sfx: Math.max(0, Math.min(1, v.sfx)),
       };
