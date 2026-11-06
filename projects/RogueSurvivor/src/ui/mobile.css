@@ -421,3 +421,12 @@ body:has(.hud) {
 .touch-controls .hud-actions {
   align-self: flex-start;
 }
+/* Safari can zoom small native form fields on focus. Keep mobile forms readable. */
+@media (max-width: 1000px), (max-height: 500px) {
+  select,
+  input[type="number"],
+  input[type="text"],
+  input:not([type]) {
+    font-size: 16px;
+  }
+}
