@@ -79,7 +79,7 @@ describe("four deterministic worlds and explicit migration", () => {
       const oldRng = s.rng,
         oldCards = { ...s.player.upgrades };
       const restored = validateRun(s);
-      expect(restored.version).toBe(4);
+      expect(restored.version).toBe(5);
       expect(restored.environment!.mapId).toBe("forest");
       expect(restored.rng).toBe(oldRng);
       for (const [id, n] of Object.entries(oldCards))
@@ -352,7 +352,7 @@ describe("boss phases, warning budgets and safe imitation", () => {
             : "eclipse",
       ),
       e = enemy(c, kind, 2100);
-    c.s.player.weapons = { bow: 5, blade: 5, ember: 5, orbit: 5, drone: 5 };
+    c.s.player.weapons = { bow: 3, blade: 3, ember: 3, orbit: 3, drone: 3 };
     e.timer = 0;
     advancedAI(c, e, 0.05);
     const first = e.timer;

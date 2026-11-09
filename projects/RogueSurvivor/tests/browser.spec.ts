@@ -334,6 +334,9 @@ const fateTest = test.extend({
   },
 });
 denseTest("密集战斗真实渲染、性能面板、无控制台异常", async ({ page }) => {
+  // Keep the full-density capture, then quiesce rendering before Chromium teardown.
+  // Windows software rendering can otherwise exhaust the test budget while closing a live scene.
+  denseTest.setTimeout(90000);
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   const w = new World(createRun("endless", "mage", 77));
@@ -343,7 +346,7 @@ denseTest("密集战斗真实渲染、性能面板、无控制台异常", async 
   w.s.player.invincible = 300;
   for (const id of ["bow", "blade", "ember", "orbit", "drone"] as const)
     w.s.player.upgrades["weapon_" + id] =
-      5 - (ensureDeck(w.s).baseWeapons[id] || 0);
+      3 - (ensureDeck(w.s).baseWeapons[id] || 0);
   recalculate(w.s);
   for (let i = 0; i < 140; i++) {
     const a = i * 2.4;
@@ -376,6 +379,8 @@ denseTest("密集战斗真实渲染、性能面板、无控制台异常", async 
     await page.locator("#performance").textContent(),
   );
   expect(errors).toEqual([]);
+  await page.locator('[data-action="pause"]').click();
+  await expect(page.getByRole("heading", { name: "远征已暂停" })).toBeVisible();
 });
 test("窄屏菜单无水平溢出，主要入口可用", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -621,9 +626,9 @@ test("v1.1 重抽、遗忘与属性落盘", async ({ page }) => {
 
 fateTest("v1.2 三类图鉴、当前构筑合并层数及独立刷新", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".version")).toContainText("v1.7");
+  await expect(page.locator(".version")).toContainText("v1.8");
   await page.getByRole("button", { name: "远征图鉴", exact: true }).click();
-  await expect(page.locator(".codex-card")).toHaveCount(70);
+  await expect(page.locator(".codex-card")).toHaveCount(83);
   await page.getByRole("button", { name: "技能图鉴", exact: true }).click();
   await expect(page.locator(".codex-card")).toHaveCount(11);
   await page.getByRole("button", { name: "怪物图鉴", exact: true }).click();

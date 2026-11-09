@@ -1,0 +1,1158 @@
+{
+  "method": "原有确定性控制器、三角色×三种子，真实World与敌人攻击；控制器不能等同真人。死亡局时长不同，不能用其未归一化抽卡总量衡量40%目标，经济目标另用同死亡事件对照。",
+  "summary": [
+    {
+      "version": "before",
+      "samples": 9,
+      "automatedVictories": 0,
+      "meanSeconds": 179,
+      "meanLevels": 13,
+      "meanKills": 206.11111111111111
+    },
+    {
+      "version": "after",
+      "samples": 9,
+      "automatedVictories": 0,
+      "meanSeconds": 232.55555555555554,
+      "meanLevels": 14.444444444444445,
+      "meanKills": 361.22222222222223
+    }
+  ],
+  "rows": [
+    {
+      "version": "before",
+      "map": "forest",
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 1,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 1,
+      "negativeLayers": 0,
+      "output": [],
+      "finiteDefinitions": 25,
+      "remainingDefinitions": 25,
+      "remainingRanks": 67,
+      "acquiredRanks": 14,
+      "weapons": {
+        "bow": 2,
+        "drone": 3
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "ranger",
+      "seed": 11,
+      "stress": false,
+      "seconds": 194,
+      "phase": "dead",
+      "level": 14,
+      "kills": 233,
+      "bosses": 0,
+      "damage": 22704,
+      "peakEnemies": 48,
+      "peakBullets": 31,
+      "frames": 3885,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 1.11,
+      "build": [
+        "追星弓",
+        "萤火灵",
+        "春芽",
+        "古树之心",
+        "星核"
+      ]
+    },
+    {
+      "version": "before",
+      "map": "forest",
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 1,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 0,
+      "negativeLayers": 0,
+      "output": [],
+      "finiteDefinitions": 25,
+      "remainingDefinitions": 25,
+      "remainingRanks": 69,
+      "acquiredRanks": 13,
+      "weapons": {
+        "bow": 1,
+        "orbit": 1
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "ranger",
+      "seed": 29,
+      "stress": false,
+      "seconds": 148,
+      "phase": "dead",
+      "level": 13,
+      "kills": 196,
+      "bosses": 0,
+      "damage": 15374,
+      "peakEnemies": 42,
+      "peakBullets": 25,
+      "frames": 2964,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.87,
+      "build": [
+        "追星弓",
+        "月环",
+        "星核",
+        "春芽",
+        "古树之心",
+        "拾星",
+        "穿林"
+      ]
+    },
+    {
+      "version": "before",
+      "map": "forest",
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 0,
+      "negativeLayers": 0,
+      "output": [],
+      "finiteDefinitions": 25,
+      "remainingDefinitions": 25,
+      "remainingRanks": 70,
+      "acquiredRanks": 10,
+      "weapons": {
+        "bow": 1
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "ranger",
+      "seed": 83,
+      "stress": false,
+      "seconds": 131,
+      "phase": "dead",
+      "level": 11,
+      "kills": 171,
+      "bosses": 0,
+      "damage": 8957,
+      "peakEnemies": 43,
+      "peakBullets": 32,
+      "frames": 2629,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.54,
+      "build": [
+        "追星弓",
+        "星核",
+        "穿林",
+        "春芽",
+        "古树之心"
+      ]
+    },
+    {
+      "version": "before",
+      "map": "forest",
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 0,
+      "negativeLayers": 0,
+      "output": [],
+      "finiteDefinitions": 25,
+      "remainingDefinitions": 25,
+      "remainingRanks": 67,
+      "acquiredRanks": 13,
+      "weapons": {
+        "blade": 3,
+        "orbit": 1
+      },
+      "fate": {
+        "chests": 1,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "knight",
+      "seed": 11,
+      "stress": false,
+      "seconds": 214,
+      "phase": "dead",
+      "level": 13,
+      "kills": 200,
+      "bosses": 0,
+      "damage": 17069,
+      "peakEnemies": 43,
+      "peakBullets": 26,
+      "frames": 4286,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.67,
+      "build": [
+        "弧月刃",
+        "古树之心",
+        "春芽",
+        "霜潮学派",
+        "月环",
+        "遗忘药剂",
+        "旅途宝箱",
+        "战意"
+      ]
+    },
+    {
+      "version": "before",
+      "map": "forest",
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 2,
+      "negativeLayers": 0,
+      "output": [],
+      "finiteDefinitions": 25,
+      "remainingDefinitions": 25,
+      "remainingRanks": 66,
+      "acquiredRanks": 12,
+      "weapons": {
+        "blade": 2,
+        "orbit": 2
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "knight",
+      "seed": 29,
+      "stress": false,
+      "seconds": 214,
+      "phase": "dead",
+      "level": 13,
+      "kills": 200,
+      "bosses": 0,
+      "damage": 16037,
+      "peakEnemies": 46,
+      "peakBullets": 33,
+      "frames": 4282,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.53,
+      "build": [
+        "弧月刃",
+        "月环",
+        "辅术精通",
+        "古树之心",
+        "春芽",
+        "双月共舞",
+        "冰火共鸣"
+      ]
+    },
+    {
+      "version": "before",
+      "map": "forest",
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 0,
+      "negativeLayers": 0,
+      "output": [],
+      "finiteDefinitions": 25,
+      "remainingDefinitions": 25,
+      "remainingRanks": 68,
+      "acquiredRanks": 12,
+      "weapons": {
+        "blade": 1,
+        "orbit": 1
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "knight",
+      "seed": 83,
+      "stress": false,
+      "seconds": 205,
+      "phase": "dead",
+      "level": 13,
+      "kills": 200,
+      "bosses": 0,
+      "damage": 15526,
+      "peakEnemies": 36,
+      "peakBullets": 22,
+      "frames": 4102,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.54,
+      "build": [
+        "弧月刃",
+        "辅术精通",
+        "星核",
+        "月环",
+        "古树之心",
+        "双月共舞",
+        "春芽",
+        "满月",
+        "战意"
+      ]
+    },
+    {
+      "version": "before",
+      "map": "forest",
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 1,
+      "negativeLayers": 0,
+      "output": [],
+      "finiteDefinitions": 25,
+      "remainingDefinitions": 25,
+      "remainingRanks": 67,
+      "acquiredRanks": 11,
+      "weapons": {
+        "ember": 3,
+        "drone": 1
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "mage",
+      "seed": 11,
+      "stress": false,
+      "seconds": 119,
+      "phase": "dead",
+      "level": 12,
+      "kills": 191,
+      "bosses": 0,
+      "damage": 11325,
+      "peakEnemies": 42,
+      "peakBullets": 27,
+      "frames": 2384,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.5,
+      "build": [
+        "烬火杖",
+        "星核",
+        "辅术精通",
+        "春芽",
+        "萤火灵",
+        "不熄余烬"
+      ]
+    },
+    {
+      "version": "before",
+      "map": "forest",
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 1,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 3,
+      "negativeLayers": 0,
+      "output": [],
+      "finiteDefinitions": 25,
+      "remainingDefinitions": 25,
+      "remainingRanks": 66,
+      "acquiredRanks": 12,
+      "weapons": {
+        "ember": 3,
+        "orbit": 1,
+        "drone": 1
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "mage",
+      "seed": 29,
+      "stress": false,
+      "seconds": 130,
+      "phase": "dead",
+      "level": 12,
+      "kills": 191,
+      "bosses": 0,
+      "damage": 13395,
+      "peakEnemies": 39,
+      "peakBullets": 23,
+      "frames": 2605,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.5,
+      "build": [
+        "烬火杖",
+        "月环",
+        "古树之心",
+        "春芽",
+        "萤火灵",
+        "萤火之森"
+      ]
+    },
+    {
+      "version": "before",
+      "map": "forest",
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 3,
+      "negativeLayers": 0,
+      "output": [],
+      "finiteDefinitions": 25,
+      "remainingDefinitions": 25,
+      "remainingRanks": 68,
+      "acquiredRanks": 15,
+      "weapons": {
+        "ember": 2,
+        "drone": 1
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "mage",
+      "seed": 83,
+      "stress": false,
+      "seconds": 256,
+      "phase": "dead",
+      "level": 16,
+      "kills": 273,
+      "bosses": 0,
+      "damage": 26909,
+      "peakEnemies": 55,
+      "peakBullets": 27,
+      "frames": 5126,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.94,
+      "build": [
+        "烬火杖",
+        "古树之心",
+        "星核",
+        "春芽",
+        "萤火灵",
+        "辅术精通"
+      ]
+    },
+    {
+      "version": "after",
+      "map": "forest",
+      "draws": {
+        "level": 10,
+        "positive": 0,
+        "negative": 0,
+        "replacement": 0,
+        "refresh": 2
+      },
+      "wave": 5,
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 1,
+      "negativeLayers": 0,
+      "output": [],
+      "finiteDefinitions": 35,
+      "remainingDefinitions": 33,
+      "remainingRanks": 66,
+      "acquiredRanks": 10,
+      "weapons": {
+        "bow": 2,
+        "drone": 3
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "ranger",
+      "seed": 11,
+      "stress": false,
+      "seconds": 114,
+      "phase": "dead",
+      "level": 11,
+      "kills": 196,
+      "bosses": 0,
+      "damage": 12907,
+      "peakEnemies": 38,
+      "peakBullets": 17,
+      "frames": 2289,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.61,
+      "build": [
+        "追星弓",
+        "萤火灵",
+        "春芽",
+        "引力信标",
+        "星核",
+        "古树之心"
+      ]
+    },
+    {
+      "version": "after",
+      "map": "forest",
+      "draws": {
+        "level": 21,
+        "positive": 1,
+        "negative": 0,
+        "replacement": 0,
+        "refresh": 3
+      },
+      "wave": 10,
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 1,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 0,
+      "negativeLayers": 1,
+      "output": [
+        {
+          "time": 300,
+          "damage": 70610,
+          "layers": 22,
+          "negativeLayers": 1,
+          "extraDraws": {
+            "positive": 1,
+            "negative": 0
+          },
+          "attack": 1.4,
+          "maxHp": 190
+        }
+      ],
+      "finiteDefinitions": 35,
+      "remainingDefinitions": 33,
+      "remainingRanks": 60,
+      "acquiredRanks": 23,
+      "weapons": {
+        "bow": 3,
+        "orbit": 1,
+        "drone": 2
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 1,
+        "cleansed": 0
+      },
+      "character": "ranger",
+      "seed": 29,
+      "stress": false,
+      "seconds": 313,
+      "phase": "dead",
+      "level": 22,
+      "kills": 710,
+      "bosses": 1,
+      "damage": 80677,
+      "peakEnemies": 77,
+      "peakBullets": 101,
+      "frames": 6253,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 2.14,
+      "build": [
+        "追星弓",
+        "月环",
+        "春芽",
+        "古树之心",
+        "星核",
+        "萤火灵",
+        "穿林",
+        "旅人步伐",
+        "琉璃彗星",
+        "弓弦张力",
+        "蜂群节律",
+        "星纹护甲",
+        "贪婪之冠",
+        "脆弱",
+        "生息",
+        "拾星",
+        "双生星轨"
+      ]
+    },
+    {
+      "version": "after",
+      "map": "forest",
+      "draws": {
+        "level": 9,
+        "positive": 0,
+        "negative": 0,
+        "replacement": 0,
+        "refresh": 3
+      },
+      "wave": 5,
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 0,
+      "negativeLayers": 0,
+      "output": [],
+      "finiteDefinitions": 35,
+      "remainingDefinitions": 35,
+      "remainingRanks": 68,
+      "acquiredRanks": 9,
+      "weapons": {
+        "bow": 3
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "ranger",
+      "seed": 83,
+      "stress": false,
+      "seconds": 126,
+      "phase": "dead",
+      "level": 10,
+      "kills": 188,
+      "bosses": 0,
+      "damage": 14335,
+      "peakEnemies": 36,
+      "peakBullets": 21,
+      "frames": 2518,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.47,
+      "build": [
+        "追星弓",
+        "古树之心",
+        "双生星轨",
+        "星核",
+        "春芽"
+      ]
+    },
+    {
+      "version": "after",
+      "map": "forest",
+      "draws": {
+        "level": 14,
+        "positive": 1,
+        "negative": 0,
+        "replacement": 0,
+        "refresh": 3
+      },
+      "wave": 7,
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 1,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 0,
+      "negativeLayers": 0,
+      "output": [
+        {
+          "time": 300,
+          "damage": 34845,
+          "layers": 14,
+          "negativeLayers": 0,
+          "extraDraws": {
+            "positive": 1,
+            "negative": 0
+          },
+          "attack": 1.2,
+          "maxHp": 235
+        }
+      ],
+      "finiteDefinitions": 35,
+      "remainingDefinitions": 35,
+      "remainingRanks": 67,
+      "acquiredRanks": 15,
+      "weapons": {
+        "blade": 1,
+        "orbit": 2,
+        "drone": 1
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "knight",
+      "seed": 11,
+      "stress": false,
+      "seconds": 313,
+      "phase": "dead",
+      "level": 15,
+      "kills": 324,
+      "bosses": 0,
+      "damage": 35865,
+      "peakEnemies": 56,
+      "peakBullets": 32,
+      "frames": 6256,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 1.09,
+      "build": [
+        "弧月刃",
+        "古树之心",
+        "满月",
+        "月环",
+        "春芽",
+        "星核",
+        "星尘引力",
+        "萤火灵",
+        "不熄余烬",
+        "辅术精通",
+        "灵体聚能"
+      ]
+    },
+    {
+      "version": "after",
+      "map": "forest",
+      "draws": {
+        "level": 11,
+        "positive": 0,
+        "negative": 1,
+        "replacement": 0,
+        "refresh": 3
+      },
+      "wave": 6,
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 0,
+        "negative": 1
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 3,
+      "negativeLayers": 1,
+      "output": [],
+      "finiteDefinitions": 35,
+      "remainingDefinitions": 34,
+      "remainingRanks": 68,
+      "acquiredRanks": 12,
+      "weapons": {
+        "blade": 1,
+        "orbit": 1
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 1,
+        "cleansed": 0
+      },
+      "character": "knight",
+      "seed": 29,
+      "stress": false,
+      "seconds": 264,
+      "phase": "dead",
+      "level": 12,
+      "kills": 240,
+      "bosses": 0,
+      "damage": 21521,
+      "peakEnemies": 51,
+      "peakBullets": 23,
+      "frames": 5274,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.75,
+      "build": [
+        "弧月刃",
+        "月环",
+        "辅术精通",
+        "古树之心",
+        "荒芜",
+        "春芽",
+        "群星聚焦",
+        "命运馈赠"
+      ]
+    },
+    {
+      "version": "after",
+      "map": "forest",
+      "draws": {
+        "level": 15,
+        "positive": 0,
+        "negative": 0,
+        "replacement": 0,
+        "refresh": 3
+      },
+      "wave": 8,
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 1,
+      "refreshes": 0,
+      "negativeLayers": 0,
+      "output": [
+        {
+          "time": 300,
+          "damage": 41652,
+          "layers": 16,
+          "negativeLayers": 0,
+          "extraDraws": {
+            "positive": 0,
+            "negative": 0
+          },
+          "attack": 1.3199999999999998,
+          "maxHp": 195
+        }
+      ],
+      "finiteDefinitions": 35,
+      "remainingDefinitions": 35,
+      "remainingRanks": 66,
+      "acquiredRanks": 16,
+      "weapons": {
+        "blade": 3,
+        "orbit": 1
+      },
+      "fate": {
+        "chests": 1,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "knight",
+      "seed": 83,
+      "stress": false,
+      "seconds": 301,
+      "phase": "dead",
+      "level": 16,
+      "kills": 436,
+      "bosses": 0,
+      "damage": 42152,
+      "peakEnemies": 63,
+      "peakBullets": 21,
+      "frames": 6029,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.94,
+      "build": [
+        "弧月刃",
+        "辅术精通",
+        "古树之心",
+        "冰火共鸣",
+        "春芽",
+        "满月",
+        "穿林",
+        "星尘引力",
+        "月环",
+        "旅途宝箱",
+        "战意",
+        "星核"
+      ]
+    },
+    {
+      "version": "after",
+      "map": "forest",
+      "draws": {
+        "level": 21,
+        "positive": 3,
+        "negative": 0,
+        "replacement": 0,
+        "refresh": 3
+      },
+      "wave": 10,
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 3,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 1,
+      "refreshes": 0,
+      "negativeLayers": 0,
+      "output": [
+        {
+          "time": 300,
+          "damage": 76897,
+          "layers": 24,
+          "negativeLayers": 0,
+          "extraDraws": {
+            "positive": 3,
+            "negative": 0
+          },
+          "attack": 1.2,
+          "maxHp": 215
+        }
+      ],
+      "finiteDefinitions": 35,
+      "remainingDefinitions": 33,
+      "remainingRanks": 61,
+      "acquiredRanks": 24,
+      "weapons": {
+        "ember": 3,
+        "orbit": 1,
+        "drone": 3
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "mage",
+      "seed": 11,
+      "stress": false,
+      "seconds": 307,
+      "phase": "dead",
+      "level": 22,
+      "kills": 749,
+      "bosses": 1,
+      "damage": 83658,
+      "peakEnemies": 90,
+      "peakBullets": 96,
+      "frames": 6149,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 1.89,
+      "build": [
+        "烬火杖",
+        "萤火灵",
+        "古树之心",
+        "星核",
+        "月环",
+        "春芽",
+        "拾星",
+        "月核增幅",
+        "辅术精通",
+        "萤火之森",
+        "不熄余烬",
+        "求知者",
+        "主术精通",
+        "鹰眼",
+        "燃素循环",
+        "星尘引力"
+      ]
+    },
+    {
+      "version": "after",
+      "map": "forest",
+      "draws": {
+        "level": 11,
+        "positive": 0,
+        "negative": 0,
+        "replacement": 0,
+        "refresh": 0
+      },
+      "wave": 6,
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 3,
+      "negativeLayers": 0,
+      "output": [],
+      "finiteDefinitions": 35,
+      "remainingDefinitions": 35,
+      "remainingRanks": 67,
+      "acquiredRanks": 11,
+      "weapons": {
+        "ember": 2,
+        "orbit": 2
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "mage",
+      "seed": 29,
+      "stress": false,
+      "seconds": 226,
+      "phase": "dead",
+      "level": 12,
+      "kills": 236,
+      "bosses": 0,
+      "damage": 20379,
+      "peakEnemies": 50,
+      "peakBullets": 30,
+      "frames": 4527,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.66,
+      "build": [
+        "烬火杖",
+        "月环",
+        "古树之心",
+        "星核",
+        "春芽",
+        "辅术精通"
+      ]
+    },
+    {
+      "version": "after",
+      "map": "forest",
+      "draws": {
+        "level": 9,
+        "positive": 0,
+        "negative": 0,
+        "replacement": 0,
+        "refresh": 1
+      },
+      "wave": 5,
+      "shuffles": [],
+      "extraDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "pendingDraws": {
+        "positive": 0,
+        "negative": 0
+      },
+      "dropObjects": 0,
+      "refreshes": 2,
+      "negativeLayers": 0,
+      "output": [],
+      "finiteDefinitions": 35,
+      "remainingDefinitions": 35,
+      "remainingRanks": 70,
+      "acquiredRanks": 9,
+      "weapons": {
+        "ember": 1,
+        "drone": 1
+      },
+      "fate": {
+        "chests": 0,
+        "gained": 0,
+        "cleansed": 0
+      },
+      "character": "mage",
+      "seed": 83,
+      "stress": false,
+      "seconds": 129,
+      "phase": "dead",
+      "level": 10,
+      "kills": 172,
+      "bosses": 0,
+      "damage": 11701,
+      "peakEnemies": 41,
+      "peakBullets": 18,
+      "frames": 2577,
+      "checkpoint": [],
+      "validatedSnapshots": 0,
+      "peakHeapMiB": 0,
+      "wallSeconds": 0.46,
+      "build": [
+        "烬火杖",
+        "古树之心",
+        "星核",
+        "萤火灵",
+        "春芽"
+      ]
+    }
+  ]
+}

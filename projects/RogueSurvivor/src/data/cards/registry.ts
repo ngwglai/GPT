@@ -90,7 +90,9 @@ export interface CardDefinition extends Upgrade {
 export function defineCards(raw: Upgrade[]): CardDefinition[] {
   return raw.map((u) => {
     const negative = u.id.startsWith("hex_"),
-      mixed = ["bloodmoon", "greed", "chest_risk"].includes(u.id);
+      mixed = ["bloodmoon", "greed", "chest_risk", "glass_comet"].includes(
+        u.id,
+      );
     const utility = [
       "reroll",
       "forget",
@@ -99,6 +101,7 @@ export function defineCards(raw: Upgrade[]): CardDefinition[] {
       "shuffle",
     ].includes(u.id);
     const numeric =
+      ["crit_damage", "boss_hunter", "burning_judge"].includes(u.id) ||
       !!LEGACY_MODIFIERS[u.id] ||
       (!!MODIFIERS[u.id] && !mixed) ||
       ["burn", "shatter", "wide"].includes(u.id);
@@ -119,8 +122,9 @@ export function defineCards(raw: Upgrade[]): CardDefinition[] {
     const m: Modifier | undefined = LEGACY_MODIFIERS[u.id] || MODIFIERS[u.id];
     return {
       ...u,
+      excludes: u.excludes || raw.find((x) => x.excludes === u.id)?.id,
       conditions: {
-        minLevel: u.id === "ascend" ? 25 : 1,
+        minLevel: u.minLevel || (u.id === "ascend" ? 25 : 1),
         source: m?.source || "",
       },
       max,
@@ -134,9 +138,9 @@ export function defineCards(raw: Upgrade[]): CardDefinition[] {
             : u.id === "wide"
               ? "每层斩击半径+18（最多+240），挥砍补盾+2（最多40，仅补至80）；超出半径贡献转化伤害。"
               : u.id === "burn"
-                ? "前4层每层燃烧时间+1秒、燃烧系数+25个百分点；其后按4+4×ln(层数/4)计算有效层数。"
+                ? "前4层每层燃烧时间+1秒、燃烧系数+40个百分点；其后按4+4×ln(层数/4)计算有效层数。"
                 : u.id === "shatter"
-                  ? "前2层每层对冻结/减速敌人伤害+30个百分点；其后按2+2×ln(层数/2)计算有效层数。"
+                  ? "前2层每层对冻结/减速敌人条件增伤区+40个百分点；其后按2+2×ln(层数/2)计算有效层数。"
                   : u.desc,
       type: negative
         ? "负面"

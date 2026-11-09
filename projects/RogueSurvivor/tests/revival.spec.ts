@@ -49,6 +49,60 @@ for (const character of ["ranger", "knight", "mage"])
   }) => {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
+    // Observe the one-second clip inside the page; slow cross-process polling can miss it.
+    // Pause through the normal HUD as soon as combat resumes, before a slow screenshot
+    // or assertion round trip can outlive the three-second revival protection.
+    await page.addInitScript(() => {
+      const evidence = {
+        frames: [] as {
+          action: string;
+          texture: string;
+          frame: number;
+          caption: string;
+        }[],
+        paused: false,
+      };
+      (window as any).revivalEvidence = evidence;
+      new MutationObserver((records) => {
+        for (const record of records) {
+          const el = record.target;
+          if (!(el instanceof HTMLCanvasElement)) continue;
+          const action = el.dataset.characterAction || "";
+          if (action === "revive") {
+            const frame = Number(el.dataset.characterFrame);
+            if (!evidence.frames.some((x) => x.frame === frame))
+              evidence.frames.push({
+                action,
+                frame,
+                texture: el.dataset.characterTexture || "",
+                caption:
+                  document.querySelector(".presentation-caption")
+                    ?.textContent || "",
+              });
+          } else if (
+            evidence.frames.length &&
+            !evidence.paused &&
+            ["idle", "run"].includes(action)
+          ) {
+            const pause = document.querySelector<HTMLButtonElement>(
+              '[data-action="pause"]',
+            );
+            if (pause) {
+              evidence.paused = true;
+              pause.click();
+            }
+          }
+        }
+      }).observe(document, {
+        subtree: true,
+        attributes: true,
+        attributeFilter: [
+          "data-character-action",
+          "data-character-frame",
+          "data-character-texture",
+        ],
+      });
+    });
     const w = new World(createRun("endless", character, 1602));
     w.s.player.hp = 1;
     w.s.player.invincible = 0;
@@ -99,29 +153,41 @@ for (const character of ["ranger", "knight", "mage"])
     ).toBeVisible();
     expect((await saved(page)).revival.used).toBe(0);
     await page.getByRole("button", { name: "重新点燃星火" }).click();
-    await expect(page.locator(".presentation-caption")).toContainText(
-      "星火汇聚",
-    );
-    await expect(page.locator("canvas")).toHaveAttribute(
-      "data-character-action",
-      "revive",
-    );
-    await expect(page.locator("canvas")).toHaveAttribute(
-      "data-character-texture",
-      new RegExp(`animation.${character}.revive`),
-    );
-    await page.screenshot({
-      path: `validation/v1.6/${character}-reviving.jpg`,
-      type: "jpeg",
-      quality: 82,
-    });
+    // Deliberately emulate an observer slower than the clip in the ranger case.
+    if (character === "ranger") await page.waitForTimeout(1500);
+    await expect
+      .poll(() =>
+        page.evaluate((character) => {
+          const e = (window as any).revivalEvidence;
+          return e.frames.filter(
+            (f: any) =>
+              f.action === "revive" &&
+              f.texture === `animation.${character}.revive` &&
+              f.caption.includes("星火汇聚"),
+          ).length;
+        }, character),
+      )
+      .toBeGreaterThanOrEqual(2);
+    // Retain a diagnostic screenshot only when it still depicts the actual clip.
+    if (
+      (await page.locator("canvas").getAttribute("data-character-action")) ===
+      "revive"
+    )
+      await page.screenshot({
+        path: `validation/v1.6/${character}-reviving.jpg`,
+        type: "jpeg",
+        quality: 82,
+      });
     await expect(page.locator(".presentation-caption")).toHaveCount(0);
-    await page.keyboard.press("Escape");
+    await expect(
+      page.getByRole("heading", { name: "远征已暂停" }),
+    ).toBeVisible();
     await page
       .getByRole("button", { name: "保存当前进度", exact: true })
       .click();
     await expect(page.locator("#toast")).toContainText("进度已保存");
     const after = await saved(page);
+    expect(after.phase).toBe("playing");
     expect(after.revival.used).toBe(1);
     expect(after.revival.remaining).toBe(0);
     expect(after.player.hp).toBe(after.player.maxHp * 0.5);
@@ -342,6 +408,14 @@ test("正式首领奖励一次星火，放弃复活与旧检查点重放不重�
   expect(records).toBe(1);
 });
 test("旧静态角色覆盖优先，单动作静态图片也可正常加载", async ({ page }) => {
+  // Two complete texture reloads need their own software-rendering budget.
+  test.setTimeout(90000);
+  const pause = async () => {
+    await page.locator('[data-action="pause"]').click();
+    await expect(
+      page.getByRole("heading", { name: "远征已暂停" }),
+    ).toBeVisible();
+  };
   const w = new World(createRun("endless", "ranger", 1609));
   w.s.player.invincible = 999;
   await page.goto("/");
@@ -390,12 +464,14 @@ test("旧静态角色覆盖优先，单动作静态图片也可正常加载", as
     "data-character-texture",
     "player.ranger",
   );
+  await pause();
   await setPack(false);
   await resume(page, w.s);
   await expect(page.locator("canvas")).toHaveAttribute(
     "data-character-texture",
     "animation.ranger.idle",
   );
+  await pause();
 });
 test("结算前刷新留下的终局检查点在启动时补记且只记一次", async ({ page }) => {
   const s = createRun("endless", "mage", 1610);

@@ -1,10 +1,11 @@
+import { GROWTH_RULES } from "../growth";
 import { skillLevelText } from "../skills";
 import { weaponStats } from "../weapons";
 import { WEAPONS } from "../weapons";
 import type { WeaponId } from "../../core/types";
 import type { Run } from "../../core/types";
 import { MODIFIERS } from "./expedition";
-import { LEGACY_MODIFIERS } from "../../core/fate";
+import { LEGACY_MODIFIERS } from "./effects";
 const exact: Record<string, string> = {
   fork: "每级弓箭数量 +1；箭之间夹角0.14弧度。",
   pierce: "每级弓箭、星火、灵体弹道额外穿透1次；与碎星互斥。",
@@ -12,9 +13,9 @@ const exact: Record<string, string> = {
   satellite: "每级月环卫星 +1，环绕半径 +12。",
   swarm: "每级灵体弹道 +1，射击频率系数 +20%（加算）。",
   wildfire: "燃烧敌人死亡时，145半径内敌人获得相同强度的火种。",
-  power: "所有伤害系数每级 +0.12（同类加算）。",
+  power: "所有伤害系数每级 +0.20（同类加算）。",
   ascend:
-    "每级回复15%最大生命；伤害乘区为1+0.23×ln(1+领悟等级)。25级起出现，无限叠加。",
+    "每级回复15%最大生命；基础攻击区贡献0.32×ln(1+领悟等级)，参与基础攻击递减。25级起出现，无限叠加。",
 };
 export function detail(s: Run, id: string) {
   if (id.startsWith("weapon_")) {
@@ -26,13 +27,13 @@ export function detail(s: Run, id: string) {
         ? `基础单次伤害${weaponStats(key, n).damage.toFixed(1)}，基础间隔${weaponStats(key, n).interval.toFixed(2)}秒`
         : "尚未持有";
     const evolution = {
-      bow: "5级额外1箭",
-      blade: "5级横扫半径额外+35",
-      ember: "命中爆炸并燃烧，5级爆炸半径55→90",
-      orbit: "5级额外2颗卫星",
-      drone: "5级弹道自动追踪",
+      bow: "3级额外1箭",
+      blade: "3级横扫半径额外+45",
+      ember: "命中爆炸并燃烧，3级爆炸半径55→100",
+      orbit: "3级额外2颗卫星",
+      drone: "3级弹道自动追踪",
     };
-    return `${stat(lv)} → ${stat(Math.min(5, lv + 1))}；锁敌/基础范围${w.range}；${evolution[key]}。伤害、频率还受其他卡牌影响。`;
+    return `${stat(lv)} → ${stat(Math.min(GROWTH_RULES.weaponMax, lv + 1))}；锁敌/基础范围${w.range}；${evolution[key]}。伤害、频率还受其他卡牌影响。`;
   }
 
   const n = s.player.upgrades[id] || 0,

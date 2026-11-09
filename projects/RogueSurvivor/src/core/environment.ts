@@ -95,7 +95,7 @@ export function hitCrystals(c: Combat, p: Vec, r: number, damage: number) {
     if (x.type === "blast") {
       for (const e of s.enemies)
         if (e.hp > 0 && distance(e, x) < 145 + e.r)
-          c.damage(e, 85, "crystal", false, x);
+          c.damage(e, 85, "crystal", false, x, { kind: "proc" });
       for (const other of env.crystals)
         if (other.hp > 0 && distance(other, x) < ENV_RULES.chainRange) {
           other.hp = 0;

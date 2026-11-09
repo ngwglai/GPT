@@ -251,7 +251,7 @@ test("v1.4 new boss second phase, map state and five weapons resume", async ({
   w.s.player.invincible = 30;
   for (const id of ["bow", "blade", "ember", "orbit", "drone"] as const)
     w.s.player.upgrades["weapon_" + id] =
-      5 - (ensureDeck(w.s).baseWeapons[id] || 0);
+      3 - (ensureDeck(w.s).baseWeapons[id] || 0);
   const { recalculate } = await import("../src/core/fate");
   recalculate(w.s);
   const boss = spawn(w, "crystalQueen", { x: 2100, y: 1800 })!;

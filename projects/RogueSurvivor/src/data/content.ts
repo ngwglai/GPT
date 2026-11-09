@@ -9,9 +9,7 @@ export const LIMITS = {
   number: 1e12,
 };
 export const RARITIES = ["寻常", "珍稀", "传奇"];
-export function xpNeeded(level: number) {
-  return 18 + level * 12 + Math.floor(Math.sqrt(level) * 8);
-}
+export { experienceRequired as xpNeeded } from "./growth";
 // v1.4.1 extreme-wave progression. Multipliers are relative to base enemy stats.
 // Values are continuous between milestones; the 60-minute tier is the floor
 // for late endless runs, rather than allowing numerical overflow.
@@ -57,12 +55,14 @@ export { WEAPONS } from "./weapons";
 export { SKILLS } from "./skills";
 export { ENEMIES } from "./enemies";
 export type { Upgrade } from "./cards/legacy";
+import { CORE_CARDS } from "./cards/cores";
 import { LEGACY_CARDS } from "./cards/legacy";
 import { NEW_CARDS } from "./cards/expedition";
 import { defineCards, NEGATIVES } from "./cards/registry";
 export const UPGRADES = defineCards([
   ...LEGACY_CARDS,
   ...NEW_CARDS,
+  ...CORE_CARDS,
   ...NEGATIVES,
   {
     id: "shuffle",

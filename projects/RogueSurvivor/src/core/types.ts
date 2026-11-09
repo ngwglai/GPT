@@ -168,10 +168,11 @@ export interface Stats {
   peakBullets: number;
 }
 export interface Run {
+  build?: import("./buildState").BuildState;
   fate?: import("./fate").Fate;
   deck?: import("./deckState").DeckState;
   rewardDrops?: import("./drops").RewardDrop[];
-  version: 1 | 2 | 3 | 4;
+  version: 1 | 2 | 3 | 4 | 5;
   revival?: import("./revival").RevivalState;
   recordId?: string;
   recorded?: Mode[];

@@ -1,3 +1,4 @@
+import { buildState } from "../src/core/buildState";
 import type { MapId } from "../src/data/maps";
 import { refresh } from "../src/core/cardPool";
 import { ensureDeck, heldLayers } from "../src/core/deckState";
@@ -28,9 +29,9 @@ export function simulate(
   );
   if (stress)
     for (const id of ["bow", "blade", "ember", "orbit", "drone"] as const) {
-      w.s.player.weapons[id] = 5;
+      w.s.player.weapons[id] = 3;
       w.s.player.upgrades["weapon_" + id] =
-        5 - (ensureDeck(w.s).baseWeapons[id] || 0);
+        3 - (ensureDeck(w.s).baseWeapons[id] || 0);
     }
   const shuffles: {
     time: number;
@@ -187,6 +188,8 @@ export function simulate(
   }
   const result = {
     map,
+    draws: { ...buildState(w.s).draws },
+    wave: w.s.wave?.number,
     shuffles,
     extraDraws: ensureDeck(w.s).earned,
     pendingDraws: ensureDeck(w.s).pending,

@@ -105,7 +105,7 @@ function fixture(map: MapId, dense = false) {
   w.s.player.invincible = 300;
   for (const id of ["bow", "blade", "ember", "orbit", "drone"] as const)
     w.s.player.upgrades["weapon_" + id] =
-      5 - (ensureDeck(w.s).baseWeapons[id] || 0);
+      3 - (ensureDeck(w.s).baseWeapons[id] || 0);
   recalculate(w.s);
   for (const id of dense ? bossKinds : [MAPS[map].bosses[3]]) {
     const e = spawn(w, id, {
