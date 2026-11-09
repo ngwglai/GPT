@@ -579,3 +579,17 @@ it("较早v5检查点缺少新增控制时钟时可安全补齐", () => {
   delete (s.build as any).twinReady;
   expect(validateRun(s).build!.twinReady).toBe(0);
 });
+
+it("双生共鸣计入致命命中，三次击杀后的一次存活命中仍触发冻结", () => {
+  const w = world();
+  cards(w, ["weapon_orbit", "twin_resonance"]);
+  for (let i = 0; i < 3; i++) {
+    const e = dummy(w);
+    e.hp = 0.01;
+    w.damage(e, 1, "bow", false);
+  }
+  const target = dummy(w);
+  w.damage(target, 0.01, "bow", false);
+  expect(buildState(w.s).twinHits).toBe(0);
+  expect(target.freeze).toBe(P.twins.freeze);
+});

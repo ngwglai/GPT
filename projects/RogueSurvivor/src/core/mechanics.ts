@@ -61,14 +61,14 @@ export function afterHit(
     b.hunt = true;
     c.effect(s.player, "critical", 25, "追猎就绪");
   }
-  if (u.twin_resonance && source === "bow" && e.hp > 0) {
+  if (u.twin_resonance && source === "bow") {
     b.twinHits = (b.twinHits + 1) % P.twins.every;
-    if (!b.twinHits && ready(c, "twinReady", P.twins.cooldown)) {
+    if (!b.twinHits && e.hp > 0 && ready(c, "twinReady", P.twins.cooldown)) {
       e.freeze = Math.max(
         e.freeze,
         ENEMIES[e.kind].boss ? P.twins.bossFreeze : P.twins.freeze,
       );
-      e.slow = Math.max(e.slow, 1.2);
+      e.slow = Math.max(e.slow, P.twins.slow);
       c.effect(e, "ice", 32);
     }
   }
