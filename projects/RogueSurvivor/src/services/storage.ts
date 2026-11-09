@@ -786,6 +786,7 @@ export function validateRun(input: unknown): Run {
     );
     assert(
       [
+        ...(b.twinReady === undefined ? [] : [b.twinReady]),
         b.fractureReady,
         b.orbitReady,
         b.chainReady,

@@ -8,7 +8,7 @@ export const CORE_PARAMS = {
   chain: { chance: 0.25, range: 180, count: 3, fraction: 0.6, cooldown: 0.65 },
   judgment: { threshold: 0.5, bonus: 0.6 },
   focus: { step: 0.04, hits: 10 },
-  twins: { every: 4, freeze: 0.7 },
+  twins: { every: 4, freeze: 0.7, bossFreeze: 0.15, cooldown: 0.8 },
   steam: { damage: 28, radius: 85, cooldown: 0.8 },
   comet: { duration: 4, bonus: 0.45, cost: 0.05 },
 };
@@ -29,7 +29,7 @@ export const CORE_CARDS: Upgrade[] = [
     rarity: 2,
     max: 1,
     requires: "burn",
-    desc: `燃烧每次结算独立按角色暴击率判定，基础暴击倍率${P.burnCrit}，另享暴伤卡的${G.burnCritShare * 100}%增量（燃烧暴击最高${G.burnCritLimit}倍）；不触发直接命中机制。`,
+    desc: `燃烧每次结算独立按角色暴击率判定，基础暴击倍率${P.burnCrit}，另享暴伤卡递减后、直接暴击上限截断前贡献的${G.burnCritShare * 100}%（燃烧暴击最高${G.burnCritLimit}倍）；不触发直接命中机制。`,
   },
   {
     id: "blood_hunt",
@@ -83,7 +83,7 @@ export const CORE_CARDS: Upgrade[] = [
     max: 1,
     requires: "weapon_bow",
     allOf: ["weapon_orbit"],
-    desc: `追星弓每${P.twins.every}次直接命中，将目标冻结${P.twins.freeze}秒，供月环及冻结流联动；衍生伤害不计数。`,
+    desc: `追星弓每${P.twins.every}次直接命中，将目标冻结${P.twins.freeze}秒（Boss为${P.twins.bossFreeze}秒），供月环及冻结流联动；全局触发间隔${P.twins.cooldown}秒，衍生伤害不计数。`,
   },
   {
     id: "frostfire",

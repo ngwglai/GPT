@@ -5,6 +5,7 @@ export interface BuildState {
   focusHits: number;
   hunt: boolean;
   twinHits: number;
+  twinReady: number;
   fractureReady: number;
   orbitReady: number;
   chainReady: number;
@@ -20,12 +21,14 @@ export interface BuildState {
   compensation: number;
 }
 export function buildState(s: Run): BuildState {
+  if (s.build) s.build.twinReady ??= 0;
   return (s.build ||= {
     schema: 1,
     focusId: 0,
     focusHits: 0,
     hunt: false,
     twinHits: 0,
+    twinReady: 0,
     fractureReady: 0,
     orbitReady: 0,
     chainReady: 0,
@@ -41,6 +44,7 @@ export function clearMechanics(s: Run) {
   b.focusHits = 0;
   b.hunt = false;
   b.twinHits = 0;
+  b.twinReady = 0;
   b.fractureReady = 0;
   b.orbitReady = 0;
   b.chainReady = 0;

@@ -542,3 +542,40 @@ it("暴伤说明不会在缺少余烬循环时暗示燃烧已可暴击", () => {
   s.player.upgrades.ember_cycle = 1;
   expect(effectSummary(s, "crit_damage")).not.toContain("未解锁");
 });
+
+it("高频多箭的双生共鸣不会永久冻结Boss", () => {
+  const w = world();
+  cards(w, ["weapon_orbit", "twin_resonance"]);
+  const e = dummy(w, "warden");
+  let frozen = 0;
+  // Four impacts per 0.2s is within an evolved, forked, quickened bow's firing rate.
+  for (let frame = 0; frame < 200; frame++) {
+    w.s.time = frame * 0.02;
+    e.freeze = Math.max(0, e.freeze - 0.02);
+    if (frame % 10 === 0)
+      for (let arrow = 0; arrow < 4; arrow++) w.damage(e, 0.01, "bow", false);
+    if (e.freeze > 0) frozen += 0.02;
+  }
+  expect(frozen).toBeLessThanOrEqual(1);
+  expect(e.hp).toBeGreaterThan(0);
+});
+
+it("双生控制冷却随存档恢复，不会重复触发", () => {
+  const w = world();
+  cards(w, ["weapon_orbit", "twin_resonance"]);
+  const e = dummy(w, "warden");
+  for (let i = 0; i < 4; i++) w.damage(e, 0.01, "bow", false);
+  const saved = validateRun(w.s);
+  expect(saved.build!.twinReady).toBeCloseTo(P.twins.cooldown);
+  const resumed = new World(saved),
+    target = resumed.s.enemies[0];
+  target.freeze = 0;
+  resumed.s.time = 0.1;
+  for (let i = 0; i < 4; i++) resumed.damage(target, 0.01, "bow", false);
+  expect(target.freeze).toBe(0);
+});
+it("较早v5检查点缺少新增控制时钟时可安全补齐", () => {
+  const s = world().s;
+  delete (s.build as any).twinReady;
+  expect(validateRun(s).build!.twinReady).toBe(0);
+});

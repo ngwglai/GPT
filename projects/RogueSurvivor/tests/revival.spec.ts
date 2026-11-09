@@ -342,6 +342,14 @@ test("正式首领奖励一次星火，放弃复活与旧检查点重放不重�
   expect(records).toBe(1);
 });
 test("旧静态角色覆盖优先，单动作静态图片也可正常加载", async ({ page }) => {
+  // Two complete texture reloads need their own software-rendering budget.
+  test.setTimeout(90000);
+  const pause = async () => {
+    await page.locator('[data-action="pause"]').click();
+    await expect(
+      page.getByRole("heading", { name: "远征已暂停" }),
+    ).toBeVisible();
+  };
   const w = new World(createRun("endless", "ranger", 1609));
   w.s.player.invincible = 999;
   await page.goto("/");
@@ -390,12 +398,14 @@ test("旧静态角色覆盖优先，单动作静态图片也可正常加载", as
     "data-character-texture",
     "player.ranger",
   );
+  await pause();
   await setPack(false);
   await resume(page, w.s);
   await expect(page.locator("canvas")).toHaveAttribute(
     "data-character-texture",
     "animation.ranger.idle",
   );
+  await pause();
 });
 test("结算前刷新留下的终局检查点在启动时补记且只记一次", async ({ page }) => {
   const s = createRun("endless", "mage", 1610);

@@ -74,6 +74,11 @@ test("二级到三级武器进化、图鉴与新的乘区说明", async ({ page 
   await expect(page.locator(".codex-card").first()).toContainText("最高3级");
   await page.getByRole("button", { name: "卡牌图鉴", exact: true }).click();
   await expect(page.locator(".damage-rules")).toContainText("条件区");
+  await page.locator("#card-search").fill("双生共鸣");
+  await expect(page.locator(".codex-card:visible")).toContainText(
+    "Boss为0.15秒",
+  );
+  await expect(page.locator(".codex-card:visible")).toContainText("间隔0.8秒");
   await page.locator("#card-search").fill("冰晶碎裂");
   await expect(page.locator(".codex-card:visible")).toHaveCount(1);
   await expect(page.locator(".codex-card:visible")).toContainText("不递归");

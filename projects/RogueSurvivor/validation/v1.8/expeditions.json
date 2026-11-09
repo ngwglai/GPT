@@ -63,7 +63,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 1.9,
+      "wallSeconds": 0.91,
       "build": [
         "追星弓",
         "萤火灵",
@@ -116,7 +116,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 1.49,
+      "wallSeconds": 0.66,
       "build": [
         "追星弓",
         "月环",
@@ -170,7 +170,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 0.98,
+      "wallSeconds": 0.45,
       "build": [
         "追星弓",
         "星核",
@@ -223,7 +223,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 1.11,
+      "wallSeconds": 0.59,
       "build": [
         "弧月刃",
         "古树之心",
@@ -279,7 +279,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 0.98,
+      "wallSeconds": 0.47,
       "build": [
         "弧月刃",
         "月环",
@@ -334,7 +334,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 1.05,
+      "wallSeconds": 0.44,
       "build": [
         "弧月刃",
         "辅术精通",
@@ -391,7 +391,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 0.96,
+      "wallSeconds": 0.43,
       "build": [
         "烬火杖",
         "星核",
@@ -446,7 +446,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 0.71,
+      "wallSeconds": 0.49,
       "build": [
         "烬火杖",
         "月环",
@@ -500,7 +500,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 1.72,
+      "wallSeconds": 0.78,
       "build": [
         "烬火杖",
         "古树之心",
@@ -562,7 +562,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 1.51,
+      "wallSeconds": 0.5,
       "build": [
         "追星弓",
         "萤火灵",
@@ -638,7 +638,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 4.68,
+      "wallSeconds": 1.88,
       "build": [
         "追星弓",
         "月环",
@@ -710,7 +710,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 0.77,
+      "wallSeconds": 0.47,
       "build": [
         "追星弓",
         "古树之心",
@@ -785,7 +785,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 1.94,
+      "wallSeconds": 0.92,
       "build": [
         "弧月刃",
         "古树之心",
@@ -852,7 +852,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 1.77,
+      "wallSeconds": 0.67,
       "build": [
         "弧月刃",
         "月环",
@@ -929,7 +929,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 1.99,
+      "wallSeconds": 0.87,
       "build": [
         "弧月刃",
         "辅术精通",
@@ -1011,7 +1011,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 4.61,
+      "wallSeconds": 1.55,
       "build": [
         "烬火杖",
         "萤火灵",
@@ -1083,7 +1083,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 1.89,
+      "wallSeconds": 0.59,
       "build": [
         "烬火杖",
         "月环",
@@ -1145,7 +1145,7 @@
       "checkpoint": [],
       "validatedSnapshots": 0,
       "peakHeapMiB": 0,
-      "wallSeconds": 1.91,
+      "wallSeconds": 0.42,
       "build": [
         "烬火杖",
         "古树之心",

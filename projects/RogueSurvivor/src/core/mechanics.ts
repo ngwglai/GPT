@@ -1,3 +1,4 @@
+import { ENEMIES } from "../data/enemies";
 import type { Combat } from "./combat";
 import type { Enemy, Vec } from "./types";
 import type { DamageContext } from "./damage";
@@ -7,7 +8,8 @@ import { distance, random } from "./math";
 
 function ready(
   c: Combat,
-  key: "fractureReady" | "orbitReady" | "chainReady" | "steamReady",
+  key:
+    "fractureReady" | "orbitReady" | "chainReady" | "steamReady" | "twinReady",
   interval: number,
 ) {
   const b = buildState(c.s);
@@ -61,8 +63,11 @@ export function afterHit(
   }
   if (u.twin_resonance && source === "bow" && e.hp > 0) {
     b.twinHits = (b.twinHits + 1) % P.twins.every;
-    if (!b.twinHits) {
-      e.freeze = Math.max(e.freeze, P.twins.freeze);
+    if (!b.twinHits && ready(c, "twinReady", P.twins.cooldown)) {
+      e.freeze = Math.max(
+        e.freeze,
+        ENEMIES[e.kind].boss ? P.twins.bossFreeze : P.twins.freeze,
+      );
       e.slow = Math.max(e.slow, 1.2);
       c.effect(e, "ice", 32);
     }
