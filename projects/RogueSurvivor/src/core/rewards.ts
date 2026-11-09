@@ -59,6 +59,7 @@ export function grant(s: Run, id: string): boolean {
     for (let i = 0; i < count; i++) {
       const pool = eligible(s).filter(
         (u) =>
+          u.polarity === "positive" &&
           !u.id.startsWith("chest_") &&
           ![
             "cleanse",

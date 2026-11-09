@@ -94,7 +94,7 @@ try {
     w.s.player.invincible = 300;
     for (const id of ["bow", "blade", "ember", "orbit", "drone"] as const)
       w.s.player.upgrades["weapon_" + id] =
-        5 - (ensureDeck(w.s).baseWeapons[id] || 0);
+        3 - (ensureDeck(w.s).baseWeapons[id] || 0);
     recalculate(w.s);
     for (let i = 0; i < 160; i++) {
       const a = i * 2.4;

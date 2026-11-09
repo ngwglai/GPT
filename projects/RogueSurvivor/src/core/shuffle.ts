@@ -1,3 +1,4 @@
+import { clearMechanics } from "./buildState";
 import type { Run } from "./types";
 import { ensureDeck, heldLayers } from "./deckState";
 import { eligible } from "./cardPool";
@@ -86,6 +87,7 @@ export function shuffleDeck(
     s.fate = f;
     s.deck = d;
     s.rng = draft.rng;
+    clearMechanics(s);
     recalculate(s);
     for (const e of s.enemies) {
       e.burn = 0;

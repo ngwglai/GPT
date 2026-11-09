@@ -6,10 +6,10 @@ export interface RewardDrop extends Vec {
   count: number;
 }
 export const DROP_RULES = {
-  normal: { positive: 0.002, negative: 0.0004 },
-  elite: { positive: 0.025, negative: 0.008 },
-  boss: { positive: 0.75, negative: 0.15 },
-  perMinute: { positive: 8, negative: 3 },
+  normal: { positive: 0.0007, negative: 0.00015 },
+  elite: { positive: 0.012, negative: 0.004 },
+  boss: { positive: 0.6, negative: 0.05 },
+  perMinute: { positive: 3, negative: 1 },
   perKindObjects: 16,
 };
 export function placeDrop(s: Run, point: Vec, kind: DrawKind, count = 1) {

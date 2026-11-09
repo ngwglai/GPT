@@ -132,7 +132,9 @@ export function ai(c: Combat, dt: number) {
     e.slow = Math.max(0, e.slow - dt);
     if (e.burn > 0) {
       e.burn -= dt;
-      c.damage(e, e.burnPower * dt, e.burnSource, false);
+      c.damage(e, e.burnPower * dt, e.burnSource, false, undefined, {
+        kind: "burn",
+      });
     }
     if (e.hp <= 0 || e.freeze > 0) continue;
     if (["warden", "witch", "titan"].includes(e.kind)) {

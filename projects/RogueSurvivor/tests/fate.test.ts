@@ -136,7 +136,7 @@ describe("命运与奇遇", () => {
     }
     grant(s, "vigor");
     expect(cardDescription(s, "vigor")).toContain("当前1级 → 2级");
-    expect(s.player.attack).toBeCloseTo(1.07);
+    expect(s.player.attack).toBeCloseTo(1.12);
   });
   it("risk benefits and harms are effective and recoverable", () => {
     const s = createRun("standard");
@@ -151,7 +151,7 @@ describe("命运与奇遇", () => {
 it("legacy removable ranks are reconstructed and new skill/weapon levels are not removed", () => {
   const s = createRun("standard");
   s.player.upgrades.power = 1;
-  s.player.attack = 1.12;
+  s.player.attack = 1.2;
   expect(forget(s)).toBe("power");
   expect(s.player.attack).toBeCloseTo(1);
   expect(s.player.weapons.bow).toBe(1);
@@ -192,12 +192,13 @@ it("wildfire transmits without exponential burn amplification", async () => {
   w.burn(a, 10, "ember");
   a.hp = 0;
   w.step(0.05, { x: 0, y: 0, aim: s.player });
-  expect(b.burnPower).toBe(20);
+  expect(b.burnPower).toBe(26);
+  expect(b.burnPower).toBe(a.burnPower);
 });
 
 it("checks actual equipment levels as well as card counters", () => {
   const s = createRun("standard");
-  s.player.weapons.bow = 5;
+  s.player.weapons.bow = 3;
   s.player.skillLevels[s.player.skills[0]] = 5;
   expect(grant(s, "weapon_bow")).toBe(false);
   expect(grant(s, "skill_q")).toBe(false);

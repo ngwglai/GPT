@@ -1,3 +1,4 @@
+import { GROWTH_RULES } from "./growth";
 import type { EnemyId, SkillId, WeaponId } from "../core/types";
 export const WEAPONS: Record<
   WeaponId,
@@ -54,9 +55,16 @@ export const WEAPONS: Record<
 
 export function weaponStats(id: WeaponId, level: number) {
   const w = WEAPONS[id];
+  const rank = Math.max(
+    1,
+    Math.min(
+      GROWTH_RULES.weaponMax,
+      Number.isFinite(level) ? Math.floor(level) : 1,
+    ),
+  );
   return {
-    damage: w.damage * (1 + (level - 1) * 0.3),
-    interval: w.interval / (1 + (level - 1) * 0.08),
+    damage: w.damage * GROWTH_RULES.weaponDamage[rank],
+    interval: w.interval / GROWTH_RULES.weaponFrequency[rank],
     range: w.range,
   };
 }

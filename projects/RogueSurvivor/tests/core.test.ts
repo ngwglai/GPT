@@ -158,8 +158,8 @@ describe("weapons and active skills", () => {
     w.s.player.upgrades.shatter = 1;
     e.freeze = 1;
     w.damage(e, 10, "bow");
-    expect(e.maxHp - e.hp).toBeCloseTo(26);
-    expect(w.s.stats.bySource.bow).toBeCloseTo(26);
+    expect(e.maxHp - e.hp).toBeCloseTo(28);
+    expect(w.s.stats.bySource.bow).toBeCloseTo(28);
   });
   it("kills credit XP gems and damage never overcounts overkill", () => {
     const w = make(),
@@ -209,15 +209,15 @@ describe("builds and rewards", () => {
     upgrade(v, "pierce");
     expect(eligible(v.s).some((u) => u.id === "split")).toBe(false);
   });
-  it("allows all five weapon families and keeps them at five levels", () => {
+  it("allows all five weapon families and keeps them at three levels", () => {
     const w = make();
     upgrade(w, "weapon_blade");
     upgrade(w, "weapon_orbit");
     upgrade(w, "weapon_drone");
     upgrade(w, "weapon_ember");
     expect(Object.keys(w.s.player.weapons)).toHaveLength(5);
-    for (let i = 0; i < 4; i++) upgrade(w, "weapon_bow");
-    expect(w.s.player.weapons.bow).toBe(5);
+    for (let i = 0; i < 2; i++) upgrade(w, "weapon_bow");
+    expect(w.s.player.weapons.bow).toBe(3);
     expect(eligible(w.s).some((u) => u.id === "weapon_bow")).toBe(false);
   });
   it("split generates fragments that cannot split recursively", () => {
@@ -256,7 +256,7 @@ describe("builds and rewards", () => {
   it("fifth level changes bow behavior by adding a projectile", () => {
     const w = make();
     enemy(w);
-    w.s.player.weapons.bow = 5;
+    w.s.player.weapons.bow = 3;
     w.auto(0.05);
     expect(w.s.bullets).toHaveLength(2);
   });

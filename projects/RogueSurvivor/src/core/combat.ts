@@ -1,8 +1,11 @@
+import { evolved, GROWTH_RULES } from "../data/growth";
+import { damageBreakdown, type DamageContext } from "./damage";
+import { afterHit, fireChain } from "./mechanics";
+import { buildState } from "./buildState";
 import { beginDefeat } from "./revival";
 import { zoneContains } from "./attackGeometry";
 import { temporary, hitCrystals, environment, addBuff } from "./environment";
-import { selectTarget, frontalFactor } from "./targeting";
-import { ENEMY_RULES } from "../data/enemies";
+import { selectTarget } from "./targeting";
 import { skillStats } from "../data/skills";
 import { weaponStats } from "../data/weapons";
 import { modifier, soft } from "./fate";
@@ -34,29 +37,35 @@ export class Combat {
     if (this.effects.length < LIMITS.effects)
       this.effects.push({ ...p, kind, r, text, life: 0.45, maxLife: 0.45 });
   }
-  damage(e: Enemy, amount: number, source: string, crit = true, origin?: Vec) {
+  damage(
+    e: Enemy,
+    amount: number,
+    source: string,
+    crit = true,
+    origin?: Vec,
+    context: DamageContext = {},
+  ) {
     if (e.hp <= 0) return;
     const p = this.s.player;
-    const critical = crit && random(this.s) < p.crit;
-    const synergy =
-      e.slow > 0 || e.freeze > 0
-        ? 1 + soft(p.upgrades.shatter || 0, 2) * 0.3
-        : 1;
-    const value = Math.min(
-      LIMITS.number,
-      amount *
-        damageMultiplier(this.s) *
-        temporary(this.s, "damage") *
-        frontalFactor(e, origin) *
-        modifier(this.s, "damage", source) *
-        synergy *
-        (p.upgrades.execution && e.hp / e.maxHp < 0.25 ? 1.4 : 1) *
-        (p.upgrades.specialist
-          ? 1 + 0.3 / Math.max(1, Object.keys(p.weapons).length)
-          : 1) *
-        (critical ? 2 : 1) *
-        (e.kind === "guard" ? ENEMY_RULES.guardDamageFactor : 1),
-    );
+    const kind = context.kind || "hit",
+      state = buildState(this.s);
+    const charged =
+      kind === "hit" && crit && !!p.upgrades.blood_hunt && state.hunt;
+    const critical =
+      kind !== "proc" &&
+      (crit || (kind === "burn" && !!p.upgrades.ember_cycle)) &&
+      (charged || random(this.s) < p.crit);
+    if (charged) state.hunt = false;
+    const value = damageBreakdown(
+      this.s,
+      e,
+      amount,
+      source,
+      critical,
+      origin,
+      context,
+      charged,
+    ).total;
     const shield = e.behavior?.shield || 0,
       absorbed = Math.min(shield, value);
     if (e.behavior) e.behavior.shield -= absorbed;
@@ -67,9 +76,10 @@ export class Combat {
         if (x.behavior?.shieldOwner === e.id) x.behavior.shield = 0;
     e.hit = 0.1;
     this.s.stats.damage = Math.min(LIMITS.number, this.s.stats.damage + actual);
-    this.s.stats.bySource[source] = Math.min(
+    const credit = context.credit || source;
+    this.s.stats.bySource[credit] = Math.min(
       LIMITS.number,
-      (this.s.stats.bySource[source] || 0) + actual,
+      (this.s.stats.bySource[credit] || 0) + actual,
     );
     if (this.effects.length < 60 && value >= 1)
       this.effect(
@@ -78,6 +88,7 @@ export class Combat {
         12,
         String(Math.round(value)),
       );
+    afterHit(this, e, source, critical, context);
   }
   hurt(amount: number) {
     const p = this.s.player;
@@ -105,10 +116,18 @@ export class Combat {
   burn(e: Enemy, power: number, source: string) {
     e.burn = 3 + soft(this.s.player.upgrades.burn || 0, 4);
     e.burnPower =
-      power * (1 + soft(this.s.player.upgrades.burn || 0, 4) * 0.25);
+      power *
+      (1 + soft(this.s.player.upgrades.burn || 0, 4) * GROWTH_RULES.burnStep);
     e.burnSource = source;
   }
-  area(p: Vec, r: number, damage: number, kind: string, source: string) {
+  area(
+    p: Vec,
+    r: number,
+    damage: number,
+    kind: string,
+    source: string,
+    context: DamageContext = {},
+  ) {
     this.effect(p, kind, r);
     hitCrystals(
       this,
@@ -121,8 +140,16 @@ export class Combat {
     );
     for (const e of this.grid.nearby(p, r + 64)) {
       if (e.hp <= 0 || distance(p, e) > r + e.r) continue;
-      this.damage(e, damage, source);
-      if (kind === "fire") this.burn(e, damage * 0.15, source);
+      this.damage(
+        e,
+        damage,
+        source,
+        context.kind !== "proc",
+        undefined,
+        context,
+      );
+      if (kind === "fire" && context.kind !== "proc")
+        this.burn(e, damage * 0.15, source);
       if (kind === "ice") {
         e.freeze = 1.2;
         e.slow = 4;
@@ -132,6 +159,8 @@ export class Combat {
         move(e, n.x * 22, n.y * 22, e.r, this.s.rocks);
       }
     }
+    if (kind === "fire" && context.kind !== "proc")
+      fireChain(this, p, damage, source, r);
   }
   shoot(
     p: Vec,
@@ -335,7 +364,7 @@ export class Combat {
         mult = weaponStats(key, lv).damage / w.damage;
       p.weaponTimers[key] =
         w.interval /
-        ((1 + (lv - 1) * 0.08) *
+        ((w.interval / weaponStats(key, lv).interval) *
           modifier(this.s, "interval", key) *
           temporary(this.s, "interval"));
       const enemy = selectTarget(
@@ -354,13 +383,13 @@ export class Combat {
               (r) => r.crystalId !== x.id && segmentDistance(r, p, x) < r.r + 3,
             ),
         );
-      if (target) this.sound(lv >= 5 ? "attackStrong" : "attack");
+      if (target) this.sound(evolved(lv) ? "attackStrong" : "attack");
       if (key === "blade") {
         this.area(
           p,
           w.range +
             Math.min(240, (p.upgrades.wide || 0) * 18) +
-            (lv >= 5 ? 35 : 0),
+            (evolved(lv) ? GROWTH_RULES.bladeEvolutionRadius : 0),
           w.damage * mult,
           "slash",
           key,
@@ -372,7 +401,10 @@ export class Combat {
         continue;
       }
       if (key === "orbit") {
-        const count = 2 + (p.upgrades.satellite || 0) + (lv >= 5 ? 2 : 0);
+        const count =
+          2 +
+          (p.upgrades.satellite || 0) +
+          (evolved(lv) ? GROWTH_RULES.evolvedSatellites : 0);
         for (let i = 0; i < count; i++) {
           const a = this.s.time * 2 + (i * Math.PI * 2) / count;
           const pos = {
@@ -393,7 +425,9 @@ export class Combat {
         angle = Math.atan2(dir.y, dir.x);
       const count =
         key === "bow"
-          ? 1 + (p.upgrades.fork || 0) + (lv >= 5 ? 1 : 0)
+          ? 1 +
+            (p.upgrades.fork || 0) +
+            (evolved(lv) ? GROWTH_RULES.evolvedBowArrows : 0)
           : key === "drone"
             ? 2 + (p.upgrades.swarm || 0)
             : 1;
@@ -415,7 +449,7 @@ export class Combat {
           false,
           {
             pierce: p.upgrades.pierce || 0,
-            homing: !!p.upgrades.homing || (key === "drone" && lv >= 5),
+            homing: !!p.upgrades.homing || (key === "drone" && evolved(lv)),
             split: key === "bow" && !!p.upgrades.split,
             r: key === "ember" ? 10 : 5,
           },
@@ -556,7 +590,9 @@ export class Combat {
           this.burn(e, b.damage * 0.18, b.source);
           this.area(
             e,
-            s.player.weapons.ember === 5 ? 90 : 55,
+            evolved(s.player.weapons.ember || 0)
+              ? GROWTH_RULES.emberEvolutionRadius
+              : GROWTH_RULES.emberRadius,
             b.damage * 0.4,
             "fire",
             b.source,

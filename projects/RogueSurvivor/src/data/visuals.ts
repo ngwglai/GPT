@@ -68,18 +68,36 @@ export function cardArt(u: {
   weapon?: string;
   maxStacks: number | null;
 }) {
-  return u.id === "shuffle"
-    ? "card.shuffle"
-    : u.polarity === "negative"
-      ? "card.negative"
-      : u.id.startsWith("chest_")
-        ? "card.treasure"
-        : u.weapon
-          ? "weapon." + u.weapon
-          : u.id === "reroll"
-            ? "card.lucky"
-            : u.maxStacks !== null
-              ? "card.mechanism"
-              : "card." +
-                (["common", "rare", "epic", "epic"][u.rarity] || "common");
+  const coreIcons: Record<string, string> = {
+    crystal_fracture: "skill.ice",
+    ember_cycle: "weapon.ember",
+    blood_hunt: "skill.lance",
+    orbit_resonance: "weapon.orbit",
+    star_chain: "skill.fire",
+    final_judgment: "skill.storm",
+    star_focus: "weapon.bow",
+    twin_resonance: "weapon.drone",
+    frostfire: "skill.ice",
+    glass_comet: "skill.ward",
+    crit_damage: "skill.lance",
+    boss_hunter: "enemy.titan",
+    burning_judge: "weapon.ember",
+  };
+  return (
+    coreIcons[u.id] ||
+    (u.id === "shuffle"
+      ? "card.shuffle"
+      : u.polarity === "negative"
+        ? "card.negative"
+        : u.id.startsWith("chest_")
+          ? "card.treasure"
+          : u.weapon
+            ? "weapon." + u.weapon
+            : u.id === "reroll"
+              ? "card.lucky"
+              : u.maxStacks !== null
+                ? "card.mechanism"
+                : "card." +
+                  (["common", "rare", "epic", "epic"][u.rarity] || "common"))
+  );
 }

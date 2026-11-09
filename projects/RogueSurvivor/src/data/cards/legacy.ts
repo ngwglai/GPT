@@ -7,6 +7,8 @@ export interface Upgrade {
   rarity: 0 | 1 | 2;
   max: number;
   requires?: string;
+  allOf?: string[];
+  minLevel?: number;
   excludes?: string;
   weapon?: WeaponId;
 }
@@ -14,9 +16,9 @@ export const LEGACY_CARDS: Upgrade[] = [
   ...Object.entries(WEAPONS).map(([id, w]) => ({
     id: `weapon_${id}`,
     name: w.name,
-    desc: `获得或强化${w.name}。可同时携带全部武器；最高五级。`,
+    desc: `获得或强化${w.name}。可同时携带全部武器；最高三级，三级进化。`,
     rarity: 1 as const,
-    max: 5,
+    max: 3,
     weapon: id as WeaponId,
   })),
   {

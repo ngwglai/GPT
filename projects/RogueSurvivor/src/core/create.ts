@@ -1,3 +1,4 @@
+import { buildState } from "./buildState";
 import { initialRevival } from "./revival";
 import { newWave } from "./waves";
 import { MAPS } from "../data/maps";
@@ -16,7 +17,7 @@ export function createRun(
 ): Run {
   const c = CHARACTERS.find((c) => c.id === character) || CHARACTERS[0];
   const s: Run = {
-    version: 4,
+    version: 5,
     revival: initialRevival(),
     wave: newWave(1, 0),
     seed,
@@ -89,5 +90,6 @@ export function createRun(
       });
     }
   initializeMap(s, map);
+  buildState(s);
   return s;
 }

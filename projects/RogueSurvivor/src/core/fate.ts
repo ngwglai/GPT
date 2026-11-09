@@ -1,3 +1,4 @@
+import { GROWTH_RULES } from "../data/growth";
 import { negativeFactor } from "../data/cards/registry";
 import { ensureDeck } from "./deckState";
 import { UPGRADES } from "../data/content";
@@ -72,12 +73,17 @@ export function recalculate(s: Run) {
   for (const id of Object.keys(CURSES) as Curse[])
     if (n(id)) f.curses[id] = n(id);
   let overflow =
-    Math.max(0, values.speed - 500) / 15 +
-    Math.max(0, values.crit - 0.75) / 0.07 +
-    Math.max(0, 0.35 - values.cooldown) / 0.08 +
-    Math.max(0, values.magnet - 900) / 55;
+    Math.max(0, values.speed - 500) / LEGACY_MODIFIERS.stride.amount +
+    Math.max(0, values.crit - 0.75) / LEGACY_MODIFIERS.critical.amount +
+    Math.max(0, 0.35 - values.cooldown) /
+      Math.abs(LEGACY_MODIFIERS.haste.amount) +
+    Math.max(0, values.magnet - 900) / LEGACY_MODIFIERS.magnet.amount;
   overflow +=
-    Math.max(0, (p.upgrades.armor || 0) * 0.08 - 0.6) / 0.08 +
+    Math.max(
+      0,
+      (p.upgrades.armor || 0) * Math.abs(MODIFIERS.armor.taken!) - 0.6,
+    ) /
+      Math.abs(MODIFIERS.armor.taken!) +
     Math.max(0, (p.upgrades.wide || 0) - 240 / 18);
   for (const [id, m] of Object.entries(MODIFIERS))
     if (m.interval)
@@ -91,10 +97,19 @@ export function recalculate(s: Run) {
   p.hp = Math.min(p.hp, p.maxHp);
   p.speed =
     clamp(values.speed, 80, 500) * negativeFactor("hex_lead", n("lead"));
-  p.attack = Math.max(
-    1e-12,
-    (soft(values.attack, 3) + Math.log1p(overflow) * 0.04) *
-      negativeFactor("hex_damage", n("damage")),
+  overflow += Math.max(
+    0,
+    soft((p.upgrades.crit_damage || 0) * GROWTH_RULES.critDamageStep, 2) -
+      (GROWTH_RULES.critDamageMax - 2),
+  );
+  values.attack += GROWTH_RULES.ascend * Math.log1p(p.upgrades.ascend || 0);
+  p.attack = Math.min(
+    1e6,
+    Math.max(
+      1e-12,
+      (soft(values.attack, 3) + Math.log1p(overflow) * 0.04) *
+        negativeFactor("hex_damage", n("damage")),
+    ),
   );
   p.crit = clamp(values.crit, 0, 0.75);
   p.regen =
@@ -107,7 +122,7 @@ export function recalculate(s: Run) {
   p.weapons = {};
   for (const key of ["bow", "blade", "ember", "orbit", "drone"] as const) {
     const lv = (d.baseWeapons[key] || 0) + (p.upgrades["weapon_" + key] || 0);
-    if (lv) p.weapons[key] = Math.min(5, lv);
+    if (lv) p.weapons[key] = Math.min(GROWTH_RULES.weaponMax, lv);
   }
   p.skillLevels = { ...d.baseSkills };
   for (const [slot, id] of ["skill_q", "skill_e", "skill_r"].entries())
@@ -179,7 +194,11 @@ export function removable(s: Run) {
         UPGRADES.some((u) => u.id === id && u.forgettable) &&
         s.player.upgrades[id] > 0 &&
         (s.player.upgrades[id] > 1 ||
-          !UPGRADES.some((u) => u.requires === id && s.player.upgrades[u.id])),
+          !UPGRADES.some(
+            (u) =>
+              (u.requires === id || u.allOf?.includes(id)) &&
+              s.player.upgrades[u.id],
+          )),
     );
 }
 export function forget(s: Run) {

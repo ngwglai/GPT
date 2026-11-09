@@ -343,7 +343,7 @@ denseTest("密集战斗真实渲染、性能面板、无控制台异常", async 
   w.s.player.invincible = 300;
   for (const id of ["bow", "blade", "ember", "orbit", "drone"] as const)
     w.s.player.upgrades["weapon_" + id] =
-      5 - (ensureDeck(w.s).baseWeapons[id] || 0);
+      3 - (ensureDeck(w.s).baseWeapons[id] || 0);
   recalculate(w.s);
   for (let i = 0; i < 140; i++) {
     const a = i * 2.4;
@@ -621,9 +621,9 @@ test("v1.1 重抽、遗忘与属性落盘", async ({ page }) => {
 
 fateTest("v1.2 三类图鉴、当前构筑合并层数及独立刷新", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".version")).toContainText("v1.7");
+  await expect(page.locator(".version")).toContainText("v1.8");
   await page.getByRole("button", { name: "远征图鉴", exact: true }).click();
-  await expect(page.locator(".codex-card")).toHaveCount(70);
+  await expect(page.locator(".codex-card")).toHaveCount(83);
   await page.getByRole("button", { name: "技能图鉴", exact: true }).click();
   await expect(page.locator(".codex-card")).toHaveCount(11);
   await page.getByRole("button", { name: "怪物图鉴", exact: true }).click();

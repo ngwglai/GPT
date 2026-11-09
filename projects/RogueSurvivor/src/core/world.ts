@@ -1,3 +1,6 @@
+import { buildState } from "./buildState";
+import { CORE_PARAMS } from "../data/cards/cores";
+import { GROWTH_RULES } from "../data/growth";
 import {
   ensureRevival,
   acceptRevival,
@@ -94,6 +97,13 @@ export class World extends Combat {
       }
     }
     if (input.dash && p.dashCd <= 0) {
+      if (p.upgrades.glass_comet) {
+        p.hp = Math.max(Math.min(1, p.hp), p.hp * (1 - CORE_PARAMS.comet.cost));
+        buildState(s).dashUntil = Math.min(
+          1e12,
+          s.time + CORE_PARAMS.comet.duration,
+        );
+      }
       p.dash = 0.18;
       p.invincible = Math.max(p.invincible, 0.3);
       p.dashCd = Math.max(1.3, 2.7 - (p.upgrades.stride || 0) * 0.2);
@@ -178,7 +188,8 @@ export class World extends Combat {
           if (other.hp > 0 && distance(other, e) < 145)
             this.burn(
               other,
-              e.burnPower / (1 + soft(p.upgrades.burn || 0, 4) * 0.25),
+              e.burnPower /
+                (1 + soft(p.upgrades.burn || 0, 4) * GROWTH_RULES.burnStep),
               e.burnSource,
             );
         }

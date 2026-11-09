@@ -178,7 +178,7 @@ it("old schema3 does not award historical kills, but its live boss still earns o
   old.version = 3;
   delete old.revival;
   const s = validateRun(old);
-  expect(s.version).toBe(4);
+  expect(s.version).toBe(5);
   expect(ensureRevival(s).remaining).toBe(0);
   expect(s.revival!.rewardedBoss).toBe(2);
   s.enemies[0].hp = 0;

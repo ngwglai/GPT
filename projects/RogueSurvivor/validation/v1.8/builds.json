@@ -1,0 +1,4303 @@
+{
+  "method": "八流派、相等合法卡牌预算、四随机种子、十秒固定靶场；人群靶可重生，Boss靶固定生命；非通关率。沿用真实攻击/暴击/持续/核心机制，敌方不攻击；生存面板不等于真实生存率。",
+  "summary": [
+    {
+      "style": "single",
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1772,
+      "kills": 11.5,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "single",
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 1144,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "single",
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3997,
+      "kills": 39,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "single",
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 4032,
+      "kills": 0.5,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "single",
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 8514,
+      "kills": 102,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "single",
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 11996,
+      "kills": 2.75,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "multi",
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1422,
+      "kills": 7.75,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "multi",
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 281,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "multi",
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3727,
+      "kills": 33.5,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "multi",
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 905,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "multi",
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 6342,
+      "kills": 71.75,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "multi",
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 1610,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "critical",
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1470,
+      "kills": 9,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "critical",
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 723,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "critical",
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 4898,
+      "kills": 56,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "critical",
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 3796,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "critical",
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 10196,
+      "kills": 123.5,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "critical",
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 10009,
+      "kills": 2,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "burning",
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1354,
+      "kills": 10.25,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "burning",
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 338,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "burning",
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3400,
+      "kills": 32.25,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "burning",
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 1111,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "burning",
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 7163,
+      "kills": 78.5,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "burning",
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 3435,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "frozen",
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 4497,
+      "kills": 46.75,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "frozen",
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 639,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "frozen",
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 14213,
+      "kills": 170,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "frozen",
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 2523,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "frozen",
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 29808,
+      "kills": 368.75,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "frozen",
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 8462,
+      "kills": 2,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "area",
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 2819,
+      "kills": 25.25,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "area",
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 303,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "area",
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 7454,
+      "kills": 81.25,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "area",
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 787,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "area",
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 23100,
+      "kills": 288.75,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "area",
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 1924,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "survival",
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1771,
+      "kills": 12,
+      "maxHp": 250,
+      "regen": 1.2000000000000002,
+      "taken": 0.9
+    },
+    {
+      "style": "survival",
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 145,
+      "kills": 0,
+      "maxHp": 250,
+      "regen": 1.2000000000000002,
+      "taken": 0.9
+    },
+    {
+      "style": "survival",
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3046,
+      "kills": 29,
+      "maxHp": 320,
+      "regen": 3.3000000000000003,
+      "taken": 0.7
+    },
+    {
+      "style": "survival",
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 262,
+      "kills": 0,
+      "maxHp": 320,
+      "regen": 3.3000000000000003,
+      "taken": 0.7
+    },
+    {
+      "style": "survival",
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 4562,
+      "kills": 50.25,
+      "maxHp": 530,
+      "regen": 5.4,
+      "taken": 0.5
+    },
+    {
+      "style": "survival",
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 412,
+      "kills": 0,
+      "maxHp": 530,
+      "regen": 5.4,
+      "taken": 0.5
+    },
+    {
+      "style": "hybrid",
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1656,
+      "kills": 9.75,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "hybrid",
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 398,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "hybrid",
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 7097,
+      "kills": 80.25,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "hybrid",
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 1688,
+      "kills": 0,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "hybrid",
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 12213,
+      "kills": 144.5,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    },
+    {
+      "style": "hybrid",
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 4451,
+      "kills": 1,
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1
+    }
+  ],
+  "rows": [
+    {
+      "style": "single",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1833,
+      "kills": 12,
+      "damageSources": {
+        "ice": 9132.760000000018,
+        "bow": 9199.6
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 28,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "single",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 1176,
+      "kills": 0,
+      "damageSources": {
+        "ice": 605.2592,
+        "bow": 11159.231999999993
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 28,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "single",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1791,
+      "kills": 12,
+      "damageSources": {
+        "ice": 8302.840000000015,
+        "bow": 9605.074048
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 28,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "single",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 1142,
+      "kills": 0,
+      "damageSources": {
+        "ice": 477.8591999999999,
+        "bow": 10938.396671999999
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 28,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "single",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1722,
+      "kills": 11,
+      "damageSources": {
+        "ice": 8088.080000000015,
+        "bow": 9135.703871999996
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 28,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "single",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 1102,
+      "kills": 0,
+      "damageSources": {
+        "ice": 500.5727999999999,
+        "bow": 10520.219135999994
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 28,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "single",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1741,
+      "kills": 11,
+      "damageSources": {
+        "ice": 8608.600000000017,
+        "bow": 8805.074048
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 28,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "single",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 1157,
+      "kills": 0,
+      "damageSources": {
+        "ice": 420.2016,
+        "bow": 11154.533375999992
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 28,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "single",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3924,
+      "kills": 39,
+      "damageSources": {
+        "ice": 15092.771199999981,
+        "bow": 24151.6288
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 58,
+      "critDamage": 2,
+      "bullets": 1
+    },
+    {
+      "style": "single",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 4138,
+      "kills": 1,
+      "damageSources": {
+        "ice": 803.712,
+        "bow": 40581.145599999996
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 58,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "single",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 4085,
+      "kills": 37,
+      "damageSources": {
+        "ice": 14165.97119999998,
+        "bow": 26681.628800000002
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 58,
+      "critDamage": 2,
+      "bullets": 1
+    },
+    {
+      "style": "single",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 3986,
+      "kills": 0,
+      "damageSources": {
+        "ice": 953.264,
+        "bow": 38904.60672000001
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 58,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "single",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 4168,
+      "kills": 44,
+      "damageSources": {
+        "ice": 15163.971199999984,
+        "bow": 26520.428800000005
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 58,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "single",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 3933,
+      "kills": 0,
+      "damageSources": {
+        "ice": 1115.712,
+        "bow": 38212.17792000003
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 58,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "single",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3809,
+      "kills": 36,
+      "damageSources": {
+        "ice": 14789.199999999986,
+        "bow": 23298.000000000004
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 58,
+      "critDamage": 2,
+      "bullets": 1
+    },
+    {
+      "style": "single",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 4069,
+      "kills": 1,
+      "damageSources": {
+        "ice": 901.2639999999999,
+        "bow": 39791.1648
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 58,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "single",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 8738,
+      "kills": 104,
+      "damageSources": {
+        "ice": 20649.467601426753,
+        "bow": 66726.48311488397
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "single",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 12000,
+      "kills": 3,
+      "damageSources": {
+        "ice": 1151.4961975188705,
+        "bow": 118848.5038024812
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "single",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 8956,
+      "kills": 108,
+      "damageSources": {
+        "ice": 19449.992395677913,
+        "bow": 70111.58731330199
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "single",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 12000,
+      "kills": 3,
+      "damageSources": {
+        "ice": 1367.9940679885963,
+        "bow": 118632.00593201148
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "single",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 8606,
+      "kills": 105,
+      "damageSources": {
+        "ice": 18487.450563904174,
+        "bow": 67570.9081225043
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "single",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 11985,
+      "kills": 2,
+      "damageSources": {
+        "ice": 1657.941284390596,
+        "bow": 118187.11107165948
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "single",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 7757,
+      "kills": 91,
+      "damageSources": {
+        "ice": 20167.846822705764,
+        "bow": 57400.43732854265
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "single",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 12000,
+      "kills": 3,
+      "damageSources": {
+        "ice": 1657.9412843905957,
+        "bow": 118342.05871560944
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "multi",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1433,
+      "kills": 8,
+      "damageSources": {
+        "blade": 10088.294399999992,
+        "orbit": 460.80000000000007,
+        "ice": 1618,
+        "drone": 810.7632000000038,
+        "ember": 1083.844800000038,
+        "bow": 268.84960000000103
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 8
+    },
+    {
+      "style": "multi",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 271,
+      "kills": 0,
+      "damageSources": {
+        "blade": 706.56,
+        "orbit": 172.8,
+        "drone": 421.7999999999999,
+        "ice": 172,
+        "ember": 1001.8943999999915,
+        "bow": 238.27999999999997
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 9
+    },
+    {
+      "style": "multi",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1429,
+      "kills": 7,
+      "damageSources": {
+        "blade": 10131.271999999992,
+        "orbit": 432.00000000000006,
+        "ice": 1632,
+        "drone": 865.8000000000003,
+        "ember": 991.7631999999787,
+        "bow": 237.74240000000103
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 8
+    },
+    {
+      "style": "multi",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 287,
+      "kills": 0,
+      "damageSources": {
+        "blade": 794.88,
+        "orbit": 172.8,
+        "drone": 399.59999999999985,
+        "ice": 122,
+        "ember": 1105.5743999999934,
+        "bow": 272.32
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 9
+    },
+    {
+      "style": "multi",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1424,
+      "kills": 9,
+      "damageSources": {
+        "blade": 10078.271999999992,
+        "orbit": 425.02560000000113,
+        "ice": 1692,
+        "drone": 833.0976000000032,
+        "ember": 977.3471999999753,
+        "bow": 238.27999999999997
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 8
+    },
+    {
+      "style": "multi",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 287,
+      "kills": 0,
+      "damageSources": {
+        "blade": 794.8799999999999,
+        "orbit": 172.8,
+        "drone": 443.9999999999999,
+        "ice": 110,
+        "ember": 1105.5743999999918,
+        "bow": 238.27999999999997
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 9
+    },
+    {
+      "style": "multi",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1403,
+      "kills": 7,
+      "damageSources": {
+        "blade": 10011.83039999999,
+        "orbit": 432.00000000000006,
+        "ice": 1694,
+        "drone": 729.3984000000047,
+        "ember": 960.3071999999731,
+        "bow": 207.0224000000006
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 8
+    },
+    {
+      "style": "multi",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 280,
+      "kills": 0,
+      "damageSources": {
+        "blade": 706.56,
+        "orbit": 172.8,
+        "drone": 399.59999999999985,
+        "ice": 110,
+        "ember": 1140.1343999999988,
+        "bow": 272.32
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 9
+    },
+    {
+      "style": "multi",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3801,
+      "kills": 35,
+      "damageSources": {
+        "blade": 24566.109440000022,
+        "orbit": 1056.5280000000002,
+        "ice": 4182.727679999991,
+        "drone": 2768.9267200000013,
+        "ember": 2182.296319999887,
+        "bow": 3254.1190400000005
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 10
+    },
+    {
+      "style": "multi",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 883,
+      "kills": 0,
+      "damageSources": {
+        "blade": 1837.056,
+        "orbit": 449.28,
+        "drone": 1572.4800000000005,
+        "ice": 415.99999999999994,
+        "ember": 2604.9254399999813,
+        "bow": 1951.872
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 14
+    },
+    {
+      "style": "multi",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3734,
+      "kills": 34,
+      "damageSources": {
+        "blade": 24313.435520000014,
+        "orbit": 1118.9280000000003,
+        "ice": 4231.99167999999,
+        "drone": 2374.6406400000014,
+        "ember": 2326.818559999887,
+        "bow": 2976.1823999999992
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 10
+    },
+    {
+      "style": "multi",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 917,
+      "kills": 0,
+      "damageSources": {
+        "blade": 1837.056,
+        "orbit": 449.28,
+        "drone": 1572.48,
+        "ice": 317.2,
+        "ember": 2814.5894399999693,
+        "bow": 2181.504
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 14
+    },
+    {
+      "style": "multi",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3697,
+      "kills": 33,
+      "damageSources": {
+        "blade": 23509.15776000002,
+        "orbit": 1062.9760000000003,
+        "ice": 4386.335999999991,
+        "drone": 2516.0959999999995,
+        "ember": 2371.7132799998667,
+        "bow": 3123.532159999996
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 10
+    },
+    {
+      "style": "multi",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 922,
+      "kills": 0,
+      "damageSources": {
+        "blade": 2066.688,
+        "orbit": 524.16,
+        "drone": 1572.4800000000005,
+        "ice": 285.99999999999994,
+        "ember": 2814.589439999971,
+        "bow": 1951.8720000000003
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 14
+    },
+    {
+      "style": "multi",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3677,
+      "kills": 32,
+      "damageSources": {
+        "blade": 23810.894720000026,
+        "orbit": 1075.5296,
+        "ice": 4380.32767999999,
+        "drone": 2398.720000000002,
+        "ember": 2310.776319999887,
+        "bow": 2794.4
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 10
+    },
+    {
+      "style": "multi",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 897,
+      "kills": 0,
+      "damageSources": {
+        "blade": 1837.056,
+        "orbit": 449.28,
+        "drone": 1572.4800000000002,
+        "ice": 285.99999999999994,
+        "ember": 2754.6854399999697,
+        "bow": 2066.688
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 14
+    },
+    {
+      "style": "multi",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 6286,
+      "kills": 72,
+      "damageSources": {
+        "blade": 39615.49411730148,
+        "orbit": 2170.872303354984,
+        "ice": 7211.119173498407,
+        "drone": 4453.710038994474,
+        "ember": 4252.699439173586,
+        "bow": 5155.307373448134
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 10
+    },
+    {
+      "style": "multi",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 1572,
+      "kills": 0,
+      "damageSources": {
+        "blade": 3269.2339527767026,
+        "orbit": 799.5409123638672,
+        "drone": 2798.393193273536,
+        "ice": 740.3156595961735,
+        "ember": 4635.738209885639,
+        "bow": 3473.5610748252466
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 14
+    },
+    {
+      "style": "multi",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 6141,
+      "kills": 69,
+      "damageSources": {
+        "blade": 38548.92180615718,
+        "orbit": 1968.3070406490958,
+        "ice": 7282.470704843103,
+        "drone": 4439.199668212023,
+        "ember": 4279.409660463059,
+        "bow": 4888.527222356058
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 10
+    },
+    {
+      "style": "multi",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 1632,
+      "kills": 0,
+      "damageSources": {
+        "blade": 3269.2339527767026,
+        "orbit": 799.5409123638672,
+        "drone": 2798.3931932735354,
+        "ice": 564.4906904420823,
+        "ember": 5008.857302322098,
+        "bow": 3882.2153189223345
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 14
+    },
+    {
+      "style": "multi",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 6256,
+      "kills": 71,
+      "damageSources": {
+        "blade": 39691.31752293887,
+        "orbit": 1906.1205252430173,
+        "ice": 7309.018700177771,
+        "drone": 4095.9598996512163,
+        "ember": 4409.942301417428,
+        "bow": 5144.33561959137
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 10
+    },
+    {
+      "style": "multi",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 1640,
+      "kills": 0,
+      "damageSources": {
+        "blade": 3677.8881968737905,
+        "orbit": 932.7977310911783,
+        "drone": 2798.3931932735363,
+        "ice": 508.96701597236927,
+        "ember": 5008.857302322111,
+        "bow": 3473.561074825247
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 14
+    },
+    {
+      "style": "multi",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 6685,
+      "kills": 75,
+      "damageSources": {
+        "blade": 39253.717396187494,
+        "orbit": 1673.0100222765573,
+        "ice": 7383.583201485114,
+        "drone": 4373.089387882905,
+        "bow": 5480.4534595796795,
+        "ember": 8689.36704397521
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 8
+    },
+    {
+      "style": "multi",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 1596,
+      "kills": 0,
+      "damageSources": {
+        "blade": 3269.2339527767026,
+        "orbit": 799.5409123638672,
+        "drone": 2798.3931932735354,
+        "ice": 508.96701597236927,
+        "ember": 4902.251847340249,
+        "bow": 3677.888196873791
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 14
+    },
+    {
+      "style": "critical",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1520,
+      "kills": 9,
+      "damageSources": {
+        "ice": 8407.320000000007,
+        "bow": 6797.289600000005
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 38,
+      "critDamage": 2.9,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 745,
+      "kills": 0,
+      "damageSources": {
+        "ice": 248.16000000000003,
+        "bow": 7198.963200000007
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 38,
+      "critDamage": 2.9,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1481,
+      "kills": 9,
+      "damageSources": {
+        "ice": 7461.739520000002,
+        "bow": 7346.709760000005
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 38,
+      "critDamage": 2.9,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 745,
+      "kills": 0,
+      "damageSources": {
+        "ice": 248.16000000000003,
+        "bow": 7198.963200000008
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 38,
+      "critDamage": 2.9,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1432,
+      "kills": 9,
+      "damageSources": {
+        "ice": 7424.640000000005,
+        "bow": 6893.539200000007
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 38,
+      "critDamage": 2.9,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 674,
+      "kills": 0,
+      "damageSources": {
+        "ice": 330.23999999999995,
+        "bow": 6413.621760000008
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 38,
+      "critDamage": 2.9,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1445,
+      "kills": 9,
+      "damageSources": {
+        "ice": 7534.07999999999,
+        "bow": 6917.548800000007
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 38,
+      "critDamage": 2.9,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 729,
+      "kills": 0,
+      "damageSources": {
+        "ice": 357.59999999999997,
+        "bow": 6937.182720000006
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 38,
+      "critDamage": 2.9,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 4966,
+      "kills": 60,
+      "damageSources": {
+        "ice": 17055.022079999966,
+        "bow": 32601.937919999997
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 68,
+      "critDamage": 3.8,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 3743,
+      "kills": 0,
+      "damageSources": {
+        "ice": 616.9600000000002,
+        "bow": 36810.36288
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 68,
+      "critDamage": 3.8,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 5053,
+      "kills": 57,
+      "damageSources": {
+        "ice": 16249.422079999977,
+        "bow": 34277.15584
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 68,
+      "critDamage": 3.8,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 3937,
+      "kills": 0,
+      "damageSources": {
+        "ice": 679.6800000000001,
+        "bow": 38689.81247999999
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 68,
+      "critDamage": 3.8,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 4842,
+      "kills": 56,
+      "damageSources": {
+        "ice": 16617.742079999964,
+        "bow": 31801.93792
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 68,
+      "critDamage": 3.8,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 3777,
+      "kills": 0,
+      "damageSources": {
+        "ice": 957.4400000000002,
+        "bow": 36810.362880000015
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 68,
+      "critDamage": 3.8,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 4729,
+      "kills": 51,
+      "damageSources": {
+        "ice": 15689.582079999982,
+        "bow": 31599.395839999997
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 68,
+      "critDamage": 3.8,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 3728,
+      "kills": 0,
+      "damageSources": {
+        "ice": 840.9600000000002,
+        "bow": 36434.47296000001
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 68,
+      "critDamage": 3.8,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 10280,
+      "kills": 126,
+      "damageSources": {
+        "ice": 30318.21014937419,
+        "bow": 72479.23442488477
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 5.001550575824979,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 10141,
+      "kills": 2,
+      "damageSources": {
+        "ice": 1194.7213637492978,
+        "bow": 100212.40880181317
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 5.001550575824979,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 10082,
+      "kills": 122,
+      "damageSources": {
+        "ice": 26923.70133847602,
+        "bow": 73893.26446534511
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 5.001550575824979,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 10103,
+      "kills": 2,
+      "damageSources": {
+        "ice": 1194.7213637492978,
+        "bow": 99834.25788808549
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 5.001550575824979,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 10165,
+      "kills": 123,
+      "damageSources": {
+        "ice": 28176.033878393882,
+        "bow": 73478.37930287191
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 5.001550575824979,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 10068,
+      "kills": 2,
+      "damageSources": {
+        "ice": 1393.866241736439,
+        "bow": 99284.32765043582
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 5.001550575824979,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 10258,
+      "kills": 123,
+      "damageSources": {
+        "ice": 28292.767714399564,
+        "bow": 74284.6001688279
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 5.001550575824979,
+      "bullets": 0
+    },
+    {
+      "style": "critical",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 9725,
+      "kills": 2,
+      "damageSources": {
+        "ice": 1908.32384320322,
+        "bow": 95337.57434354459
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 75,
+      "critDamage": 5.001550575824979,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1376,
+      "kills": 10,
+      "damageSources": {
+        "ice": 4959.599999999998,
+        "bow": 524.4000000000001,
+        "ember": 7511.241228800126,
+        "star_chain": 767.7296639999996
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 353,
+      "kills": 0,
+      "damageSources": {
+        "ice": 257.4,
+        "bow": 579.6,
+        "ember": 2691.043430400018
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1362,
+      "kills": 10,
+      "damageSources": {
+        "ice": 5149.799999999997,
+        "bow": 593.4,
+        "ember": 7571.264806400121,
+        "star_chain": 307.09186559999995
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 326,
+      "kills": 0,
+      "damageSources": {
+        "ice": 257.4,
+        "bow": 579.6,
+        "ember": 2420.2893312000188
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1327,
+      "kills": 10,
+      "damageSources": {
+        "ice": 4925.999999999999,
+        "bow": 558.9000000000001,
+        "ember": 7627.695526400144,
+        "star_chain": 153.54593279999997
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 340,
+      "kills": 0,
+      "damageSources": {
+        "ice": 257.4,
+        "bow": 614.1,
+        "ember": 2533.4000640000186
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1352,
+      "kills": 11,
+      "damageSources": {
+        "ice": 5052.636223999999,
+        "bow": 475.0458111999982,
+        "ember": 7839.72471040014,
+        "star_chain": 153.54593279999997
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 333,
+      "kills": 0,
+      "damageSources": {
+        "ice": 257.4,
+        "bow": 579.6,
+        "ember": 2488.472064000016
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3348,
+      "kills": 31,
+      "damageSources": {
+        "ice": 7561.209641291227,
+        "bow": 883.1999999999998,
+        "ember": 24732.176885940942,
+        "star_chain": 299.21771520000004
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 1098,
+      "kills": 0,
+      "damageSources": {
+        "ice": 440.8000000000001,
+        "bow": 1131.6000000000001,
+        "ember": 9407.097982379753
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3438,
+      "kills": 32,
+      "damageSources": {
+        "ice": 7469.26700432342,
+        "bow": 846.3999999999999,
+        "ember": 25462.476186022708,
+        "star_chain": 598.4354304
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 1104,
+      "kills": 0,
+      "damageSources": {
+        "ice": 440.8000000000001,
+        "bow": 1002.7999999999998,
+        "ember": 9594.571112477945
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3420,
+      "kills": 32,
+      "damageSources": {
+        "ice": 7730.8289238737,
+        "bow": 846.3999999999999,
+        "ember": 25019.464828941032,
+        "star_chain": 598.4354304
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 1117,
+      "kills": 0,
+      "damageSources": {
+        "ice": 440.8000000000001,
+        "bow": 1002.7999999999998,
+        "ember": 9721.856743221271
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3395,
+      "kills": 34,
+      "damageSources": {
+        "ice": 7614.362404265498,
+        "bow": 818.8,
+        "ember": 24916.068706194248,
+        "star_chain": 598.4354304
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 1126,
+      "kills": 0,
+      "damageSources": {
+        "ice": 474.4000000000001,
+        "bow": 1067.2,
+        "ember": 9720.57142574581
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 7300,
+      "kills": 81,
+      "damageSources": {
+        "ice": 9457.723919867529,
+        "bow": 1077.495669740866,
+        "ember": 59799.78708619105,
+        "star_chain": 2665.708544000002
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 3398,
+      "kills": 0,
+      "damageSources": {
+        "ice": 734,
+        "bow": 1886,
+        "ember": 31361.996509538654
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 7115,
+      "kills": 77,
+      "damageSources": {
+        "ice": 9547.106245122273,
+        "bow": 996.1736404271797,
+        "ember": 58955.71107215696,
+        "star_chain": 1653.5715840000003
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 3359,
+      "kills": 0,
+      "damageSources": {
+        "ice": 794,
+        "bow": 1771,
+        "ember": 31021.16311923813
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 6854,
+      "kills": 74,
+      "damageSources": {
+        "ice": 9471.23809365939,
+        "bow": 1498.5737246328254,
+        "ember": 55915.38364846913,
+        "star_chain": 1653.5715840000003
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 3568,
+      "kills": 0,
+      "damageSources": {
+        "ice": 1044,
+        "bow": 2001,
+        "ember": 32636.774410053535
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 7383,
+      "kills": 82,
+      "damageSources": {
+        "ice": 9976.615973514348,
+        "bow": 888.5636557065922,
+        "ember": 61347.72852357535,
+        "star_chain": 1614.7857920000004
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "burning",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 3414,
+      "kills": 0,
+      "damageSources": {
+        "ice": 734,
+        "bow": 1886,
+        "ember": 31516.248282499964
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 4595,
+      "kills": 48,
+      "damageSources": {
+        "orbit": 24834.176000000083,
+        "ice": 6878.32320000001,
+        "bow": 966.0608,
+        "orbit_resonance": 3986.0160000000014,
+        "crystal_fracture": 9281.830400000006
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 614,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 4136.140799999998,
+        "ice": 397.43999999999994,
+        "bow": 993.5999999999997,
+        "orbit_resonance": 608.2560000000002
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 4355,
+      "kills": 44,
+      "damageSources": {
+        "orbit": 24136.790400000093,
+        "ice": 7037.580800000008,
+        "bow": 783.8399999999998,
+        "orbit_resonance": 4138.787200000002,
+        "crystal_fracture": 7454.521600000004
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 658,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 4733.337599999998,
+        "ice": 397.43999999999994,
+        "bow": 844.5599999999998,
+        "orbit_resonance": 608.2560000000002
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 4626,
+      "kills": 48,
+      "damageSources": {
+        "orbit": 24222.060800000076,
+        "ice": 7368.1728000000085,
+        "bow": 728.6399999999999,
+        "orbit_resonance": 4340.665600000003,
+        "crystal_fracture": 9598.0608
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 653,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 4633.804799999998,
+        "ice": 397.43999999999994,
+        "bow": 894.2399999999998,
+        "orbit_resonance": 608.2560000000002
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 4412,
+      "kills": 47,
+      "damageSources": {
+        "orbit": 24603.772800000093,
+        "ice": 7139.584000000007,
+        "bow": 778.3199999999998,
+        "orbit_resonance": 4216.409600000003,
+        "crystal_fracture": 7377.664000000004
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 631,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 4434.739199999998,
+        "ice": 423.3599999999999,
+        "bow": 844.5599999999997,
+        "orbit_resonance": 608.2560000000002
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 14438,
+      "kills": 173,
+      "damageSources": {
+        "orbit": 77991.11752203025,
+        "ice": 11613.58304427911,
+        "bow": 1461.0431884651173,
+        "orbit_resonance": 8009.226769247609,
+        "crystal_fracture": 45303.526202938396
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 2453,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 20154.742407923437,
+        "ice": 838.9403923173761,
+        "bow": 1782.748333674424,
+        "orbit_resonance": 1755.3915817510317
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 14381,
+      "kills": 171,
+      "damageSources": {
+        "orbit": 77032.32992306446,
+        "ice": 12107.817874106733,
+        "bow": 1169.2460144186034,
+        "orbit_resonance": 6287.5412268782375,
+        "crystal_fracture": 47213.642711573135
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 2563,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 20811.304454084864,
+        "ice": 1066.9133250123152,
+        "bow": 1992.483431753768,
+        "orbit_resonance": 1755.3915817510317
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 13938,
+      "kills": 166,
+      "damageSources": {
+        "orbit": 78509.66183752126,
+        "ice": 11235.413235595091,
+        "bow": 1243.1893519124455,
+        "orbit_resonance": 6035.129505783861,
+        "crystal_fracture": 42355.918798084764
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 2552,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 21139.585477165572,
+        "ice": 838.9403923173761,
+        "bow": 1782.748333674424,
+        "orbit_resonance": 1755.3915817510317
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 14094,
+      "kills": 170,
+      "damageSources": {
+        "orbit": 81367.83453177029,
+        "ice": 10933.964454834495,
+        "bow": 1273.3269182763356,
+        "orbit_resonance": 8512.048780760599,
+        "crystal_fracture": 38852.72204131868
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 2524,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 20811.304454084868,
+        "ice": 893.6538961641616,
+        "bow": 1782.748333674424,
+        "orbit_resonance": 1755.3915817510317
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 29686,
+      "kills": 367,
+      "damageSources": {
+        "orbit": 193111.8474960074,
+        "ice": 17741.99519782391,
+        "crystal_fracture": 81962.89389079285,
+        "bow": 1675.5694225896957,
+        "orbit_resonance": 2366.3020420293296
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 8114,
+      "kills": 2,
+      "damageSources": {
+        "orbit": 72292.88369319458,
+        "ice": 1530.4609190404374,
+        "bow": 2986.399112121338,
+        "orbit_resonance": 4329.269574033575
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 29887,
+      "kills": 369,
+      "damageSources": {
+        "orbit": 193237.35748998026,
+        "ice": 18618.346189120002,
+        "crystal_fracture": 82141.57305882992,
+        "bow": 1675.5694225896957,
+        "orbit_resonance": 3197.625819475945
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 8683,
+      "kills": 2,
+      "damageSources": {
+        "orbit": 77211.55062690025,
+        "ice": 1436.7592301195943,
+        "bow": 3232.7082677690873,
+        "orbit_resonance": 4947.736656038371
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 29673,
+      "kills": 367,
+      "damageSources": {
+        "orbit": 192517.80780604313,
+        "ice": 18146.16590319632,
+        "bow": 1795.1694225896956,
+        "crystal_fracture": 81542.45541436042,
+        "orbit_resonance": 2725.9618887233073
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 8530,
+      "kills": 2,
+      "damageSources": {
+        "orbit": 75313.85408350267,
+        "ice": 2108.2880007189697,
+        "bow": 2933.318460239189,
+        "orbit_resonance": 4947.736656038371
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 29985,
+      "kills": 372,
+      "damageSources": {
+        "orbit": 194791.63710265286,
+        "ice": 17770.594079061306,
+        "bow": 1661.8654623016942,
+        "crystal_fracture": 81200.06342147989,
+        "orbit_resonance": 4423.509244627215
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "frozen",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 8521,
+      "kills": 2,
+      "damageSources": {
+        "orbit": 76390.35334342104,
+        "ice": 1436.7592301195943,
+        "bow": 3053.113364004138,
+        "orbit_resonance": 4329.269574033575
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "area",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 2849,
+      "kills": 24,
+      "damageSources": {
+        "blade": 24869.374208000034,
+        "ice": 1945.7024000000047,
+        "ember": 1449.9852800000758,
+        "bow": 220.79999999999998
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 310,
+      "kills": 0,
+      "damageSources": {
+        "blade": 1865.3183999999999,
+        "ice": 132.00000000000003,
+        "ember": 885.5308800000155,
+        "bow": 220.79999999999998
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 2779,
+      "kills": 28,
+      "damageSources": {
+        "blade": 24232.395648000027,
+        "ice": 1995.4048000000048,
+        "ember": 1369.6015360000497,
+        "bow": 193.2
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 289,
+      "kills": 0,
+      "damageSources": {
+        "blade": 1695.744,
+        "ice": 132.00000000000003,
+        "ember": 867.5596800000155,
+        "bow": 193.2
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 2847,
+      "kills": 24,
+      "damageSources": {
+        "blade": 24887.241472000034,
+        "ice": 1889.8048000000042,
+        "ember": 1472.8814080000602,
+        "bow": 220.79999999999998
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 313,
+      "kills": 0,
+      "damageSources": {
+        "blade": 1865.3183999999999,
+        "ice": 146.4,
+        "ember": 921.4732800000155,
+        "bow": 193.2
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 2801,
+      "kills": 25,
+      "damageSources": {
+        "blade": 24564.37030400004,
+        "ice": 1950.1470720000054,
+        "ember": 1298.122752000055,
+        "bow": 193.2
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 299,
+      "kills": 0,
+      "damageSources": {
+        "blade": 1865.3183999999999,
+        "ice": 132.00000000000003,
+        "ember": 795.6748800000154,
+        "bow": 193.2
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 7634,
+      "kills": 83,
+      "damageSources": {
+        "blade": 70088.44800000013,
+        "ice": 2827.5199999999945,
+        "ember": 3130.231999999955,
+        "bow": 289.8
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 794,
+      "kills": 0,
+      "damageSources": {
+        "blade": 5166.719999999999,
+        "ice": 197.99999999999997,
+        "ember": 2247.886079999982,
+        "bow": 331.2
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 7473,
+      "kills": 80,
+      "damageSources": {
+        "blade": 68824.47846400016,
+        "ice": 2767.839999999995,
+        "ember": 2848.7615359999945,
+        "bow": 289.8
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 746,
+      "kills": 0,
+      "damageSources": {
+        "blade": 4769.28,
+        "ice": 197.99999999999997,
+        "ember": 2202.2668799999788,
+        "bow": 289.8
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 7395,
+      "kills": 83,
+      "damageSources": {
+        "blade": 67655.57952000014,
+        "ice": 2631.0399999999954,
+        "ember": 3343.3791999999476,
+        "bow": 321.3612800000001
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 841,
+      "kills": 0,
+      "damageSources": {
+        "blade": 5564.16,
+        "ice": 219.6,
+        "ember": 2339.124479999979,
+        "bow": 289.8
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 7314,
+      "kills": 79,
+      "damageSources": {
+        "blade": 67018.79628800016,
+        "ice": 2630.6303359999956,
+        "ember": 3237.5946239999525,
+        "bow": 248.97875200000033
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 767,
+      "kills": 0,
+      "damageSources": {
+        "blade": 5166.719999999999,
+        "ice": 197.99999999999997,
+        "ember": 2019.7900800000198,
+        "bow": 289.8
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 23200,
+      "kills": 290,
+      "damageSources": {
+        "blade": 219965.59951765664,
+        "ice": 4269.199999999992,
+        "bow": 416.6126877531044,
+        "ember": 7348.587794590374
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 1896,
+      "kills": 0,
+      "damageSources": {
+        "blade": 13227.571768753787,
+        "ice": 285.99999999999994,
+        "ember": 4965.825628769157,
+        "bow": 478.40000000000003
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 23040,
+      "kills": 288,
+      "damageSources": {
+        "blade": 218603.67158356388,
+        "ice": 4336.79999999999,
+        "bow": 416.6126877531044,
+        "ember": 7042.9157286831605
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 1880,
+      "kills": 0,
+      "damageSources": {
+        "blade": 13227.571768753787,
+        "ice": 285.99999999999994,
+        "ember": 4865.047838230947,
+        "bow": 418.6
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 23120,
+      "kills": 289,
+      "damageSources": {
+        "blade": 219493.15223067536,
+        "ice": 4170.399999999991,
+        "bow": 416.6126877531044,
+        "ember": 7119.8350815716685
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 1996,
+      "kills": 0,
+      "damageSources": {
+        "blade": 14054.295004300899,
+        "ice": 317.2,
+        "ember": 5167.381209845527,
+        "bow": 418.6
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 23040,
+      "kills": 288,
+      "damageSources": {
+        "blade": 218898.82716464024,
+        "ice": 4274.3999999999905,
+        "bow": 416.6126877531044,
+        "ember": 6810.16014760679
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "area",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 1922,
+      "kills": 0,
+      "damageSources": {
+        "blade": 14054.295004300897,
+        "ice": 285.99999999999994,
+        "ember": 4461.936676078207,
+        "bow": 418.6
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 4
+    },
+    {
+      "style": "survival",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1821,
+      "kills": 12,
+      "damageSources": {
+        "blade": 16089.772800000032,
+        "ice": 1927.2000000000048,
+        "bow": 193.2
+      },
+      "maxHp": 250,
+      "regen": 1.2000000000000002,
+      "taken": 0.9,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 146,
+      "kills": 0,
+      "damageSources": {
+        "blade": 1102.2335999999998,
+        "ice": 132.00000000000003,
+        "bow": 220.79999999999998
+      },
+      "maxHp": 250,
+      "regen": 1.2000000000000002,
+      "taken": 0.9,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1741,
+      "kills": 10,
+      "damageSources": {
+        "blade": 15197.606400000037,
+        "ice": 2030.4000000000044,
+        "bow": 185.28320000000008
+      },
+      "maxHp": 250,
+      "regen": 1.2000000000000002,
+      "taken": 0.9,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 144,
+      "kills": 0,
+      "damageSources": {
+        "blade": 1102.2335999999998,
+        "ice": 146.4,
+        "bow": 193.2
+      },
+      "maxHp": 250,
+      "regen": 1.2000000000000002,
+      "taken": 0.9,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1769,
+      "kills": 13,
+      "damageSources": {
+        "blade": 15542.476800000037,
+        "ice": 1924.800000000004,
+        "bow": 227.28320000000005
+      },
+      "maxHp": 250,
+      "regen": 1.2000000000000002,
+      "taken": 0.9,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 147,
+      "kills": 0,
+      "damageSources": {
+        "blade": 1102.2335999999998,
+        "ice": 146.4,
+        "bow": 220.79999999999998
+      },
+      "maxHp": 250,
+      "regen": 1.2000000000000002,
+      "taken": 0.9,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1752,
+      "kills": 13,
+      "damageSources": {
+        "blade": 15340.38080000003,
+        "ice": 1987.2000000000048,
+        "bow": 193.2
+      },
+      "maxHp": 250,
+      "regen": 1.2000000000000002,
+      "taken": 0.9,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 144,
+      "kills": 0,
+      "damageSources": {
+        "blade": 1102.2335999999998,
+        "ice": 146.4,
+        "bow": 193.2
+      },
+      "maxHp": 250,
+      "regen": 1.2000000000000002,
+      "taken": 0.9,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3054,
+      "kills": 29,
+      "damageSources": {
+        "blade": 27714.905599999995,
+        "ice": 2569.599999999998,
+        "bow": 257.6
+      },
+      "maxHp": 320,
+      "regen": 3.3000000000000003,
+      "taken": 0.7,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 262,
+      "kills": 0,
+      "damageSources": {
+        "blade": 2147.9423999999995,
+        "ice": 176,
+        "bow": 294.40000000000003
+      },
+      "maxHp": 320,
+      "regen": 3.3000000000000003,
+      "taken": 0.7,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3001,
+      "kills": 28,
+      "damageSources": {
+        "blade": 27045.798399999996,
+        "ice": 2707.199999999997,
+        "bow": 257.6
+      },
+      "maxHp": 320,
+      "regen": 3.3000000000000003,
+      "taken": 0.7,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 260,
+      "kills": 0,
+      "damageSources": {
+        "blade": 2147.9423999999995,
+        "ice": 195.2,
+        "bow": 257.6
+      },
+      "maxHp": 320,
+      "regen": 3.3000000000000003,
+      "taken": 0.7,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3109,
+      "kills": 30,
+      "damageSources": {
+        "blade": 28193.612799999995,
+        "ice": 2566.3999999999983,
+        "bow": 331.20000000000005
+      },
+      "maxHp": 320,
+      "regen": 3.3000000000000003,
+      "taken": 0.7,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 264,
+      "kills": 0,
+      "damageSources": {
+        "blade": 2147.9423999999995,
+        "ice": 195.20000000000005,
+        "bow": 294.40000000000003
+      },
+      "maxHp": 320,
+      "regen": 3.3000000000000003,
+      "taken": 0.7,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 3020,
+      "kills": 29,
+      "damageSources": {
+        "blade": 27292.81279999999,
+        "ice": 2649.5999999999963,
+        "bow": 257.6
+      },
+      "maxHp": 320,
+      "regen": 3.3000000000000003,
+      "taken": 0.7,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 260,
+      "kills": 0,
+      "damageSources": {
+        "blade": 2147.9423999999995,
+        "ice": 195.2,
+        "bow": 257.6
+      },
+      "maxHp": 320,
+      "regen": 3.3000000000000003,
+      "taken": 0.7,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 4762,
+      "kills": 54,
+      "damageSources": {
+        "blade": 44081.99999999999,
+        "ice": 3212,
+        "bow": 322
+      },
+      "maxHp": 530,
+      "regen": 5.4,
+      "taken": 0.5,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 412,
+      "kills": 0,
+      "damageSources": {
+        "blade": 3532.7999999999997,
+        "ice": 220,
+        "bow": 368
+      },
+      "maxHp": 530,
+      "regen": 5.4,
+      "taken": 0.5,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 4530,
+      "kills": 50,
+      "damageSources": {
+        "blade": 41593.19999999999,
+        "ice": 3384,
+        "bow": 322
+      },
+      "maxHp": 530,
+      "regen": 5.4,
+      "taken": 0.5,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 410,
+      "kills": 0,
+      "damageSources": {
+        "blade": 3532.7999999999997,
+        "ice": 244,
+        "bow": 322
+      },
+      "maxHp": 530,
+      "regen": 5.4,
+      "taken": 0.5,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 4450,
+      "kills": 49,
+      "damageSources": {
+        "blade": 40877.19999999999,
+        "ice": 3208,
+        "bow": 414
+      },
+      "maxHp": 530,
+      "regen": 5.4,
+      "taken": 0.5,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 414,
+      "kills": 0,
+      "damageSources": {
+        "blade": 3532.7999999999997,
+        "ice": 244,
+        "bow": 368
+      },
+      "maxHp": 530,
+      "regen": 5.4,
+      "taken": 0.5,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 4507,
+      "kills": 48,
+      "damageSources": {
+        "blade": 41435.99999999999,
+        "ice": 3312,
+        "bow": 322
+      },
+      "maxHp": 530,
+      "regen": 5.4,
+      "taken": 0.5,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "survival",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 410,
+      "kills": 0,
+      "damageSources": {
+        "blade": 3532.7999999999997,
+        "ice": 244,
+        "bow": 322
+      },
+      "maxHp": 530,
+      "regen": 5.4,
+      "taken": 0.5,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 2
+    },
+    {
+      "style": "hybrid",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1634,
+      "kills": 10,
+      "damageSources": {
+        "orbit": 2449.4287786239993,
+        "ice": 6025.663999999988,
+        "bow": 574.0799999999999,
+        "ember": 2968.349719295898,
+        "frostfire": 2564.4576046079887,
+        "orbit_resonance": 1760.0564990719984
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 11,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 401,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 580.3199999999999,
+        "ice": 329.2799999999999,
+        "bow": 656.8799999999999,
+        "ember": 1770.8976230399835,
+        "frostfire": 385.72800000000007,
+        "orbit_resonance": 288.28799999999995
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1657,
+      "kills": 9,
+      "damageSources": {
+        "orbit": 2727.820307072001,
+        "ice": 6087.8399999999865,
+        "bow": 640.3199999999999,
+        "ember": 2813.0293214719113,
+        "frostfire": 2517.2066822399947,
+        "orbit_resonance": 1786.9466420479982
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 29,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 403,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 482.0399999999999,
+        "ice": 309.1199999999999,
+        "bow": 695.5199999999999,
+        "ember": 1867.3784962559766,
+        "frostfire": 385.72800000000007,
+        "orbit_resonance": 288.28799999999995
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1672,
+      "kills": 11,
+      "damageSources": {
+        "orbit": 2537.4337419519916,
+        "ice": 6003.8399999999865,
+        "bow": 641.2624405759988,
+        "ember": 3162.550974591902,
+        "frostfire": 2577.4108477439922,
+        "orbit_resonance": 1798.368
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 47,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 402,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 547.56,
+        "ice": 329.28,
+        "bow": 618.2399999999999,
+        "ember": 1848.3646970879772,
+        "frostfire": 385.72800000000007,
+        "orbit_resonance": 288.28799999999995
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "crowd",
+      "dps": 1659,
+      "kills": 9,
+      "damageSources": {
+        "orbit": 2298.228896127997,
+        "ice": 6238.240522111988,
+        "bow": 706.5599999999998,
+        "ember": 3104.709979135906,
+        "frostfire": 2434.248185215998,
+        "orbit_resonance": 1808.5262865919974
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 83,
+      "budget": 12,
+      "scenario": "boss",
+      "dps": 387,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 514.8,
+        "ice": 309.1199999999999,
+        "bow": 656.8799999999999,
+        "ember": 1712.6615600639902,
+        "frostfire": 385.72800000000007,
+        "orbit_resonance": 288.28799999999995
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 7005,
+      "kills": 79,
+      "damageSources": {
+        "orbit": 34375.11136832598,
+        "ice": 9607.708978984914,
+        "bow": 1011.0575909138703,
+        "ember": 15390.96048458563,
+        "frostfire": 4471.512775916973,
+        "orbit_resonance": 5191.260084279431
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 11,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 1644,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 6969.293921894548,
+        "ice": 625.4151422616351,
+        "bow": 1407.1840700886787,
+        "ember": 5688.7959732677855,
+        "frostfire": 894.6155730612084,
+        "orbit_resonance": 852.4680308653154
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 6962,
+      "kills": 77,
+      "damageSources": {
+        "orbit": 33664.03229244317,
+        "ice": 10314.630951214369,
+        "bow": 1039.368927827044,
+        "ember": 14654.758046337849,
+        "frostfire": 4687.429418600861,
+        "orbit_resonance": 5261.84265726855
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 29,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 1713,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 7155.286946810616,
+        "ice": 666.2030863221764,
+        "bow": 1250.8302845232702,
+        "ember": 6311.163875420615,
+        "frostfire": 894.6155730612084,
+        "orbit_resonance": 852.4680308653154
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 7126,
+      "kills": 82,
+      "damageSources": {
+        "orbit": 33712.51142599159,
+        "ice": 10889.244829812114,
+        "bow": 1002.5689278270438,
+        "ember": 14710.452701243135,
+        "orbit_resonance": 5880.101960262511,
+        "frostfire": 5068.90459803658
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 47,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 1697,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 6783.300896978479,
+        "ice": 706.9910303827178,
+        "bow": 1485.360962871383,
+        "ember": 6249.891899549316,
+        "frostfire": 894.6155730612084,
+        "orbit_resonance": 852.4680308653154
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "crowd",
+      "dps": 7293,
+      "kills": 83,
+      "damageSources": {
+        "orbit": 34926.73679468625,
+        "ice": 10238.284639660982,
+        "bow": 1070.7371972566543,
+        "ember": 15753.14465878779,
+        "frostfire": 5241.731962624234,
+        "orbit_resonance": 5694.525928057043
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 83,
+      "budget": 24,
+      "scenario": "boss",
+      "dps": 1696,
+      "kills": 0,
+      "damageSources": {
+        "orbit": 6783.300896978479,
+        "ice": 666.2030863221764,
+        "bow": 1329.0071773059744,
+        "ember": 6438.945390744843,
+        "frostfire": 894.6155730612084,
+        "orbit_resonance": 852.4680308653154
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 12230,
+      "kills": 145,
+      "damageSources": {
+        "orbit": 59811.68834707073,
+        "ice": 14996.81246470143,
+        "bow": 1045.263485782444,
+        "ember": 30707.16994467764,
+        "orbit_resonance": 10423.825145933675,
+        "frostfire": 5311.084873664759
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 11,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 4363,
+      "kills": 1,
+      "damageSources": {
+        "orbit": 17464.049536551323,
+        "ice": 812.3258211020743,
+        "bow": 2354.981032569846,
+        "ember": 18178.13865051569,
+        "frostfire": 2640.3138173690318,
+        "orbit_resonance": 2178.2588993294507
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 12498,
+      "kills": 148,
+      "damageSources": {
+        "orbit": 62837.99409058436,
+        "ice": 15179.42091624408,
+        "bow": 1530.12629099057,
+        "ember": 30380.738150518406,
+        "orbit_resonance": 10318.836295422834,
+        "frostfire": 4733.627887742433
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 29,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 4494,
+      "kills": 1,
+      "damageSources": {
+        "orbit": 17766.07171610053,
+        "ice": 1520.5378680384154,
+        "bow": 2168.8292071245605,
+        "ember": 18666.923935025403,
+        "frostfire": 2640.3138173690318,
+        "orbit_resonance": 2178.2588993294507
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 12099,
+      "kills": 143,
+      "damageSources": {
+        "orbit": 58018.60488643061,
+        "ice": 15967.425538023723,
+        "bow": 1454.8627781169953,
+        "ember": 31037.42076448314,
+        "orbit_resonance": 9351.980041341898,
+        "frostfire": 5158.942442889731
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 47,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 4392,
+      "kills": 1,
+      "damageSources": {
+        "orbit": 16252.43519926258,
+        "ice": 1151.182105232828,
+        "bow": 2575.4846834604164,
+        "ember": 19123.71086719023,
+        "frostfire": 2640.3138173690318,
+        "orbit_resonance": 2178.2588993294507
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "crowd",
+      "dps": 12023,
+      "kills": 142,
+      "damageSources": {
+        "orbit": 59792.192208407956,
+        "ice": 15999.932203866298,
+        "bow": 1224.0484966312147,
+        "ember": 30948.651168684893,
+        "orbit_resonance": 8673.75268269842,
+        "frostfire": 3586.7019864717327
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    },
+    {
+      "style": "hybrid",
+      "seed": 83,
+      "budget": 40,
+      "scenario": "boss",
+      "dps": 4553,
+      "kills": 1,
+      "damageSources": {
+        "orbit": 17464.049536551323,
+        "ice": 1084.4146035622807,
+        "bow": 2304.381032569846,
+        "ember": 19857.100333707996,
+        "frostfire": 2640.3138173690318,
+        "orbit_resonance": 2178.2588993294507
+      },
+      "maxHp": 110,
+      "regen": 0.15,
+      "taken": 1,
+      "crit": 8,
+      "critDamage": 2,
+      "bullets": 0
+    }
+  ]
+}

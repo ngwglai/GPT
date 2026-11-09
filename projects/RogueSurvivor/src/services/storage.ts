@@ -1,3 +1,6 @@
+import { migrateGrowth } from "../core/migrateGrowth";
+import { buildState } from "../core/buildState";
+import { GROWTH_RULES } from "../data/growth";
 import { migrateRevival, REVIVAL_RULES } from "../core/revival";
 import { migrateWaves, WAVE_RULES } from "../core/waves";
 import { emptyEnvironment } from "../core/environmentTypes";
@@ -67,6 +70,7 @@ function assert(ok: unknown): asserts ok {
 function obj(v: unknown): v is Record<string, unknown> {
   return !!v && typeof v === "object" && !Array.isArray(v);
 }
+// Normalize structural schemas 1–3 to 4. Validate the entire old snapshot before growth schema 5 migration.
 // Validate all numerical leaves, collection budgets, required structures, identifiers and cross references.
 export function migrateRun(value: unknown): unknown {
   if (obj(value) && [1, 2, 3].includes(value.version as number)) {
@@ -92,7 +96,9 @@ export function migrateRun(value: unknown): unknown {
 }
 export function validateRun(input: unknown): Run {
   const value = migrateRun(input);
-  assert(obj(value) && value.version === 4);
+  assert(obj(value) && (value.version === 4 || value.version === 5));
+  const legacy = value.version === 4;
+  const weaponMax = legacy ? 5 : GROWTH_RULES.weaponMax;
   const s = value as unknown as Run;
   const visit = (v: unknown, depth = 0) => {
     assert(depth < 12);
@@ -153,6 +159,7 @@ export function validateRun(input: unknown): Run {
   }
   const base = createRun("standard");
   for (const [k, v] of Object.entries(base)) {
+    if (legacy && k === "build") continue;
     assert(Object.hasOwn(s, k));
     assert(typeof (s as unknown as Record<string, unknown>)[k] === typeof v);
   }
@@ -287,7 +294,10 @@ export function validateRun(input: unknown): Run {
       Object.keys(p.weapons).length <= 5 &&
       Object.entries(p.weapons).every(
         ([k, v]) =>
-          Object.hasOwn(WEAPONS, k) && Number.isInteger(v) && v >= 1 && v <= 5,
+          Object.hasOwn(WEAPONS, k) &&
+          Number.isInteger(v) &&
+          v >= 1 &&
+          v <= weaponMax,
       ),
   );
   assert(
@@ -309,7 +319,11 @@ export function validateRun(input: unknown): Run {
     obj(p.upgrades) &&
       Object.entries(p.upgrades).every(([k, v]) =>
         UPGRADES.some(
-          (u) => u.id === k && v >= 0 && Number.isInteger(v) && v <= u.max,
+          (u) =>
+            u.id === k &&
+            v >= 0 &&
+            Number.isInteger(v) &&
+            v <= (legacy && u.weapon ? 5 : u.max),
         ),
       ),
   );
@@ -474,7 +488,10 @@ export function validateRun(input: unknown): Run {
     assert(
       Object.entries(d.baseWeapons).every(
         ([id, n]) =>
-          Object.hasOwn(WEAPONS, id) && Number.isInteger(n) && n >= 1 && n <= 5,
+          Object.hasOwn(WEAPONS, id) &&
+          Number.isInteger(n) &&
+          n >= 1 &&
+          n <= weaponMax,
       ),
     );
     assert(
@@ -746,8 +763,41 @@ export function validateRun(input: unknown): Run {
           h.owner > 0,
       );
     }
-  const result = structuredClone(s),
-    d = ensureDeck(result),
+  if (s.build) {
+    const b = s.build;
+    assert(
+      obj(b) && b.schema === 1 && typeof b.hunt === "boolean" && obj(b.draws),
+    );
+    assert(
+      [
+        b.focusId,
+        b.focusHits,
+        b.twinHits,
+        b.compensation,
+        ...Object.values(b.draws),
+      ].every((n) => Number.isInteger(n) && n >= 0),
+    );
+    assert(
+      b.focusHits <= 10 &&
+        b.twinHits < 4 &&
+        ["level", "positive", "negative", "replacement", "refresh"].every((k) =>
+          Object.hasOwn(b.draws, k),
+        ),
+    );
+    assert(
+      [
+        b.fractureReady,
+        b.orbitReady,
+        b.chainReady,
+        b.steamReady,
+        b.dashUntil,
+      ].every((n) => typeof n === "number" && n >= 0),
+    );
+  }
+  const result = structuredClone(s);
+  if (legacy) migrateGrowth(result);
+  buildState(result);
+  const d = ensureDeck(result),
     revision = d.revision;
   recalculate(result);
   d.revision = revision;

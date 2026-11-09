@@ -750,7 +750,9 @@ export class GameScene extends Phaser.Scene {
       if (!p.weapons[key]) continue;
       const count =
         key === "orbit"
-          ? 2 + (p.upgrades.satellite || 0) + (p.weapons.orbit === 5 ? 2 : 0)
+          ? 2 +
+            (p.upgrades.satellite || 0) +
+            ((p.weapons.orbit || 0) >= 3 ? 2 : 0)
           : 2 + (p.upgrades.swarm || 0);
       for (let i = 0; i < count; i++) {
         const a =
