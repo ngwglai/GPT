@@ -185,7 +185,7 @@
       "style": "burning",
       "budget": 12,
       "scenario": "crowd",
-      "dps": 1354,
+      "dps": 1344,
       "kills": 10.25,
       "maxHp": 110,
       "regen": 0.15,
@@ -205,7 +205,7 @@
       "style": "burning",
       "budget": 24,
       "scenario": "crowd",
-      "dps": 3400,
+      "dps": 3384,
       "kills": 32.25,
       "maxHp": 110,
       "regen": 0.15,
@@ -225,8 +225,8 @@
       "style": "burning",
       "budget": 40,
       "scenario": "crowd",
-      "dps": 7163,
-      "kills": 78.5,
+      "dps": 7112,
+      "kills": 77.25,
       "maxHp": 110,
       "regen": 0.15,
       "taken": 1
@@ -1880,13 +1880,13 @@
       "seed": 11,
       "budget": 12,
       "scenario": "crowd",
-      "dps": 1376,
+      "dps": 1353,
       "kills": 10,
       "damageSources": {
         "ice": 4959.599999999998,
         "bow": 524.4000000000001,
         "ember": 7511.241228800126,
-        "star_chain": 767.7296639999996
+        "star_chain": 534.8229120000001
       },
       "maxHp": 110,
       "regen": 0.15,
@@ -1919,13 +1919,13 @@
       "seed": 29,
       "budget": 12,
       "scenario": "crowd",
-      "dps": 1362,
+      "dps": 1353,
       "kills": 10,
       "damageSources": {
         "ice": 5149.799999999997,
         "bow": 593.4,
         "ember": 7571.264806400121,
-        "star_chain": 307.09186559999995
+        "star_chain": 213.92916479999997
       },
       "maxHp": 110,
       "regen": 0.15,
@@ -1958,13 +1958,13 @@
       "seed": 47,
       "budget": 12,
       "scenario": "crowd",
-      "dps": 1327,
+      "dps": 1322,
       "kills": 10,
       "damageSources": {
         "ice": 4925.999999999999,
         "bow": 558.9000000000001,
         "ember": 7627.695526400144,
-        "star_chain": 153.54593279999997
+        "star_chain": 106.96458239999998
       },
       "maxHp": 110,
       "regen": 0.15,
@@ -1997,13 +1997,13 @@
       "seed": 83,
       "budget": 12,
       "scenario": "crowd",
-      "dps": 1352,
+      "dps": 1347,
       "kills": 11,
       "damageSources": {
         "ice": 5052.636223999999,
         "bow": 475.0458111999982,
         "ember": 7839.72471040014,
-        "star_chain": 153.54593279999997
+        "star_chain": 106.96458239999998
       },
       "maxHp": 110,
       "regen": 0.15,
@@ -2036,13 +2036,13 @@
       "seed": 11,
       "budget": 24,
       "scenario": "crowd",
-      "dps": 3348,
+      "dps": 3339,
       "kills": 31,
       "damageSources": {
         "ice": 7561.209641291227,
         "bow": 883.1999999999998,
         "ember": 24732.176885940942,
-        "star_chain": 299.21771520000004
+        "star_chain": 208.4438016
       },
       "maxHp": 110,
       "regen": 0.15,
@@ -2075,13 +2075,13 @@
       "seed": 29,
       "budget": 24,
       "scenario": "crowd",
-      "dps": 3438,
+      "dps": 3420,
       "kills": 32,
       "damageSources": {
         "ice": 7469.26700432342,
         "bow": 846.3999999999999,
         "ember": 25462.476186022708,
-        "star_chain": 598.4354304
+        "star_chain": 416.88760320000006
       },
       "maxHp": 110,
       "regen": 0.15,
@@ -2114,13 +2114,13 @@
       "seed": 47,
       "budget": 24,
       "scenario": "crowd",
-      "dps": 3420,
+      "dps": 3401,
       "kills": 32,
       "damageSources": {
         "ice": 7730.8289238737,
         "bow": 846.3999999999999,
         "ember": 25019.464828941032,
-        "star_chain": 598.4354304
+        "star_chain": 416.88760320000006
       },
       "maxHp": 110,
       "regen": 0.15,
@@ -2153,13 +2153,13 @@
       "seed": 83,
       "budget": 24,
       "scenario": "crowd",
-      "dps": 3395,
+      "dps": 3377,
       "kills": 34,
       "damageSources": {
         "ice": 7614.362404265498,
         "bow": 818.8,
         "ember": 24916.068706194248,
-        "star_chain": 598.4354304
+        "star_chain": 416.88760320000006
       },
       "maxHp": 110,
       "regen": 0.15,
@@ -2192,13 +2192,13 @@
       "seed": 11,
       "budget": 40,
       "scenario": "crowd",
-      "dps": 7300,
-      "kills": 81,
+      "dps": 7225,
+      "kills": 80,
       "damageSources": {
-        "ice": 9457.723919867529,
+        "ice": 9454.651919867529,
         "bow": 1077.495669740866,
         "ember": 59799.78708619105,
-        "star_chain": 2665.708544000002
+        "star_chain": 1919.8771200000003
       },
       "maxHp": 110,
       "regen": 0.15,
@@ -2231,13 +2231,13 @@
       "seed": 29,
       "budget": 40,
       "scenario": "crowd",
-      "dps": 7115,
-      "kills": 77,
+      "dps": 7080,
+      "kills": 76,
       "damageSources": {
-        "ice": 9547.106245122273,
-        "bow": 996.1736404271797,
-        "ember": 58955.71107215696,
-        "star_chain": 1653.5715840000003
+        "ice": 9731.274793774312,
+        "bow": 950.1736404271797,
+        "ember": 58961.707697135855,
+        "star_chain": 1151.926272
       },
       "maxHp": 110,
       "regen": 0.15,
@@ -2270,13 +2270,13 @@
       "seed": 47,
       "budget": 40,
       "scenario": "crowd",
-      "dps": 6854,
-      "kills": 74,
+      "dps": 6806,
+      "kills": 73,
       "damageSources": {
-        "ice": 9471.23809365939,
-        "bow": 1498.5737246328254,
-        "ember": 55915.38364846913,
-        "star_chain": 1653.5715840000003
+        "ice": 9606.43476565939,
+        "bow": 1383.5737246328254,
+        "ember": 55918.194939284585,
+        "star_chain": 1151.926272
       },
       "maxHp": 110,
       "regen": 0.15,
@@ -2309,13 +2309,13 @@
       "seed": 83,
       "budget": 40,
       "scenario": "crowd",
-      "dps": 7383,
-      "kills": 82,
+      "dps": 7336,
+      "kills": 80,
       "damageSources": {
         "ice": 9976.615973514348,
         "bow": 888.5636557065922,
         "ember": 61347.72852357535,
-        "star_chain": 1614.7857920000004
+        "star_chain": 1151.926272
       },
       "maxHp": 110,
       "regen": 0.15,

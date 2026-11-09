@@ -24,6 +24,7 @@ function pulse(
   raw: number,
   source: string,
   credit: string,
+  visited?: Set<number>,
 ) {
   c.effect(
     p,
@@ -36,8 +37,10 @@ function pulse(
   );
   // Proc damage uses raw power and passes through the same multipliers exactly once.
   for (const e of c.grid.nearby(p, r + 64))
-    if (e.hp > 0 && distance(p, e) <= r + e.r)
+    if (e.hp > 0 && !visited?.has(e.id) && distance(p, e) <= r + e.r) {
+      visited?.add(e.id);
       c.damage(e, raw, source, false, undefined, { kind: "proc", credit });
+    }
 }
 export function afterHit(
   c: Combat,
@@ -137,9 +140,8 @@ export function fireChain(
       }
     }
     if (!next) break;
-    visited.add(next.id);
     origin = { x: next.x, y: next.y };
     raw *= P.chain.fraction;
-    pulse(c, origin, 55, raw, source, "star_chain");
+    pulse(c, origin, P.chain.radius, raw, source, "star_chain", visited);
   }
 }

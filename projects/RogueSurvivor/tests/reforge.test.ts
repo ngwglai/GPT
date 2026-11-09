@@ -1,3 +1,4 @@
+import { fireChain } from "../src/core/mechanics";
 import legacyV17 from "./fixtures/v17-run.json";
 import { describe, it, expect } from "vitest";
 import { createRun } from "../src/core/create";
@@ -592,4 +593,15 @@ it("双生共鸣计入致命命中，三次击杀后的一次存活命中仍触�
   w.damage(target, 0.01, "bow", false);
   expect(buildState(w.s).twinHits).toBe(0);
   expect(target.freeze).toBe(P.twins.freeze);
+});
+
+it("星火连锁的重叠脉冲跳过原爆炸覆盖目标和所有已命中敌人", () => {
+  const w = world();
+  cards(w, ["weapon_ember", "star_chain"]);
+  const targets = [50, 90, 130, 170].map((x) => dummy(w, "crawler", 1800 + x));
+  w.s.rng = 7;
+  fireChain(w, w.s.player, 100, "ember", 60);
+  expect(w.effects.length).toBeGreaterThan(0);
+  expect(targets.map((e) => e.maxHp - e.hp)).toEqual([0, 60, 60, 36]);
+  expect(w.s.stats.bySource.star_chain).toBe(156);
 });
