@@ -334,6 +334,9 @@ const fateTest = test.extend({
   },
 });
 denseTest("密集战斗真实渲染、性能面板、无控制台异常", async ({ page }) => {
+  // Keep the full-density capture, then quiesce rendering before Chromium teardown.
+  // Windows software rendering can otherwise exhaust the test budget while closing a live scene.
+  denseTest.setTimeout(90000);
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   const w = new World(createRun("endless", "mage", 77));
@@ -376,6 +379,8 @@ denseTest("密集战斗真实渲染、性能面板、无控制台异常", async 
     await page.locator("#performance").textContent(),
   );
   expect(errors).toEqual([]);
+  await page.locator('[data-action="pause"]').click();
+  await expect(page.getByRole("heading", { name: "远征已暂停" })).toBeVisible();
 });
 test("窄屏菜单无水平溢出，主要入口可用", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
