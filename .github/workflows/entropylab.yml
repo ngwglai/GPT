@@ -39,6 +39,8 @@ jobs:
       - run: npm run build
       - run: npm run bench
         if: runner.os == 'Linux'
+      - uses: ./.github/actions/ubuntu-apt
+        if: runner.os == 'Linux'
       - run: npx playwright install --with-deps chromium
         if: runner.os == 'Linux'
       - run: npx playwright install chromium

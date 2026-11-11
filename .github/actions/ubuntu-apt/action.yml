@@ -1,0 +1,14 @@
+name: Official Ubuntu package mirror
+description: Avoid an unavailable Azure mirror when installing browser dependencies.
+runs:
+  using: composite
+  steps:
+    - name: Select the official Ubuntu archive
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        # Hosted Ubuntu sources use this mirror list for every Ubuntu pocket.
+        # Keep signed Ubuntu packages and HTTPS; do not skip dependency checks.
+        if [ -f /etc/apt/apt-mirrors.txt ]; then
+          printf '%s\n' 'https://archive.ubuntu.com/ubuntu' | sudo tee /etc/apt/apt-mirrors.txt > /dev/null
+        fi

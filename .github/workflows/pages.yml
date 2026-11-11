@@ -46,6 +46,8 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
+      - uses: ./.github/actions/ubuntu-apt
+        if: runner.os == 'Linux'
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0

@@ -120,6 +120,8 @@ jobs:
       - run: npm --prefix frontend ci
       - run: npm --prefix frontend audit --audit-level=moderate
       - run: npm --prefix frontend run build
+      - uses: ./.github/actions/ubuntu-apt
+        if: runner.os == 'Linux'
       - run: npx --prefix frontend playwright install --with-deps chromium
       - name: Browser acceptance
         if: runner.os != 'Windows'
@@ -154,6 +156,8 @@ jobs:
           cache-dependency-path: projects/qq-mail-mcp/package-lock.json
       - run: npm ci
       - run: npm audit --audit-level=moderate
+      - uses: ./.github/actions/ubuntu-apt
+        if: runner.os == 'Linux'
       - name: Install browser for OAuth consent regression
         run: npx playwright-core install --with-deps chromium
       - name: Resolve installed Chromium path
