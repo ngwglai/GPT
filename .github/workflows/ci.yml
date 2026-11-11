@@ -91,6 +91,7 @@ jobs:
     if: needs.layout.outputs.constraintlab == 'true'
     timeout-minutes: 20
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.os == 'ubuntu-latest' && 'mcr.microsoft.com/playwright:v1.64.1-noble@sha256:2f05f8a734509a7b3f26a912639488ee08f58a7b292d14d62271bcff9038768f' || null }}
     strategy:
       fail-fast: false
       matrix:
@@ -120,9 +121,7 @@ jobs:
       - run: npm --prefix frontend ci
       - run: npm --prefix frontend audit --audit-level=moderate
       - run: npm --prefix frontend run build
-      - uses: ./.github/actions/ubuntu-apt
-        if: runner.os == 'Linux'
-      - run: npx --prefix frontend playwright install --with-deps chromium
+      - run: npx --prefix frontend playwright install chromium
       - name: Browser acceptance
         if: runner.os != 'Windows'
         run: python ../../scripts/ci_constraintlab_e2e.py
@@ -141,6 +140,7 @@ jobs:
   qq-mail-mcp:
     name: QQ Mail MCP
     runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:2f05f8a734509a7b3f26a912639488ee08f58a7b292d14d62271bcff9038768f
     timeout-minutes: 15
     defaults:
       run:
@@ -156,10 +156,8 @@ jobs:
           cache-dependency-path: projects/qq-mail-mcp/package-lock.json
       - run: npm ci
       - run: npm audit --audit-level=moderate
-      - uses: ./.github/actions/ubuntu-apt
-        if: runner.os == 'Linux'
       - name: Install browser for OAuth consent regression
-        run: npx playwright-core install --with-deps chromium
+        run: npx playwright-core install chromium
       - name: Resolve installed Chromium path
         run: node --input-type=module -e "import {chromium} from 'playwright-core'; import {appendFileSync} from 'node:fs'; appendFileSync(process.env.GITHUB_ENV, 'CHROMIUM_PATH=' + chromium.executablePath() + '\n')"
       - run: npm run typecheck

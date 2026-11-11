@@ -380,3 +380,5 @@
 ### v1.8.1验收的共享CI镜像修复
 
 - 多个Linux检查在Playwright系统依赖安装前因默认Azure Ubuntu镜像DNS失败；共享准备动作固定官方HTTPS归档，保留签名验证、依赖与原有测试，覆盖聚合Pages。未修改其他项目业务功能。最终检查与部署见[PR #44](https://github.com/ngwglai/GPT/pull/44)。
+
+- 官方Ubuntu归档同样DNS失败后，撤回临时镜像列表动作，改用摘要固定的微软Playwright预装Linux环境运行原测试；Windows原生验收保留。

@@ -42,6 +42,8 @@ async function load(page: Page, s: Run) {
   );
   await page.reload();
   await page.getByRole("button", { name: /继续旅程/ }).click();
+  if (s.phase === "playing")
+    await expect(page.locator("html")).not.toHaveClass(/touch-input-inactive/);
 }
 async function save(page: Page) {
   await page.getByRole("button", { name: "Ⅱ 暂停" }).click();
