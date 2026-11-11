@@ -8,13 +8,14 @@ import { random } from "./math";
 export const WAVE_RULES = {
   bossEvery: 5,
   finalBoss: 4,
-  normalDuration: 55,
-  bossDuration: 75,
+  normalDuration: 70,
+  bossDuration: 90,
+  restDuration: 5,
   maxBudget: 360,
   maxNumber: LIMITS.number,
 };
 export interface WaveState {
-  schema: 1;
+  schema: 2;
   number: number;
   startedAt: number;
   duration: number;
@@ -22,7 +23,8 @@ export interface WaveState {
   processed: number;
   spawned: number;
   skipped: number;
-  status: "entering" | "active";
+  status: "entering" | "active" | "resting";
+  restUntil: number;
   boss: boolean;
   announced: boolean;
 }
@@ -48,7 +50,7 @@ export function newWave(number: number, startedAt: number): WaveState {
   number = Math.max(1, Math.min(WAVE_RULES.maxNumber, Math.floor(number)));
   const boss = number % WAVE_RULES.bossEvery === 0;
   return {
-    schema: 1,
+    schema: 2,
     number,
     startedAt,
     duration: boss ? WAVE_RULES.bossDuration : WAVE_RULES.normalDuration,
@@ -57,12 +59,13 @@ export function newWave(number: number, startedAt: number): WaveState {
     spawned: 0,
     skipped: 0,
     status: "entering",
+    restUntil: 0,
     boss,
     announced: false,
   };
 }
 export function entryWindow(w: WaveState) {
-  return Math.min(24, 10 + (w.number - 1) * 0.3);
+  return Math.min(30, 18 + (w.number - 1) * 0.3);
 }
 /** Explicit legacy conversion: existing enemies are already admitted, never replay them. */
 export function migrateWaves(s: Run): WaveState {
@@ -87,7 +90,31 @@ export function bossesDue(s: Run) {
 }
 export function waveRemaining(s: Run) {
   const w = ensureWaves(s);
+  if (w.status === "resting") return Math.max(0, w.restUntil - s.time);
   return Math.max(0, w.duration - (s.time - w.startedAt));
+}
+/** Called before environment damage, and by the scheduler. Pending deaths settle first. */
+export function prepareRest(c: Combat) {
+  const s = c.s,
+    w = ensureWaves(s);
+  const clear = s.enemies.length === 0 && s.bossIndex >= bossesDue(s);
+  if (w.status === "resting") {
+    if (!clear) {
+      w.status = "active";
+      w.restUntil = 0;
+    }
+    return;
+  }
+  if (!clear || w.processed < w.budget || waveRemaining(s) <= 0) return;
+  w.status = "resting";
+  w.restUntil = Math.min(LIMITS.number, s.time + WAVE_RULES.restDuration);
+  // A cleared arena gets an actual respite; no rewards are produced by cleanup.
+  s.bullets = s.bullets.filter((b) => !b.enemy);
+  s.zones = s.zones.filter((z) => !z.enemy);
+  const env = environment(s);
+  env.fields = env.fields.filter((f) => f.kind !== "eclipse");
+  if (["兽潮来袭", "流星雨", "月蚀弹幕"].includes(s.event))
+    s.eventUntil = s.time;
 }
 type Spawn = (
   c: Combat,
@@ -98,13 +125,10 @@ type Spawn = (
 /** At most one transition per step. Unadmitted ordinary slots expire at the cap, not a queue. */
 export function tickWaves(c: Combat, _dt: number, spawn: Spawn) {
   const s = c.s;
+  prepareRest(c);
   let w = ensureWaves(s);
-  if (
-    waveRemaining(s) <= 0 ||
-    (w.processed >= w.budget &&
-      !s.enemies.some((e) => e.hp > 0) &&
-      s.bossIndex >= bossesDue(s))
-  ) {
+  if (w.status === "resting" && waveRemaining(s) > 0) return;
+  if (waveRemaining(s) <= 0) {
     w = s.wave = newWave(w.number + 1, s.time);
   }
   if (s.mode === "standard" && w.number > 20) {

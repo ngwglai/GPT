@@ -175,7 +175,7 @@ function characterPreview(id: string) {
   return `<div class="character-preview" style="--frames:${frames};--duration:${frames / fps}s">${img(sheet, "idle-sheet")}</div>`;
 }
 function header() {
-  return `<header><a href="#" data-action="home" class="brand"><span class="brand-star">✦</span><span>星烬远征<small>ROGUE SURVIVOR</small></span></a><nav>${button("codex", "远征图鉴")}${button("records", "远征记录")}${button("assets", "资源工坊")}${button("settings", "设置", "nav-setting")}</nav><span class="version">离线单人 · v1.8</span></header>`;
+  return `<header><a href="#" data-action="home" class="brand"><span class="brand-star">✦</span><span>星烬远征<small>ROGUE SURVIVOR</small></span></a><nav>${button("codex", "远征图鉴")}${button("records", "远征记录")}${button("assets", "资源工坊")}${button("settings", "设置", "nav-setting")}</nav><span class="version">离线单人 · v1.8.1</span></header>`;
 }
 function shell(content: string, cls = "") {
   touch.setActive(false);
@@ -256,9 +256,20 @@ function updateHud() {
     queued = Math.max(0, bossesDue(s) - s.bossIndex);
   set(
     "wave-hud",
-    `第 ${wave.number} 波 · ${wave.boss ? "首领降临" : "星潮来袭"} ｜ 下一波 ${time(Math.ceil(waveRemaining(s)))}${wave.status === "entering" ? " · 入场中" : " · 清场可提前推进"}${queued ? ` · 待出场首领 ${queued}` : ""}${!wave.boss && wave.number % 5 === 4 && (s.mode === "endless" || wave.number < 20) ? " · 下一波首领战" : ""}`,
+    `第 ${wave.number} 波 · ${wave.status === "resting" ? `清场休整 ｜ 下一波将在 ${Math.ceil(waveRemaining(s))} 秒后开始` : `${wave.boss ? "首领战" : "星潮来袭"} ｜ 波次上限 ${time(Math.ceil(waveRemaining(s)))} · ${wave.status === "entering" ? "怪物入场中" : "战斗中"}`}${queued ? ` · 待出场首领 ${queued}` : ""}${!wave.boss && wave.number % 5 === 4 && (s.mode === "endless" || wave.number < 20) ? " · 下一波首领战" : ""}`,
   );
   document.getElementById("wave-hud")?.classList.toggle("boss-wave", wave.boss);
+  document
+    .getElementById("wave-hud")
+    ?.classList.toggle("wave-rest", wave.status === "resting");
+  document
+    .getElementById("wave-hud")
+    ?.classList.toggle(
+      "boss-next",
+      wave.status === "resting" &&
+        wave.number % 5 === 4 &&
+        (s.mode === "endless" || wave.number < 20),
+    );
   document
     .getElementById("wave-hud")
     ?.classList.toggle("wave-entry", s.time - wave.startedAt < 1.2);

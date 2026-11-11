@@ -245,7 +245,7 @@ export function validateRun(input: unknown): Run {
   const w = s.wave;
   assert(
     obj(w) &&
-      w.schema === 1 &&
+      [1, 2].includes(w.schema) &&
       Number.isInteger(w.number) &&
       w.number >= 1 &&
       w.number <= WAVE_RULES.maxNumber &&
@@ -263,11 +263,21 @@ export function validateRun(input: unknown): Run {
       ) &&
       w.processed <= w.budget &&
       w.spawned + w.skipped === w.processed &&
-      ["entering", "active"].includes(w.status) &&
-      (w.status === "active") === (w.processed === w.budget) &&
+      (Number(w.schema) === 1
+        ? ["entering", "active"].includes(w.status)
+        : ["entering", "active", "resting"].includes(w.status)) &&
+      (w.status !== "entering") === (w.processed === w.budget) &&
       typeof w.boss === "boolean" &&
       typeof w.announced === "boolean",
   );
+  if (Number(w.schema) === 2)
+    assert(
+      typeof w.restUntil === "number" &&
+        w.restUntil >= 0 &&
+        (w.status === "resting"
+          ? w.restUntil <= s.time + WAVE_RULES.restDuration + 0.001
+          : w.restUntil === 0),
+    );
   assert(Number.isInteger(s.bossIndex) && s.bossIndex >= 0);
   for (const e of s.enemies)
     if (e.bossOrdinal !== undefined)
@@ -796,6 +806,14 @@ export function validateRun(input: unknown): Run {
     );
   }
   const result = structuredClone(s);
+  // Wave schema is independent of Run/growth schema. Convert only after full validation.
+  if (result.wave && Number(result.wave.schema) === 1) {
+    result.wave.schema = 2;
+    result.wave.restUntil = 0;
+    result.wave.duration = result.wave.boss
+      ? WAVE_RULES.bossDuration
+      : WAVE_RULES.normalDuration;
+  }
   if (legacy) migrateGrowth(result);
   buildState(result);
   const d = ensureDeck(result),

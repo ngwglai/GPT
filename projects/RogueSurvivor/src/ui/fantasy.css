@@ -535,6 +535,15 @@ th {
   border-color: #f1a571;
   color: #ffe1a6;
 }
+#wave-hud.wave-rest {
+  background: #28443bed;
+  border-color: #acedd2;
+  color: #edfff5;
+}
+#wave-hud.boss-next {
+  border: 2px solid #ffb77e;
+  color: #ffe1a6;
+}
 
 #boss-hud {
   top: 135px;

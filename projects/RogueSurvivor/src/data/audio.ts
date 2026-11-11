@@ -1,5 +1,5 @@
 import type { MapId } from "./maps";
-// Titles verified against the original uploads' ID3 and decoded audio fingerprints.
+// New titles read from upload ID3; old titles retain the verified v1.5 mapping.
 export const MUSIC_TRACKS = {
   1: "サイバーバトルビート",
   2: "Crystal Sparkle Battle",
@@ -7,12 +7,34 @@ export const MUSIC_TRACKS = {
   4: "軽快な戦闘テーマ",
   5: "Sugar Rush Battle（原文件 Battle1）",
   6: "Sugar Rush Battle（原文件 Battle）",
+  7: "最終の旋律",
+  8: "Enchanted Circus Swing",
+  9: "Abandoned Sanctuary",
+  10: "冒険の旋律",
+  11: "星森冒険曲",
+  12: "Frozen Dawn",
 } as const;
-export const MAP_PLAYLISTS: Record<MapId, readonly number[]> = {
-  forest: [4, 3, 2],
-  cavern: [2, 3],
-  garden: [6, 5, 4],
-  eclipse: [3, 1, 2],
+export type MusicTrackId = keyof typeof MUSIC_TRACKS;
+// Measured EBU R128: attenuation only, target -16 LUFS / true peak <= -1 dBTP.
+export const MUSIC_GAINS: Record<MusicTrackId, number> = {
+  1: 0.8414,
+  2: 0.8318,
+  3: 0.861,
+  4: 0.8035,
+  5: 0.8414,
+  6: 0.8128,
+  7: 0.7762,
+  8: 0.881,
+  9: 0.8128,
+  10: 0.8035,
+  11: 0.871,
+  12: 0.7762,
+};
+export const MAP_PLAYLISTS: Record<MapId, readonly MusicTrackId[]> = {
+  forest: [11, 10, 4, 3],
+  cavern: [2, 12, 3, 10],
+  garden: [8, 6, 5, 11],
+  eclipse: [9, 7, 1, 12],
 };
 export interface SfxDefinition {
   file: string;

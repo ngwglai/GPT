@@ -70,6 +70,11 @@ export function director(c: Combat, dt: number) {
   const s = c.s,
     d = difficulty(s.time);
   tickWaves(c, dt, spawn);
+  if (s.wave?.status === "resting") {
+    // Freeze the event schedule, rather than accumulating a burst after rest.
+    s.nextEvent = Math.min(LIMITS.number, s.nextEvent + dt);
+    return;
+  }
   if (s.time >= s.nextEvent) {
     s.nextEvent += 90;
     const events = ["兽潮来袭", "流星雨", "生命潮汐", "月蚀弹幕"];

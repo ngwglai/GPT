@@ -35,6 +35,11 @@ it("fresh empty arena first admits enemies, and unfinished admission cannot skip
   expect(w.s.wave!.processed).toBe(w.s.wave!.budget);
   w.s.enemies = [];
   director(w, 0.05);
+  expect(w.s.wave!.number).toBe(1);
+  expect(w.s.wave!.status).toBe("resting");
+  expect(waveRemaining(w.s)).toBe(5);
+  w.s.time += 5;
+  director(w, 0.05);
   expect(w.s.wave!.number).toBe(2);
   expect(w.s.enemies.length).toBeGreaterThan(0);
 });
@@ -46,7 +51,7 @@ it("timeout advances exactly once and retains every old living enemy", () => {
   director(w, 0.05);
   expect(w.s.wave!.number).toBe(2);
   expect(before.every((e) => w.s.enemies.includes(e) && e.hp > 0)).toBe(true);
-  expect(waveRemaining(w.s)).toBe(55);
+  expect(waveRemaining(w.s)).toBe(70);
   director(w, 0.05);
   expect(w.s.wave!.number).toBe(2);
 });
@@ -56,7 +61,7 @@ it("deadlines bound summon and split blockers without deleting them", () => {
   finishAdmission(w);
   director(w, 0.05);
   expect(w.s.wave!.number).toBe(1);
-  w.s.time = 55;
+  w.s.time = 70;
   director(w, 0.05);
   expect(w.s.wave!.number).toBe(2);
   expect(w.s.enemies.includes(e)).toBe(true);
@@ -69,7 +74,7 @@ it("cap consumes unadmitted ordinary slots and never accumulates a spawn backlog
   expect(w.s.wave!.processed).toBe(w.s.wave!.budget);
   expect(w.s.wave!.skipped).toBe(w.s.wave!.budget);
   expect(w.s.enemies.map((e) => e.id)).toEqual(ids);
-  w.s.time = 55;
+  w.s.time = 70;
   director(w, 0.05);
   expect(w.s.wave!.number).toBe(2);
   expect(w.s.enemies.length).toBe(LIMITS.enemies - 3);

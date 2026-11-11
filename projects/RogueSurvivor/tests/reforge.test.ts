@@ -476,7 +476,12 @@ it("原v1.7 API构造的存档夹具完整迁移，不含玩家数据且不丢�
   expect(v.player.upgrades.bow_power).toBe(2);
   expect(v.player.upgrades.hex_wither).toBe(old.player.upgrades.hex_wither);
   expect(v.revival).toEqual(old.revival);
-  expect(v.wave).toEqual(old.wave);
+  expect(v.wave).toEqual({
+    ...old.wave,
+    schema: 2,
+    restUntil: 0,
+    duration: 70,
+  });
   expect(v.deck!.pending).toEqual(old.deck.pending);
   expect(v.rng).toBe(old.rng);
   expect(v.fate!.base).toEqual(old.fate.base);
