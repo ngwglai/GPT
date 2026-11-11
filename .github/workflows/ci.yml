@@ -91,6 +91,7 @@ jobs:
     if: needs.layout.outputs.constraintlab == 'true'
     timeout-minutes: 20
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.os == 'ubuntu-latest' && 'mcr.microsoft.com/playwright:v1.64.1-noble@sha256:2f05f8a734509a7b3f26a912639488ee08f58a7b292d14d62271bcff9038768f' || null }}
     strategy:
       fail-fast: false
       matrix:
@@ -120,7 +121,7 @@ jobs:
       - run: npm --prefix frontend ci
       - run: npm --prefix frontend audit --audit-level=moderate
       - run: npm --prefix frontend run build
-      - run: npx --prefix frontend playwright install --with-deps chromium
+      - run: npx --prefix frontend playwright install chromium
       - name: Browser acceptance
         if: runner.os != 'Windows'
         run: python ../../scripts/ci_constraintlab_e2e.py
@@ -139,6 +140,7 @@ jobs:
   qq-mail-mcp:
     name: QQ Mail MCP
     runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:2f05f8a734509a7b3f26a912639488ee08f58a7b292d14d62271bcff9038768f
     timeout-minutes: 15
     defaults:
       run:
@@ -147,6 +149,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Trust the current checkout for Git commands
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '24'
@@ -155,7 +159,7 @@ jobs:
       - run: npm ci
       - run: npm audit --audit-level=moderate
       - name: Install browser for OAuth consent regression
-        run: npx playwright-core install --with-deps chromium
+        run: npx playwright-core install chromium
       - name: Resolve installed Chromium path
         run: node --input-type=module -e "import {chromium} from 'playwright-core'; import {appendFileSync} from 'node:fs'; appendFileSync(process.env.GITHUB_ENV, 'CHROMIUM_PATH=' + chromium.executablePath() + '\n')"
       - run: npm run typecheck

@@ -30,7 +30,7 @@ it("director admits exactly one finite budget across fractional timesteps", () =
   const w = new World(createRun("endless"));
   w.s.nextEvent = 9999;
   let count = 0;
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < Math.ceil(entryWindow(w.s.wave!) / 0.05); i++) {
     w.s.time += 0.05;
     director(w, 0.05);
   }

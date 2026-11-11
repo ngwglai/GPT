@@ -9,7 +9,7 @@ import {
   rewardBossLife,
   REVIVAL_RULES,
 } from "./revival";
-import { ensureWaves } from "./waves";
+import { ensureWaves, prepareRest } from "./waves";
 import { addExperienceGem } from "./gems";
 import { environment, tickEnvironment, temporary } from "./environment";
 import { childSpawn } from "./creatureAI";
@@ -73,6 +73,7 @@ export class World extends Combat {
     dt = Math.min(dt, 1 / 20);
     const s = this.s,
       p = s.player;
+    prepareRest(this);
     s.time = Math.min(LIMITS.number, s.time + dt);
     this.tickEffects(dt);
     tickEnvironment(this, dt);

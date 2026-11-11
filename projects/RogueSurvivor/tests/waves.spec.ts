@@ -111,19 +111,23 @@ for (const map of Object.keys(MAPS) as MapId[]) {
       });
   });
 }
-test("清空已入场波次立即推进，超时推进保留旧怪物", async ({ page }) => {
+test("清空已入场波次休整五秒再推进，超时推进保留旧怪物", async ({ page }) => {
   const w = new World(createRun("endless", "ranger", 320));
   w.s.wave!.processed = w.s.wave!.spawned = w.s.wave!.budget;
   w.s.wave!.status = "active";
   w.s.player.invincible = 999;
   await resume(page, w.s);
-  await expect(page.locator("#wave-hud")).toContainText("第 2 波");
+  await expect(page.locator("#wave-hud")).toContainText("清场休整");
+  await expect(page.locator("#wave-hud")).toContainText("下一波将在");
+  await expect(page.locator("#wave-hud")).toContainText("第 2 波", {
+    timeout: 15000,
+  });
   const s = await save(page);
   expect(s.wave!.number).toBe(2);
   // Fresh document prevents a prior world's autosave from racing the fixture.
   await page.reload();
   const t = new World(createRun("endless", "ranger", 321));
-  t.s.time = 54.95;
+  t.s.time = 69.95;
   t.s.player.invincible = 999;
   const old = spawn(t, "guard", { x: 2400, y: 1800 })!;
   await resume(page, t.s);

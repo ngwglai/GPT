@@ -16,7 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
-| 星烬远征 RogueSurvivor | [projects/RogueSurvivor](projects/RogueSurvivor/) | Completed | 浏览器俯视角动作肉鸽：自动攻击、主动技能、标准/无尽、存档与资源工坊 | v1.8 星轨重铸：三级武器、10机制核心、伤害乘区、低频抽卡、Run v5迁移与等级补偿；规则及模拟限制见V1.8.md；保留触屏操作。v1.7 指尖远征：触屏摇杆、多点触控、原技能栏按钮、自动／定点瞄准、横竖屏与安全区域；实现及真机限制见V1.7.md。v1.6 星火重燃：三角色21组逐帧动画、战败演出、Boss星火复活、Run v4兼容；实现与限制见V1.6.md。v1.5 波次远征：固定预算、清场/超时推进、5/10/15/20波首领与等待队列、四地图歌单、23个CC0采样；规则和验证见V1.5.md，保留成长强度与容量。v1.4：四地图、17普通怪/7Boss、环境互动、抽卡音乐连续；保留卡牌/角色/资源工坊，验证与限制见V1.4.md，远端状态见Actions |
+| 星烬远征 RogueSurvivor | [projects/RogueSurvivor](projects/RogueSurvivor/) | Completed | 浏览器俯视角动作肉鸽：自动攻击、主动技能、标准/无尽、存档与资源工坊 | v1.8.1：普通/Boss波70/90秒、18～30秒入场、清场5秒休整与可恢复倒计时、十二首地图音乐及逐曲播放增益；见V1.8.1.md、MUSIC.md。v1.8 星轨重铸：三级武器、10机制核心、伤害乘区、低频抽卡、Run v5迁移与等级补偿；规则及模拟限制见V1.8.md；保留触屏操作。v1.7 指尖远征：触屏摇杆、多点触控、原技能栏按钮、自动／定点瞄准、横竖屏与安全区域；实现及真机限制见V1.7.md。v1.6 星火重燃：三角色21组逐帧动画、战败演出、Boss星火复活、Run v4兼容；实现与限制见V1.6.md。v1.5 波次远征：固定预算、清场/超时推进、5/10/15/20波首领与等待队列、四地图歌单、23个CC0采样；规则和验证见V1.5.md，保留成长强度与容量。v1.4：四地图、17普通怪/7Boss、环境互动、抽卡音乐连续；保留卡牌/角色/资源工坊，验证与限制见V1.4.md，远端状态见Actions |
 | RogueLab | [projects/roguelab](projects/roguelab/) | Completed | Godot 4 三职业卡组肉鸽：三幕路线、遗物构筑、随机事件与首领；Web / Windows | PR #24；独立 Linux/Windows 验收通过，Web / 下载入口见 README；v1.1 完整简体中文；后续玩家反馈 |
 | CompilerLab | [projects/compilerlab](projects/compilerlab/) | Completed | 本地微型编译流水线、独立解释器与栈式 VM 语义对照 | PR #23；最终修复头253单元/14生产E2E、Linux/Windows与CI required已35/35通过；最新验收记录仍需完整CI成功，不部署 |
 | CalibrationLab | [projects/calibrationlab](projects/calibrationlab/) | Completed | 本地概率预测、独立样本校准与可靠性图 | PR #22；最终121单元/13生产E2E；初始功能头Linux/Windows与CI required全通过，数值修复头仍须完整CI，不部署 |
@@ -376,3 +376,9 @@
 - 经济配对：四地图×64种子，20波抽卡平均75.68→47.73次（−36.93%）；升级与掉落协同调整，刷新不计新增机会。
 - 兼容：Run 1～4显式迁移至5，旧高等级武器补偿专精，保留随机数、波次、敌人、星火和待领奖励；未修改敌人难度、地图与移动端输入。
 - 验证数据、构筑靶场、自动驾驶局限、浏览器和Windows检查见项目[V1.8.md](projects/RogueSurvivor/V1.8.md)及Actions；真机与人工平衡体验仍待玩家反馈。
+
+### v1.8.1验收的共享CI镜像修复
+
+- 多个Linux检查在Playwright系统依赖安装前因默认Azure Ubuntu镜像DNS失败；共享准备动作固定官方HTTPS归档，保留签名验证、依赖与原有测试，覆盖聚合Pages。未修改其他项目业务功能。最终检查与部署见[PR #44](https://github.com/ngwglai/GPT/pull/44)。
+
+- 官方Ubuntu归档同样DNS失败后，撤回临时镜像列表动作，改用摘要固定的微软Playwright预装Linux环境运行原测试；Windows原生验收保留。

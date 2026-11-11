@@ -2,7 +2,7 @@ import { defineConfig } from "@playwright/test";
 import base from "./playwright.config";
 export default defineConfig({
   ...base,
-  testMatch: ["mobile.spec.ts", "reforge.spec.ts"],
+  testMatch: ["mobile.spec.ts", "reforge.spec.ts", "respite.spec.ts"],
   use: { ...base.use, baseURL: "http://127.0.0.1:4175", launchOptions: {} },
   projects: [
     { name: "webkit", use: { browserName: "webkit", launchOptions: {} } },

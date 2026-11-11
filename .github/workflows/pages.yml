@@ -19,6 +19,7 @@ jobs:
   build:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:2f05f8a734509a7b3f26a912639488ee08f58a7b292d14d62271bcff9038768f
     timeout-minutes: 35
     outputs:
       auto_deploy: ${{ steps.changed.outputs.game }}
@@ -30,6 +31,8 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 2
+      - name: Trust the current checkout for Git commands
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Detect authorized game changes
         id: changed
         working-directory: .
@@ -46,7 +49,7 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - run: npm run test:e2e
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
@@ -63,7 +66,7 @@ jobs:
         run: |
           python projects/roguelab/tools/verify.py --export
           python -m pip install playwright==1.62.0
-          python -m playwright install --with-deps chromium
+          python -m playwright install chromium
           python projects/roguelab/tests/web_smoke.py
       - name: Build and validate RogueSurvivor
         working-directory: projects/RogueSurvivor
@@ -71,7 +74,7 @@ jobs:
           npm ci
           npm test
           npm run build
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
           npm run test:e2e
       - name: Assemble project site
         working-directory: .

@@ -152,7 +152,8 @@ export function tickEnvironment(c: Combat, dt: number) {
     s.eventUntil = s.time + 9;
     env.hint = true;
   }
-  if (env.mapId === "garden") {
+  const resting = s.wave?.status === "resting";
+  if (env.mapId === "garden" && !resting) {
     env.nextCandy -= dt;
     if (env.nextCandy <= 0) {
       env.nextCandy = env.rule ? 8 : ENV_RULES.candyPeriod;
@@ -164,7 +165,7 @@ export function tickEnvironment(c: Combat, dt: number) {
       );
     }
   }
-  if (env.mapId === "eclipse") {
+  if (env.mapId === "eclipse" && !resting) {
     env.nextField -= dt;
     if (env.nextField <= 0) {
       env.nextField = Math.max(
