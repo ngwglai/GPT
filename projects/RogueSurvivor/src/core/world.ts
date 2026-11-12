@@ -1,3 +1,4 @@
+import { tickMimicEscapes } from "./mimics";
 import { buildState } from "./buildState";
 import { CORE_PARAMS } from "../data/cards/cores";
 import { GROWTH_RULES } from "../data/growth";
@@ -140,6 +141,7 @@ export class World extends Combat {
       return;
     }
     this.settleDeaths();
+    tickMimicEscapes(this, dt);
     for (const g of s.gems) {
       const d = distance(g, p);
       if (d < p.magnet) {

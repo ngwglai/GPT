@@ -1,3 +1,4 @@
+import { MIMIC_RULES } from "../data/mimics";
 import { migrateGrowth } from "../core/migrateGrowth";
 import { buildState } from "../core/buildState";
 import { GROWTH_RULES } from "../data/growth";
@@ -561,7 +562,13 @@ export function validateRun(input: unknown): Run {
       env.destroyed.length <= 128 &&
       env.destroyed.every(Number.isInteger),
   );
-  assert(Array.isArray(env.candies) && env.candies.length <= ENV_RULES.candies);
+  assert(
+    Array.isArray(env.candies) &&
+      env.candies.filter((x) => !x.mimicReward).length <= ENV_RULES.candies &&
+      env.candies.filter((x) => x.mimicReward).length <=
+        (env.mapId === "garden" ? MIMIC_RULES.rewardCapacity : 0),
+  );
+  assert(new Set(env.candies.map((x) => x.id)).size === env.candies.length);
   assert(Array.isArray(env.fields) && env.fields.length <= ENV_RULES.fields);
   assert(
     obj(env.targets) &&
@@ -629,6 +636,12 @@ export function validateRun(input: unknown): Run {
   for (const x of env.candies) {
     point(x);
     assert(
+      x.mimicReward === undefined ||
+        (x.mimicReward === true &&
+          env.mapId === "garden" &&
+          MIMIC_RULES.positiveCandies.some((k) => k === x.kind)),
+    );
+    assert(
       Number.isInteger(x.id) &&
         buffKinds.includes(x.kind) &&
         x.life > 0 &&
@@ -651,6 +664,15 @@ export function validateRun(input: unknown): Run {
   for (const e of s.enemies)
     if (e.behavior) {
       const b = e.behavior;
+      assert(
+        b.escapeRemaining === undefined ||
+          (env.mapId === "garden" &&
+            e.kind === "mimic" &&
+            !b.awakened &&
+            typeof b.escapeRemaining === "number" &&
+            b.escapeRemaining >= 0 &&
+            b.escapeRemaining <= MIMIC_RULES.escapeMax),
+      );
       assert(
         b.copyShots === undefined ||
           (Number.isInteger(b.copyShots) &&

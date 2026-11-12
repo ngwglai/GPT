@@ -1,3 +1,4 @@
+import { awakenMimic } from "./mimics";
 import { evolved, GROWTH_RULES } from "../data/growth";
 import { damageBreakdown, type DamageContext } from "./damage";
 import { afterHit, fireChain } from "./mechanics";
@@ -46,6 +47,8 @@ export class Combat {
     context: DamageContext = {},
   ) {
     if (e.hp <= 0) return;
+    if (this.s.environment?.mapId === "garden" && amount > 0)
+      awakenMimic(this, e);
     const p = this.s.player;
     const kind = context.kind || "hit",
       state = buildState(this.s);

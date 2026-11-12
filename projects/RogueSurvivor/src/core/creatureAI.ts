@@ -1,3 +1,5 @@
+import { behavior } from "./enemyBehavior";
+import { awakenMimic } from "./mimics";
 import { bossPatterns } from "./bossPatterns";
 import type { Enemy, Run, Vec } from "./types";
 import type { Combat } from "./combat";
@@ -15,24 +17,7 @@ import {
   environment,
   hitCrystals,
 } from "./environment";
-export function behavior(e: Enemy) {
-  return (e.behavior ??= {
-    facing: 0,
-    shield: 0,
-    shieldTime: 0,
-    shieldOwner: 0,
-    summonOwner: 0,
-    child: false,
-    rewardless: false,
-    warning: 0,
-    target: null,
-    reflecting: 0,
-    awakened: false,
-    copied: [],
-    copyShots: 0,
-    healUntil: 0,
-  });
-}
+export { behavior } from "./enemyBehavior";
 export function tickDefense(s: Run, e: Enemy, dt: number) {
   const b = e.behavior;
   if (!b) return;
@@ -359,10 +344,7 @@ export function advancedAI(c: Combat, e: Enemy, dt: number) {
     if (!b.awakened) {
       vx = vy = 0;
       if (d < 190 || e.hp < e.maxHp) {
-        b.awakened = true;
-        e.charge = n;
-        b.warning = 0.7;
-        c.effect(e, "warning", 55);
+        awakenMimic(c, e);
       }
     }
   }
