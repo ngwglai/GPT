@@ -202,12 +202,19 @@ test.each(["dying", "revive", "reviving"] as const)(
   },
 );
 
-test("12 unique local files are covered by four distinct themed playlists", async () => {
+test("12 local files are assigned once to four three-track themed playlists", async () => {
   const { MUSIC_TRACKS, MAP_PLAYLISTS, MUSIC_GAINS } =
     await import("../src/data/audio");
   const { statSync } = await import("node:fs");
   expect(Object.keys(MUSIC_TRACKS)).toHaveLength(12);
+  expect(MAP_PLAYLISTS).toEqual({
+    forest: [11, 10, 4],
+    cavern: [2, 12, 1],
+    garden: [8, 6, 5],
+    eclipse: [9, 3, 7],
+  });
   const all = Object.values(MAP_PLAYLISTS).flat();
+  expect(all).toHaveLength(12);
   expect([...new Set(all)].sort((a, b) => a - b)).toEqual(
     Array.from({ length: 12 }, (_, i) => i + 1),
   );
@@ -215,7 +222,7 @@ test("12 unique local files are covered by four distinct themed playlists", asyn
     new Set(Object.values(MAP_PLAYLISTS).map((x) => x.join(","))).size,
   ).toBe(4);
   for (const list of Object.values(MAP_PLAYLISTS)) {
-    expect(list).toHaveLength(4);
+    expect(list).toHaveLength(3);
     expect(new Set(list).size).toBe(list.length);
     for (const id of list) {
       expect(statSync(`public/audio/battle-${id}.mp3`).size).toBeGreaterThan(
@@ -241,7 +248,7 @@ test("track gain is applied before rollover playback and multiplies volume/duck"
   const m = Track.current;
   expect(m.volume).toBeCloseTo(0.7 * 0.35 * MUSIC_GAINS[9]);
   m.dispatchEvent(new Event("ended"));
-  expect(m.src).toContain("battle-7.mp3");
+  expect(m.src).toContain("battle-3.mp3");
   expect(m.volume).toBeCloseTo(0.7 * 0.35 * MUSIC_GAINS[7]);
   a.settings.music = 0;
   a.update(0, "playing");
