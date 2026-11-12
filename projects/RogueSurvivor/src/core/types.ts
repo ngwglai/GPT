@@ -74,6 +74,8 @@ export interface Enemy extends Vec {
     target: Vec | null;
     reflecting: number;
     awakened: boolean;
+    /** Simulation seconds remaining; absent until the garden escape starts. */
+    escapeRemaining?: number;
     copied: string[];
     copyShots?: number;
     healUntil: number;

@@ -6,6 +6,7 @@ import {
   type MagicField,
 } from "./environmentTypes";
 import { ENV_RULES, MAPS, type MapId } from "../data/maps";
+import { MIMIC_RULES } from "../data/mimics";
 import { LIMITS } from "../data/content";
 import { clamp, distance, random } from "./math";
 export function environment(s: Run) {
@@ -109,17 +110,31 @@ export function hitCrystals(c: Combat, p: Vec, r: number, damage: number) {
   env.crystals = env.crystals.filter((x) => !env.destroyed.includes(x.id));
   return count;
 }
-export function addCandy(s: Run, p: Vec, kind?: BuffKind) {
+export function addCandy(s: Run, p: Vec, kind?: BuffKind, mimicReward = false) {
   const env = environment(s);
-  if (env.candies.length >= ENV_RULES.candies) return;
+  if (mimicReward) {
+    if (
+      env.mapId !== "garden" ||
+      !MIMIC_RULES.positiveCandies.some((k) => k === kind) ||
+      env.candies.filter((x) => x.mimicReward).length >=
+        MIMIC_RULES.rewardCapacity
+    )
+      return;
+  } else if (
+    env.candies.filter((x) => !x.mimicReward).length >= ENV_RULES.candies
+  )
+    return;
   const kinds: BuffKind[] = ["speed", "haste", "heal", "xp", "slow", "weak"];
-  env.candies.push({
+  const candy = {
     id: s.nextId++,
-    x: clamp(p.x, 60, 3540),
-    y: clamp(p.y, 60, 3540),
+    x: mimicReward ? p.x : clamp(p.x, 60, 3540),
+    y: mimicReward ? p.y : clamp(p.y, 60, 3540),
     kind: kind || kinds[Math.floor(random(s) * kinds.length)],
     life: ENV_RULES.candyLife,
-  });
+    ...(mimicReward ? { mimicReward: true as const } : {}),
+  };
+  env.candies.push(candy);
+  return candy;
 }
 export function addField(
   s: Run,

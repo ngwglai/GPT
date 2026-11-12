@@ -16,6 +16,8 @@ export interface Crystal extends Vec {
   type: "blast" | "xp" | "ice";
 }
 export interface Candy extends Vec {
+  /** Garden-only escape reward, with its own bounded capacity. */
+  mimicReward?: true;
   id: number;
   kind: BuffKind;
   life: number;

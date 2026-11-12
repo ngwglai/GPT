@@ -607,19 +607,27 @@ export class GameScene extends Phaser.Scene {
         this.sprite("effect." + z.kind, z, z.r * 2, 0, 0.25);
     }
     for (const e of s.enemies) {
+      const fleeing =
+        e.kind === "mimic" &&
+        !e.behavior?.awakened &&
+        e.behavior?.escapeRemaining !== undefined;
       const bob =
-        Math.sin(s.time * (e.kind === "runner" ? 12 : 5) + e.id) * 0.04;
+        Math.sin(
+          s.time * (fleeing ? 24 : e.kind === "runner" ? 12 : 5) + e.id,
+        ) * (fleeing ? 0.1 : 0.04);
       this.sprite(
         e.kind === "mimic" && !e.behavior?.awakened
           ? "enemy.mimicDormant"
           : "enemy." + e.kind,
         e,
         e.r * 2.7 * (1 + bob),
-        e.kind === "crab"
-          ? (e.behavior?.facing || 0) - Math.PI / 2
-          : e.charge
-            ? Math.sin(s.time * 35) * 0.06
-            : 0,
+        fleeing
+          ? Math.sin(s.time * 28 + e.id) * 0.12
+          : e.kind === "crab"
+            ? (e.behavior?.facing || 0) - Math.PI / 2
+            : e.charge
+              ? Math.sin(s.time * 35) * 0.06
+              : 0,
         e.hit > 0 ? 0.55 : 1,
         e.hit > 0
           ? 0xffffff
@@ -640,6 +648,10 @@ export class GameScene extends Phaser.Scene {
       if (e.kind === "mimic" && !e.behavior?.awakened) {
         g.fillStyle(0xeb8ca7, 0.9);
         g.fillCircle(sx(e.x) + e.r + 12, sy(e.y) - e.r - 8, 3);
+        if (fleeing) {
+          g.lineStyle(2, 0xffc772, 0.9);
+          g.strokeCircle(sx(e.x), sy(e.y), e.r + 7 + bob * 14);
+        }
       }
       if (e.behavior) {
         const b = e.behavior;
