@@ -1,5 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
-import { version } from "../package.json";
+import { readFileSync } from "node:fs";
+const { version } = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+);
 import { createRun } from "../src/core/create";
 import { newWave } from "../src/core/waves";
 import { MAP_PLAYLISTS } from "../src/data/audio";
