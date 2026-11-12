@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { version } from "../package.json";
 import { createRun } from "../src/core/create";
 import { newWave } from "../src/core/waves";
 import { MAP_PLAYLISTS } from "../src/data/audio";
@@ -133,7 +134,7 @@ test("十二首真实本地MP3均可解码播放，首页不预载整套音乐",
     if (/battle-\d+\.mp3/.test(r.url())) requested.add(r.url());
   });
   await page.goto("/");
-  await expect(page.locator(".version")).toContainText("v1.8.1");
+  await expect(page.locator(".version")).toContainText(`v${version}`);
   expect(requested.size).toBe(0);
   const decoded = await page.evaluate(async () => {
     const base = new URL("audio/", location.href);
