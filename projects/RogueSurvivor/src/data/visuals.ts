@@ -1,8 +1,10 @@
+import { EFFECT_VISUALS } from "./effects";
 import { CHARACTER_SHEETS } from "./characterAnimations";
 import { WORLD_VISUALS } from "./worldVisuals";
 /** Original generated art, independent of all collision and rule data. */
 export const VISUALS: Record<string, string> = {
   ...WORLD_VISUALS,
+  ...EFFECT_VISUALS,
   ...CHARACTER_SHEETS,
   "portrait.ranger": "v1.6/characters/ranger/portrait.webp",
   "player.ranger": "v1.6/characters/ranger/fallback.webp",

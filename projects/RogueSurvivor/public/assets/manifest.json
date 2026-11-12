@@ -1,5 +1,5 @@
 {
-  "version": "1.6",
+  "version": "1.9.0",
   "generator": "OpenAI image_gen pose atlases; GIF previews encoded locally",
   "assets": {
     "enemy.mimicDormant": "cards/treasure.webp",
@@ -115,6 +115,31 @@
     "card.epic": "effects/storm.webp",
     "card.mechanism": "effects/lance.webp",
     "map.ground": "maps/grass.webp",
-    "ui.world": "ui/world.webp"
+    "ui.world": "ui/world.webp",
+    "vfx.arrow": "v1.9.0/effects/arrow.webp",
+    "vfx.slash": "v1.9.0/effects/slash.webp",
+    "vfx.fireball": "v1.9.0/effects/fireball.webp",
+    "vfx.spirit": "v1.9.0/effects/spirit.webp",
+    "vfx.frost": "v1.9.0/effects/frost.webp",
+    "vfx.lance": "v1.9.0/effects/lance.webp",
+    "vfx.shield": "v1.9.0/effects/shield.webp",
+    "vfx.heal": "v1.9.0/effects/heal.webp",
+    "vfx.starfall": "v1.9.0/effects/starfall.webp",
+    "vfx.dash": "v1.9.0/effects/dash.webp",
+    "vfx.hit": "v1.9.0/effects/hit.webp",
+    "vfx.critical": "v1.9.0/effects/critical.webp",
+    "vfx.hostile": "v1.9.0/effects/hostile.webp",
+    "vfx.warning": "v1.9.0/effects/warning.webp",
+    "vfx.revive": "v1.9.0/effects/revive.webp",
+    "vfx.dissolve": "v1.9.0/effects/dissolve.webp",
+    "vfx.vine": "v1.9.0/effects/vine.webp",
+    "vfx.beam": "v1.9.0/effects/beam.webp",
+    "vfx.candy": "v1.9.0/effects/candy.webp",
+    "vfx.moon": "v1.9.0/effects/moon.webp",
+    "vfx.meteor": "v1.9.0/effects/meteor.webp",
+    "vfx.fan": "v1.9.0/effects/fan.webp",
+    "vfx.mirror": "v1.9.0/effects/mirror.webp",
+    "vfx.phase": "v1.9.0/effects/phase.webp",
+    "vfx.impact": "v1.9.0/effects/impact.webp"
   }
 }

@@ -1,3 +1,7 @@
+import { readFileSync } from "node:fs";
+const { version } = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+);
 import { test, expect, type Page } from "@playwright/test";
 import { createRun } from "../src/core/create";
 import { World } from "../src/core/world";
@@ -70,7 +74,7 @@ for (const map of Object.keys(MAPS) as MapId[]) {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
     await page.goto("/");
-    await expect(page.locator(".version")).toContainText("v1.8");
+    await expect(page.locator(".version")).toContainText(`v${version}`);
     await page.getByRole("button", { name: "开启远征" }).click();
     await page.locator(`[data-action="map-${map}"]`).click();
     await page.locator('[data-action="launch"]').click();

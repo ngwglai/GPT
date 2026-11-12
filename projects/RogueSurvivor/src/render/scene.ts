@@ -1,3 +1,11 @@
+import {
+  EFFECT_SHEETS,
+  FX_BUDGET,
+  weaponEffect,
+  impactFrame,
+} from "../data/effects";
+import { BattleFeedback } from "./battleFeedback";
+import { paintBattleEffects, transientEffect } from "./battleEffects";
 import type { TouchControls } from "../input/touchControls";
 import { clampAim } from "../input/touchState";
 import { CharacterAnimation, MovementPose } from "./characterAnimation";
@@ -50,6 +58,9 @@ export class GameScene extends Phaser.Scene {
   private cy = 1800;
   private queued = { dash: false, skills: [false, false, false] };
   private assetRevision = 0;
+  private feedback = new BattleFeedback();
+  private fxUsed = 0;
+  private fxLimit = FX_BUDGET.high as number;
   constructor() {
     super("expedition");
   }
@@ -87,6 +98,7 @@ export class GameScene extends Phaser.Scene {
   setWorld(w: World) {
     this.needsPaint = true;
     this.world = w;
+    this.feedback.reset(w.s);
     void this.loadCharacterSheets(w.s.character);
     this.characterAnimation.reset();
     this.movementPose.reset();
@@ -117,7 +129,13 @@ export class GameScene extends Phaser.Scene {
             if (!this.decoded.has(url)) this.decoded.set(url, decodeImage(url));
             const image = await this.decoded.get(url)!;
             if (!this.textures.exists("builtin:" + id)) {
-              if (CHARACTER_SHEETS[id])
+              if (EFFECT_SHEETS[id])
+                this.textures.addSpriteSheet("builtin:" + id, image, {
+                  frameWidth: EFFECT_SHEETS[id].frameWidth,
+                  frameHeight: EFFECT_SHEETS[id].frameHeight,
+                  endFrame: EFFECT_SHEETS[id].frames - 1,
+                });
+              else if (CHARACTER_SHEETS[id])
                 this.textures.addSpriteSheet("builtin:" + id, image, {
                   frameWidth: FRAME_SIZE,
                   frameHeight: FRAME_SIZE,
@@ -273,7 +291,9 @@ export class GameScene extends Phaser.Scene {
     if (tint) sprite.setTint(tint);
     if (
       frame !== undefined &&
-      ((key.startsWith("builtin:") && CHARACTER_SHEETS[id]) || custom?.frames)
+      ((key.startsWith("builtin:") &&
+        (CHARACTER_SHEETS[id] || EFFECT_SHEETS[id])) ||
+        custom?.frames)
     )
       sprite.setFrame(frame);
     else if (custom?.frames && key.startsWith("custom:"))
@@ -281,7 +301,64 @@ export class GameScene extends Phaser.Scene {
         Math.floor((this.world?.s.time || 0) * (custom.fps || 8)) %
           custom.frames,
       );
+    return sprite;
   }
+  private effectSprite = (
+    name: string,
+    p: Vec,
+    width: number,
+    height = width,
+    angle = 0,
+    alpha = 0.6,
+    progress?: number,
+    depth = 7,
+    essential = false,
+  ) => {
+    if (!essential && this.fxUsed >= this.fxLimit) return false;
+    const id = "vfx." + name,
+      custom = assetPack.assets[id];
+    if (
+      !this.textures.exists("builtin:" + id) &&
+      !this.textures.exists("custom:" + id)
+    )
+      return false;
+    const sheet = custom
+      ? custom.frames
+        ? custom
+        : undefined
+      : EFFECT_SHEETS[id];
+    const count = sheet?.frames || 1;
+    const frame =
+      count > 1
+        ? impactFrame(
+            progress ??
+              (((this.world?.s.time || 0) *
+                ((sheet as { fps?: number }).fps || 12)) %
+                count) /
+                count,
+            count,
+          )
+        : undefined;
+    const sprite = this.sprite(
+      id,
+      p,
+      Math.max(width, height),
+      angle,
+      alpha,
+      undefined,
+      frame,
+    );
+    if (sprite) {
+      sprite
+        .setDisplaySize(
+          width * (custom?.scale || 1),
+          height * (custom?.scale || 1),
+        )
+        .setDepth(depth);
+      if (!essential) this.fxUsed++;
+    }
+    return true;
+  };
   private label(
     text: string,
     x: number,
@@ -403,6 +480,9 @@ export class GameScene extends Phaser.Scene {
     const busy = low || s.enemies.length > 110 || s.bullets.length > 220;
     this.used = 0;
     this.textUsed = 0;
+    this.fxUsed = 0;
+    this.fxLimit = low ? FX_BUDGET.low : busy ? 64 : FX_BUDGET.high;
+    this.feedback.observe(s);
     g.clear();
     const sx = (x: number) => x - this.cx + W / 2,
       sy = (y: number) => y - this.cy + H / 2;
@@ -591,7 +671,7 @@ export class GameScene extends Phaser.Scene {
         color = z.enemy
           ? 0xff867c
           : SKILLS[z.kind as keyof typeof SKILLS]?.color || 0xa0eac8;
-      g.fillStyle(color, z.delay > 0 ? 0.09 : 0.18);
+      g.fillStyle(color, z.delay > 0 ? 0.04 : 0.07);
       g.fillCircle(x, y, z.r);
       g.lineStyle(4, 0xb7eaff, z.delay > 0 ? 0.85 : 0.65);
       g.strokeCircle(x, y, z.r);
@@ -786,8 +866,28 @@ export class GameScene extends Phaser.Scene {
           : b.kind === "lance"
             ? "lance"
             : b.kind;
+      const legacyId = "projectile." + id;
+      const art = b.enemy ? "hostile" : weaponEffect(b.kind);
+      const evolved =
+        !b.enemy && (p.weapons[b.source as keyof typeof p.weapons] || 0) >= 3;
+      // Old workshop projectile overrides retain priority; the outline stays independent.
+      if (
+        !assetPack.assets[legacyId] &&
+        this.effectSprite(
+          art,
+          b,
+          (b.r * 4 + 18) * (evolved ? 1.15 : 1),
+          b.r * 2 + 10,
+          Math.atan2(b.vy, b.vx),
+          b.enemy ? 0.95 : 0.9,
+          undefined,
+          b.enemy ? 11.5 : 5,
+          true,
+        )
+      )
+        continue;
       this.sprite(
-        "projectile." + id,
+        legacyId,
         b,
         b.r * 3 + 5,
         Math.atan2(b.vy, b.vx) +
@@ -805,14 +905,23 @@ export class GameScene extends Phaser.Scene {
             : undefined,
       );
     }
+    paintBattleEffects(
+      s,
+      w.effects,
+      this.feedback.pulses,
+      this.effectSprite,
+      ensureRevival(s).elapsed,
+    );
+    this.game.canvas.dataset.effectSprites = String(this.fxUsed);
+    this.game.canvas.dataset.effectBudget = String(this.fxLimit);
     const danger = this.danger;
     danger.clear();
     this.friendly.clear();
     for (const z of s.zones)
       if (!z.enemy) {
-        this.friendly.lineStyle(4, 0x123b60, 0.8);
+        this.friendly.lineStyle(2, 0x123b60, 0.5);
         this.friendly.strokeCircle(sx(z.x), sy(z.y), z.r);
-        this.friendly.lineStyle(2, 0xb7efff, 0.95);
+        this.friendly.lineStyle(1.2, 0xb7efff, 0.65);
         this.friendly.strokeCircle(sx(z.x), sy(z.y), z.r);
       }
     for (const effect of w.effects)
@@ -823,9 +932,9 @@ export class GameScene extends Phaser.Scene {
         )
       ) {
         const alpha = effect.life / effect.maxLife;
-        this.friendly.lineStyle(3, 0x123b60, alpha * 0.7);
+        this.friendly.lineStyle(2, 0x123b60, alpha * 0.25);
         this.friendly.strokeCircle(sx(effect.x), sy(effect.y), effect.r);
-        this.friendly.lineStyle(1.5, 0xc6f8ff, alpha * 0.8);
+        this.friendly.lineStyle(1, 0xc6f8ff, alpha * 0.4);
         this.friendly.strokeCircle(sx(effect.x), sy(effect.y), effect.r);
       }
     for (const b of s.bullets)
@@ -847,10 +956,8 @@ export class GameScene extends Phaser.Scene {
           x - (b.vx / speed) * 14,
           y - (b.vy / speed) * 14,
         );
-        this.friendly.lineStyle(5, 0x123b60, 1);
-        this.friendly.strokeCircle(x, y, b.r + 1);
-        this.friendly.lineStyle(2, 0x50e9ff, 1);
-        this.friendly.strokeCircle(x, y, b.r + 1);
+        // Independent cyan core and dark tail remain readable with custom artwork.
+        // Keep the painted projectile silhouette visible instead of covering it with a ring.
         this.friendly.fillStyle(0xf1ffff, 0.85);
         this.friendly.fillCircle(x, y, Math.max(1.5, b.r * 0.4));
       }
@@ -950,7 +1057,8 @@ export class GameScene extends Phaser.Scene {
     const limit = busy ? 25 : 90;
     for (const e of w.effects.slice(-limit)) {
       const a = e.life / e.maxLife;
-      if (e.kind === "heal") this.sprite("effect.heal", e, 32, 0, a * 0.8);
+      if (e.kind === "heal" && !this.textures.exists("builtin:vfx.heal"))
+        this.sprite("effect.heal", e, 32, 0, a * 0.8);
       if (e.text) {
         this.label(
           e.text,
@@ -961,6 +1069,13 @@ export class GameScene extends Phaser.Scene {
         );
         continue;
       }
+      const art = transientEffect(e.kind);
+      if (
+        art &&
+        (this.textures.exists("builtin:vfx." + art) ||
+          this.textures.exists("custom:vfx." + art))
+      )
+        continue;
       g.lineStyle(
         3,
         e.kind === "hurt"

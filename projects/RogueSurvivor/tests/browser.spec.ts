@@ -1,3 +1,7 @@
+import { readFileSync } from "node:fs";
+const { version } = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+);
 import { ensureDeck } from "../src/core/deckState";
 import { recalculate } from "../src/core/fate";
 import { heldLayers } from "../src/core/deckState";
@@ -626,7 +630,7 @@ test("v1.1 重抽、遗忘与属性落盘", async ({ page }) => {
 
 fateTest("v1.2 三类图鉴、当前构筑合并层数及独立刷新", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator(".version")).toContainText("v1.8");
+  await expect(page.locator(".version")).toContainText(`v${version}`);
   await page.getByRole("button", { name: "远征图鉴", exact: true }).click();
   await expect(page.locator(".codex-card")).toHaveCount(83);
   await page.getByRole("button", { name: "技能图鉴", exact: true }).click();
