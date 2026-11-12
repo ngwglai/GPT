@@ -42,6 +42,7 @@ export class GameScene extends Phaser.Scene {
   private ground?: Phaser.GameObjects.TileSprite;
   private decoded = new Map<string, Promise<HTMLImageElement>>();
   private builtins?: Promise<void>;
+  private effectArt?: Promise<void>;
   private characterSheets = new Map<string, Promise<void>>();
   private characterReady = new Set<string>();
   private background!: Phaser.GameObjects.Graphics;
@@ -99,7 +100,9 @@ export class GameScene extends Phaser.Scene {
     this.needsPaint = true;
     this.world = w;
     this.feedback.reset(w.s);
-    void this.loadCharacterSheets(w.s.character);
+    void this.loadCharacterSheets(w.s.character).then(() =>
+      this.loadEffectArt(),
+    );
     this.characterAnimation.reset();
     this.movementPose.reset();
     this.lastPosition = { x: w.s.player.x, y: w.s.player.y };
@@ -111,47 +114,53 @@ export class GameScene extends Phaser.Scene {
   async reloadAssets() {
     this.needsPaint = true;
     if (!this.ready) return;
-    this.builtins ??= Promise.all(
-      Object.keys(VISUALS)
-        .filter(
-          (id) =>
-            !id.startsWith("animation.") &&
-            !id.startsWith("portrait.") &&
-            !id.startsWith("avatar.") &&
-            !id.startsWith("card.") &&
-            id !== "ui.world" &&
-            !id.startsWith("skill.") &&
-            !id.endsWith(".preview"),
-        )
-        .map(async (id) => {
-          try {
-            const url = artUrl(id)!;
-            if (!this.decoded.has(url)) this.decoded.set(url, decodeImage(url));
-            const image = await this.decoded.get(url)!;
-            if (!this.textures.exists("builtin:" + id)) {
-              if (EFFECT_SHEETS[id])
-                this.textures.addSpriteSheet("builtin:" + id, image, {
-                  frameWidth: EFFECT_SHEETS[id].frameWidth,
-                  frameHeight: EFFECT_SHEETS[id].frameHeight,
-                  endFrame: EFFECT_SHEETS[id].frames - 1,
-                });
-              else if (CHARACTER_SHEETS[id])
-                this.textures.addSpriteSheet("builtin:" + id, image, {
-                  frameWidth: FRAME_SIZE,
-                  frameHeight: FRAME_SIZE,
-                  endFrame: 7,
-                });
-              else this.textures.addImage("builtin:" + id, image);
-            }
-          } catch {
-            /* Original vector fallback remains available. */
-          }
-        }),
-    ).then(() => {
-      this.needsPaint = true;
-    });
+    const actorReady = this.world
+      ? this.loadCharacterSheets(this.world.s.character)
+      : Promise.resolve();
+    this.builtins ??= actorReady
+      .then(() =>
+        Promise.all(
+          Object.keys(VISUALS)
+            .filter(
+              (id) =>
+                !id.startsWith("vfx.") &&
+                !id.startsWith("animation.") &&
+                !id.startsWith("portrait.") &&
+                !id.startsWith("avatar.") &&
+                !id.startsWith("card.") &&
+                id !== "ui.world" &&
+                !id.startsWith("skill.") &&
+                !id.endsWith(".preview"),
+            )
+            .map(async (id) => {
+              try {
+                const url = artUrl(id)!;
+                if (!this.decoded.has(url))
+                  this.decoded.set(url, decodeImage(url));
+                const image = await this.decoded.get(url)!;
+                if (!this.textures.exists("builtin:" + id)) {
+                  if (CHARACTER_SHEETS[id])
+                    this.textures.addSpriteSheet("builtin:" + id, image, {
+                      frameWidth: FRAME_SIZE,
+                      frameHeight: FRAME_SIZE,
+                      endFrame: 7,
+                    });
+                  else this.textures.addImage("builtin:" + id, image);
+                }
+              } catch {
+                /* Original vector fallback remains available. */
+              }
+            }),
+        ),
+      )
+      .then(() => {
+        this.needsPaint = true;
+      });
     // Custom edits are independent of unrelated default-image downloads.
-    if (this.world) void this.loadCharacterSheets(this.world.s.character);
+    if (this.world)
+      void this.loadCharacterSheets(this.world.s.character).then(() =>
+        this.loadEffectArt(),
+      );
     const rev = ++this.assetRevision;
     this.ground?.setVisible(false).setTexture("map.ground");
     for (const sprite of this.sprites)
@@ -176,6 +185,36 @@ export class GameScene extends Phaser.Scene {
       }
     }
     this.needsPaint = true;
+  }
+  private loadEffectArt() {
+    if (!this.ready) return Promise.resolve();
+    // Critical actor frames finish before the optional cosmetic download queue.
+    return (this.effectArt ??= Promise.all(
+      Object.keys(VISUALS)
+        .filter((id) => id.startsWith("vfx."))
+        .map(async (id) => {
+          try {
+            const url = artUrl(id)!;
+            if (!this.decoded.has(url)) this.decoded.set(url, decodeImage(url));
+            const image = await this.decoded.get(url)!;
+            const key = "builtin:" + id;
+            if (!this.textures.exists(key)) {
+              const sheet = EFFECT_SHEETS[id];
+              if (sheet)
+                this.textures.addSpriteSheet(key, image, {
+                  frameWidth: sheet.frameWidth,
+                  frameHeight: sheet.frameHeight,
+                  endFrame: sheet.frames - 1,
+                });
+              else this.textures.addImage(key, image);
+            }
+          } catch {
+            /* Cosmetic failure keeps the independent vector/fallback layer. */
+          }
+        }),
+    ).then(() => {
+      this.needsPaint = true;
+    }));
   }
   private loadCharacterSheets(character: string) {
     if (!this.ready) return Promise.resolve();

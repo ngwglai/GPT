@@ -332,6 +332,11 @@ const fateTest = test.extend({
             })
             .catch(() => {});
       }
+      // Release the running Canvas/audio page before closing its owning context.
+      // Teardown errors still fail; do not suppress a disconnected browser.
+      for (const page of context.pages())
+        if (!page.isClosed())
+          await page.goto("about:blank", { waitUntil: "commit" });
       await context.close();
       await browser.close();
     }

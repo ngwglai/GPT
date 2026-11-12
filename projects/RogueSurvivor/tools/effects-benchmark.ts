@@ -32,6 +32,7 @@ try {
       const scene = (window as any).vfxHarness.scene;
       await scene.builtins;
       await Promise.all(scene.characterSheets.values());
+      await scene.effectArt;
     });
     await page.waitForTimeout(750);
     const samples = [];
