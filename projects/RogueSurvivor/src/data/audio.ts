@@ -31,10 +31,10 @@ export const MUSIC_GAINS: Record<MusicTrackId, number> = {
   12: 0.7762,
 };
 export const MAP_PLAYLISTS: Record<MapId, readonly MusicTrackId[]> = {
-  forest: [11, 10, 4, 3],
-  cavern: [2, 12, 3, 10],
-  garden: [8, 6, 5, 11],
-  eclipse: [9, 7, 1, 12],
+  forest: [11, 10, 4],
+  cavern: [2, 12, 1],
+  garden: [8, 6, 5],
+  eclipse: [9, 3, 7],
 };
 export interface SfxDefinition {
   file: string;
