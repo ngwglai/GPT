@@ -1,3 +1,10 @@
+import { enemyGrowth } from "./enemyGrowth";
+export {
+  bossHpMultiplier,
+  bossDamageMultiplier,
+  bossAttackRate,
+  bossAttackInterval,
+} from "./enemyGrowth";
 import type { EnemyId, SkillId, WeaponId } from "../core/types";
 export const LIMITS = {
   world: 3600,
@@ -10,44 +17,34 @@ export const LIMITS = {
 };
 export const RARITIES = ["寻常", "珍稀", "传奇"];
 export { experienceRequired as xpNeeded } from "./growth";
-// v1.4.1 extreme-wave progression. Multipliers are relative to base enemy stats.
-// Values are continuous between milestones; the 60-minute tier is the floor
-// for late endless runs, rather than allowing numerical overflow.
-const MILESTONES = [0, 5, 10, 15, 20, 30, 60] as const;
-function milestone(time: number, values: readonly number[]) {
-  const m = Math.min(60, Math.max(0, time / 60));
-  for (let i = 1; i < MILESTONES.length; i++) {
-    if (m <= MILESTONES[i]) {
-      const amount =
-        (m - MILESTONES[i - 1]) / (MILESTONES[i] - MILESTONES[i - 1]);
-      return values[i - 1] + (values[i] - values[i - 1]) * amount;
-    }
+/** Compatibility metadata for pre-wave tools only. The director uses waves.ts.
+ * These density milestones are unchanged; they are not enemy attribute growth. */
+function legacySpawnRate(time: number) {
+  const points = [
+    [0, 2],
+    [5, 4],
+    [10, 6],
+    [15, 9],
+    [20, 12],
+    [30, 18],
+    [60, 25],
+  ] as const;
+  const t = Math.max(0, time / 60);
+  for (let i = 1; i < points.length; i++) {
+    const [a, x] = points[i - 1],
+      [b, y] = points[i];
+    if (t <= b) return x + (y - x) * ((t - a) / (b - a));
   }
-  return values[values.length - 1];
+  return points[points.length - 1][1];
 }
 export function difficulty(time: number) {
   const m = Math.max(0, time) / 60;
   return {
-    hp: milestone(time, [1, 2, 5, 12, 30, 100, 1000]),
-    damage: milestone(time, [1, 1.8, 3, 5, 10, 25, 150]),
-    attackRate: milestone(time, [1, 1.5, 2, 3, 4, 6, 12]),
-    speed: 1 + Math.min(0.6, m * 0.012),
-    // Legacy rate metadata for v1.4.2 tools; v1.5 director uses finite waves.
-    spawn: 2 / milestone(time, [2, 4, 6, 9, 12, 18, 25]),
+    ...enemyGrowth(time),
+    spawn: 2 / legacySpawnRate(time),
     pack: 2,
-    elite: milestone(time, [0.03, 0.06, 0.1, 0.16, 0.23, 0.32, 0.48]),
     tier: Math.floor(m / 5),
   };
-}
-export function bossHpMultiplier(time: number) {
-  return milestone(time, [3, 3, 8, 20, 50, 150, 1500]);
-}
-export function bossDamageMultiplier(time: number) {
-  return milestone(time, [2, 2, 4, 8, 15, 40, 250]);
-}
-export function bossAttackInterval(time: number, secondPhase: boolean) {
-  const base = milestone(time, [1.5, 1.5, 1, 0.7, 0.5, 0.35, 0.2]);
-  return Math.max(0.16, base * (secondPhase ? 0.8 : 1));
 }
 
 export { CHARACTERS } from "./characters";

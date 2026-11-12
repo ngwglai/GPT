@@ -1,0 +1,15 @@
+{
+  "version": "1.8.2",
+  "commit": "e37a2ac09e1280a1d205d97078f0535fd82047fa",
+  "source": "src/data/content.ts",
+  "minutes": [0, 5, 10, 15, 20, 30, 60],
+  "hp": [1, 2, 5, 12, 30, 100, 1000],
+  "damage": [1, 1.8, 3, 5, 10, 25, 150],
+  "attackRate": [1, 1.5, 2, 3, 4, 6, 12],
+  "elite": [0.03, 0.06, 0.1, 0.16, 0.23, 0.32, 0.48],
+  "bossHp": [3, 3, 8, 20, 50, 150, 1500],
+  "bossDamage": [2, 2, 4, 8, 15, 40, 250],
+  "bossInterval": [1.5, 1.5, 1, 0.7, 0.5, 0.35, 0.2],
+  "bossSecondPhase": 0.8,
+  "bossIntervalFloor": 0.16
+}

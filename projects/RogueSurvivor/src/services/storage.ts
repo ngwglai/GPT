@@ -408,7 +408,7 @@ export function validateRun(input: unknown): Run {
         e.r > 0 &&
         e.r < 100 &&
         e.speed >= 0 &&
-        e.speed < 1000 &&
+        e.speed <= LIMITS.number &&
         typeof e.elite === "boolean" &&
         typeof e.burnSource === "string" &&
         (e.charge === null ||

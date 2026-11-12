@@ -1,6 +1,6 @@
 {
   "name": "rogue-survivor",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,7 +16,8 @@
     "test:mobile:webkit": "playwright test -c playwright.mobile.config.ts",
     "simulate:economy": "tsx tools/economy-check.ts",
     "simulate:builds": "tsx tools/build-check.ts",
-    "simulate:expeditions": "tsx tools/expedition-check.ts"
+    "simulate:expeditions": "tsx tools/expedition-check.ts",
+    "report:growth": "tsx tools/enemy-growth-report.ts"
   },
   "dependencies": {
     "phaser": "^3.90.0"
