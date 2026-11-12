@@ -326,7 +326,7 @@ describe("director, enemies and victory", () => {
     expect(w.s.phase).toBe("playing");
     expect(w.s.wave!.number).toBeGreaterThanOrEqual(20);
   });
-  it("endless cycles boss families and increases composition without unbounded speed", () => {
+  it("endless cycles boss families and uses the v1.8.3 linear speed beyond 50 minutes", () => {
     const w = new World(createRun("endless"));
     for (let i = 1; i <= 8; i++) {
       w.s.time = i * 300;
@@ -336,7 +336,7 @@ describe("director, enemies and victory", () => {
       w.s.enemies = [];
     }
     expect(difficulty(7200).elite).toBeGreaterThan(difficulty(1200).elite);
-    expect(difficulty(1e12).speed).toBeLessThanOrEqual(1.6);
+    expect(difficulty(1e12).speed).toBeCloseTo(1 + 0.012 * (1e12 / 60));
   });
   it("danger zones do not damage until the full telegraph completes", () => {
     const w = make();

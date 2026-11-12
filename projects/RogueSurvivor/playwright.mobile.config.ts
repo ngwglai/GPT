@@ -7,6 +7,7 @@ export default defineConfig({
     "reforge.spec.ts",
     "respite.spec.ts",
     "mimics.spec.ts",
+    "enemy-growth.spec.ts",
   ],
   use: { ...base.use, baseURL: "http://127.0.0.1:4175", launchOptions: {} },
   projects: [

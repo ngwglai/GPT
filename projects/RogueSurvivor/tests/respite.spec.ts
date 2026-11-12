@@ -92,8 +92,16 @@ for (const viewport of [
     expect(box!.x).toBeGreaterThanOrEqual(0);
     expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width);
     await page.keyboard.down("d");
-    await page.waitForTimeout(150);
-    await page.keyboard.up("d");
+    try {
+      // The simulation can render no frame during a 150ms wall-clock tap.
+      // Hold input across a visible simulation-clock change, then test actual movement.
+      const clock = await page.locator("#clock").innerText();
+      await expect
+        .poll(() => page.locator("#clock").innerText(), { timeout: 20000 })
+        .not.toBe(clock);
+    } finally {
+      await page.keyboard.up("d");
+    }
     const saved = await save(page);
     expect(saved.player.x).toBeGreaterThan(s.player.x);
     expect(saved.player.xp).toBe(1);

@@ -13,17 +13,17 @@ import { bossPatterns, BOSS_MOVES } from "../src/core/bossPatterns";
 import { advancedAI } from "../src/core/creatureAI";
 import { zoneContains } from "../src/core/attackGeometry";
 import { validateRun } from "../src/services/storage";
-it("interpolates actual pack/interval rates and preserves combat growth", () => {
+it("preserves density metadata and uses the v1.8.3 linear attribute targets", () => {
   [2, 4, 6, 9, 12, 18, 25].forEach((rate, i) => {
     const t = [0, 300, 600, 900, 1200, 1800, 3600][i],
       d = difficulty(t);
     expect(d.pack / d.spawn).toBeCloseTo(rate);
   });
   expect(difficulty(450).pack / difficulty(450).spawn).toBeCloseTo(5);
-  expect(difficulty(3600).hp).toBe(1000);
-  expect(difficulty(3600).damage).toBe(150);
-  expect(difficulty(3600).attackRate).toBe(12);
-  expect(bossAttackInterval(3600, true)).toBeCloseTo(0.16);
+  expect(difficulty(3600).hp).toBe(13);
+  expect(difficulty(3600).damage).toBeCloseTo(10.6);
+  expect(difficulty(3600).attackRate).toBe(7);
+  expect(bossAttackInterval(3600, true)).toBeCloseTo((1.5 / 6.5) * 0.8);
   expect(LIMITS.enemies).toBe(800);
 });
 it("director admits exactly one finite budget across fractional timesteps", () => {
