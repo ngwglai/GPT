@@ -249,7 +249,7 @@ test("track gain is applied before rollover playback and multiplies volume/duck"
   expect(m.volume).toBeCloseTo(0.7 * 0.35 * MUSIC_GAINS[9]);
   m.dispatchEvent(new Event("ended"));
   expect(m.src).toContain("battle-3.mp3");
-  expect(m.volume).toBeCloseTo(0.7 * 0.35 * MUSIC_GAINS[7]);
+  expect(m.volume).toBeCloseTo(0.7 * 0.35 * MUSIC_GAINS[3]);
   a.settings.music = 0;
   a.update(0, "playing");
   expect(m.volume).toBe(0);
