@@ -7,6 +7,8 @@ export class BiliApi {
   private async fallback(primary: () => Promise<Obj>, secondary: () => Promise<Obj>) {
     try { return await primary(); }
     catch (error) {
+      // HTTP 412 is an edge rejection: do not probe alternative endpoints automatically.
+      if (error instanceof AppError && error.upstreamCode === 412) throw error;
       if (!(error instanceof AppError) || !['RISK_CONTROL', 'UPSTREAM_HTTP', 'BILI_API_ERROR'].includes(error.code)) throw error;
       return await secondary();
     }

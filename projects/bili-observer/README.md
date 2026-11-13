@@ -90,11 +90,11 @@ Authorization: Bearer <MCP_ACCESS_TOKEN>
 
 ### ChatGPT
 
-先使用账户当前提供的 Plugins → Add custom MCP server（旧界面为 Settings → Apps → Create）配置 `/mcp`，在鉴权设置支持 Bearer / 自定义 Authorization Header 时填写独立服务令牌，然后扫描工具。先测试搜索与视频详情，再测试评论读取。
+**固定 Bearer Token 不能直接用于当前 ChatGPT 自定义 MCP 连接表单。** 官方入口支持 OAuth、无鉴权及两者混合；本服务保留鉴权，不使用无鉴权方案。
 
-本版是预共享 Bearer Token，不实现 OAuth / DCR。如果当前 ChatGPT 连接界面仅允许 OAuth 或无鉴权，不能直接连接本版；需要支持自定义 Header 的客户端，或之后接入受支持的 OAuth 网关。不要为连接而取消鉴权、把令牌放 URL 或把服务公开。服务器保留全部读写能力。
+本轮已实现标准 OAuth 资源服务器，可对接本人控制的 OAuth 2.1 提供方。它验证 JWT 签名、签发方、受众、过期时间、本人 subject 和读写 scope；授权码、PKCE 与刷新由提供方处理。本轮没有创建或授权第三方提供方，生产配置仍为空，因此不能声称 OAuth 或 ChatGPT Plus 实机连接已经成功。
 
-ChatGPT 的自定义 MCP、写入能力及权限受套餐和账户策略影响，Plus 不保证可用；本项目不声称已经完成 ChatGPT Plus 实机连接。参考 [连接自定义 MCP](https://developers.openai.com/plugins/deploy/connect-chatgpt) 和 [官方能力说明](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt)。客户端可能自行显示确认，这是客户端行为；服务端不增加二次确认接口。
+完整配置、账户权限限制及逐步连接说明见 [NETWORK-AUTH.md](NETWORK-AUTH.md)。当前 Plugins 界面通常无需先打开旧 Developer Mode；Plus 是否具备入口与读写权限需要在实际账号确认，不能保证。服务器保留全部九个工具。
 
 ## 工具与参数
 
@@ -139,8 +139,8 @@ ChatGPT 的自定义 MCP、写入能力及权限受套餐和账户策略影响�
 ## 请求边界与维护
 
 - API 细节集中在 `src/bilibili/`；工具定义位于 `src/tools.ts`；鉴权与 HTTP 入口位于 `src/index.ts`。
-- 公开资料读取不发送登录 Cookie；字幕和写入按需登录。Cookie 只发到精确的 `api.bilibili.com`，字幕 CDN 请求不携带 Cookie；禁止跟随重定向。
-- 每个请求内部 API 调用至少间隔 300 ms，预算最多 9 次 / 28 秒，单次出站最多 12 秒；读取备用接口仅尝试一次；写入绝不重试。
+- 公开资料读取不发送登录 Cookie；字幕和写入按需登录。默认直连时 Cookie 只发到精确的 `api.bilibili.com`；显式批准并开启后端时，会由本人受信后端在内存中转交，字幕 CDN 请求不携带 Cookie；禁止跟随重定向。
+- 每个请求内部 API 调用至少间隔 300 ms，预算最多 9 次 / 28 秒，单次出站最多 12 秒；HTTP 412 立即停止，不尝试其他接口；其他可恢复读取最多尝试一次备用接口；写入绝不重试。
 - 无持久状态，无法跨并发 Worker 全局限流。个人客户端建议串行调用、每秒最多一次，遇风控停止重试，不自动循环扫描。
 - MCP 请求体最多 16 KiB；普通上游 JSON 最多 4 MiB，字幕 JSON 最多 8 MiB。字幕输出最多 500 个片段；过大上游返回明确错误，不无限缓冲。
 - 日志只含请求随机 ID、工具名、状态、错误类别及耗时；不记录正文、查询、完整 URL、Cookie、CSRF 或上游响应。Workers Logs 与抽样 Traces 已启用；未使用持久化业务数据。
@@ -155,3 +155,9 @@ npm run smoke
 ```
 
 脚本使用官方 MCP 客户端，测试鉴权、发现、7 个读取工具及参数错误；只输出脱敏结果，不发布评论。设有代理的 Node.js 24 环境可按需设置 `NODE_USE_ENV_PROXY=1`。实际验证和剩余限制见 [VALIDATION.md](VALIDATION.md)。
+
+## 独立网络出口与本轮状态
+
+本次 Worker 匿名/登录六次对照均返回 412，Codex 云端匿名存在有效视频与评论结果，证据支持当前出口/连接特征受限。继续变换头、域名或 WBI 参数不能作为修复方案。代码已提供默认关闭的 `BILI_TRANSPORT=backend` 适配层和仅接受 B站白名单的 Node 后端；未部署新服务器、Tunnel 或其他网络资源。
+
+本人设备可只在使用时上线，不必 24 小时运行，但后端和 Tunnel 退出后服务无法读取 B站。没有可用设备时，需要先确认受信托管服务、真实出口可达性、费用和授权。具体可审查方案、命令与凭据边界见 [NETWORK-AUTH.md](NETWORK-AUTH.md)。

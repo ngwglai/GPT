@@ -53,6 +53,7 @@ export class BiliClient {
       const fetcher = this.fetcher;
       const response = await fetcher(url, { method: body ? 'POST' : 'GET', headers, body, redirect: 'manual', signal: controller.signal });
       if (!response.ok) {
+        if (body && response.status >= 500) { await response.body?.cancel(); throw new AppError('WRITE_OUTCOME_UNKNOWN', '发布接口返回服务器错误，结果未知；请先读取确认，勿自动重发。'); }
         await response.body?.cancel();
         throw new AppError([403, 412, 429].includes(response.status) ? 'RISK_CONTROL' : 'UPSTREAM_HTTP', `B站接口 HTTP ${response.status}；请稍后重试。`, response.status);
       }

@@ -4,3 +4,7 @@ MCP_ACCESS_TOKEN=replace-with-at-least-32-random-characters
 # BILI_SESSDATA=
 # BILI_JCT=
 # BILI_BUVID3=
+
+# Optional; only after approving your own trusted backend / OAuth provider:
+# BILI_BACKEND_TOKEN=
+# OAUTH_ALLOWED_SUBJECT=

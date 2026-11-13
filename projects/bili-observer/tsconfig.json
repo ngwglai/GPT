@@ -12,7 +12,8 @@
     "types": [
       "./worker-configuration.d.ts",
       "node"
-    ]
+    ],
+    "allowJs": true
   },
   "include": [
     "src/**/*.ts",

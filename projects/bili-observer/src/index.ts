@@ -1,11 +1,6 @@
 import { createMcpHandler } from '@modelcontextprotocol/server';
 import { createServer } from './tools';
-
-async function authorized(provided: string, expected: string) {
-  const encoder = new TextEncoder();
-  const hashes = await Promise.all([provided, expected].map(v => crypto.subtle.digest('SHA-256', encoder.encode(v))));
-  return crypto.subtle.timingSafeEqual(hashes[0], hashes[1]);
-}
+import { authenticate, challenge, resourceMetadata } from './oauth';
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -23,6 +18,12 @@ export default {
     };
     try {
       if (url.pathname === '/health' && request.method === 'GET') return finish(Response.json({ name: 'bili-observer', version: '0.1.0', status: 'ok' }));
+      if (['/.well-known/oauth-protected-resource', '/.well-known/oauth-protected-resource/mcp'].includes(url.pathname) && request.method === 'GET') {
+        try {
+          const metadata = resourceMetadata(env);
+          return finish(Response.json(metadata ?? { error: 'OAUTH_NOT_CONFIGURED' }, { status: metadata ? 200 : 404, headers: { 'Access-Control-Allow-Origin': '*' } }));
+        } catch { return finish(Response.json({ error: 'OAUTH_CONFIGURATION_INCOMPLETE' }, { status: 503 })); }
+      }
       if (url.pathname !== '/mcp') return finish(Response.json({ error: 'NOT_FOUND' }, { status: 404 }));
       if (url.search) return finish(Response.json({ error: 'QUERY_NOT_ALLOWED', message: '请通过 Authorization Header 传递访问令牌。' }, { status: 400 }));
       const origin = request.headers.get('Origin');
@@ -33,10 +34,10 @@ export default {
         if (origin) headers.set('Access-Control-Allow-Origin', origin);
         return finish(new Response(null, { status: 204, headers }));
       }
-      if (!env.MCP_ACCESS_TOKEN || env.MCP_ACCESS_TOKEN.length < 32) return finish(Response.json({ error: 'SERVICE_NOT_CONFIGURED' }, { status: 503 }));
-      const token = request.headers.get('Authorization')?.match(/^Bearer (\S+)$/i)?.[1] ?? '';
-      if (!await authorized(token, env.MCP_ACCESS_TOKEN)) return finish(Response.json({ error: 'UNAUTHORIZED' }, { status: 401, headers: { 'WWW-Authenticate': 'Bearer realm="bili-observer"' } }));
-      const handler = createMcpHandler(() => createServer(env), { legacy: 'stateless', responseMode: 'json', maxRequestBodySize: 16 * 1024, onerror: () => console.warn(JSON.stringify({ event: 'protocol_error', request_id: requestId })) });
+      if ((!env.MCP_ACCESS_TOKEN || env.MCP_ACCESS_TOKEN.length < 32) && !env.OAUTH_ISSUER) return finish(Response.json({ error: 'SERVICE_NOT_CONFIGURED' }, { status: 503 }));
+      const access = await authenticate(request.headers.get('Authorization'), env);
+      if (!access) return finish(Response.json({ error: 'UNAUTHORIZED' }, { status: 401, headers: { 'WWW-Authenticate': env.OAUTH_ISSUER ? challenge(url.origin) : 'Bearer realm="bili-observer"' } }));
+      const handler = createMcpHandler(() => createServer(env, undefined, access), { legacy: 'stateless', responseMode: 'json', maxRequestBodySize: 16 * 1024, onerror: () => console.warn(JSON.stringify({ event: 'protocol_error', request_id: requestId })) });
       const response = await handler.fetch(request);
       const headers = new Headers(response.headers);
       if (origin) { headers.set('Access-Control-Allow-Origin', origin); headers.set('Vary', 'Origin'); }

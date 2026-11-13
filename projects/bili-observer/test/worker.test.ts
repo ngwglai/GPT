@@ -7,7 +7,7 @@ import { BiliApi } from '../src/bilibili/api';
 import { signWbi } from '../src/bilibili/wbi';
 import { apiError } from '../src/errors';
 
-const env: Env = { ALLOWED_ORIGINS: 'https://chatgpt.com,https://chat.openai.com', MCP_ACCESS_TOKEN: 'test-access-token-at-least-32-characters', BILI_SESSDATA: '', BILI_JCT: '', BILI_BUVID3: '' };
+const env: Env = { ALLOWED_ORIGINS: 'https://chatgpt.com,https://chat.openai.com', MCP_ACCESS_TOKEN: 'test-access-token-at-least-32-characters', BILI_SESSDATA: '', BILI_JCT: '', BILI_BUVID3: '', BILI_BACKEND_TOKEN: '', OAUTH_ALLOWED_SUBJECT: '', BILI_TRANSPORT: 'direct', BILI_BACKEND_URL: '', OAUTH_ISSUER: '', OAUTH_RESOURCE: '', OAUTH_JWKS_URL: '' };
 const valid = { BILI_SESSDATA: 'fixture-session', BILI_JCT: '0123456789abcdef0123456789abcdef' };
 const detail = { aid: 170001, bvid: 'BV17x411w7KC', title: 'Fixture video', owner: { mid: 42, name: '示例作者' }, pubdate: 1700000000, desc: 'description', stat: { view: 123, like: 5 }, pages: [{ page: 1, cid: 99, part: 'P1' }] };
 const reply = { rpid_str: '12345678901234567890', root_str: '111', parent_str: '222', ctime: 1700000000, like: 7, content: { message: '<原始>\n评论 & 不做总结' }, member: { uname: '示例用户', mid: '42' } };
@@ -81,9 +81,14 @@ describe('Bilibili read operations', () => {
     const result = await rpc('tools/call', { name: 'search_videos', arguments: { keyword: 'fixture', page: 2, page_size: 2 } }, f);
     expect(result.result.structuredContent).toMatchObject({ ok: true, data: { page: 2, has_more: true, items: [{ title: 'Fixture' }] } });
   });
-  it('video detail uses an alternate public endpoint on 412', async () => {
-    const f = mock(url => url.pathname.includes('/wbi/') ? new Response('', { status: 412 }) : json(detail));
+  it('video detail uses an alternate public endpoint on a recoverable HTTP error', async () => {
+    const f = mock(url => url.pathname.includes('/wbi/') ? new Response('', { status: 502 }) : json(detail));
     expect(await new BiliApi(new BiliClient({}, f)).info('BV17x411w7KC')).toMatchObject({ title: 'Fixture video', likes: 5 }); expect(f).toHaveBeenCalledTimes(2);
+  });
+  it('stops immediately on HTTP 412 instead of probing more endpoints', async () => {
+    const f = mock(() => new Response('', { status: 412 }));
+    await expect(new BiliApi(new BiliClient({}, f)).info('170001')).rejects.toMatchObject({ code: 'RISK_CONTROL', upstreamCode: 412 });
+    expect(f).toHaveBeenCalledTimes(1);
   });
   it('invokes injected fetch without a receiver, matching Workers native fetch', async () => {
     const f = function(this: unknown) { expect(this).toBeUndefined(); return Promise.resolve(json(detail)); } as Fetcher;
