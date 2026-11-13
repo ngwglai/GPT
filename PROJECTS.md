@@ -31,6 +31,7 @@
 | EntropyLab | [projects/entropylab](projects/entropylab/) | Completed | 浏览器内的计算物理与复杂系统交互实验室 | v1.1 已合并；依赖审计清零、完整复验通过，按需手动部署 |
 | ConstraintLab | [projects/constraintlab](projects/constraintlab/) | Completed | 本地 CSP 求解与算法实验平台 | 修复及整合 main 后 Linux/Windows 完整验收通过；按需扩展 |
 | RepoScope | [projects/reposcope](projects/reposcope/) | Completed | 面向 Windows 用户的离线仓库规模、技术栈与维护风险分析；HTML / Markdown 报告 | HTML 修复与 Linux/Windows CI 通过；按需扩展功能 |
+| Bili Observer | [projects/bili-observer](projects/bili-observer/) | Testing | 无状态 Cloudflare Workers B站 MCP，7 个读取与 2 个评论发布工具 | 已部署；38 项本地测试通过；线上 B站 HTTP 412 风控，登录凭据、实际写入与 ChatGPT 连接待验证，见 VALIDATION.md |
 | QQ Mail MCP | [projects/qq-mail-mcp](projects/qq-mail-mcp/) | Testing | Cloudflare Workers 上的私人 QQ 邮箱只读 MCP，OAuth/DCR 与六个工具 | PR #6 已合并，62 项本地回归通过；真实邮箱验收和部署仍待安全本地配置 |
 
 > 下方按日期保留历史开发快照；当前状态以总览和末尾最新维护复验为准。旧记录中的人工合并约束已由当前 AGENTS.md 的自动验收规则替代。
@@ -382,3 +383,12 @@
 - 多个Linux检查在Playwright系统依赖安装前因默认Azure Ubuntu镜像DNS失败；共享准备动作固定官方HTTPS归档，保留签名验证、依赖与原有测试，覆盖聚合Pages。未修改其他项目业务功能。最终检查与部署见[PR #44](https://github.com/ngwglai/GPT/pull/44)。
 
 - 官方Ubuntu归档同样DNS失败后，撤回临时镜像列表动作，改用摘要固定的微软Playwright预装Linux环境运行原测试；Windows原生验收保留。
+
+
+## Bili Observer（2026-11-13）
+
+- **目的与差异**：面向个人 MCP 客户端的 B站视频、字幕、用户与评论访问；从零独立开发，不复用 QQ Mail MCP。
+- **范围**：官方 MCP TypeScript SDK、Streamable HTTP、独立 Bearer Token、Cloudflare Secrets；七个读取工具、发表评论及回复，无数据库、前端、定时任务或主动采集。
+- **验收**：线上发现工具、真实读取、长结果、错误处理及授权账号具体发送测试；真实发送只按私人对话授权执行。
+- **实现与测试**：Workers 运行时 38 项测试、类型、构建与依赖审计通过，独立 Linux/Windows CI 接入 CI required；已部署并回读配置。
+- **限制与下一步**：Worker 出口对 B站接口返回 HTTP 412；备用接口/域名也受限，未伪造成功。登录凭据、实际写入和 ChatGPT 账户连接仍待验证，保持 Testing / PR 待测，详见项目 VALIDATION.md。

@@ -1,0 +1,6 @@
+# Copy to .dev.vars for local development; never commit the real file.
+MCP_ACCESS_TOKEN=replace-with-at-least-32-random-characters
+# Optional for login-required subtitles and posting:
+# BILI_SESSDATA=
+# BILI_JCT=
+# BILI_BUVID3=
