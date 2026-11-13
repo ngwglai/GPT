@@ -17,6 +17,12 @@
       "database_name": "qq-mail-mcp-auth",
       "database_id": "00000000-0000-0000-0000-000000000000",
       "migrations_dir": "migrations"
+    },
+    {
+      "binding": "TASK_DB",
+      "database_name": "qq-mail-gateway-tasks",
+      "database_id": "00000000-0000-0000-0000-000000000001",
+      "migrations_dir": "task-migrations"
     }
   ],
   "ratelimits": [
@@ -35,6 +41,10 @@
     "logs": {
       "enabled": true,
       "invocation_logs": false
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.01
     }
   },
   "upload_source_maps": false,
@@ -45,5 +55,28 @@
       "OWNER_PASSWORD"
     ]
   },
-  "minify": true
+  "minify": true,
+  "queues": {
+    "producers": [
+      {
+        "binding": "MAIL_QUEUE",
+        "queue": "qq-mail-gateway-tasks"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "qq-mail-gateway-tasks",
+        "max_batch_size": 1,
+        "max_batch_timeout": 1,
+        "max_retries": 5,
+        "max_concurrency": 1,
+        "retry_delay": 60
+      }
+    ]
+  },
+  "triggers": {
+    "crons": [
+      "*/5 * * * *"
+    ]
+  }
 }

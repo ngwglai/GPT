@@ -1,15 +1,22 @@
-# QQ Mail MCP
+# QQ-Mail-Gateway 1.1
 
-单用户、只读、按需连接的 QQ 邮箱 MCP Server。TypeScript + 官方 MCP SDK + Cloudflare Workers TCP/TLS；无需本地电脑、VPS 或常驻进程。
+单用户、按需运行的 QQ 邮箱任务网关。ChatGPT 通过 Cloudflare 官方插件提交 Queue 任务，原 Worker 使用 IMAP 读取、SMTP TLS 465 发送，再将短期结果写入独立 D1。原六个只读 MCP 工具与 OAuth 保留。无需本地电脑、VPS 或额外 AI API。
+
+**新主入口与完整操作步骤：[官方连接器接入](docs/GATEWAY.md)。测试与剩余验收：[1.1 验证报告](docs/GATEWAY-VALIDATION.md)。真实测试邮件必须由用户明确安排，`sent` 只表示 SMTP 接受，不等于收件箱已送达。
 
 ```mermaid
 flowchart LR
-  ChatGPT -->|HTTPS / OAuth 2.1| Worker[Cloudflare Worker /mcp]
-  Worker -->|TLS 993 / EXAMINE / BODY.PEEK| QQ[imap.qq.com]
-  Worker --> D1[免费 D1：OAuth 客户端与令牌哈希]
+  ChatGPT --> CF[Cloudflare 官方连接器]
+  CF --> Queue[Cloudflare Queues]
+  Queue --> Worker[现有 Cloudflare Worker]
+  Worker -->|TLS 993 / 465| QQ[QQ IMAP / SMTP]
+  Worker --> Tasks[独立任务 D1 / 短期结果]
+  CF --> Tasks
+  ChatGPT -->|兼容 OAuth /mcp，只读| Worker
+  Worker --> Auth[原 OAuth D1]
 ```
 
-## 工具
+## 兼容 MCP 工具
 
 | 工具 | 功能 |
 |---|---|
@@ -57,14 +64,14 @@ ChatGPT 使用 OAuth 2.1 授权码 + S256 PKCE，DCR 公共客户端，无客户
 - 批量最多 3 封，总返回内容有预算；MIME 限制 100 个部分和 20 层嵌套。
 - 入站 JSON/form 最多 16 KiB、读取 body 最多 5 秒；不接受 JSON-RPC 批量请求。
 - 每个 Cloudflare 节点约 30 请求/分钟/IP，邮箱操作另有单用户限流；限流最终一致，不是全球精确计费器。
-- D1 只存 OAuth 元数据和哈希，不存邮件或邮箱密码；没有 Durable Objects、KV、付费数据库、AI API。
+- 原 AUTH_DB 只存 OAuth 元数据和哈希；独立 TASK_DB 保存任务状态和 15 分钟结果，不存邮箱密码。无 Durable Objects、KV、付费数据库、AI API。
 - Workers Free 的 CPU 时间/每日请求额度仍适用。网络等待不计 CPU，但 MIME/HTML 解析计 CPU；复杂邮件可能触发免费 CPU 上限。先缩小批量和邮件范围，不自动升级套餐。
 
 ## 已知边界
 
-不支持附件下载、嵌套 `.eml` 正文展开、发送/删除/移动/标签修改；附件 `size` 为 IMAP BODYSTRUCTURE 的编码后字节数，并非解码后文件大小。优先选纯文本部分，无纯文本时转换 HTML。中文搜索依赖 QQ 对 `CHARSET UTF-8` 的支持；服务器拒绝时返回 `IMAP_REJECTED`，不悄悄改变搜索语义。没有缓存邮件。真实 QQ 登录、中文文件夹和状态不变仍须使用用户安全配置的凭据验收。
+兼容 MCP 不支持发送；网关支持用户明确提交的单封发送。所有接口均不支持附件下载、嵌套 `.eml` 正文展开、删除/移动/标签修改；附件 `size` 为 IMAP BODYSTRUCTURE 的编码后字节数，并非解码后文件大小。优先选纯文本部分，无纯文本时转换 HTML。中文搜索依赖 QQ 对 `CHARSET UTF-8` 的支持；服务器拒绝时返回 `IMAP_REJECTED`，不悄悄改变搜索语义。任务结果短期缓存于独立 D1，5 分钟清理任务不会采集或发送邮件。原只读 IMAP 行为保持不变；真实验证范围见 1.1 报告。
 
 
 公开 `wrangler.jsonc` 与插件 `mcp.json` 使用保留域名和示例资源 ID。已有服务部署必须使用被忽略的 `wrangler.local.jsonc`，不要直接把公开模板部署到生产。CI 只执行检查与 dry-run 构建，不部署。完整流程见部署文档；此迁移未修改线上服务。
 
-浏览器测试当前已在 Linux / Chromium 验证。Windows 可通过 `CHROMIUM_PATH` 指向实际浏览器，但尚未对本项目进行 Windows 原生回归。当前仓库授权按钮显示“授权一年”，与 365 天令牌期限一致；浏览器回归同时核对按钮文字和授权流程。本地维护不部署线上服务，线上显示仍需按实际部署版本确认。
+浏览器测试当前已在 Linux / Chromium 验证。Windows 可通过 `CHROMIUM_PATH` 指向实际浏览器，但尚未对本项目进行 Windows 原生回归。当前仓库授权按钮显示“授权一年”，与 365 天令牌期限一致；浏览器回归同时核对按钮文字和授权流程。1.1 已部署原 Worker，部署记录与真实链路验证见 1.1 报告。

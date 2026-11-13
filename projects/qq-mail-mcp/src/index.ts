@@ -5,11 +5,12 @@ import { handleMcp } from './mcp';
 import { authorized, oauth } from './oauth';
 import { boundedBody, json } from './security';
 import { errorCode } from './errors';
+import { consumeBatch, cleanupTasks } from './tasks';
 async function route(request:Request,env:Env,diagnostic:Diagnostic):Promise<Response> {
     try {
       const url=new URL(request.url);
       if(url.origin!==env.PUBLIC_ORIGIN)return json({error:'INVALID_HOST'},400);
-      if(request.method==='GET'&&url.pathname==='/health')return json({status:'ok',service:'qq-mail-mcp',version:'1.0.0',readOnly:true});
+      if(request.method==='GET'&&url.pathname==='/health')return json({status:'ok',service:'qq-mail-gateway',version:'1.1.0',readOnly:false,mcpReadOnly:true});
       const origin=request.headers.get('origin');
       if(origin && origin!==env.PUBLIC_ORIGIN && origin!=='https://chatgpt.com')return json({error:'ORIGIN_DENIED'},403);
       if(!env.RATE_LIMITER)return json({error:'SERVICE_UNAVAILABLE'},503);
@@ -32,6 +33,8 @@ async function route(request:Request,env:Env,diagnostic:Diagnostic):Promise<Resp
     }
 }
 export default {
+  async queue(batch:MessageBatch<unknown>,env:Env) { await consumeBatch(batch,env); },
+  async scheduled(_event:ScheduledController,env:Env) { await cleanupTasks(env.TASK_DB); },
   async fetch(request:Request,env:Env):Promise<Response> {
     const detail:Diagnostic={};
     const response=await route(request,env,detail);

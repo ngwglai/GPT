@@ -1,6 +1,6 @@
 # 安全模型与审查
 
-此服务仅用于单用户私人邮箱。公网访问必须先通过 OAuth；部署不能等同于真实邮箱验收或 ChatGPT 已接通。
+此服务仅用于单用户私人邮箱。公网 MCP 访问必须先通过 OAuth，任务队列须通过 Cloudflare 账户 IAM；部署不能等同于真实邮箱验收或 ChatGPT 已接通。
 
 ## 已实现的控制
 
@@ -31,3 +31,13 @@ OAuth 使用自行实现的小型单用户授权服务器，已测试主要绑�
 自动化测试覆盖输入注入、字节 Literal、UIDVALIDITY、只读 FLAGS、中文编码、MIME、分页、部分成功、连接失败/超时，以及 OAuth CSRF、错误 PKCE/resource/client、并发重放、过期、撤销、MCP 未授权/工具调用。生产依赖审计和实际测试结果记录于 `docs/ACCEPTANCE.md`。
 
 收到安全问题后先关闭访问（移除 Owner Secret 或撤销全部会话），不要在 Issue 中粘贴邮件、Token 或授权码。
+
+## 1.1 发送与任务安全
+
+SMTP 固定 `smtp.qq.com:465`、隐式 TLS，复用原邮箱 Secrets；没有 MCP 发送工具或公开任务入口。Queue 消费严格校验任务与收件人，上限合计 10 人，发送需可信提交者声明 `confirmed:true`，只用于用户明确安排的邮件。不会从邮件正文创建发送任务。队列只传业务参数，不传凭据。
+
+独立 TASK_DB 与 AUTH_DB 隔离；任务 SQL 固定且参数化，任务不能提供 SQL。官方 Cloudflare 插件本身的账户权限不是由 Worker 限制的沙箱，操作说明只查询任务库。不能通过降低 OAuth 或 Cloudflare 访问控制完成集成。
+
+原子领取防止 SMTP 重复执行；DATA 最终提交前保存标记。提交后断线、保存成功结果失败或过期 processing 会保守归为 unknown；同 ID 不自动重发，去重墓碑不自动删除。`sent` 仅表示 SMTP 接受，不保证收件箱送达。正文及搜索结果保存 15 分钟，5 分钟 Cron 只清理 D1；7 天后清理详细执行元数据。恢复副本的保留受 D1 平台策略约束。
+
+立即停止发送须暂停 Queue Consumer，停止新增 Queue 消息。删除 OWNER_PASSWORD 仅停止兼容 MCP，不会关闭已获 Cloudflare IAM 授权的 Queue 消费。既有恢复与撤销章节仅针对 MCP；不要为了停止发送清空 OAuth 表或删除去重记录。

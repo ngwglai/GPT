@@ -1,5 +1,7 @@
 # 部署与接入
 
+> 1.1 升级操作及主入口见 [GATEWAY.md](GATEWAY.md)。已有三个 Secret 直接复用，不重新索要、删除或覆盖邮箱授权码。以下首次安装步骤仅适用于没有任何已有配置的环境。当前部署与测试见 [GATEWAY-VALIDATION.md](GATEWAY-VALIDATION.md)。
+
 ## 配置与地址
 
 公开示例地址为 `https://mail-mcp.example.com`（保留域名）；MCP 路径 `/mcp`，健康路径 `/health`。插件 `mcp.json` 也使用示例地址，使用前在私有副本中替换。
@@ -61,7 +63,7 @@ npx wrangler d1 migrations apply qq-mail-mcp-auth --remote --config wrangler.loc
 npm run deploy
 ```
 
-`npm run deploy` 显式使用本地配置；缺少该文件时会失败，避免误用占位符。运行前核对现有 Secrets，使用 `--keep-vars` 保留控制台 vars 时须确认与本地配置一致；Wrangler 会保留未在文件中重定义的现有 Secret。API 部署使用下面的 keep_bindings 规则。部署后运行公开 smoke，并由用户在 ChatGPT 复验。此次迁移未运行上述迁移/部署/secret 命令。
+`npm run deploy` 显式使用本地配置；缺少该文件时会失败，避免误用占位符。运行前核对现有 Secrets，使用 `--keep-vars` 保留控制台 vars 时须确认与本地配置一致；Wrangler 会保留未在文件中重定义的现有 Secret。API 部署使用下面的 keep_bindings 规则。部署后运行公开 smoke，并由用户在 ChatGPT 复验。历史迁移未运行上述命令；1.1 的部署与独立任务库迁移记录见新报告，未运行 secret 修改命令。
 
 D1 为免费套餐 OAuth 存储，只有客户端 redirect 和短期 grant/token 哈希。不要开启付费套餐。此项目首次已创建数据库、应用迁移并绑定，无需重复创建。API 部署应使用 `keep_bindings: ["secret_text"]` 保留现有 Secrets。
 

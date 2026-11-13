@@ -27,10 +27,10 @@ async function exchange(clientId:string,verifier:string,code:string,extra:Record
  return oauth(req('/token',{method:'POST',body:new URLSearchParams({grant_type:'authorization_code',client_id:clientId,redirect_uri:redirect,code_verifier:verifier,code,resource:base+'/mcp',...extra})}),env);
 }
 beforeAll(async()=>{
- mf=new Miniflare(convertV4MiniflareOptions({modules:true,script:'export default {fetch(){return new Response("test")}}',compatibilityDate:'2026-10-15',d1Databases:['AUTH_DB']}));
+ mf=new Miniflare(convertV4MiniflareOptions({modules:true,script:'export default {fetch(){return new Response("test")}}',compatibilityDate:'2026-10-15',d1Databases:['AUTH_DB','TASK_DB'],queueProducers:['MAIL_QUEUE']}));
  const db=await mf.getD1Database('AUTH_DB');
  await db.exec((await readFile('migrations/0001_auth.sql','utf8')).replace(/\n/g,' '));
- env={AUTH_DB:db as D1Database,RATE_LIMITER:{limit:async()=>({success:true})},PUBLIC_ORIGIN:base,OAUTH_REDIRECT_URIS:redirect,OWNER_PASSWORD:randomToken(),QQ_MAIL_ADDRESS:'',QQ_MAIL_AUTH_CODE:''};
+ env={TASK_DB:await mf.getD1Database('TASK_DB') as D1Database,MAIL_QUEUE:await mf.getQueueProducer('MAIL_QUEUE') as Queue,AUTH_DB:db as D1Database,RATE_LIMITER:{limit:async()=>({success:true})},PUBLIC_ORIGIN:base,OAUTH_REDIRECT_URIS:redirect,OWNER_PASSWORD:randomToken(),QQ_MAIL_ADDRESS:'',QQ_MAIL_AUTH_CODE:''};
 });
 afterAll(async()=>{await mf?.dispose();});
 beforeEach(async()=>{await env.AUTH_DB.exec('DELETE FROM oauth_grants; DELETE FROM oauth_clients;');});

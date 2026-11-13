@@ -3,7 +3,7 @@ const origin=process.env.MCP_ORIGIN;
 if(!origin?.startsWith('https://'))throw Error('Set MCP_ORIGIN to the deployed HTTPS origin');
 const headers={'Content-Type':'application/json',Accept:'application/json, text/event-stream'};
 async function request(path,options){const r=await fetch(origin+path,{...options,signal:AbortSignal.timeout(30000)});return r;}
-const health=await request('/health');assert.equal(health.status,200);assert.equal((await health.json()).readOnly,true);
+const health=await request('/health');assert.equal(health.status,200);assert.equal((await health.json()).mcpReadOnly,true);
 const denied=await request('/mcp',{method:'POST',headers,body:JSON.stringify({jsonrpc:'2.0',id:1,method:'tools/list',params:{}})});assert.equal(denied.status,401);assert.match(denied.headers.get('www-authenticate'),/oauth-protected-resource/);
 const metadata=await (await request('/.well-known/oauth-protected-resource')).json();assert.equal(metadata.resource,origin+'/mcp');
 const auth=await (await request('/.well-known/oauth-authorization-server')).json();assert.ok(auth.code_challenge_methods_supported.includes('S256'));
