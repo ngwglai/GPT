@@ -115,7 +115,11 @@ describe('Queue consumer with real local D1', () => {
   });
   it('acks malformed messages and does not persist arbitrary fields or credentials', async () => {
     const t = { ...task(), host: 'https://evil.invalid', password: 'test-only-fake-password' }; const m = message(t);
-    await consumeTask(m, env, api()); expect(m.ack).toHaveBeenCalled(); expect(await taskStatus(env.TASK_DB, t.task_id)).toBeNull(); expect(taskSchema.safeParse(t).success).toBe(false);
+    await consumeTask(m, env, api()); expect(m.ack).toHaveBeenCalled();
+    const row = await taskStatus(env.TASK_DB, t.task_id);
+    expect(row).toMatchObject({status: 'failed', error: 'INVALID_TASK'}); expect(JSON.stringify(row)).not.toContain('test-only-fake-password');
+    expect(taskSchema.safeParse(t).success).toBe(false);
+    const malformed = message([]); await consumeTask(malformed, env, api()); expect(malformed.ack).toHaveBeenCalled();
   });
   it('consumes batches and retries transient D1 outages', async () => {
     const svc = api(); const a = message(task()); const b = message(task('mail.search', {}));

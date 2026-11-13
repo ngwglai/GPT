@@ -55,7 +55,17 @@ async function finish(db: D1Database, task: Task, status: string, result: unknow
 export async function consumeTask(message: Message<unknown>, env: TaskEnv, api: Services = services(env)) {
   const bytes = new TextEncoder().encode(JSON.stringify(message.body)).length;
   const parsed = bytes <= 60000 ? taskSchema.safeParse(message.body) : null;
-  if (!parsed?.success) { console.warn(JSON.stringify({ event: 'mail_task_rejected', code: 'INVALID_TASK' })); message.ack(); return; }
+  if (!parsed?.success) {
+    const envelope = z.object({ ...common, type: z.enum(['mail.search', 'mail.read', 'mail.send', 'mail.status']) }).safeParse(message.body);
+    if (envelope.success) {
+      const task = envelope.data; const now = Date.now();
+      // Preserve a queryable validation failure without retaining rejected parameters.
+      await env.TASK_DB.prepare(`INSERT INTO mail_tasks(task_id,type,fingerprint,status,created_at,completed_at,error,metadata_expires_at)
+        VALUES(?,?,?,'failed',?,?,'INVALID_TASK',?) ON CONFLICT(task_id) DO NOTHING`)
+        .bind(task.task_id, task.type, await hash('invalid:' + canonical(task)), Date.parse(task.created_at), now, now + 7 * 86400000).run();
+    }
+    console.warn(JSON.stringify({ event: 'mail_task_rejected', code: 'INVALID_TASK' })); message.ack(); return;
+  }
   const task = parsed.data; const now = Date.now(); const created = Date.parse(task.created_at);
   const fingerprint = await hash(canonical(task));
   // Reject stale tasks, even when their queue delivery has been delayed or replayed.
