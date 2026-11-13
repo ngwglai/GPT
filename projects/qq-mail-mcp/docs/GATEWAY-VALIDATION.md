@@ -39,6 +39,7 @@ SMTP 协议测试使用可控模拟 socket；不等同于 QQ 生产 SMTP TLS/认
 | 故意提供错误 UIDVALIDITY | failed，错误为 UIDVALIDITY_CHANGED |
 | 重复投递已完成搜索任务 | 保持原完成记录，无再次执行 |
 | 公开 HTTPS smoke | health、未授权 MCP 拒绝、OAuth discovery 通过 |
+| 原已授权 MCP 兼容入口 | 使用现有 QQ-Mail-MCP 连接实际调用 mail_status，connected/authenticated 均为 true |
 | 邮箱结果及时清理 | 验证后已清空真实搜索/读取任务的结果，仅保留去重元数据 |
 | 生产清理 Cron | 将非邮件状态探针结果设为过期后，实际自动清理已将结果和过期字段清空 |
 
@@ -47,7 +48,7 @@ SMTP 协议测试使用可控模拟 socket；不等同于 QQ 生产 SMTP TLS/认
 ## 未完成的验收
 
 1. 用户尚未明确安排测试邮箱与真实发送，故没有执行真实 SMTP 测试，也没有核对实际收件。`sent` 仅代表 SMTP 接受，不能当作实际送达。安排后需单独验证 QQ SMTP TLS、授权、中文文本/HTML、CC/BCC 和实际收件结果；不能自动群发。
-2. 本轮公网 smoke 没有使用 OAuth 访问令牌，因此已认证 MCP 真实调用为明确跳过；本地 OAuth/MCP 回归全通过，兼容接口保留。官方插件真实 IMAP 读取链路已通过。
+2. 公网 smoke 脚本没有注入 OAuth 访问令牌，其已认证部分明确跳过；随后通过现有已授权 QQ-Mail-MCP 连接实际调用 mail_status 成功，兼容入口已验证。本地六工具回归及官方插件真实 IMAP 读取链路均通过。
 3. GitHub Actions 与 PR 状态以最终 PR 检查页为准；生产 Cron 自动清理及本地结果期限测试均已通过。
 4. `unknown` 没有自动核实或重发机制。相同 ID 永不重发，人工核实前不能换新 ID 绕过去重。D1 恢复副本、Cron 平台延迟和免费配额是明确的运行边界。
 
