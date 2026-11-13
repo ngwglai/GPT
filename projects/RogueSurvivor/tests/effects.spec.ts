@@ -13,6 +13,38 @@ async function instrument(page: Page) {
     const state = ((window as any).paintedEffects = {
       counts: {} as Record<string, number>,
       frames: [] as number[],
+      loaded: {} as Record<string, boolean>,
+      dashSeen: false,
+    });
+    // Observe the very Image objects loaded by GameScene, rather than preloading
+    // a second copy which could hide a missing/late runtime texture.
+    const descriptor = Object.getOwnPropertyDescriptor(
+      HTMLImageElement.prototype,
+      "src",
+    )!;
+    Object.defineProperty(HTMLImageElement.prototype, "src", {
+      ...descriptor,
+      set(this: HTMLImageElement, value: string) {
+        if (value.includes("/v1.9.0/effects/")) {
+          const name = value.split("/").pop()!.split(".")[0];
+          this.addEventListener(
+            "load",
+            () => {
+              if (this.naturalWidth > 0) state.loaded[name] = true;
+            },
+            { once: true },
+          );
+        }
+        descriptor.set!.call(this, value);
+      },
+    });
+    new MutationObserver(() => {
+      if (document.querySelector("canvas")?.dataset.characterAction === "dash")
+        state.dashSeen = true;
+    }).observe(document, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["data-character-action"],
     });
     const original = CanvasRenderingContext2D.prototype.drawImage;
     CanvasRenderingContext2D.prototype.drawImage = function (...args: any[]) {
@@ -152,21 +184,58 @@ for (const [map, width, height] of [
     await context.close();
   });
 }
+async function keyEffect(
+  page: Page,
+  key: string,
+  id: string,
+  cooldown: string,
+) {
+  await test.step(`${key}：贴图就绪、实际释放与${id}绘制`, async () => {
+    await expect
+      .poll(
+        () =>
+          page.evaluate(
+            (id) => !!(window as any).paintedEffects.loaded[id],
+            id,
+          ),
+        { message: `${id}运行时贴图必须成功加载后再验证绘制` },
+      )
+      .toBe(true);
+    await expect(page.locator(cooldown)).toHaveText("");
+    const before = await page.evaluate(
+      (id) => (window as any).paintedEffects.counts[id] || 0,
+      id,
+    );
+    await page.keyboard.press(key);
+    // A dispatched key alone does not prove that a simulation step consumed it.
+    await expect(
+      page.locator(cooldown),
+      `${key}必须被战斗逻辑消费并启动冷却`,
+    ).toHaveText(/\d/);
+    await expect
+      .poll(
+        () =>
+          page.evaluate(
+            (id) => (window as any).paintedEffects.counts[id] || 0,
+            id,
+          ),
+        { message: `${key}释放后${id}必须实际执行Canvas绘制` },
+      )
+      .toBeGreaterThan(before);
+  });
+}
 test("星贯、复苏、星幕与冲刺接入绘制，新增资源可以在工坊替换", async ({
   page,
 }) => {
   await instrument(page);
   await load(page, "forest", ["lance", "bloom", "ward"]);
-  for (const key of ["q", "e", "r", "Space"]) await page.keyboard.press(key);
-  for (const id of ["lance", "heal", "shield", "dash"])
-    await expect
-      .poll(() =>
-        page.evaluate(
-          (id) => (window as any).paintedEffects.counts[id] || 0,
-          id,
-        ),
-      )
-      .toBeGreaterThan(0);
+  for (const [key, id, cooldown] of [
+    ["q", "lance", "#cd-0"],
+    ["e", "heal", "#cd-1"],
+    ["r", "shield", "#cd-2"],
+    ["Space", "dash", "#dash-cd"],
+  ])
+    await keyEffect(page, key, id, cooldown);
   await page.getByRole("button", { name: "Ⅱ 暂停" }).click();
   await page.getByRole("button", { name: "资源工坊", exact: true }).click();
   await page.locator('[data-action="asset-vfx.impact"]').click();
@@ -200,4 +269,39 @@ test("新增特效全部缺失时回退仍可战斗和暂停", async ({ page }) 
   await page.getByRole("button", { name: "Ⅱ 暂停" }).click();
   await expect(page.getByRole("heading", { name: "远征已暂停" })).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+test("冲刺贴图晚到时保留正常冲刺，加载后下一次Space绘制正式特效", async ({
+  page,
+}) => {
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route("**/v1.9.0/effects/dash.webp", async (route) => {
+    await gate;
+    await route.continue();
+  });
+  await instrument(page);
+  try {
+    await load(page, "forest", ["lance", "bloom", "ward"]);
+    await page.keyboard.press("Space");
+    await expect(page.locator("#dash-cd")).toHaveText(/\d/);
+    await expect
+      .poll(() => page.evaluate(() => (window as any).paintedEffects.dashSeen))
+      .toBe(true);
+    await expect(page.locator("canvas")).not.toHaveAttribute(
+      "data-character-action",
+      "dash",
+    );
+    const before = await page.evaluate(() => (window as any).paintedEffects);
+    expect(before.loaded.dash).toBeUndefined();
+    expect(before.counts.dash || 0).toBe(0);
+    release();
+    // Keep the original cooldown; do not reset state or replay missed effects.
+    await keyEffect(page, "Space", "dash", "#dash-cd");
+  } finally {
+    release();
+    await page.unrouteAll({ behavior: "wait" });
+  }
 });
