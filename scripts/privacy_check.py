@@ -87,7 +87,7 @@ def is_legacy_github_squash(sha, author, author_email, committer, committer_emai
         and author_email == expected_email
         and committer == "GitHub"
         and committer_email == GITHUB_SYSTEM_EMAIL
-        and message.startswith(LEGACY_GITHUB_SQUASH_SUBJECT + "\\n")
+        and message.startswith(LEGACY_GITHUB_SQUASH_SUBJECT + "\n")
     )
 
 
