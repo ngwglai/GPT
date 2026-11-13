@@ -31,7 +31,7 @@
 | EntropyLab | [projects/entropylab](projects/entropylab/) | Completed | 浏览器内的计算物理与复杂系统交互实验室 | v1.1 已合并；依赖审计清零、完整复验通过，按需手动部署 |
 | ConstraintLab | [projects/constraintlab](projects/constraintlab/) | Completed | 本地 CSP 求解与算法实验平台 | 修复及整合 main 后 Linux/Windows 完整验收通过；按需扩展 |
 | RepoScope | [projects/reposcope](projects/reposcope/) | Completed | 面向 Windows 用户的离线仓库规模、技术栈与维护风险分析；HTML / Markdown 报告 | HTML 修复与 Linux/Windows CI 通过；按需扩展功能 |
-| QQ Mail MCP | [projects/qq-mail-mcp](projects/qq-mail-mcp/) | Testing | Cloudflare Workers 上的私人 QQ 邮箱只读 MCP，OAuth/DCR 与六个工具 | PR #6 已合并，62 项本地回归通过；真实邮箱验收和部署仍待安全本地配置 |
+| QQ-Mail-Gateway | [projects/qq-mail-mcp](projects/qq-mail-mcp/) | Completed | 官方 Cloudflare 插件 → Queue → 原 Worker，IMAP 读取与 SMTP 发送，独立任务 D1；保留只读 MCP | 1.1 已部署；99 项自动测试通过，真实读取/搜索/任务状态已验证；用户安排的真实发送已完成，已确认收件及中文显示正常，详见 GATEWAY-VALIDATION.md |
 
 > 下方按日期保留历史开发快照；当前状态以总览和末尾最新维护复验为准。旧记录中的人工合并约束已由当前 AGENTS.md 的自动验收规则替代。
 
@@ -382,3 +382,10 @@
 - 多个Linux检查在Playwright系统依赖安装前因默认Azure Ubuntu镜像DNS失败；共享准备动作固定官方HTTPS归档，保留签名验证、依赖与原有测试，覆盖聚合Pages。未修改其他项目业务功能。最终检查与部署见[PR #44](https://github.com/ngwglai/GPT/pull/44)。
 
 - 官方Ubuntu归档同样DNS失败后，撤回临时镜像列表动作，改用摘要固定的微软Playwright预装Linux环境运行原测试；Windows原生验收保留。
+
+## QQ-Mail-Gateway 1.1（2026-11-13）
+
+- 沿用原项目目录和 Worker，增加 Queue consumer、独立任务 D1、固定 QQ TLS 465 SMTP、UTF-8 MIME、CC/BCC 和任务去重；原 MCP/OAuth 保留且只读。
+- 官方插件实际验证 JSON Queue 写入、参数化 D1 查询、真实 IMAP 搜索/正文读取、UIDVALIDITY 失败记录和重复投递；未变更 Secret 或授权范围。
+- 99 项自动化测试、类型检查、构建和依赖审计通过；用户明确安排的一封真实发送已返回 SMTP 250，用户确认实际收到且中文正常；不将其他邮件的 SMTP 接受泛化为送达。任务结果 15 分钟过期，5 分钟自动清理只操作任务 D1。
+- 说明与验证：[接入](projects/qq-mail-mcp/docs/GATEWAY.md)、[报告](projects/qq-mail-mcp/docs/GATEWAY-VALIDATION.md)。部署专属 ID、URL 和私人邮件不写入公开仓库。

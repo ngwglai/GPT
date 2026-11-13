@@ -138,7 +138,7 @@ jobs:
             projects/constraintlab/server.log
 
   qq-mail-mcp:
-    name: QQ Mail MCP
+    name: QQ Mail Gateway
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:2f05f8a734509a7b3f26a912639488ee08f58a7b292d14d62271bcff9038768f
     timeout-minutes: 15
@@ -162,6 +162,9 @@ jobs:
         run: npx playwright-core install chromium
       - name: Resolve installed Chromium path
         run: node --input-type=module -e "import {chromium} from 'playwright-core'; import {appendFileSync} from 'node:fs'; appendFileSync(process.env.GITHUB_ENV, 'CHROMIUM_PATH=' + chromium.executablePath() + '\n')"
+      - run: npm run types
+      - name: Verify generated Worker bindings
+        run: git diff --exit-code -- worker-configuration.d.ts
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
