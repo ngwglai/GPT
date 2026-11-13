@@ -1,0 +1,32 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bili-observer",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-13",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "invocation_logs": false,
+      "head_sampling_rate": 1
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.01
+    },
+    "redact_query_string": true
+  },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://chatgpt.com,https://chat.openai.com",
+    "BILI_TRANSPORT": "direct",
+    "BILI_BACKEND_URL": "",
+    "OAUTH_ISSUER": "",
+    "OAUTH_RESOURCE": "",
+    "OAUTH_JWKS_URL": ""
+  }
+}
