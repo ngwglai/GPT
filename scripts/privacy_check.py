@@ -16,6 +16,11 @@ TRAILER = re.compile(r"^(?:Co-authored-by|Signed-off-by|Reviewed-by|Acked-by|Tes
 PATH = re.compile(r"(?:[A-Za-z]:[\\/](?:Users|Documents and Settings)[\\/]([^\\/\s<>\"']+)|/(?:Users|home)/([^/\s<>\"']+))")
 SAMPLE_DOMAINS = {"example.com", "example.org", "example.net", "example.test", "example.invalid", "localhost.invalid"}
 GITHUB_SYSTEM_EMAIL = "noreply" + "@" + "github.com"
+# One-time exception for the exact GitHub-generated squash commit from PR #47.
+# The SHA, one-parent shape, owner author identity, web-flow committer identity,
+# and exact subject are all pinned; normal content/tree scanning still applies.
+LEGACY_GITHUB_SQUASH_SHA = "4c06195b0078034d33e41f76a2d5ee4f03a222cc"
+LEGACY_GITHUB_SQUASH_SUBJECT = "fix(RogueSurvivor): 按确认方案调整四地图三曲歌单 (#47)"
 # One immutable pre-existing regression-test blob contains a deliberately synthetic
 # non-system address. Keep that historical fixture readable without exempting
 # other addresses, paths, future edits, or explicit private-denylist matches.
@@ -71,6 +76,19 @@ def findings(text, email, terms=(), synthetic_emails=()):
 
 def identity_ok(identity, email):
     return identity.startswith(f"ngwglai <{email}> ")
+
+
+def is_legacy_github_squash(sha, author, author_email, committer, committer_email, parents, message, expected_email):
+    """Recognize only the pinned GitHub squash commit from PR #47."""
+    return (
+        sha == LEGACY_GITHUB_SQUASH_SHA
+        and len(parents.split()) == 1
+        and author == "ngwglai"
+        and author_email == expected_email
+        and committer == "GitHub"
+        and committer_email == GITHUB_SYSTEM_EMAIL
+        and message.startswith(LEGACY_GITHUB_SQUASH_SUBJECT + "\\n")
+    )
 
 
 class Check:
@@ -161,7 +179,10 @@ class Check:
                 and ce == GITHUB_SYSTEM_EMAIL
                 and re.match(r"^Merge pull request #[0-9]+ from ngwglai/", message)
             )
-            if (committer != "ngwglai" or ce != self.email) and not platform_merge:
+            legacy_platform_squash = is_legacy_github_squash(
+                sha, author, ae, committer, ce, parents, message, self.email,
+            )
+            if (committer != "ngwglai" or ce != self.email) and not (platform_merge or legacy_platform_squash):
                 self.add("noncanonical-committer", where)
             self.text(author + " <" + ae + ">\n" + committer + " <" + ce + ">", where)
             self.text(message, where, message=True)
