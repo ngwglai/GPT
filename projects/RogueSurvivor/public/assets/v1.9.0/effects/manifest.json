@@ -1,0 +1,185 @@
+{
+  "version": "1.9.0",
+  "source": "OpenAI built-in image_gen, original generated art",
+  "assets": [
+    {
+      "id": "vfx.arrow",
+      "file": "arrow.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 11566
+    },
+    {
+      "id": "vfx.slash",
+      "file": "slash.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 15878
+    },
+    {
+      "id": "vfx.fireball",
+      "file": "fireball.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 12906
+    },
+    {
+      "id": "vfx.spirit",
+      "file": "spirit.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 13612
+    },
+    {
+      "id": "vfx.frost",
+      "file": "frost.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 19814
+    },
+    {
+      "id": "vfx.lance",
+      "file": "lance.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 9982
+    },
+    {
+      "id": "vfx.shield",
+      "file": "shield.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 13900
+    },
+    {
+      "id": "vfx.heal",
+      "file": "heal.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 17636
+    },
+    {
+      "id": "vfx.starfall",
+      "file": "starfall.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 19500
+    },
+    {
+      "id": "vfx.dash",
+      "file": "dash.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 9764
+    },
+    {
+      "id": "vfx.hit",
+      "file": "hit.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 11110
+    },
+    {
+      "id": "vfx.critical",
+      "file": "critical.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 21612
+    },
+    {
+      "id": "vfx.hostile",
+      "file": "hostile.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 9306
+    },
+    {
+      "id": "vfx.warning",
+      "file": "warning.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 20436
+    },
+    {
+      "id": "vfx.revive",
+      "file": "revive.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 19876
+    },
+    {
+      "id": "vfx.dissolve",
+      "file": "dissolve.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 18198
+    },
+    {
+      "id": "vfx.vine",
+      "file": "vine.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 13190
+    },
+    {
+      "id": "vfx.beam",
+      "file": "beam.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 9534
+    },
+    {
+      "id": "vfx.candy",
+      "file": "candy.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 19286
+    },
+    {
+      "id": "vfx.moon",
+      "file": "moon.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 14360
+    },
+    {
+      "id": "vfx.meteor",
+      "file": "meteor.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 13916
+    },
+    {
+      "id": "vfx.fan",
+      "file": "fan.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 17662
+    },
+    {
+      "id": "vfx.mirror",
+      "file": "mirror.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 18584
+    },
+    {
+      "id": "vfx.phase",
+      "file": "phase.webp",
+      "width": 192,
+      "height": 192,
+      "bytes": 20526
+    },
+    {
+      "id": "vfx.impact",
+      "file": "impact.webp",
+      "width": 768,
+      "height": 192,
+      "frames": 4,
+      "frameWidth": 192,
+      "frameHeight": 192,
+      "fps": 12,
+      "bytes": 39596
+    }
+  ]
+}

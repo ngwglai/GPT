@@ -117,6 +117,27 @@ class PrivacyTests(unittest.TestCase):
         result = self.check("--commits", merge_sha)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_legacy_github_squash_exception_is_exact_and_narrow(self):
+        sha = privacy.LEGACY_GITHUB_SQUASH_SHA
+        subject = privacy.LEGACY_GITHUB_SQUASH_SUBJECT
+        valid = (sha, "ngwglai", SAMPLE_NOREPLY, "GitHub", privacy.GITHUB_SYSTEM_EMAIL,
+                 "a" * 40, subject + "\n\nPR #47 squash merge", SAMPLE_NOREPLY)
+        self.assertTrue(privacy.is_legacy_github_squash(*valid))
+
+        invalid_cases = [
+            ("different SHA", (sha[:-1] + "0", *valid[1:])),
+            ("wrong author", (sha, "Someone Else", *valid[2:])),
+            ("wrong author email", (*valid[:2], SAMPLE_PRIVATE, *valid[3:])),
+            ("wrong committer", (*valid[:3], "Someone Else", *valid[4:])),
+            ("wrong committer email", (*valid[:4], SAMPLE_PRIVATE, *valid[5:])),
+            ("multiple parents", (*valid[:5], "a" * 40 + " " + "b" * 40, *valid[6:])),
+            ("wrong subject", (*valid[:6], "Unrelated commit\n\nPR #47", *valid[7:])),
+            ("wrong configured identity", (*valid[:7], SAMPLE_PRIVATE)),
+        ]
+        for label, args in invalid_cases:
+            with self.subTest(label=label):
+                self.assertFalse(privacy.is_legacy_github_squash(*args))
+
     def test_only_exact_public_system_email_is_exempt(self):
         self.write("file.txt", privacy.GITHUB_SYSTEM_EMAIL)
         self.assertEqual(self.check("--staged").returncode, 0)

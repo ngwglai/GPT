@@ -1,3 +1,7 @@
+import { readFileSync } from "node:fs";
+const { version } = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+);
 import { test as base, expect } from "@playwright/test";
 // Release this artwork suite's browser before legacy combat/collection workers.
 const test = base.extend({
@@ -31,7 +35,7 @@ test("v1.3 original background, three consistent portraits and card art actually
     } as any;
   });
   await page.goto("/");
-  await expect(page.locator(".version")).toContainText("v1.8");
+  await expect(page.locator(".version")).toContainText(`v${version}`);
   expect(
     await page.evaluate(() => (window as any).fallbackCanvases),
   ).toBeLessThan(15);

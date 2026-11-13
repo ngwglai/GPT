@@ -2,6 +2,7 @@ import {
   ACTION_NAMES,
   type CharacterAction,
 } from "../data/characterAnimations";
+import { EFFECT_NAMES } from "../data/effects";
 import { WORLD_ASSET_NAMES } from "../data/worldVisuals";
 import { VISUALS } from "../data/visuals";
 import { CHARACTERS, ENEMIES, SKILLS, WEAPONS } from "../data/content";
@@ -43,6 +44,7 @@ export const ASSET_IDS = [
         (id.startsWith("animation.")
           ? `角色动作 · ${CHARACTERS.find((c) => c.id === id.split(".")[1])?.name} · ${ACTION_NAMES[id.split(".")[2] as CharacterAction]}`
           : undefined) ||
+        (id.startsWith("vfx.") ? EFFECT_NAMES[id.slice(4)] : undefined) ||
         WORLD_ASSET_NAMES[id] ||
         (id.startsWith("portrait.")
           ? "角色立绘 · " + CHARACTERS.find((c) => id.endsWith(c.id))?.name
@@ -65,7 +67,7 @@ export const ASSET_IDS = [
                   "effect.ward": "魔法结界",
                 } as Record<string, string>
               )[id] || id),
-      group: "星光美术",
+      group: id.startsWith("vfx.") ? "正式特效" : "星光美术",
     })),
 ];
 export interface Asset {

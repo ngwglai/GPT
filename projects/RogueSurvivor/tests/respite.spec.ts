@@ -24,7 +24,7 @@ async function readRun(page: Page): Promise<Run> {
       }),
   );
 }
-async function load(page: Page, s: Run) {
+async function load(page: Page, s: Run, startsPaused = false) {
   validateRun(s);
   await page.goto("/");
   await page.getByRole("button", { name: "开启远征" }).waitFor();
@@ -46,11 +46,16 @@ async function load(page: Page, s: Run) {
   );
   await page.reload();
   await page.getByRole("button", { name: /继续旅程/ }).click();
-  if (s.phase === "playing")
+  if (startsPaused)
+    await expect(
+      page.getByRole("heading", { name: "远征已暂停" }),
+    ).toBeVisible();
+  else if (s.phase === "playing")
     await expect(page.locator("html")).not.toHaveClass(/touch-input-inactive/);
 }
-async function save(page: Page) {
-  await page.getByRole("button", { name: "Ⅱ 暂停" }).click();
+async function save(page: Page, alreadyPaused = false) {
+  if (!alreadyPaused)
+    await page.getByRole("button", { name: "Ⅱ 暂停" }).click();
   await page.getByRole("button", { name: "保存当前进度", exact: true }).click();
   await expect(page.locator("#toast")).toContainText("进度已保存");
   return readRun(page);
@@ -83,7 +88,35 @@ for (const viewport of [
     s.nextEvent = 9999;
     s.player.invincible = 999;
     s.gems = [{ x: s.player.x, y: s.player.y, value: 1 }];
-    await load(page, s);
+    await page.addInitScript(() => {
+      const state = ((window as any).restProbe = {
+        initial: sessionStorage.getItem("rest-probe-initial") !== "done",
+        motion: false,
+      });
+      new MutationObserver(() => {
+        const hud = document.querySelector("#wave-hud"),
+          canvas = document.querySelector("canvas"),
+          button = document.querySelector<HTMLButtonElement>(
+            '[data-action="pause"]',
+          );
+        if (!button) return;
+        if (state.initial && hud?.textContent?.includes("清场休整")) {
+          state.initial = false;
+          sessionStorage.setItem("rest-probe-initial", "done");
+          button.click();
+        } else if (state.motion && canvas?.dataset.characterAction === "run") {
+          state.motion = false;
+          button.click();
+        }
+      }).observe(document, {
+        subtree: true,
+        childList: true,
+        characterData: true,
+        attributes: true,
+        attributeFilter: ["data-character-action"],
+      });
+    });
+    await load(page, s, true);
     await expect(page.locator(".version")).toHaveCount(0); // battle replaces the main header
     await expect(page.locator("#wave-hud")).toContainText("清场休整");
     await expect(page.locator("#wave-hud")).toContainText("下一波首领战");
@@ -91,18 +124,21 @@ for (const viewport of [
     const box = await page.locator("#wave-hud").boundingBox();
     expect(box!.x).toBeGreaterThanOrEqual(0);
     expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width);
+    // Observe one actual movement frame and pause through the real HUD in-page.
+    // Cross-process inspection must not consume the five-second rest itself.
+    await page.evaluate(() => {
+      (window as any).restProbe.motion = true;
+    });
+    await page.getByRole("button", { name: "继续远征", exact: true }).click();
     await page.keyboard.down("d");
     try {
-      // The simulation can render no frame during a 150ms wall-clock tap.
-      // Hold input across a visible simulation-clock change, then test actual movement.
-      const clock = await page.locator("#clock").innerText();
-      await expect
-        .poll(() => page.locator("#clock").innerText(), { timeout: 20000 })
-        .not.toBe(clock);
+      await expect(
+        page.getByRole("heading", { name: "远征已暂停" }),
+      ).toBeVisible();
     } finally {
       await page.keyboard.up("d");
     }
-    const saved = await save(page);
+    const saved = await save(page, true);
     expect(saved.player.x).toBeGreaterThan(s.player.x);
     expect(saved.player.xp).toBe(1);
     expect(saved.gems).toHaveLength(0);

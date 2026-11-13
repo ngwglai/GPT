@@ -1,0 +1,177 @@
+{
+  "label": "before-4c06195",
+  "environment": "Linux Chromium 154.0.8037.57, headless SwiftShader, Phaser Canvas; synthetic render-only snapshots; 3 × 4-second samples, no balance adjustment",
+  "result": [
+    {
+      "map": "forest",
+      "dense": false,
+      "width": 1280,
+      "height": 720,
+      "samples": [
+        {
+          "map": "forest",
+          "dense": false,
+          "viewport": [
+            1280,
+            720
+          ],
+          "frames": 37,
+          "fps": 9.250231255781395,
+          "drawMs": 2.7432432436459773,
+          "enemies": 18,
+          "bullets": 24,
+          "zones": 9,
+          "sprites": 78,
+          "heap": 23635339
+        },
+        {
+          "map": "forest",
+          "dense": false,
+          "viewport": [
+            1280,
+            720
+          ],
+          "frames": 36,
+          "fps": 8.962804361898124,
+          "drawMs": 2.863888888930281,
+          "enemies": 18,
+          "bullets": 24,
+          "zones": 9,
+          "sprites": 78,
+          "heap": 22272811
+        },
+        {
+          "map": "forest",
+          "dense": false,
+          "viewport": [
+            1280,
+            720
+          ],
+          "frames": 42,
+          "fps": 10.28605015673981,
+          "drawMs": 2.0523809515649365,
+          "enemies": 18,
+          "bullets": 24,
+          "zones": 9,
+          "sprites": 78,
+          "heap": 24076763
+        }
+      ],
+      "errors": []
+    },
+    {
+      "map": "forest",
+      "dense": true,
+      "width": 1280,
+      "height": 720,
+      "samples": [
+        {
+          "map": "forest",
+          "dense": true,
+          "viewport": [
+            1280,
+            720
+          ],
+          "frames": 10,
+          "fps": 2.409754686972865,
+          "drawMs": 4.549999999254942,
+          "enemies": 300,
+          "bullets": 700,
+          "zones": 23,
+          "sprites": 1011,
+          "heap": 25466869
+        },
+        {
+          "map": "forest",
+          "dense": true,
+          "viewport": [
+            1280,
+            720
+          ],
+          "frames": 10,
+          "fps": 2.371635242499704,
+          "drawMs": 2.8099999994039537,
+          "enemies": 300,
+          "bullets": 700,
+          "zones": 23,
+          "sprites": 1011,
+          "heap": 28762831
+        },
+        {
+          "map": "forest",
+          "dense": true,
+          "viewport": [
+            1280,
+            720
+          ],
+          "frames": 9,
+          "fps": 2.0378127476508547,
+          "drawMs": 3.9888888878954782,
+          "enemies": 300,
+          "bullets": 700,
+          "zones": 23,
+          "sprites": 1011,
+          "heap": 26174271
+        }
+      ],
+      "errors": []
+    },
+    {
+      "map": "garden",
+      "dense": true,
+      "width": 390,
+      "height": 844,
+      "samples": [
+        {
+          "map": "garden",
+          "dense": true,
+          "viewport": [
+            390,
+            844
+          ],
+          "frames": 13,
+          "fps": 3.1708090441230277,
+          "drawMs": 3.2230769223891773,
+          "enemies": 300,
+          "bullets": 700,
+          "zones": 23,
+          "sprites": 731,
+          "heap": 26117561
+        },
+        {
+          "map": "garden",
+          "dense": true,
+          "viewport": [
+            390,
+            844
+          ],
+          "frames": 12,
+          "fps": 2.9388714733542316,
+          "drawMs": 4.666666666045785,
+          "enemies": 300,
+          "bullets": 700,
+          "zones": 23,
+          "sprites": 731,
+          "heap": 25834829
+        },
+        {
+          "map": "garden",
+          "dense": true,
+          "viewport": [
+            390,
+            844
+          ],
+          "frames": 13,
+          "fps": 3.1838554039822693,
+          "drawMs": 2.5769230774961986,
+          "enemies": 300,
+          "bullets": 700,
+          "zones": 23,
+          "sprites": 732,
+          "heap": 23088347
+        }
+      ],
+      "errors": []
+    }
+  ]
+}
