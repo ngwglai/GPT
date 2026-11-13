@@ -16,7 +16,7 @@
 ## 参考项目的实际做法
 
 - [XZXZZX-Ai/bilibili-mcp](https://github.com/XZXZZX-Ai/bilibili-mcp)：默认本地 stdio，通过本机 Node.js 网络发请求；[HTTP 层](https://github.com/XZXZZX-Ai/bilibili-mcp/blob/master/src/bilibili/http.ts) 集中处理限流、Cookie、WBI 与错误；[指纹模块](https://github.com/XZXZZX-Ai/bilibili-mcp/blob/master/src/bilibili/fingerprint.ts) 从公开接口获取设备标识。这不是 Workers 出口可用的证据。
-- [BiliParser-API](https://github.com/kiyonya/BiliParser-API)：[proxy-fetch](https://github.com/kiyonya/BiliParser-API/blob/main/src/utils/proxy-fetch.ts) 支持独立请求后端和后端令牌，[配置](https://github.com/kiyonya/BiliParser-API/blob/main/src/config.ts) 中代理开关默认开启；[bili-crypto](https://github.com/kiyonya/BiliParser-API/blob/main/src/utils/bili-crypto.ts) 合并匿名 Cookie 与可选登录 Cookie，并处理 WBI。它同样不能证明 Worker 直连可靠。
+- [BiliParser-API](https://github.com/kiyonya/BiliParser-API)：[proxy-fetch](https://github.com/kiyonya/BiliParser-API/blob/main/src/utils/proxy-fetch.ts) 支持独立请求后端和后端令牌，[配置](https://github.com/kiyonya/BiliParser-API/blob/main/src/config.ts) 中代理开关默认开启；[bili-crypto](https://github.com/kiyonya/BiliParser-API/blob/main/src/utils/bili-crypto.ts) 合并匿名 Cookie 与可选登录 Cookie，并处理 WBI。其 [README](https://github.com/kiyonya/BiliParser-API#readme) 明确把 Vercel Serverless Functions 作为独立出口方案，并链接本人部署的代理项目。这是该项目维护者对 Cloudflare IP 限制的描述，不是本项目已经验证 Vercel 可用的证据；也不能证明 Worker 直连可靠。
 
 仅研究原理，没有复制第三方实现；未采用其随机指纹、票据构造、原始响应日志或自动重试策略。
 
