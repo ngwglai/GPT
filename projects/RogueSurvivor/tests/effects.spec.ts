@@ -14,6 +14,7 @@ async function instrument(page: Page) {
       counts: {} as Record<string, number>,
       frames: [] as number[],
       loaded: {} as Record<string, boolean>,
+      images: {} as Record<string, HTMLImageElement>,
       dashSeen: false,
     });
     // Observe the very Image objects loaded by GameScene, rather than preloading
@@ -27,6 +28,7 @@ async function instrument(page: Page) {
       set(this: HTMLImageElement, value: string) {
         if (value.includes("/v1.9.0/effects/")) {
           const name = value.split("/").pop()!.split(".")[0];
+          state.images[name] = this;
           this.addEventListener(
             "load",
             () => {
@@ -59,7 +61,46 @@ async function instrument(page: Page) {
     } as any;
   });
 }
-async function load(page: Page, map: MapId, skills: SkillId[]) {
+async function effectReady(page: Page, id: string) {
+  await expect
+    .poll(
+      () =>
+        page.evaluate((id) => !!(window as any).paintedEffects.loaded[id], id),
+      { message: `${id}运行时贴图必须成功加载后再验证绘制` },
+    )
+    .toBe(true);
+}
+test.afterEach(async ({ page }, info) => {
+  if (info.status === info.expectedStatus || page.isClosed()) return;
+  const images = await page.evaluate(() => {
+    const s = (window as any).paintedEffects;
+    if (!s) return {};
+    return Object.fromEntries(
+      Object.entries(s.images as Record<string, HTMLImageElement>).map(
+        ([id, image]) => [
+          id,
+          {
+            loaded: !!s.loaded[id],
+            complete: image.complete,
+            naturalWidth: image.naturalWidth,
+            hasSource: !!image.getAttribute("src"),
+            draws: s.counts[id] || 0,
+          },
+        ],
+      ),
+    );
+  });
+  await info.attach("实际特效图片状态", {
+    body: JSON.stringify(images, null, 2),
+    contentType: "application/json",
+  });
+});
+async function load(
+  page: Page,
+  map: MapId,
+  skills: SkillId[],
+  ready: string[] = [],
+) {
   await page.goto("/");
   await page.getByRole("button", { name: "开启远征" }).waitFor();
   const w = new World(createRun("endless", "mage", 190, "fire", "ward", map));
@@ -107,6 +148,10 @@ async function load(page: Page, map: MapId, skills: SkillId[]) {
     s,
   );
   await page.reload();
+  // GameScene loads its real default textures in the paused camp too. Establish
+  // the art precondition before starting the software-rendered battle, rather
+  // than racing image decode against an already advancing combat simulation.
+  for (const id of ready) await effectReady(page, id);
   await page.getByRole("button", { name: /继续旅程/ }).click();
   await expect(page.locator("html")).not.toHaveClass(/touch-input-inactive/);
 }
@@ -191,16 +236,7 @@ async function keyEffect(
   cooldown: string,
 ) {
   await test.step(`${key}：贴图就绪、实际释放与${id}绘制`, async () => {
-    await expect
-      .poll(
-        () =>
-          page.evaluate(
-            (id) => !!(window as any).paintedEffects.loaded[id],
-            id,
-          ),
-        { message: `${id}运行时贴图必须成功加载后再验证绘制` },
-      )
-      .toBe(true);
+    await effectReady(page, id);
     await expect(page.locator(cooldown)).toHaveText("");
     const before = await page.evaluate(
       (id) => (window as any).paintedEffects.counts[id] || 0,
@@ -228,7 +264,12 @@ test("星贯、复苏、星幕与冲刺接入绘制，新增资源可以在工�
   page,
 }) => {
   await instrument(page);
-  await load(page, "forest", ["lance", "bloom", "ward"]);
+  await load(
+    page,
+    "forest",
+    ["lance", "bloom", "ward"],
+    ["lance", "heal", "shield", "dash"],
+  );
   for (const [key, id, cooldown] of [
     ["q", "lance", "#cd-0"],
     ["e", "heal", "#cd-1"],
