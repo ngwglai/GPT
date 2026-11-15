@@ -1,0 +1,63 @@
+name: RogueSurvivor Windows Portable
+
+on:
+  push:
+    branches: [main, feature/rogue-survivor-portable]
+    paths:
+      - 'projects/RogueSurvivor/**'
+      - '.github/workflows/rogue-survivor-portable.yml'
+  pull_request:
+    paths:
+      - 'projects/RogueSurvivor/**'
+      - '.github/workflows/rogue-survivor-portable.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Build Windows BAT + Python portable game
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: projects/RogueSurvivor/package-lock.json
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Test local launcher
+        working-directory: projects/RogueSurvivor/portable
+        run: python -m unittest discover -v
+      - name: Install and build game
+        working-directory: projects/RogueSurvivor
+        run: |
+          npm ci
+          npm run build
+      - name: Assemble portable folder
+        shell: pwsh
+        run: |
+          $project = Join-Path $env:GITHUB_WORKSPACE 'projects/RogueSurvivor'
+          $out = Join-Path $env:RUNNER_TEMP 'RogueSurvivor-Windows-Portable'
+          New-Item -ItemType Directory -Path $out -Force | Out-Null
+          Copy-Item -Path (Join-Path $project 'dist') -Destination (Join-Path $out 'game') -Recurse
+          Copy-Item -Path (Join-Path $project 'portable/Start-Game.bat') -Destination $out
+          Copy-Item -Path (Join-Path $project 'portable/launcher.py') -Destination $out
+          Copy-Item -Path (Join-Path $project 'portable/README.txt') -Destination $out
+          if (-not (Test-Path (Join-Path $out 'game/index.html'))) { throw 'Missing built game/index.html' }
+          if (-not (Test-Path (Join-Path $out 'game/assets'))) { throw 'Missing built game/assets' }
+          $files = Get-ChildItem -Path (Join-Path $out 'game') -File -Recurse
+          if ($files.Count -lt 5) { throw 'Suspiciously small packaged game' }
+          Write-Host "Packaged $($files.Count) game files plus BAT/Python launcher"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: RogueSurvivor-Windows-Portable
+          path: ${{ runner.temp }}/RogueSurvivor-Windows-Portable/
+          if-no-files-found: error
+          retention-days: 30
