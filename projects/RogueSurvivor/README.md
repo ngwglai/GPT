@@ -6,6 +6,19 @@
 
 采用 TypeScript、Phaser 3、Vite。无账号、无广告、无付费接口、无数据库服务器；运行时不请求外部字体、图片或音频。默认美术为本次内置 image_gen 原创图片，保留程序矢量回退；战斗音乐使用用户提供的十二首本地 MP3，音效使用本地CC0采样与Web Audio混音。与仓库中的 Godot 卡牌游戏 RogueLab 是两个独立项目。
 
+## Windows 离线便携版（Python + BAT）
+
+无需安装 Electron；便携版由 GitHub Actions 在 Windows 环境中执行 `npm ci && npm run build`，将 Vite 的 `dist/`、`Start-Game.bat`、`launcher.py` 和使用说明封装为可下载的 ZIP。**解压 ZIP 后运行**，不能直接在压缩包内双击 BAT。
+
+1. 前往仓库 Actions → **RogueSurvivor Windows Portable**，打开最近一次成功的构建任务，在页面底部 Artifacts 下载 `RogueSurvivor-Windows-Portable`。
+2. 解压后双击 `Start-Game.bat`。Windows 已安装 Python 3 并配置 `py` 或 `python` 启动命令即可，**运行时不需要 Node.js 或联网**。
+3. 脚本只在 `127.0.0.1:18765` 提供静态网页，并在默认浏览器自动打开游戏。游玩时保持命令行窗口打开；按 Ctrl+C 停止。
+4. 端口固定以保留浏览器的 IndexedDB 存档来源；如果端口被占用，先关闭以前的启动窗口，不建议随意改端口。新版覆盖游戏文件不会主动删除本地浏览器存档。
+
+**注意：** 便携版使用本机地址，原 GitHub Pages 站点的存档不会自动迁移。本地存档保存在当前浏览器的用户配置文件，而不是游戏 ZIP 中；换浏览器、清理站点数据可能丢失存档。项目本身的资源都包含在 ZIP 中；导入的自定义资源仍存储在浏览器内，必要时请先使用资源工坊导出备份。
+
+本地验证入口：`python -m unittest discover -s portable -v`。自动打包规则见 `.github/workflows/rogue-survivor-portable.yml`（仓库根目录）。
+
 ## 本地运行
 
 需要 Node.js **22.15+**（推荐最新 Node 22 LTS 或 Node 24）与现代浏览器（电脑、手机和平板）。
