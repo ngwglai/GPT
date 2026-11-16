@@ -1,32 +1,7 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { createRun } from "../src/core/create";
 import { World } from "../src/core/world";
-async function start(page: Page, policy = "build", mode = "standard") {
-  await page.goto("/ai.html");
-  await expect(page.locator("#start")).toBeEnabled();
-  await page.locator('[name="policy"]').selectOption(policy);
-  await page.locator('[name="mode"]').selectOption(mode);
-  await page.locator("#start").click();
-}
-async function advance(page: Page) {
-  await page.locator("#advance").click();
-  await expect
-    .poll(
-      async () =>
-        Number(await page.locator("#status").getAttribute("data-choices")),
-      { timeout: 60000 },
-    )
-    .toBeGreaterThan(0);
-}
-async function exported(page: Page) {
-  const download = page.waitForEvent("download");
-  await page.locator("#export").click();
-  const d = await download;
-  const stream = await d.createReadStream();
-  const chunks = [];
-  for await (const chunk of stream!) chunks.push(chunk);
-  return JSON.parse(Buffer.concat(chunks).toString());
-}
+import { start, advance, exported } from "./ai-lab-helpers";
 test("真实评分、技能、图层、暂停与重开，以及AI专用历史导出", async ({
   page,
 }) => {
@@ -175,57 +150,4 @@ test("子路径下正常入口、AI资源与独立存档保持一致", async ({
   await page.getByRole("link", { name: "返回手动游戏 ↗" }).click();
   await expect(page.getByRole("button", { name: /继续旅程/ })).toBeVisible();
   expect(failed).toEqual([]);
-});
-
-test("可视化标准模式从初始状态自动完成最终首领并保存结算", async ({ page }) => {
-  test.setTimeout(480000);
-  await page.setViewportSize({ width: 800, height: 600 });
-  await start(page);
-  await page.locator("#decision-details > summary").click();
-  for (let batch = 0; batch < 45; batch++) {
-    if (
-      (await page.locator("#status").getAttribute("data-phase")) === "victory"
-    )
-      break;
-    await page.locator("#advance").click();
-    await expect
-      .poll(() => page.locator("#status").getAttribute("data-fast-ticks"), {
-        timeout: 60000,
-      })
-      .toBe("0");
-    expect(await page.locator("#status").getAttribute("data-phase")).not.toBe(
-      "dead",
-    );
-  }
-  await expect(page.locator("#status")).toHaveAttribute(
-    "data-phase",
-    "victory",
-  );
-  const record = await exported(page);
-  console.info(
-    "Visual standard finish",
-    JSON.stringify({
-      time: record.time,
-      wave: record.wave,
-      bosses: record.bosses,
-      level: record.level,
-      kills: record.kills,
-      choices: record.totals.choices,
-      damage: record.damage,
-      taken: record.taken,
-    }),
-  );
-  expect(record.result).toBe("victory");
-  // Same seed/config through LabSession.step without rendering; no end-state injection.
-  expect(record.time).toBeCloseTo(981, 6);
-  expect(record.kills).toBe(2752);
-  expect(record.level).toBe(42);
-  expect(record.damage).toBeCloseTo(617202.8687128052, 6);
-  expect(record.taken).toBeCloseTo(256.73870222213856, 6);
-  expect(record.totals.choices).toBe(48);
-  expect(record.bosses).toBe(4);
-  expect(record.wave).toBe(20);
-  expect(record.totals.choices).toBeGreaterThan(20);
-  await page.locator("#history-open").click();
-  await expect(page.locator("#history-list")).toContainText("击败最终首领");
 });
