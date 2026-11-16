@@ -1753,7 +1753,7 @@ td {
 
 /* An additive link; the lab owns separate state and storage. */
 .ai-entry {
-  color: var(--accent, #b7d6ad);
+  color: var(--mint);
   font-size: 13px;
   padding: 8px 10px;
   white-space: nowrap;
