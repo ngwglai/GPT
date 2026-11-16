@@ -1,0 +1,492 @@
+{
+  "method": "Identical engine, character, map, loadout, seed, cap, fixed dt and decision cadence. Divergent decisions consume different in-game RNG streams. Bootstrap is over paired runs; map/character strata reported separately. Capped runs are censored, not deaths. Victory-credit statistic prevents penalizing fast clears.",
+  "groups": [
+    {
+      "policy": "build",
+      "n": 9,
+      "meanSeconds": 665.174074073757,
+      "medianSeconds": 857.8166666662152,
+      "sdSeconds": 367.3738227371609,
+      "meanSecondsBootstrap95": [
+        422.27592592578526,
+        888.753703703224
+      ],
+      "minSeconds": 177.36666666669996,
+      "maxSeconds": 1049.516666666041,
+      "victories": 6,
+      "victoryRate": 0.6666666666666666,
+      "victoryWilson95": [
+        0.35419734749908977,
+        0.879418401317257
+      ],
+      "censored": 0,
+      "meanWave": 15.11111111111111,
+      "meanBosses": 2.6666666666666665,
+      "meanKills": 1904.3333333333333,
+      "meanTaken": 700.0339101231963,
+      "meanDamage": 400474.25150828494,
+      "meanDecisionMs": 1.163978134494335,
+      "causes": {
+        "zone": 3
+      }
+    },
+    {
+      "policy": "build-v2",
+      "n": 9,
+      "meanSeconds": 999.9851851846046,
+      "medianSeconds": 1019.0166666660685,
+      "sdSeconds": 126.42017942933892,
+      "meanSecondsBootstrap95": [
+        924.1537037031919,
+        1078.1796296289779
+      ],
+      "minSeconds": 808.0166666662604,
+      "maxSeconds": 1205.5833333325656,
+      "victories": 8,
+      "victoryRate": 0.8888888888888888,
+      "victoryWilson95": [
+        0.5649937852319399,
+        0.9801096286728695
+      ],
+      "censored": 0,
+      "meanWave": 20.333333333333332,
+      "meanBosses": 3.888888888888889,
+      "meanKills": 2931.6666666666665,
+      "meanTaken": 1283.2406278018098,
+      "meanDamage": 663547.7691699411,
+      "meanDecisionMs": 2.7938966180818037,
+      "causes": {
+        "zone": 1,
+        "low-effective-health": 1
+      }
+    },
+    {
+      "policy": "build-v3",
+      "n": 9,
+      "meanSeconds": 947.2222222216892,
+      "medianSeconds": 929.5333333328166,
+      "sdSeconds": 56.117625721879406,
+      "meanSecondsBootstrap95": [
+        912.7962962957948,
+        982.1999999994355
+      ],
+      "minSeconds": 877.9166666661969,
+      "maxSeconds": 1025.8666666660624,
+      "victories": 9,
+      "victoryRate": 1,
+      "victoryWilson95": [
+        0.7008472464490407,
+        1
+      ],
+      "censored": 0,
+      "meanWave": 20.11111111111111,
+      "meanBosses": 4,
+      "meanKills": 2776.3333333333335,
+      "meanTaken": 200.95898775300833,
+      "meanDamage": 614370.8321497643,
+      "meanDecisionMs": 3.4073553080602754,
+      "causes": {}
+    },
+    {
+      "policy": "build-v3-sustain",
+      "n": 3,
+      "meanSeconds": 1212.9611111103368,
+      "medianSeconds": 1137.9666666659605,
+      "sdSeconds": 147.07524182954762,
+      "meanSecondsBootstrap95": [
+        1118.4999999993115,
+        1382.4166666657381
+      ],
+      "minSeconds": 1118.4999999993115,
+      "maxSeconds": 1382.4166666657381,
+      "victories": 3,
+      "victoryRate": 1,
+      "victoryWilson95": [
+        0.43849391955098227,
+        1
+      ],
+      "censored": 0,
+      "meanWave": 21.333333333333332,
+      "meanBosses": 4,
+      "meanKills": 4553,
+      "meanTaken": 220.40189333309533,
+      "meanDamage": 1075382.4290208498,
+      "meanDecisionMs": 7.107830444998687,
+      "causes": {}
+    },
+    {
+      "policy": "build-v4",
+      "n": 2,
+      "meanSeconds": 951.8916666661296,
+      "medianSeconds": 951.8916666661296,
+      "sdSeconds": 104.61644827645463,
+      "meanSecondsBootstrap95": [
+        877.9166666661969,
+        1025.8666666660624
+      ],
+      "minSeconds": 877.9166666661969,
+      "maxSeconds": 1025.8666666660624,
+      "victories": 2,
+      "victoryRate": 1,
+      "victoryWilson95": [
+        0.34237195288961925,
+        1
+      ],
+      "censored": 0,
+      "meanWave": 20,
+      "meanBosses": 4,
+      "meanKills": 2759,
+      "meanTaken": 255.88710666654643,
+      "meanDamage": 619588.2593635975,
+      "meanDecisionMs": 4.229717501355256,
+      "causes": {}
+    },
+    {
+      "policy": "combat",
+      "n": 9,
+      "meanSeconds": 873.8759259254598,
+      "medianSeconds": 978.6833333327719,
+      "sdSeconds": 347.10864904753964,
+      "meanSecondsBootstrap95": [
+        650.9796296293663,
+        1068.5296296289864
+      ],
+      "minSeconds": 260.7833333334248,
+      "maxSeconds": 1294.233333332485,
+      "victories": 2,
+      "victoryRate": 0.2222222222222222,
+      "victoryWilson95": [
+        0.06322376231222723,
+        0.5474166563271946
+      ],
+      "censored": 0,
+      "meanWave": 16.333333333333332,
+      "meanBosses": 2.3333333333333335,
+      "meanKills": 2330,
+      "meanTaken": 2051.2289043103406,
+      "meanDamage": 517252.123008777,
+      "meanDecisionMs": 1.2011521390354885,
+      "causes": {
+        "zone": 7,
+        "low-effective-health": 4,
+        "edge-constrained": 1
+      }
+    },
+    {
+      "policy": "legacy",
+      "n": 9,
+      "meanSeconds": 235.00555555557196,
+      "medianSeconds": 188.00000000004175,
+      "sdSeconds": 117.52079041830943,
+      "meanSecondsBootstrap95": [
+        175.64444444447633,
+        310.74629629627594
+      ],
+      "minSeconds": 142.51666666667222,
+      "maxSeconds": 512.0166666665297,
+      "victories": 0,
+      "victoryRate": 0,
+      "victoryWilson95": [
+        0,
+        0.2991527535509594
+      ],
+      "censored": 0,
+      "meanWave": 5.555555555555555,
+      "meanBosses": 0,
+      "meanKills": 227.66666666666666,
+      "meanTaken": 780.4190172839546,
+      "meanDamage": 21623.46248992648,
+      "meanDecisionMs": 0.020335700810004242,
+      "causes": {
+        "bullet": 2,
+        "zone": 7
+      }
+    }
+  ],
+  "paired": [
+    {
+      "policy": "build",
+      "pairs": 9,
+      "metric": "restricted-survival-with-victory-credit",
+      "meanGain": 1026.3444444444408,
+      "seedClusters": 3,
+      "seedClusterMeanGain95": [
+        450.4500000000624,
+        1549.5333333332846
+      ],
+      "pairedSignTestTwoSidedP": 0.0390625,
+      "gainBootstrap95": [
+        461.14259259262934,
+        1570.5722222221762
+      ],
+      "wins": 8,
+      "losses": 1,
+      "ties": 0
+    },
+    {
+      "policy": "build-v2",
+      "pairs": 9,
+      "metric": "restricted-survival-with-victory-credit",
+      "meanGain": 1478.218518518436,
+      "seedClusters": 3,
+      "seedClusterMeanGain95": [
+        1289.2055555553075,
+        1619.3666666666306
+      ],
+      "pairedSignTestTwoSidedP": 0.00390625,
+      "gainBootstrap95": [
+        1295.9462962960733,
+        1612.6555555555287
+      ],
+      "wins": 9,
+      "losses": 0,
+      "ties": 0
+    },
+    {
+      "policy": "build-v3",
+      "pairs": 9,
+      "metric": "restricted-survival-with-victory-credit",
+      "meanGain": 1564.9944444444282,
+      "seedClusters": 3,
+      "seedClusterMeanGain95": [
+        1526.0833333333685,
+        1619.3666666666306
+      ],
+      "pairedSignTestTwoSidedP": 0.00390625,
+      "gainBootstrap95": [
+        1489.253703703724,
+        1624.3555555555238
+      ],
+      "wins": 9,
+      "losses": 0,
+      "ties": 0
+    },
+    {
+      "policy": "build-v3-sustain",
+      "pairs": 3,
+      "metric": "restricted-survival-with-victory-credit",
+      "meanGain": 1461.1333333333598,
+      "seedClusters": 3,
+      "seedClusterMeanGain95": [
+        1287.9833333334705,
+        1626.69999999997
+      ],
+      "pairedSignTestTwoSidedP": 0.25,
+      "gainBootstrap95": [
+        1287.9833333334705,
+        1626.69999999997
+      ],
+      "wins": 3,
+      "losses": 0,
+      "ties": 0
+    },
+    {
+      "policy": "build-v4",
+      "pairs": 2,
+      "metric": "restricted-survival-with-victory-credit",
+      "meanGain": 1457.3416666667204,
+      "seedClusters": 2,
+      "seedClusterMeanGain95": [
+        1287.9833333334705,
+        1626.69999999997
+      ],
+      "pairedSignTestTwoSidedP": 0.5,
+      "gainBootstrap95": [
+        1287.9833333334705,
+        1626.69999999997
+      ],
+      "wins": 2,
+      "losses": 0,
+      "ties": 0
+    },
+    {
+      "policy": "combat",
+      "pairs": 9,
+      "metric": "restricted-survival-with-victory-credit",
+      "meanGain": 831.4907407403739,
+      "seedClusters": 3,
+      "seedClusterMeanGain95": [
+        494.7055555552206,
+        1130.1666666666395
+      ],
+      "pairedSignTestTwoSidedP": 0.0390625,
+      "gainBootstrap95": [
+        457.4537037036777,
+        1200.0833333332434
+      ],
+      "wins": 8,
+      "losses": 1,
+      "ties": 0
+    }
+  ],
+  "strata": [
+    {
+      "policy": "build",
+      "stratum": "forest/knight",
+      "n": 3,
+      "victories": 1,
+      "meanSeconds": 474.7666666664856,
+      "meanWave": 10.333333333333334
+    },
+    {
+      "policy": "build",
+      "stratum": "forest/mage",
+      "n": 3,
+      "victories": 2,
+      "meanSeconds": 615.9055555552794,
+      "meanWave": 15
+    },
+    {
+      "policy": "build",
+      "stratum": "forest/ranger",
+      "n": 3,
+      "victories": 3,
+      "meanSeconds": 904.8499999995057,
+      "meanWave": 20
+    },
+    {
+      "policy": "build-v2",
+      "stratum": "forest/knight",
+      "n": 3,
+      "victories": 3,
+      "meanSeconds": 1100.9999999993272,
+      "meanWave": 20.333333333333332
+    },
+    {
+      "policy": "build-v2",
+      "stratum": "forest/mage",
+      "n": 3,
+      "victories": 2,
+      "meanSeconds": 1040.4777777771603,
+      "meanWave": 20.666666666666668
+    },
+    {
+      "policy": "build-v2",
+      "stratum": "forest/ranger",
+      "n": 3,
+      "victories": 3,
+      "meanSeconds": 858.4777777773256,
+      "meanWave": 20
+    },
+    {
+      "policy": "build-v3",
+      "stratum": "forest/knight",
+      "n": 3,
+      "victories": 3,
+      "meanSeconds": 965.0444444438954,
+      "meanWave": 20.333333333333332
+    },
+    {
+      "policy": "build-v3",
+      "stratum": "forest/mage",
+      "n": 3,
+      "victories": 3,
+      "meanSeconds": 957.0444444439026,
+      "meanWave": 20
+    },
+    {
+      "policy": "build-v3",
+      "stratum": "forest/ranger",
+      "n": 3,
+      "victories": 3,
+      "meanSeconds": 919.5777777772701,
+      "meanWave": 20
+    },
+    {
+      "policy": "build-v3-sustain",
+      "stratum": "forest/knight",
+      "n": 3,
+      "victories": 3,
+      "meanSeconds": 1212.9611111103368,
+      "meanWave": 21.333333333333332
+    },
+    {
+      "policy": "build-v3-sustain",
+      "stratum": "forest/mage",
+      "n": 0,
+      "victories": 0,
+      "meanSeconds": 0,
+      "meanWave": 0
+    },
+    {
+      "policy": "build-v3-sustain",
+      "stratum": "forest/ranger",
+      "n": 0,
+      "victories": 0,
+      "meanSeconds": 0,
+      "meanWave": 0
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "forest/knight",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 951.8916666661296,
+      "meanWave": 20
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "forest/mage",
+      "n": 0,
+      "victories": 0,
+      "meanSeconds": 0,
+      "meanWave": 0
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "forest/ranger",
+      "n": 0,
+      "victories": 0,
+      "meanSeconds": 0,
+      "meanWave": 0
+    },
+    {
+      "policy": "combat",
+      "stratum": "forest/knight",
+      "n": 3,
+      "victories": 0,
+      "meanSeconds": 567.0333333331463,
+      "meanWave": 9
+    },
+    {
+      "policy": "combat",
+      "stratum": "forest/mage",
+      "n": 3,
+      "victories": 1,
+      "meanSeconds": 993.3222222216476,
+      "meanWave": 19.333333333333332
+    },
+    {
+      "policy": "combat",
+      "stratum": "forest/ranger",
+      "n": 3,
+      "victories": 1,
+      "meanSeconds": 1061.2722222215857,
+      "meanWave": 20.666666666666668
+    },
+    {
+      "policy": "legacy",
+      "stratum": "forest/knight",
+      "n": 3,
+      "victories": 0,
+      "meanSeconds": 338.8666666666401,
+      "meanWave": 6.666666666666667
+    },
+    {
+      "policy": "legacy",
+      "stratum": "forest/mage",
+      "n": 3,
+      "victories": 0,
+      "meanSeconds": 182.88888888892657,
+      "meanWave": 5
+    },
+    {
+      "policy": "legacy",
+      "stratum": "forest/ranger",
+      "n": 3,
+      "victories": 0,
+      "meanSeconds": 183.26111111114906,
+      "meanWave": 5
+    }
+  ]
+}

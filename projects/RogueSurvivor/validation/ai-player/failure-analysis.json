@@ -1,0 +1,1513 @@
+[
+  {
+    "policy": "build-v4",
+    "map": "garden",
+    "character": "knight",
+    "seed": 137,
+    "phase": "playing",
+    "wave": 28,
+    "bosses": 2,
+    "seconds": 1799.9999999986917,
+    "tags": [
+      "boss-outside-engagement-range",
+      "time-cap-with-incomplete-boss-progress",
+      "crowd-output-pressure"
+    ],
+    "enemiesRemaining": 175,
+    "lastSegmentDps": 1862.7472345325332,
+    "remainingBosses": [
+      {
+        "id": 12982,
+        "kind": "mirrorMaiden",
+        "x": 1909.6939399848102,
+        "y": 1233.99063293233,
+        "hp": 46849.5999999758,
+        "maxHp": 46849.5999999758,
+        "speed": 56.03135999999585,
+        "damage": 102.0991999999516,
+        "distance": 944.735759595479
+      }
+    ],
+    "lastHit": {
+      "time": 1654.833333332157,
+      "amount": 0,
+      "raw": 102.0991999999516,
+      "hp": 335,
+      "x": 2359.216135751832,
+      "y": 3496.1508499113247,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:mirrorMaiden"
+      ],
+      "enemies": 137,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 103.84915008867529
+    }
+  },
+  {
+    "policy": "combat-v3",
+    "map": "cavern",
+    "character": "knight",
+    "seed": 181,
+    "phase": "playing",
+    "wave": 28,
+    "bosses": 3,
+    "seconds": 1799.9999999986917,
+    "tags": [
+      "time-cap-with-incomplete-boss-progress"
+    ],
+    "enemiesRemaining": 45,
+    "lastSegmentDps": 1695.452502931246,
+    "remainingBosses": [
+      {
+        "id": 12005,
+        "kind": "crystalQueen",
+        "x": 2575.29251838803,
+        "y": 1792.7682565662067,
+        "hp": 4697.827675028714,
+        "maxHp": 62233.59999996049,
+        "speed": 45.85631999999438,
+        "damage": 149.22453333324418,
+        "distance": 582.767712755353
+      }
+    ],
+    "lastHit": {
+      "time": 1760.0333333320614,
+      "amount": 69.22453333324415,
+      "raw": 149.22453333324418,
+      "hp": 385.77546666675585,
+      "x": 1955.950338600834,
+      "y": 1131.4902613554161,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:crystalQueen"
+      ],
+      "enemies": 2,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 1131.4902613554161
+    }
+  },
+  {
+    "policy": "combat-v3",
+    "map": "eclipse",
+    "character": "knight",
+    "seed": 151,
+    "phase": "playing",
+    "wave": 28,
+    "bosses": 3,
+    "seconds": 1799.9999999986917,
+    "tags": [
+      "boss-outside-engagement-range",
+      "time-cap-with-incomplete-boss-progress",
+      "crowd-output-pressure"
+    ],
+    "enemiesRemaining": 135,
+    "lastSegmentDps": 2086.8086372859693,
+    "remainingBosses": [
+      {
+        "id": 31573,
+        "kind": "eclipseSaint",
+        "x": 1181.235295800037,
+        "y": 1140.076240927755,
+        "hp": 70883.64359633229,
+        "maxHp": 86480.0999999391,
+        "speed": 55.45245999999052,
+        "damage": 196.70737777764546,
+        "distance": 810.7688214958292
+      }
+    ],
+    "lastHit": {
+      "time": 1742.933333332077,
+      "amount": 175.71959111093906,
+      "raw": 196.70737777764546,
+      "hp": 510.15874222239285,
+      "x": 2070.72464584732,
+      "y": 1248.2476937831318,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:eclipseSaint"
+      ],
+      "enemies": 129,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 1248.2476937831318
+    }
+  },
+  {
+    "policy": "combat-v3",
+    "map": "eclipse",
+    "character": "knight",
+    "seed": 223,
+    "phase": "playing",
+    "wave": 28,
+    "bosses": 3,
+    "seconds": 1799.9999999986917,
+    "tags": [
+      "boss-outside-engagement-range",
+      "time-cap-with-incomplete-boss-progress"
+    ],
+    "enemiesRemaining": 34,
+    "lastSegmentDps": 2175.884241352022,
+    "remainingBosses": [
+      {
+        "id": 45340,
+        "kind": "eclipseSaint",
+        "x": 621.7715793662728,
+        "y": 2240.1719957714386,
+        "hp": 94548.49893578832,
+        "maxHp": 96550.19999992993,
+        "speed": 57.0189199999891,
+        "damage": 218.58808888873668,
+        "distance": 795.1973847726264
+      }
+    ],
+    "lastHit": {
+      "time": 1777.1999999987124,
+      "amount": 63.04463999995994,
+      "raw": 74.49404444439992,
+      "hp": 280.37978666681545,
+      "x": 380.4668252102286,
+      "y": 3584,
+      "category": "bullet",
+      "evidence": [
+        "bullet:hexer"
+      ],
+      "enemies": 135,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 1,
+      "edge": 16
+    }
+  },
+  {
+    "policy": "combat-v3",
+    "map": "forest",
+    "character": "knight",
+    "seed": 103,
+    "phase": "playing",
+    "wave": 27,
+    "bosses": 1,
+    "seconds": 1799.9999999986917,
+    "tags": [
+      "boss-outside-engagement-range",
+      "time-cap-with-incomplete-boss-progress",
+      "crowd-output-pressure"
+    ],
+    "enemiesRemaining": 797,
+    "lastSegmentDps": 4817.266076896974,
+    "remainingBosses": [
+      {
+        "id": 2582,
+        "kind": "witch",
+        "x": 2035.1036588420209,
+        "y": 1073.7128520671406,
+        "hp": 19855.639525202678,
+        "maxHp": 22868.99999999366,
+        "speed": 60.71724999999841,
+        "damage": 66.61199999998387,
+        "distance": 737.7382267144567
+      }
+    ],
+    "lastHit": {
+      "time": 986.4999999994315,
+      "amount": 49.28095999997947,
+      "raw": 61.601199999974334,
+      "hp": 425.7190400000205,
+      "x": 2395.77197913698,
+      "y": 1601.5458653243188,
+      "category": "zone",
+      "evidence": [
+        "zone:meteor:meteor"
+      ],
+      "enemies": 40,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 1204.22802086302
+    }
+  },
+  {
+    "policy": "combat-v3",
+    "map": "forest",
+    "character": "mage",
+    "seed": 173,
+    "phase": "dead",
+    "wave": 21,
+    "bosses": 3,
+    "seconds": 1159.1833333326078,
+    "tags": [
+      "zone",
+      "crowd-output-pressure",
+      "low-effective-health"
+    ],
+    "enemiesRemaining": 90,
+    "lastSegmentDps": 956.7788786041532,
+    "remainingBosses": [
+      {
+        "id": 15979,
+        "kind": "titan",
+        "x": 1474.490204815483,
+        "y": 2587.079741448709,
+        "hp": 19776.890466545745,
+        "maxHp": 68464.4999999591,
+        "speed": 41.16243999999572,
+        "damage": 174.5103999999027,
+        "distance": 454.2192811347407
+      }
+    ],
+    "lastHit": {
+      "time": 1159.1833333326078,
+      "amount": 200.68695999988813,
+      "raw": 174.5103999999027,
+      "hp": 0,
+      "x": 1744.4140252224518,
+      "y": 2952.396434923654,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:titan"
+      ],
+      "enemies": 90,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 647.6035650763461
+    }
+  },
+  {
+    "policy": "combat-v3",
+    "map": "garden",
+    "character": "knight",
+    "seed": 137,
+    "phase": "playing",
+    "wave": 27,
+    "bosses": 0,
+    "seconds": 1799.9999999986917,
+    "tags": [
+      "time-cap-with-incomplete-boss-progress",
+      "crowd-output-pressure"
+    ],
+    "enemiesRemaining": 476,
+    "lastSegmentDps": 3527.566628315563,
+    "remainingBosses": [
+      {
+        "id": 214,
+        "kind": "witch",
+        "x": 2138.213735153056,
+        "y": 1326.16169477834,
+        "hp": 13200,
+        "maxHp": 13200,
+        "speed": 56.50571666666668,
+        "damage": 42,
+        "distance": 566.7749600418264
+      }
+    ],
+    "lastHit": {
+      "time": 1420.5333333323701,
+      "amount": 47.6264533333086,
+      "raw": 59.53306666663575,
+      "hp": 290.3727133333574,
+      "x": 3584,
+      "y": 1252.540240597227,
+      "category": "bullet",
+      "evidence": [
+        "bullet:hexer",
+        "bullet:hexer"
+      ],
+      "enemies": 196,
+      "nearby": 0,
+      "sectors": 1,
+      "bullets": 2,
+      "edge": 16
+    }
+  },
+  {
+    "policy": "combat-v3",
+    "map": "garden",
+    "character": "knight",
+    "seed": 197,
+    "phase": "playing",
+    "wave": 27,
+    "bosses": 2,
+    "seconds": 1799.9999999986917,
+    "tags": [
+      "time-cap-with-incomplete-boss-progress"
+    ],
+    "enemiesRemaining": 67,
+    "lastSegmentDps": 3902.226394143056,
+    "remainingBosses": [
+      {
+        "id": 24306,
+        "kind": "mirrorMaiden",
+        "x": 1248.767360027601,
+        "y": 2271.567053945546,
+        "hp": 28394.63619469331,
+        "maxHp": 71493.33333328672,
+        "speed": 60.255999999992014,
+        "damage": 151.38666666657343,
+        "distance": 613.372717944953
+      }
+    ],
+    "lastHit": {
+      "time": 1771.533333332051,
+      "amount": 53.30953799996814,
+      "raw": 51.50679999996923,
+      "hp": 271.838395333554,
+      "x": 462.06159262686435,
+      "y": 2920.521256284707,
+      "category": "contact",
+      "evidence": [
+        "contact:crawler"
+      ],
+      "enemies": 144,
+      "nearby": 1,
+      "sectors": 5,
+      "bullets": 0,
+      "edge": 462.06159262686435
+    }
+  },
+  {
+    "policy": "combat-v3",
+    "map": "garden",
+    "character": "mage",
+    "seed": 139,
+    "phase": "playing",
+    "wave": 28,
+    "bosses": 2,
+    "seconds": 1799.9999999986917,
+    "tags": [
+      "boss-outside-engagement-range",
+      "time-cap-with-incomplete-boss-progress",
+      "crowd-output-pressure"
+    ],
+    "enemiesRemaining": 108,
+    "lastSegmentDps": 2234.66434961049,
+    "remainingBosses": [
+      {
+        "id": 33393,
+        "kind": "mirrorMaiden",
+        "x": 818.5487843109664,
+        "y": 1897.0237455875981,
+        "hp": 52026.177919805836,
+        "maxHp": 79828.93333327913,
+        "speed": 61.68495999999071,
+        "damage": 168.05786666655825,
+        "distance": 980.6838538512442
+      }
+    ],
+    "lastHit": {
+      "time": 1792.5333333320318,
+      "amount": 71.25207999990243,
+      "raw": 168.05786666655825,
+      "hp": 107.34792000009756,
+      "x": 466.7972904837902,
+      "y": 2256.322780469131,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:mirrorMaiden"
+      ],
+      "enemies": 72,
+      "nearby": 0,
+      "sectors": 3,
+      "bullets": 0,
+      "edge": 466.7972904837902
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "cavern",
+    "character": "knight",
+    "seed": 113,
+    "phase": "dead",
+    "wave": 11,
+    "bosses": 1,
+    "seconds": 651.6833333330693,
+    "tags": [
+      "zone",
+      "low-effective-health"
+    ],
+    "enemiesRemaining": 50,
+    "lastSegmentDps": 423.65872582054055,
+    "remainingBosses": [
+      {
+        "id": 3830,
+        "kind": "crystalQueen",
+        "x": 1139.1580241788622,
+        "y": 1512.1281008969554,
+        "hp": 26112.027455987754,
+        "maxHp": 32276.399999987738,
+        "speed": 41.593179999998256,
+        "damage": 81.62879999997233,
+        "distance": 153.73221373653618
+      }
+    ],
+    "lastHit": {
+      "time": 651.6833333330693,
+      "amount": 69.62879999997222,
+      "raw": 81.62879999997233,
+      "hp": 0,
+      "x": 1288.5605599330584,
+      "y": 1548.3562094668516,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:crystalQueen"
+      ],
+      "enemies": 50,
+      "nearby": 0,
+      "sectors": 2,
+      "bullets": 0,
+      "edge": 1288.5605599330584
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "cavern",
+    "character": "knight",
+    "seed": 181,
+    "phase": "dead",
+    "wave": 11,
+    "bosses": 1,
+    "seconds": 645.5833333330748,
+    "tags": [
+      "zone"
+    ],
+    "enemiesRemaining": 17,
+    "lastSegmentDps": 122.96245379739524,
+    "remainingBosses": [
+      {
+        "id": 2552,
+        "kind": "crystalQueen",
+        "x": 1191.2840709493971,
+        "y": 1597.9684953056035,
+        "hp": 19738.895541323836,
+        "maxHp": 28742.13333332428,
+        "speed": 41.09022666666538,
+        "damage": 73.65404444442402,
+        "distance": 279.35703502624125
+      }
+    ],
+    "lastHit": {
+      "time": 645.5833333330748,
+      "amount": 67.65404444442402,
+      "raw": 73.65404444442402,
+      "hp": 0,
+      "x": 1227.2840237812964,
+      "y": 1320.9407775321763,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:crystalQueen"
+      ],
+      "enemies": 17,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 1227.2840237812964
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "cavern",
+    "character": "mage",
+    "seed": 127,
+    "phase": "dead",
+    "wave": 10,
+    "bosses": 1,
+    "seconds": 461.1333333332426,
+    "tags": [
+      "zone"
+    ],
+    "enemiesRemaining": 35,
+    "lastSegmentDps": 412.68598292163114,
+    "remainingBosses": [
+      {
+        "id": 2807,
+        "kind": "crystalQueen",
+        "x": 2469.81075865194,
+        "y": 2382.6112705634837,
+        "hp": 17019.080085329362,
+        "maxHp": 22824.533333329666,
+        "speed": 40.24810666666614,
+        "damage": 60.30151111110283,
+        "distance": 176.55839612665827
+      }
+    ],
+    "lastHit": {
+      "time": 461.1333333332426,
+      "amount": 60.301511111102855,
+      "raw": 60.30151111110283,
+      "hp": 0,
+      "x": 2411.6987767283745,
+      "y": 2215.890351660866,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:crystalQueen"
+      ],
+      "enemies": 35,
+      "nearby": 0,
+      "sectors": 3,
+      "bullets": 0,
+      "edge": 1188.3012232716255
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "cavern",
+    "character": "mage",
+    "seed": 191,
+    "phase": "dead",
+    "wave": 10,
+    "bosses": 1,
+    "seconds": 540.3666666665039,
+    "tags": [
+      "zone"
+    ],
+    "enemiesRemaining": 58,
+    "lastSegmentDps": 375.9991909039883,
+    "remainingBosses": [
+      {
+        "id": 2014,
+        "kind": "crystalQueen",
+        "x": 2160.6661948667474,
+        "y": 1174.236199713845,
+        "hp": 24598.173466658885,
+        "maxHp": 27272.266666658954,
+        "speed": 40.88105333333224,
+        "damage": 70.33742222220482,
+        "distance": 297.68465287628015
+      }
+    ],
+    "lastHit": {
+      "time": 540.3666666665039,
+      "amount": 70.33742222220485,
+      "raw": 70.33742222220482,
+      "hp": 0,
+      "x": 2396.1935261912085,
+      "y": 1356.2884690137605,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:crystalQueen"
+      ],
+      "enemies": 58,
+      "nearby": 0,
+      "sectors": 4,
+      "bullets": 0,
+      "edge": 1203.8064738087915
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "cavern",
+    "character": "ranger",
+    "seed": 109,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 209.9666666667259,
+    "tags": [
+      "zone"
+    ],
+    "enemiesRemaining": 2,
+    "lastSegmentDps": 205.82589142101753,
+    "remainingBosses": [
+      {
+        "id": 477,
+        "kind": "warden",
+        "x": 2056.6933388381035,
+        "y": 2364.961604668797,
+        "hp": 5614.257999999932,
+        "maxHp": 9000,
+        "speed": 43.33420000000015,
+        "damage": 46,
+        "distance": 770.9065415313661
+      }
+    ],
+    "lastHit": {
+      "time": 209.9666666667259,
+      "amount": 46,
+      "raw": 46,
+      "hp": 0,
+      "x": 1369.3161738319216,
+      "y": 2015.949385965904,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:warden"
+      ],
+      "enemies": 2,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 1369.3161738319216
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "cavern",
+    "character": "ranger",
+    "seed": 179,
+    "phase": "dead",
+    "wave": 10,
+    "bosses": 1,
+    "seconds": 480.49999999989166,
+    "tags": [
+      "zone",
+      "surrounded"
+    ],
+    "enemiesRemaining": 55,
+    "lastSegmentDps": 505.961994305562,
+    "remainingBosses": [
+      {
+        "id": 3405,
+        "kind": "crystalQueen",
+        "x": 1214.179838002418,
+        "y": 2337.1905138270895,
+        "hp": 15262.961333328329,
+        "maxHp": 23999.733333328597,
+        "speed": 40.415346666666,
+        "damage": 62.95324444443376,
+        "distance": 104.76012076223563
+      }
+    ],
+    "lastHit": {
+      "time": 480.49999999989166,
+      "amount": 62.95324444443372,
+      "raw": 62.95324444443376,
+      "hp": 0,
+      "x": 1269.2208121749325,
+      "y": 2248.0548079384907,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:crystalQueen"
+      ],
+      "enemies": 55,
+      "nearby": 0,
+      "sectors": 7,
+      "bullets": 0,
+      "edge": 1269.2208121749325
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "eclipse",
+    "character": "knight",
+    "seed": 151,
+    "phase": "dead",
+    "wave": 9,
+    "bosses": 0,
+    "seconds": 497.74999999987597,
+    "tags": [
+      "zone"
+    ],
+    "enemiesRemaining": 29,
+    "lastSegmentDps": 192.62314565481825,
+    "remainingBosses": [
+      {
+        "id": 210,
+        "kind": "warden",
+        "x": 3132.795027285932,
+        "y": 1047.291281718442,
+        "hp": 2681.680000000004,
+        "maxHp": 9000,
+        "speed": 43.29164000000012,
+        "damage": 46,
+        "distance": 227.0920255607717
+      }
+    ],
+    "lastHit": {
+      "time": 497.74999999987597,
+      "amount": 44,
+      "raw": 46,
+      "hp": 0,
+      "x": 3315.2147586509545,
+      "y": 1182.5459662288397,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:warden"
+      ],
+      "enemies": 29,
+      "nearby": 0,
+      "sectors": 1,
+      "bullets": 0,
+      "edge": 284.78524134904546
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "eclipse",
+    "character": "knight",
+    "seed": 223,
+    "phase": "dead",
+    "wave": 7,
+    "bosses": 0,
+    "seconds": 361.41666666666663,
+    "tags": [
+      "zone"
+    ],
+    "enemiesRemaining": 1,
+    "lastSegmentDps": 131.98400560845135,
+    "remainingBosses": [
+      {
+        "id": 195,
+        "kind": "warden",
+        "x": 2934.036626487431,
+        "y": 3141.7105143687854,
+        "hp": 2405.4399999999982,
+        "maxHp": 9000,
+        "speed": 43.18706000000004,
+        "damage": 46,
+        "distance": 406.84170833506096
+      }
+    ],
+    "lastHit": {
+      "time": 361.41666666666663,
+      "amount": 46,
+      "raw": 46,
+      "hp": 0,
+      "x": 3052.9002935809917,
+      "y": 2752.6197739417457,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:warden"
+      ],
+      "enemies": 1,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 547.0997064190083
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "eclipse",
+    "character": "mage",
+    "seed": 157,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 168.616666666693,
+    "tags": [
+      "zone"
+    ],
+    "enemiesRemaining": 1,
+    "lastSegmentDps": 157.27468417914682,
+    "remainingBosses": [
+      {
+        "id": 289,
+        "kind": "warden",
+        "x": 2499.1837004666636,
+        "y": 1638.9786655441665,
+        "hp": 5298.119039999918,
+        "maxHp": 9000,
+        "speed": 43.05909999999995,
+        "damage": 46,
+        "distance": 675.0334379700431
+      }
+    ],
+    "lastHit": {
+      "time": 168.616666666693,
+      "amount": 46,
+      "raw": 46,
+      "hp": 0,
+      "x": 2238.0167754011936,
+      "y": 2261.4431059979993,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:warden"
+      ],
+      "enemies": 1,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 1338.5568940020007
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "eclipse",
+    "character": "mage",
+    "seed": 227,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 182.21666666670382,
+    "tags": [
+      "zone",
+      "low-effective-health"
+    ],
+    "enemiesRemaining": 1,
+    "lastSegmentDps": 155.76816620212907,
+    "remainingBosses": [
+      {
+        "id": 317,
+        "kind": "warden",
+        "x": 2228.4373835795886,
+        "y": 1921.4659918891355,
+        "hp": 4465.912840000197,
+        "maxHp": 9000,
+        "speed": 43.12307999999999,
+        "damage": 46,
+        "distance": 355.891985628943
+      }
+    ],
+    "lastHit": {
+      "time": 182.21666666670382,
+      "amount": 46,
+      "raw": 46,
+      "hp": 0,
+      "x": 1897.6061187796483,
+      "y": 2052.652041703068,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:warden"
+      ],
+      "enemies": 1,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 1547.3479582969321
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "eclipse",
+    "character": "ranger",
+    "seed": 149,
+    "phase": "dead",
+    "wave": 10,
+    "bosses": 1,
+    "seconds": 387.8166666666426,
+    "tags": [
+      "bullet"
+    ],
+    "enemiesRemaining": 1,
+    "lastSegmentDps": 382.2963640163136,
+    "remainingBosses": [
+      {
+        "id": 2718,
+        "kind": "eclipseSaint",
+        "x": 1640.443553702559,
+        "y": 1995.2144812862914,
+        "hp": 8585.102000000565,
+        "maxHp": 18475.200000000947,
+        "speed": 44.87392000000015,
+        "damage": 48.9436444444465,
+        "distance": 289.3055535842357
+      }
+    ],
+    "lastHit": {
+      "time": 387.8166666666426,
+      "amount": 40.94364444444659,
+      "raw": 48.9436444444465,
+      "hp": 0,
+      "x": 1698.6327166917636,
+      "y": 2278.607714524661,
+      "category": "bullet",
+      "evidence": [
+        "bullet:eclipseSaint"
+      ],
+      "enemies": 1,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 1,
+      "edge": 1321.3922854753391
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "eclipse",
+    "character": "ranger",
+    "seed": 211,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 181.41666666670318,
+    "tags": [
+      "zone"
+    ],
+    "enemiesRemaining": 1,
+    "lastSegmentDps": 177.1342560621327,
+    "remainingBosses": [
+      {
+        "id": 379,
+        "kind": "warden",
+        "x": 2305.3283936776616,
+        "y": 2266.1382809264965,
+        "hp": 2675.122499999752,
+        "maxHp": 9000,
+        "speed": 43.1375,
+        "damage": 46,
+        "distance": 615.3703724799673
+      }
+    ],
+    "lastHit": {
+      "time": 181.41666666670318,
+      "amount": 41.39999999999998,
+      "raw": 46,
+      "hp": 0,
+      "x": 1724.454950789402,
+      "y": 2469.2804446278647,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:warden"
+      ],
+      "enemies": 1,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 1130.7195553721353
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "forest",
+    "character": "knight",
+    "seed": 103,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 247.2500000000889,
+    "tags": [
+      "zone"
+    ],
+    "enemiesRemaining": 1,
+    "lastSegmentDps": 160.920108550069,
+    "remainingBosses": [
+      {
+        "id": 351,
+        "kind": "warden",
+        "x": 1392.9084096028275,
+        "y": 1619.426534262063,
+        "hp": 5386.32000000001,
+        "maxHp": 9000,
+        "speed": 43.70730000000045,
+        "damage": 46,
+        "distance": 295.1585681086928
+      }
+    ],
+    "lastHit": {
+      "time": 247.2500000000889,
+      "amount": 38,
+      "raw": 46,
+      "hp": 0,
+      "x": 1131.506307207097,
+      "y": 1756.4941131823382,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:warden"
+      ],
+      "enemies": 1,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 1131.506307207097
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "forest",
+    "character": "knight",
+    "seed": 167,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 216.30000000006427,
+    "tags": [
+      "bullet"
+    ],
+    "enemiesRemaining": 21,
+    "lastSegmentDps": 4.178206305475871,
+    "remainingBosses": [
+      {
+        "id": 665,
+        "kind": "warden",
+        "x": 1206.4466755444578,
+        "y": 1025.0078597004463,
+        "hp": 9000,
+        "maxHp": 9000,
+        "speed": 43.80390000000053,
+        "damage": 46,
+        "distance": 565.5260057243955
+      }
+    ],
+    "lastHit": {
+      "time": 216.30000000006427,
+      "amount": 17.053866666667204,
+      "raw": 17.053866666667236,
+      "hp": 0,
+      "x": 1131.6952444298815,
+      "y": 1585.571760337039,
+      "category": "bullet",
+      "evidence": [
+        "bullet:enemy",
+        "bullet:enemy"
+      ],
+      "enemies": 21,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 2,
+      "edge": 1131.6952444298815
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "forest",
+    "character": "mage",
+    "seed": 107,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 209.23333333339198,
+    "tags": [
+      "zone"
+    ],
+    "enemiesRemaining": 1,
+    "lastSegmentDps": 140.75338497749598,
+    "remainingBosses": [
+      {
+        "id": 394,
+        "kind": "warden",
+        "x": 2433.008436173037,
+        "y": 2005.4815791838878,
+        "hp": 5665.972776000238,
+        "maxHp": 9000,
+        "speed": 43.291360000000125,
+        "damage": 46,
+        "distance": 938.3542407775965
+      }
+    ],
+    "lastHit": {
+      "time": 209.23333333339198,
+      "amount": 46,
+      "raw": 46,
+      "hp": 0,
+      "x": 1503.1393161826707,
+      "y": 1879.5764527050926,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:warden"
+      ],
+      "enemies": 1,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 1503.1393161826707
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "forest",
+    "character": "mage",
+    "seed": 173,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 170.9333333333615,
+    "tags": [
+      "zone"
+    ],
+    "enemiesRemaining": 28,
+    "lastSegmentDps": 108.91752246150199,
+    "remainingBosses": [
+      {
+        "id": 462,
+        "kind": "warden",
+        "x": 2366.968486049044,
+        "y": 2393.1101336587794,
+        "hp": 8749.807199999963,
+        "maxHp": 9000,
+        "speed": 43.29766000000013,
+        "damage": 46,
+        "distance": 302.5279120249647
+      }
+    ],
+    "lastHit": {
+      "time": 170.9333333333615,
+      "amount": 46,
+      "raw": 46,
+      "hp": 0,
+      "x": 2210.405552219264,
+      "y": 2651.9753211691836,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:warden"
+      ],
+      "enemies": 28,
+      "nearby": 0,
+      "sectors": 2,
+      "bullets": 0,
+      "edge": 948.0246788308164
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "forest",
+    "character": "ranger",
+    "seed": 101,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 169.88333333336067,
+    "tags": [
+      "bullet"
+    ],
+    "enemiesRemaining": 34,
+    "lastSegmentDps": 108.85236189832506,
+    "remainingBosses": [
+      {
+        "id": 917,
+        "kind": "warden",
+        "x": 1928.402277470582,
+        "y": 2043.961398569435,
+        "hp": 7489.344000000001,
+        "maxHp": 9000,
+        "speed": 43.2588800000001,
+        "damage": 46,
+        "distance": 138.24158345827453
+      }
+    ],
+    "lastHit": {
+      "time": 169.88333333336067,
+      "amount": 17.230933333334065,
+      "raw": 17.230933333334043,
+      "hp": 0,
+      "x": 1847.5859734399653,
+      "y": 1931.8032049325811,
+      "category": "bullet",
+      "evidence": [
+        "bullet:enemy"
+      ],
+      "enemies": 34,
+      "nearby": 0,
+      "sectors": 4,
+      "bullets": 1,
+      "edge": 1668.1967950674189
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "forest",
+    "character": "ranger",
+    "seed": 163,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 195.15000000004744,
+    "tags": [
+      "zone"
+    ],
+    "enemiesRemaining": 4,
+    "lastSegmentDps": 122.52515572307392,
+    "remainingBosses": [
+      {
+        "id": 591,
+        "kind": "warden",
+        "x": 2548.711089239137,
+        "y": 2547.8023155198493,
+        "hp": 6864.675000000159,
+        "maxHp": 9000,
+        "speed": 43.28408000000011,
+        "damage": 46,
+        "distance": 400.11571280306055
+      }
+    ],
+    "lastHit": {
+      "time": 195.15000000004744,
+      "amount": 46,
+      "raw": 46,
+      "hp": 0,
+      "x": 2663.229699509181,
+      "y": 2164.425123274772,
+      "category": "zone",
+      "evidence": [
+        "zone:bossShape:warden"
+      ],
+      "enemies": 4,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 0,
+      "edge": 936.770300490819
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "garden",
+    "character": "knight",
+    "seed": 137,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 219.86666666673378,
+    "tags": [
+      "bullet"
+    ],
+    "enemiesRemaining": 10,
+    "lastSegmentDps": 207.73056017264273,
+    "remainingBosses": [
+      {
+        "id": 240,
+        "kind": "witch",
+        "x": 1119.0950638102158,
+        "y": 1787.669922065832,
+        "hp": 9984.731999999927,
+        "maxHp": 13200,
+        "speed": 56.83645000000027,
+        "damage": 42,
+        "distance": 308.53336087304996
+      }
+    ],
+    "lastHit": {
+      "time": 219.86666666673378,
+      "amount": 42,
+      "raw": 42,
+      "hp": 0,
+      "x": 1178.4156405920612,
+      "y": 1484.8929349253149,
+      "category": "bullet",
+      "evidence": [
+        "bullet:witch",
+        "bullet:witch",
+        "bullet:witch",
+        "bullet:witch",
+        "bullet:witch"
+      ],
+      "enemies": 10,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 5,
+      "edge": 1178.4156405920612
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "garden",
+    "character": "knight",
+    "seed": 197,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 207.7333333333908,
+    "tags": [
+      "bullet"
+    ],
+    "enemiesRemaining": 15,
+    "lastSegmentDps": 113.36115786932477,
+    "remainingBosses": [
+      {
+        "id": 236,
+        "kind": "witch",
+        "x": 1301.484694929711,
+        "y": 1987.0629505278914,
+        "hp": 13200,
+        "maxHp": 13200,
+        "speed": 56.912900000000334,
+        "damage": 42,
+        "distance": 237.79052571893115
+      }
+    ],
+    "lastHit": {
+      "time": 207.7333333333908,
+      "amount": 36,
+      "raw": 42,
+      "hp": 0,
+      "x": 1099.783222637303,
+      "y": 1861.1230831436487,
+      "category": "bullet",
+      "evidence": [
+        "bullet:witch",
+        "bullet:witch",
+        "bullet:witch",
+        "bullet:witch",
+        "bullet:witch"
+      ],
+      "enemies": 15,
+      "nearby": 0,
+      "sectors": 1,
+      "bullets": 5,
+      "edge": 1099.783222637303
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "garden",
+    "character": "mage",
+    "seed": 139,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 174.40000000003093,
+    "tags": [
+      "bullet"
+    ],
+    "enemiesRemaining": 6,
+    "lastSegmentDps": 168.0525613647197,
+    "remainingBosses": [
+      {
+        "id": 642,
+        "kind": "witch",
+        "x": 2150.702798214908,
+        "y": 2371.2948514480518,
+        "hp": 12404.199999999873,
+        "maxHp": 13200,
+        "speed": 56.54660000000005,
+        "damage": 42,
+        "distance": 89.60702844454934
+      }
+    ],
+    "lastHit": {
+      "time": 174.40000000003093,
+      "amount": 42,
+      "raw": 42,
+      "hp": 0,
+      "x": 2137.7137587819207,
+      "y": 2282.634237863041,
+      "category": "bullet",
+      "evidence": [
+        "bullet:witch"
+      ],
+      "enemies": 6,
+      "nearby": 0,
+      "sectors": 2,
+      "bullets": 1,
+      "edge": 1317.365762136959
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "garden",
+    "character": "mage",
+    "seed": 199,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 173.98333333336393,
+    "tags": [
+      "bullet"
+    ],
+    "enemiesRemaining": 18,
+    "lastSegmentDps": 174.23005435442465,
+    "remainingBosses": [
+      {
+        "id": 731,
+        "kind": "witch",
+        "x": 2371.9043175109678,
+        "y": 2224.617560274711,
+        "hp": 11605.032000000017,
+        "maxHp": 13200,
+        "speed": 56.60728333333342,
+        "damage": 42,
+        "distance": 415.72435959703256
+      }
+    ],
+    "lastHit": {
+      "time": 173.98333333336393,
+      "amount": 42,
+      "raw": 42,
+      "hp": 0,
+      "x": 1961.780386890884,
+      "y": 2292.625682547684,
+      "category": "bullet",
+      "evidence": [
+        "bullet:witch"
+      ],
+      "enemies": 18,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 1,
+      "edge": 1307.374317452316
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "garden",
+    "character": "ranger",
+    "seed": 131,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 168.23333333335935,
+    "tags": [
+      "contact"
+    ],
+    "enemiesRemaining": 32,
+    "lastSegmentDps": 128.26520566877255,
+    "remainingBosses": [
+      {
+        "id": 478,
+        "kind": "witch",
+        "x": 2429.6821030745073,
+        "y": 2284.885579663618,
+        "hp": 12124.152000000013,
+        "maxHp": 13200,
+        "speed": 56.61828333333343,
+        "damage": 42,
+        "distance": 157.88577822504482
+      }
+    ],
+    "lastHit": {
+      "time": 168.23333333335935,
+      "amount": 28.650666666667803,
+      "raw": 28.650666666667803,
+      "hp": 0,
+      "x": 2519.523853212502,
+      "y": 2414.717697792647,
+      "category": "contact",
+      "evidence": [
+        "contact:bomber",
+        "bullet:witch"
+      ],
+      "enemies": 32,
+      "nearby": 1,
+      "sectors": 4,
+      "bullets": 1,
+      "edge": 1080.4761467874978
+    }
+  },
+  {
+    "policy": "legacy",
+    "map": "garden",
+    "character": "ranger",
+    "seed": 193,
+    "phase": "dead",
+    "wave": 5,
+    "bosses": 0,
+    "seconds": 172.15000000002914,
+    "tags": [
+      "bullet"
+    ],
+    "enemiesRemaining": 4,
+    "lastSegmentDps": 197.7704972292,
+    "remainingBosses": [
+      {
+        "id": 708,
+        "kind": "witch",
+        "x": 2574.0627511939383,
+        "y": 2354.321960626752,
+        "hp": 10428.036000000026,
+        "maxHp": 13200,
+        "speed": 56.50223333333334,
+        "damage": 42,
+        "distance": 305.93546876996527
+      }
+    ],
+    "lastHit": {
+      "time": 172.15000000002914,
+      "amount": 42,
+      "raw": 42,
+      "hp": 0,
+      "x": 2837.3449019376776,
+      "y": 2198.5046953727074,
+      "category": "bullet",
+      "evidence": [
+        "bullet:witch"
+      ],
+      "enemies": 4,
+      "nearby": 0,
+      "sectors": 0,
+      "bullets": 1,
+      "edge": 762.6550980623224
+    }
+  }
+]

@@ -1,0 +1,151 @@
+{
+  "method": "Identical engine, character, map, loadout, seed, cap, fixed dt and decision cadence. Divergent decisions consume different in-game RNG streams. Bootstrap is over paired runs; map/character strata reported separately. Capped runs are censored, not deaths. Victory-credit statistic prevents penalizing fast clears.",
+  "groups": [
+    {
+      "policy": "build-v4",
+      "n": 12,
+      "meanSeconds": 1799.9999999986915,
+      "medianSeconds": 1799.9999999986917,
+      "sdSeconds": 2.374840586831367e-13,
+      "meanSecondsBootstrap95": [
+        1799.9999999986915,
+        1799.9999999986915
+      ],
+      "minSeconds": 1799.9999999986917,
+      "maxSeconds": 1799.9999999986917,
+      "victories": 0,
+      "victoryRate": 0,
+      "victoryWilson95": [
+        0,
+        0.2425007574992425
+      ],
+      "censored": 12,
+      "meanWave": 39,
+      "meanBosses": 7.166666666666667,
+      "meanKills": 7570.583333333333,
+      "meanTaken": 192.46046851837264,
+      "meanDamage": 2897232.4702414726,
+      "meanDecisionMs": 2.9683034740648906,
+      "causes": {}
+    }
+  ],
+  "paired": [
+    {
+      "policy": "build-v4",
+      "pairs": 0,
+      "metric": "restricted-survival-with-victory-credit",
+      "meanGain": 0,
+      "seedClusters": 0,
+      "seedClusterMeanGain95": [
+        0,
+        0
+      ],
+      "pairedSignTestTwoSidedP": 1,
+      "gainBootstrap95": [
+        0,
+        0
+      ],
+      "wins": 0,
+      "losses": 0,
+      "ties": 0
+    }
+  ],
+  "strata": [
+    {
+      "policy": "build-v4",
+      "stratum": "cavern/knight",
+      "n": 1,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 38
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "cavern/mage",
+      "n": 1,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 42
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "cavern/ranger",
+      "n": 1,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 45
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "eclipse/knight",
+      "n": 1,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 41
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "eclipse/mage",
+      "n": 1,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 41
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "eclipse/ranger",
+      "n": 1,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 39
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "forest/knight",
+      "n": 1,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 39
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "forest/mage",
+      "n": 1,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 41
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "forest/ranger",
+      "n": 1,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 36
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "garden/knight",
+      "n": 1,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 34
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "garden/mage",
+      "n": 1,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 42
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "garden/ranger",
+      "n": 1,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 30
+    }
+  ]
+}

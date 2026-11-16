@@ -1,0 +1,63 @@
+{
+  "method": "Identical engine, character, map, loadout, seed, cap, fixed dt and decision cadence. Divergent decisions consume different in-game RNG streams. Bootstrap is over paired runs; map/character strata reported separately. Capped runs are censored, not deaths. Victory-credit statistic prevents penalizing fast clears.",
+  "groups": [
+    {
+      "policy": "build-v4",
+      "n": 1,
+      "meanSeconds": 7200.01666664604,
+      "medianSeconds": 7200.01666664604,
+      "sdSeconds": 0,
+      "meanSecondsBootstrap95": [
+        7200.01666664604,
+        7200.01666664604
+      ],
+      "minSeconds": 7200.01666664604,
+      "maxSeconds": 7200.01666664604,
+      "victories": 0,
+      "victoryRate": 0,
+      "victoryWilson95": [
+        0,
+        0.7934567085261071
+      ],
+      "censored": 1,
+      "meanWave": 158,
+      "meanBosses": 31,
+      "meanKills": 55463,
+      "meanTaken": 973.0738488907907,
+      "meanDamage": 89056768.23633988,
+      "meanDecisionMs": 5.676639294171407,
+      "causes": {}
+    }
+  ],
+  "paired": [
+    {
+      "policy": "build-v4",
+      "pairs": 0,
+      "metric": "restricted-survival-with-victory-credit",
+      "meanGain": 0,
+      "seedClusters": 0,
+      "seedClusterMeanGain95": [
+        0,
+        0
+      ],
+      "pairedSignTestTwoSidedP": 1,
+      "gainBootstrap95": [
+        0,
+        0
+      ],
+      "wins": 0,
+      "losses": 0,
+      "ties": 0
+    }
+  ],
+  "strata": [
+    {
+      "policy": "build-v4",
+      "stratum": "forest/ranger",
+      "n": 1,
+      "victories": 0,
+      "meanSeconds": 7200.01666664604,
+      "meanWave": 158
+    }
+  ]
+}

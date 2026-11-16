@@ -3,3 +3,6 @@ dist/
 test-results/
 playwright-report/
 *.local
+
+# Full AI telemetry is committed compressed; expanded review files are reproducible.
+validation/ai-player/*/matches.json

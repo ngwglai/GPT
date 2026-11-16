@@ -1,0 +1,426 @@
+{
+  "method": "Identical engine, character, map, loadout, seed, cap, fixed dt and decision cadence. Divergent decisions consume different in-game RNG streams. Bootstrap is over paired runs; map/character strata reported separately. Capped runs are censored, not deaths. Victory-credit statistic prevents penalizing fast clears.",
+  "groups": [
+    {
+      "policy": "build-v4",
+      "n": 24,
+      "meanSeconds": 968.8048611105587,
+      "medianSeconds": 933.7666666661461,
+      "sdSeconds": 208.5761107434109,
+      "meanSecondsBootstrap95": [
+        900.3444444439542,
+        1059.5534722215873
+      ],
+      "minSeconds": 747.9166666663151,
+      "maxSeconds": 1799.9999999986917,
+      "victories": 23,
+      "victoryRate": 0.9583333333333334,
+      "victoryWilson95": [
+        0.7975777375115778,
+        0.992606734645195
+      ],
+      "censored": 1,
+      "meanWave": 20.833333333333332,
+      "meanBosses": 3.9166666666666665,
+      "meanKills": 2680.5,
+      "meanTaken": 192.5813301851039,
+      "meanDamage": 649096.4593374413,
+      "meanDecisionMs": 1.0058462359136793,
+      "causes": {}
+    },
+    {
+      "policy": "combat-v3",
+      "n": 24,
+      "meanSeconds": 1330.9479166657848,
+      "medianSeconds": 1222.8999999992166,
+      "sdSeconds": 364.579841003646,
+      "meanSecondsBootstrap95": [
+        1184.4006944436962,
+        1470.6430555545467
+      ],
+      "minSeconds": 798.5333333329357,
+      "maxSeconds": 1799.9999999986917,
+      "victories": 16,
+      "victoryRate": 0.6666666666666666,
+      "victoryWilson95": [
+        0.4670595949408046,
+        0.8202802131162036
+      ],
+      "censored": 7,
+      "meanWave": 23.083333333333332,
+      "meanBosses": 3.375,
+      "meanKills": 3883.5416666666665,
+      "meanTaken": 745.6773188421871,
+      "meanDamage": 1127200.7718139195,
+      "meanDecisionMs": 3.638888952367907,
+      "causes": {
+        "zone": 1,
+        "crowd-output-pressure": 1,
+        "low-effective-health": 1
+      }
+    },
+    {
+      "policy": "legacy",
+      "n": 24,
+      "meanSeconds": 295.565972222209,
+      "medianSeconds": 209.60000000005894,
+      "sdSeconds": 162.2874351443949,
+      "meanSecondsBootstrap95": [
+        235.98680555558096,
+        359.53402777773414
+      ],
+      "minSeconds": 168.23333333335935,
+      "maxSeconds": 651.6833333330693,
+      "victories": 0,
+      "victoryRate": 0,
+      "victoryWilson95": [
+        0,
+        0.13798057582897535
+      ],
+      "censored": 0,
+      "meanWave": 6.583333333333333,
+      "meanBosses": 0.25,
+      "meanKills": 337.125,
+      "meanTaken": 706.2141025925577,
+      "meanDamage": 40812.31917593204,
+      "meanDecisionMs": 0.07839447846017022,
+      "causes": {
+        "zone": 15,
+        "low-effective-health": 2,
+        "surrounded": 1,
+        "bullet": 8,
+        "contact": 1
+      }
+    }
+  ],
+  "paired": [
+    {
+      "policy": "build-v4",
+      "pairs": 24,
+      "metric": "restricted-survival-with-victory-credit",
+      "meanGain": 1504.4340277777364,
+      "seedClusters": 24,
+      "seedClusterMeanGain95": [
+        1440.4659722222113,
+        1564.0131944443103
+      ],
+      "pairedSignTestTwoSidedP": 1.1920928955078125e-7,
+      "gainBootstrap95": [
+        1440.4659722222113,
+        1564.0131944443103
+      ],
+      "wins": 24,
+      "losses": 0,
+      "ties": 0
+    },
+    {
+      "policy": "combat-v3",
+      "pairs": 24,
+      "metric": "restricted-survival-with-victory-credit",
+      "meanGain": 1477.7333333329345,
+      "seedClusters": 24,
+      "seedClusterMeanGain95": [
+        1399.0402777774414,
+        1549.5576388885477
+      ],
+      "pairedSignTestTwoSidedP": 1.1920928955078125e-7,
+      "gainBootstrap95": [
+        1399.0402777774414,
+        1549.5576388885477
+      ],
+      "wins": 24,
+      "losses": 0,
+      "ties": 0
+    }
+  ],
+  "strata": [
+    {
+      "policy": "build-v4",
+      "stratum": "cavern/knight",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 947.3416666661337,
+      "meanWave": 21
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "cavern/mage",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 794.4499999996061,
+      "meanWave": 20
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "cavern/ranger",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 810.308333332925,
+      "meanWave": 20
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "eclipse/knight",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 1009.0583333327443,
+      "meanWave": 21.5
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "eclipse/mage",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 974.9916666661086,
+      "meanWave": 21
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "eclipse/ranger",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 903.83333333284,
+      "meanWave": 21
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "forest/knight",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 1043.816666666046,
+      "meanWave": 20.5
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "forest/mage",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 902.5583333328411,
+      "meanWave": 20
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "forest/ranger",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 898.0666666661785,
+      "meanWave": 20
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "garden/knight",
+      "n": 2,
+      "victories": 1,
+      "meanSeconds": 1487.7249999989758,
+      "meanWave": 25
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "garden/mage",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 1004.1166666660822,
+      "meanWave": 20
+    },
+    {
+      "policy": "build-v4",
+      "stratum": "garden/ranger",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 849.3916666662228,
+      "meanWave": 20
+    },
+    {
+      "policy": "combat-v3",
+      "stratum": "cavern/knight",
+      "n": 2,
+      "victories": 1,
+      "meanSeconds": 1529.9749999989372,
+      "meanWave": 24.5
+    },
+    {
+      "policy": "combat-v3",
+      "stratum": "cavern/mage",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 1017.3333333327369,
+      "meanWave": 20
+    },
+    {
+      "policy": "combat-v3",
+      "stratum": "cavern/ranger",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 932.4916666661472,
+      "meanWave": 20
+    },
+    {
+      "policy": "combat-v3",
+      "stratum": "eclipse/knight",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 28
+    },
+    {
+      "policy": "combat-v3",
+      "stratum": "eclipse/mage",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 1101.8583333326599,
+      "meanWave": 21.5
+    },
+    {
+      "policy": "combat-v3",
+      "stratum": "eclipse/ranger",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 1053.9416666660368,
+      "meanWave": 21.5
+    },
+    {
+      "policy": "combat-v3",
+      "stratum": "forest/knight",
+      "n": 2,
+      "victories": 1,
+      "meanSeconds": 1723.699999998761,
+      "meanWave": 26
+    },
+    {
+      "policy": "combat-v3",
+      "stratum": "forest/mage",
+      "n": 2,
+      "victories": 1,
+      "meanSeconds": 1376.6416666657433,
+      "meanWave": 22.5
+    },
+    {
+      "policy": "combat-v3",
+      "stratum": "forest/ranger",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 1023.8083333327309,
+      "meanWave": 20.5
+    },
+    {
+      "policy": "combat-v3",
+      "stratum": "garden/knight",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 1799.9999999986917,
+      "meanWave": 27
+    },
+    {
+      "policy": "combat-v3",
+      "stratum": "garden/mage",
+      "n": 2,
+      "victories": 1,
+      "meanSeconds": 1593.1666666655465,
+      "meanWave": 25.5
+    },
+    {
+      "policy": "combat-v3",
+      "stratum": "garden/ranger",
+      "n": 2,
+      "victories": 2,
+      "meanSeconds": 1018.4583333327357,
+      "meanWave": 20
+    },
+    {
+      "policy": "legacy",
+      "stratum": "cavern/knight",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 648.6333333330721,
+      "meanWave": 11
+    },
+    {
+      "policy": "legacy",
+      "stratum": "cavern/mage",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 500.74999999987324,
+      "meanWave": 10
+    },
+    {
+      "policy": "legacy",
+      "stratum": "cavern/ranger",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 345.2333333333088,
+      "meanWave": 7.5
+    },
+    {
+      "policy": "legacy",
+      "stratum": "eclipse/knight",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 429.5833333332713,
+      "meanWave": 8
+    },
+    {
+      "policy": "legacy",
+      "stratum": "eclipse/mage",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 175.4166666666984,
+      "meanWave": 5
+    },
+    {
+      "policy": "legacy",
+      "stratum": "eclipse/ranger",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 284.6166666666729,
+      "meanWave": 7.5
+    },
+    {
+      "policy": "legacy",
+      "stratum": "forest/knight",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 231.7750000000766,
+      "meanWave": 5
+    },
+    {
+      "policy": "legacy",
+      "stratum": "forest/mage",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 190.08333333337674,
+      "meanWave": 5
+    },
+    {
+      "policy": "legacy",
+      "stratum": "forest/ranger",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 182.51666666670405,
+      "meanWave": 5
+    },
+    {
+      "policy": "legacy",
+      "stratum": "garden/knight",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 213.80000000006228,
+      "meanWave": 5
+    },
+    {
+      "policy": "legacy",
+      "stratum": "garden/mage",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 174.19166666669742,
+      "meanWave": 5
+    },
+    {
+      "policy": "legacy",
+      "stratum": "garden/ranger",
+      "n": 2,
+      "victories": 0,
+      "meanSeconds": 170.19166666669423,
+      "meanWave": 5
+    }
+  ]
+}

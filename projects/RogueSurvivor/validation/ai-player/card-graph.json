@@ -1,0 +1,1375 @@
+{
+  "source": "src/data/cards registry",
+  "nodes": [
+    {
+      "id": "weapon_bow",
+      "name": "追星弓",
+      "type": "武器",
+      "polarity": "positive",
+      "maxStacks": 3,
+      "effects": {
+        "handler": "weapon_bow"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "weapon_blade",
+      "name": "弧月刃",
+      "type": "武器",
+      "polarity": "positive",
+      "maxStacks": 3,
+      "effects": {
+        "handler": "weapon_blade"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "weapon_ember",
+      "name": "烬火杖",
+      "type": "武器",
+      "polarity": "positive",
+      "maxStacks": 3,
+      "effects": {
+        "handler": "weapon_ember"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "weapon_orbit",
+      "name": "月环",
+      "type": "武器",
+      "polarity": "positive",
+      "maxStacks": 3,
+      "effects": {
+        "handler": "weapon_orbit"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "weapon_drone",
+      "name": "萤火灵",
+      "type": "武器",
+      "polarity": "positive",
+      "maxStacks": 3,
+      "effects": {
+        "handler": "weapon_drone"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "fork",
+      "name": "双生星轨",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 3,
+      "effects": {
+        "handler": "fork"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "pierce",
+      "name": "穿林",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 3,
+      "effects": {
+        "handler": "pierce"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "split",
+      "name": "碎星",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "split"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "homing",
+      "name": "引力信标",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "homing"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "wide",
+      "name": "满月",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "wide"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "burn",
+      "name": "不熄余烬",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "burn"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "wildfire",
+      "name": "野火蔓延",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "wildfire"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "shatter",
+      "name": "冰火共鸣",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "shatter"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "satellite",
+      "name": "双月共舞",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 3,
+      "effects": {
+        "handler": "satellite"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "swarm",
+      "name": "萤火之森",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 2,
+      "effects": {
+        "handler": "swarm"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "skill_q",
+      "name": "主术精通",
+      "type": "技能",
+      "polarity": "positive",
+      "maxStacks": 4,
+      "effects": {
+        "handler": "skill_q"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "skill_e",
+      "name": "辅术精通",
+      "type": "技能",
+      "polarity": "positive",
+      "maxStacks": 4,
+      "effects": {
+        "handler": "skill_e"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "skill_r",
+      "name": "星坠回响",
+      "type": "技能",
+      "polarity": "positive",
+      "maxStacks": 4,
+      "effects": {
+        "handler": "skill_r"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "haste",
+      "name": "时隙",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "cooldown",
+        "amount": -0.12
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "vitality",
+      "name": "古树之心",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "maxHp",
+        "amount": 40
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "stride",
+      "name": "轻羽",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "speed",
+        "amount": 22
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "critical",
+      "name": "鹰眼",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "crit",
+        "amount": 0.1
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "renew",
+      "name": "春芽",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "regen",
+        "amount": 0.65
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "magnet",
+      "name": "拾星",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "magnet",
+        "amount": 85
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "power",
+      "name": "星核",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "attack",
+        "amount": 0.2
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "ascend",
+      "name": "无垠领悟",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "ascend"
+      },
+      "conditions": {
+        "minLevel": 25,
+        "source": ""
+      }
+    },
+    {
+      "id": "execution",
+      "name": "残星裁决",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "execution"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "harvest",
+      "name": "生命收割",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "harvest"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "specialist",
+      "name": "独行之道",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "specialist"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "fortress",
+      "name": "磐石体魄",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "maxHp",
+        "amount": 30
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "march",
+      "name": "旅人步伐",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "speed",
+        "amount": 13
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "focus",
+      "name": "凝神",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "crit",
+        "amount": 0.06
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "recovery",
+      "name": "生息",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "regen",
+        "amount": 0.4
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "reach",
+      "name": "星尘引力",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "magnet",
+        "amount": 55
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "clock",
+      "name": "时砂",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "cooldown",
+        "amount": -0.06
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "vigor",
+      "name": "战意",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "stat": "attack",
+        "amount": 0.12
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "bow_power",
+      "name": "弓弦张力",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "bow",
+        "damage": 0.3
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "bow"
+      }
+    },
+    {
+      "id": "bow_quick",
+      "name": "速射弦",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "bow",
+        "interval": 0.18
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "bow"
+      }
+    },
+    {
+      "id": "blade_power",
+      "name": "重月锋",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "blade",
+        "damage": 0.3
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "blade"
+      }
+    },
+    {
+      "id": "blade_quick",
+      "name": "回旋刃",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "blade",
+        "interval": 0.18
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "blade"
+      }
+    },
+    {
+      "id": "ember_power",
+      "name": "炽热核心",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "ember",
+        "damage": 0.3
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "ember"
+      }
+    },
+    {
+      "id": "ember_quick",
+      "name": "燃素循环",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "ember",
+        "interval": 0.18
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "ember"
+      }
+    },
+    {
+      "id": "orbit_power",
+      "name": "月核增幅",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "orbit",
+        "damage": 0.3
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "orbit"
+      }
+    },
+    {
+      "id": "orbit_quick",
+      "name": "月轮加速",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "orbit",
+        "interval": 0.18
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "orbit"
+      }
+    },
+    {
+      "id": "drone_power",
+      "name": "灵体聚能",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "drone",
+        "damage": 0.3
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "drone"
+      }
+    },
+    {
+      "id": "drone_quick",
+      "name": "蜂群节律",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "drone",
+        "interval": 0.18
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "drone"
+      }
+    },
+    {
+      "id": "fire_master",
+      "name": "陨火学派",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "fire",
+        "damage": 0.4
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "fire"
+      }
+    },
+    {
+      "id": "ice_master",
+      "name": "霜潮学派",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "ice",
+        "damage": 0.4
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "ice"
+      }
+    },
+    {
+      "id": "lance_master",
+      "name": "星贯学派",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "lance",
+        "damage": 0.4
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "lance"
+      }
+    },
+    {
+      "id": "storm_master",
+      "name": "终章学派",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "source": "storm",
+        "damage": 0.32
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": "storm"
+      }
+    },
+    {
+      "id": "armor",
+      "name": "星纹护甲",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "taken": -0.1
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "scholar",
+      "name": "求知者",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "xp": 0.16
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "bloodmoon",
+      "name": "血月契约",
+      "type": "契约",
+      "polarity": "mixed",
+      "maxStacks": 1,
+      "effects": {
+        "stat": "attack",
+        "amount": 0.4
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "greed",
+      "name": "贪婪之冠",
+      "type": "契约",
+      "polarity": "mixed",
+      "maxStacks": 1,
+      "effects": {
+        "xp": 0.45
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "chest_common",
+      "name": "旅途宝箱",
+      "type": "宝箱",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "chest_common"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "chest_rare",
+      "name": "星银宝箱",
+      "type": "宝箱",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "chest_rare"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "chest_epic",
+      "name": "星金宝箱",
+      "type": "宝箱",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "chest_epic"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "chest_risk",
+      "name": "禁忌之书",
+      "type": "契约",
+      "polarity": "mixed",
+      "maxStacks": null,
+      "effects": {
+        "handler": "chest_risk"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "cleanse",
+      "name": "净化之光",
+      "type": "功能",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "cleanse"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "baptism",
+      "name": "星辰洗礼",
+      "type": "功能",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "baptism"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "reroll",
+      "name": "命运馈赠",
+      "type": "功能",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "reroll"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "forget",
+      "name": "遗忘药剂",
+      "type": "功能",
+      "polarity": "positive",
+      "maxStacks": 3,
+      "effects": {
+        "handler": "forget"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "crystal_fracture",
+      "name": "冰晶碎裂",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "crystal_fracture"
+      },
+      "conditions": {
+        "minLevel": 5,
+        "source": ""
+      }
+    },
+    {
+      "id": "ember_cycle",
+      "name": "余烬循环",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "ember_cycle"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "blood_hunt",
+      "name": "血色追猎",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "blood_hunt"
+      },
+      "conditions": {
+        "minLevel": 5,
+        "source": ""
+      }
+    },
+    {
+      "id": "orbit_resonance",
+      "name": "月环共振",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "orbit_resonance"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "star_chain",
+      "name": "星火连锁",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "star_chain"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "final_judgment",
+      "name": "终末裁决",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "final_judgment"
+      },
+      "conditions": {
+        "minLevel": 8,
+        "source": ""
+      }
+    },
+    {
+      "id": "star_focus",
+      "name": "群星聚焦",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "star_focus"
+      },
+      "conditions": {
+        "minLevel": 5,
+        "source": ""
+      }
+    },
+    {
+      "id": "twin_resonance",
+      "name": "双生共鸣",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "twin_resonance"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "frostfire",
+      "name": "霜焰蒸腾",
+      "type": "机制",
+      "polarity": "positive",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "frostfire"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "glass_comet",
+      "name": "琉璃彗星",
+      "type": "契约",
+      "polarity": "mixed",
+      "maxStacks": 1,
+      "effects": {
+        "handler": "glass_comet"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "crit_damage",
+      "name": "星芒锐化",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "crit_damage"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "boss_hunter",
+      "name": "破冠者",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "boss_hunter"
+      },
+      "conditions": {
+        "minLevel": 5,
+        "source": ""
+      }
+    },
+    {
+      "id": "burning_judge",
+      "name": "焰痕追击",
+      "type": "属性",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "burning_judge"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "hex_wither",
+      "name": "枯萎",
+      "type": "负面",
+      "polarity": "negative",
+      "maxStacks": 3,
+      "effects": {
+        "amount": -0.12,
+        "mode": "linear"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "hex_lead",
+      "name": "铅足",
+      "type": "负面",
+      "polarity": "negative",
+      "maxStacks": 3,
+      "effects": {
+        "amount": -0.08,
+        "mode": "linear"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "hex_frail",
+      "name": "脆弱",
+      "type": "负面",
+      "polarity": "negative",
+      "maxStacks": 3,
+      "effects": {
+        "amount": 0.15,
+        "mode": "linear"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "hex_silence",
+      "name": "缄默",
+      "type": "负面",
+      "polarity": "negative",
+      "maxStacks": 3,
+      "effects": {
+        "amount": 0.1,
+        "mode": "linear"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "hex_damage",
+      "name": "黯光",
+      "type": "负面",
+      "polarity": "negative",
+      "maxStacks": null,
+      "effects": {
+        "amount": 0.06,
+        "mode": "divide"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "hex_regen",
+      "name": "荒芜",
+      "type": "负面",
+      "polarity": "negative",
+      "maxStacks": null,
+      "effects": {
+        "amount": 0.12,
+        "mode": "divide"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "hex_xp",
+      "name": "迷惘",
+      "type": "负面",
+      "polarity": "negative",
+      "maxStacks": null,
+      "effects": {
+        "amount": 0.08,
+        "mode": "divide"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    },
+    {
+      "id": "shuffle",
+      "name": "命运洗牌",
+      "type": "功能",
+      "polarity": "positive",
+      "maxStacks": null,
+      "effects": {
+        "handler": "shuffle"
+      },
+      "conditions": {
+        "minLevel": 1,
+        "source": ""
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "weapon_bow",
+      "to": "fork",
+      "kind": "requires"
+    },
+    {
+      "from": "pierce",
+      "to": "split",
+      "kind": "excludes"
+    },
+    {
+      "from": "weapon_bow",
+      "to": "split",
+      "kind": "requires"
+    },
+    {
+      "from": "split",
+      "to": "pierce",
+      "kind": "excludes"
+    },
+    {
+      "from": "weapon_blade",
+      "to": "wide",
+      "kind": "requires"
+    },
+    {
+      "from": "burn",
+      "to": "wildfire",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_orbit",
+      "to": "satellite",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_drone",
+      "to": "swarm",
+      "kind": "requires"
+    },
+    {
+      "from": "fortress",
+      "to": "glass_comet",
+      "kind": "excludes"
+    },
+    {
+      "from": "weapon_bow",
+      "to": "bow_power",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_bow",
+      "to": "bow_quick",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_blade",
+      "to": "blade_power",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_blade",
+      "to": "blade_quick",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_ember",
+      "to": "ember_power",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_ember",
+      "to": "ember_quick",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_orbit",
+      "to": "orbit_power",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_orbit",
+      "to": "orbit_quick",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_drone",
+      "to": "drone_power",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_drone",
+      "to": "drone_quick",
+      "kind": "requires"
+    },
+    {
+      "from": "shatter",
+      "to": "crystal_fracture",
+      "kind": "requires"
+    },
+    {
+      "from": "burn",
+      "to": "ember_cycle",
+      "kind": "requires"
+    },
+    {
+      "from": "critical",
+      "to": "blood_hunt",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_orbit",
+      "to": "orbit_resonance",
+      "kind": "requires"
+    },
+    {
+      "from": "shatter",
+      "to": "orbit_resonance",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_ember",
+      "to": "star_chain",
+      "kind": "requires"
+    },
+    {
+      "from": "star_chain",
+      "to": "star_focus",
+      "kind": "excludes"
+    },
+    {
+      "from": "execution",
+      "to": "final_judgment",
+      "kind": "requires"
+    },
+    {
+      "from": "star_focus",
+      "to": "star_chain",
+      "kind": "excludes"
+    },
+    {
+      "from": "weapon_bow",
+      "to": "twin_resonance",
+      "kind": "requires"
+    },
+    {
+      "from": "weapon_orbit",
+      "to": "twin_resonance",
+      "kind": "requires"
+    },
+    {
+      "from": "burn",
+      "to": "frostfire",
+      "kind": "requires"
+    },
+    {
+      "from": "shatter",
+      "to": "frostfire",
+      "kind": "requires"
+    },
+    {
+      "from": "glass_comet",
+      "to": "fortress",
+      "kind": "excludes"
+    },
+    {
+      "from": "burn",
+      "to": "burning_judge",
+      "kind": "requires"
+    }
+  ]
+}
