@@ -80,4 +80,6 @@ export interface Policy {
   readonly name: string;
   act(s: Observation): Input;
   choose(s: Observation): CardDecision;
+  setDebug?(enabled: boolean): void;
+  readonly debug?: import("./diagnostics").DecisionDebug;
 }

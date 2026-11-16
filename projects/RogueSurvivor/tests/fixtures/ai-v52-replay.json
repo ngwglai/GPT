@@ -1,0 +1,49 @@
+{
+  "sourceCommit": "974365751cdd84a217f9f71af676316d1294db15",
+  "seed": 11,
+  "map": "forest",
+  "rows": [
+    {
+      "id": "legacy",
+      "character": "ranger",
+      "ticks": 12000,
+      "hash": "5dbb7b67c65cba2a957e6b8906045f844693ec099630c23c90363e07f01b6b9b",
+      "time": 200.0000000000513
+    },
+    {
+      "id": "legacy",
+      "character": "knight",
+      "ticks": 12000,
+      "hash": "e12638220ab4ede4a244df733f46b21d62af2e125cc736ebd2a02b847c2ba126",
+      "time": 200.0000000000513
+    },
+    {
+      "id": "combat",
+      "character": "ranger",
+      "ticks": 12000,
+      "hash": "6910afaa4aa363b8afb73fd0590a64a88001e15cfe77258eb681b7407f034ec3",
+      "time": 200.0000000000513
+    },
+    {
+      "id": "combat",
+      "character": "knight",
+      "ticks": 12000,
+      "hash": "af1d6b08a1ec6b18289aed3420c5580ab147b2f376349770cc886a04f6b0dbde",
+      "time": 200.0000000000513
+    },
+    {
+      "id": "build",
+      "character": "ranger",
+      "ticks": 12000,
+      "hash": "c21f0aa3321cfd68a4f38d4aef639b53d05a83d4ef193f9c4fc1b3850176b62e",
+      "time": 200.0000000000513
+    },
+    {
+      "id": "build",
+      "character": "knight",
+      "ticks": 12000,
+      "hash": "4150308615856d35b7ad221435f6aca9d8838b185c01bb0da7acd03d4e782628",
+      "time": 200.0000000000513
+    }
+  ]
+}

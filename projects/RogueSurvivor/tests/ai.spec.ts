@@ -13,7 +13,7 @@ test("独立 AI 入口使用真实渲染、自动选牌、暂停且不写手动�
   // The lab does not even open the game's IndexedDB database.
   await page.locator('select[name="policy"]').selectOption("build");
   await page.getByRole("button", { name: "开始新对局" }).click();
-  await expect(page.locator("canvas")).toBeVisible();
+  await expect(page.locator("#game canvas")).toBeVisible();
   await page.getByRole("button", { name: "快速模拟 30 秒" }).click();
   await expect
     .poll(

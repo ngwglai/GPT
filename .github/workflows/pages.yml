@@ -83,9 +83,11 @@ jobs:
           cp -R projects/entropylab/dist/. _site/entropylab/
           cp -R projects/roguelab/build/web/. _site/roguelab/
           cp -R projects/RogueSurvivor/dist/. _site/RogueSurvivor/
+          test -s _site/RogueSurvivor/index.html
+          test -s _site/RogueSurvivor/ai.html
           touch _site/.nojekyll
           cat > _site/index.html <<'HTML'
-          <!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GPT 项目</title><h1>交互实验</h1><p><a href="./entropylab/">EntropyLab · 计算物理实验室</a></p><p><a href="./roguelab/">RogueLab · 深井协议 / 卡组肉鸽</a></p><p><a href="./RogueSurvivor/">星烬远征 / 俯视角动作肉鸽</a></p></html>
+          <!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GPT 项目</title><h1>交互实验</h1><p><a href="./entropylab/">EntropyLab · 计算物理实验室</a></p><p><a href="./roguelab/">RogueLab · 深井协议 / 卡组肉鸽</a></p><p><a href="./RogueSurvivor/">星烬远征 / 俯视角动作肉鸽</a></p><p><a href="./RogueSurvivor/ai.html">AI 自动玩家实验室</a></p></html>
           HTML
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:

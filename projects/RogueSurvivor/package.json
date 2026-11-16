@@ -21,7 +21,8 @@
     "ai:check": "tsc --noEmit -p tsconfig.ai.json",
     "ai:benchmark": "tsx tools/ai/benchmark.ts",
     "ai:report": "tsx tools/ai/report.ts",
-    "report:growth": "tsx tools/enemy-growth-report.ts"
+    "report:growth": "tsx tools/enemy-growth-report.ts",
+    "test:ai:complete": "playwright test -c playwright.ai.config.ts"
   },
   "dependencies": {
     "phaser": "^3.90.0"

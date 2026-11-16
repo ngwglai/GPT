@@ -1,9 +1,205 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI 自动玩家 · 星烬远征</title></head>
-<body><div id="game"></div><aside><h1>AI 自动玩家实验室</h1><p>正常规则 · 独立演示 · 不读写游戏存档</p><form id="setup">
-<label>策略<select name="policy"><option value="build">战斗 + 构筑 AI</option><option value="combat">新版战斗 + 旧选牌</option><option value="legacy">原有自动玩家</option></select></label>
-<label>角色<select name="character"><option value="ranger">逐星游侠</option><option value="knight">余烬守卫</option><option value="mage">月棘术士</option></select></label>
-<label>地图<select name="map"><option value="forest">星光森林</option><option value="cavern">水晶洞窟</option><option value="garden">糖果庭院</option><option value="eclipse">月蚀遗迹</option></select></label>
-<label>模式<select name="mode"><option value="standard">标准 20 波</option><option value="endless">无尽</option></select></label>
-<label>种子<input name="seed" type="number" min="0" max="4294967295" value="101"></label><button type="submit">开始新对局</button><button type="button" id="pause">暂停</button><button type="button" id="advance">快速模拟 30 秒</button></form>
-<output id="status" aria-live="polite">准备就绪</output><details><summary>选牌记录</summary><ol id="choices"></ol></details><a href="./index.html">返回手动游戏</a></aside><script type="module" src="/src/ai/demo.ts"></script></body></html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#102a27" />
+    <title>AI 自动玩家实验室 · 星烬远征</title>
+  </head>
+  <body>
+    <div id="game"></div>
+    <canvas
+      id="debug-layer"
+      aria-label="AI 实际候选路线与选择轨迹"
+      hidden
+    ></canvas>
+    <header class="lab-header">
+      <a class="brand" href="./index.html"
+        ><span class="brand-star">✦</span
+        ><span>星烬远征<small>ROGUE SURVIVOR / AI LAB</small></span></a
+      ><span class="lab-badge">自主游玩 · 实时观测</span
+      ><a class="return-link" href="./index.html">返回手动游戏 ↗</a>
+    </header>
+    <aside class="setup-panel panel">
+      <details open>
+        <summary>远征设置 <span>CONFIGURATION</span></summary>
+        <h1>AI 自动玩家实验室</h1>
+        <p class="muted">选一个种子，观看 AI 的整场远征。</p>
+        <form id="setup">
+          <label
+            >策略<select name="policy">
+              <option value="build">Build V4 · 战斗与构筑</option>
+              <option value="combat">Combat V3 · 新战斗 / 旧选牌</option>
+              <option value="legacy">Legacy · 原始自动玩家</option>
+            </select></label
+          >
+          <div class="field-pair">
+            <label
+              >角色<select name="character">
+                <option value="ranger">逐星游侠</option>
+                <option value="knight">余烬守卫</option>
+                <option value="mage">月棘术士</option>
+              </select></label
+            ><label
+              >地图<select name="map">
+                <option value="forest">星光森林</option>
+                <option value="cavern">水晶洞窟</option>
+                <option value="garden">糖果庭院</option>
+                <option value="eclipse">月蚀遗迹</option>
+              </select></label
+            >
+          </div>
+          <label
+            >模式<select name="mode">
+              <option value="standard">标准模式 · 第20波最终首领</option>
+              <option value="endless">无尽模式 · 持续成长</option>
+            </select></label
+          >
+          <label
+            >随机种子<input
+              name="seed"
+              type="number"
+              min="0"
+              max="4294967295"
+              value="101"
+              required
+          /></label>
+          <label
+            >运行速度<select id="speed" name="speed">
+              <option value="0.5">0.5 倍</option>
+              <option value="1" selected>1 倍</option>
+              <option value="2">2 倍</option>
+              <option value="4">4 倍</option>
+              <option value="8">8 倍</option>
+            </select></label
+          >
+          <div class="actions">
+            <button id="start" class="primary" type="submit" disabled>
+              开始新对局</button
+            ><button type="button" id="pause" disabled>暂停</button>
+          </div>
+          <button type="button" id="advance" class="subtle" disabled>
+            快速模拟 30 秒
+          </button>
+        </form>
+        <div class="sound-row">
+          <label class="toggle"
+            ><input id="sound" type="checkbox" checked /> 音乐与音效</label
+          ><label class="volume-label"
+            >音量<input
+              id="volume"
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value="0.35"
+          /></label>
+        </div>
+        <p class="footnote">
+          同一地图、角色和种子便于观察策略差异。AI
+          自动选牌与合法复活；手动游戏存档独立。
+        </p>
+      </details>
+      <div class="history-actions">
+        <button type="button" id="export" disabled>导出当前 JSON</button
+        ><button type="button" id="history-open">
+          对局记录 <span id="history-count">0</span>
+        </button>
+      </div>
+      <p id="storage-warning" class="warning" hidden></p>
+    </aside>
+    <aside class="decision-panel panel">
+      <details id="decision-details" open>
+        <summary>AI 决策观察 <span>LIVE DECISIONS</span></summary>
+        <div class="decision-tools">
+          <label class="toggle"
+            ><input id="show-routes" type="checkbox" /> 显示实际路线图层</label
+          ><span class="legend"><i></i>候选 <b></b>已选择</span>
+        </div>
+        <dl id="decision-state">
+          <dt>策略</dt>
+          <dd id="policy-name">等待开始</dd>
+          <dt>行动</dt>
+          <dd id="action-state">准备就绪</dd>
+          <dt>主要威胁</dt>
+          <dd id="threat-state">—</dd>
+          <dt>移动目标</dt>
+          <dd id="goal-state">—</dd>
+          <dt>决策采样</dt>
+          <dd id="decision-time">—</dd>
+        </dl>
+        <section class="card-section">
+          <div class="section-title">
+            <h2>卡牌抉择</h2>
+            <small id="choice-count">0 次</small>
+          </div>
+          <label class="history-select"
+            >选择记录<select id="choice-select" aria-label="查看卡牌选择记录">
+              <option>暂无选择</option>
+            </select></label
+          >
+          <p id="choice-result" class="choice-result">升级时自动展示真实评分</p>
+          <table id="card-scores">
+            <thead>
+              <tr>
+                <th>候选卡牌</th>
+                <th>AI 评分</th>
+                <th>结果</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <p id="score-note" class="footnote">
+            分数来自策略原始结果。不同策略使用不同尺度，数值不直接横比。
+          </p>
+          <ol id="choices" class="compact-log"></ol>
+        </section>
+        <section>
+          <div class="section-title">
+            <h2>技能释放</h2>
+            <small id="skill-count">0 次</small>
+          </div>
+          <ol id="skill-log" class="compact-log">
+            <li class="muted">只记录实际成功施放的技能</li>
+          </ol>
+        </section>
+      </details>
+    </aside>
+    <footer class="run-hud panel">
+      <output id="status" aria-live="off">画面载入中…</output>
+      <div class="hud-metrics">
+        <span><small>游戏时间</small><b id="game-time">00:00</b></span
+        ><span><small>波次</small><b id="wave">—</b></span
+        ><span><small>生命</small><b id="health">—</b></span
+        ><span><small>等级</small><b id="level">—</b></span
+        ><span><small>敌人</small><b id="enemies">—</b></span
+        ><span><small>击杀 / BOSS</small><b id="kills">—</b></span
+        ><span class="speed-metric"
+          ><small>实际模拟速度</small><b id="actual-speed">0.00×</b></span
+        >
+      </div>
+      <div class="loadout-line">
+        <span id="loadout" class="loadout"></span
+        ><span id="skill-bar" class="skill-bar"></span>
+      </div>
+      <p id="performance-note" class="footnote">
+        每个逻辑步完整执行；性能不足时自动降低实际速度。
+      </p>
+    </footer>
+    <dialog id="history-dialog">
+      <div class="dialog-title">
+        <div>
+          <small>LOCAL EXPEDITIONS</small>
+          <h2>AI 对局记录</h2>
+        </div>
+        <button type="button" id="history-close">关闭</button>
+      </div>
+      <p class="muted">
+        最多保留12局、总容量约1
+        MB；每局保留最近240次选牌与160次技能。旧记录按容量自动淘汰，不保存或恢复手动游戏。
+      </p>
+      <div id="history-list"></div>
+    </dialog>
+    <script type="module" src="/src/ai/demo.ts"></script>
+  </body>
+</html>

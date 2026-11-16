@@ -199,6 +199,10 @@ export class CombatPolicy extends LegacyPolicy {
     });
     const evaluate = (dir: Vec, dash: boolean) => {
       const pos = { x: p.x, y: p.y };
+      const path = this.debugEnabled ? [{ ...pos }] : [];
+      const parts = this.debugEnabled
+        ? { enemies: 0, bullets: 0, zones: 0, environment: 0 }
+        : undefined;
       let risk = 0,
         early = 0;
       for (let i = 1; i <= samples; i++) {
@@ -213,6 +217,7 @@ export class CombatPolicy extends LegacyPolicy {
           ? { x: p.dx, y: p.dy }
           : dir;
         move(pos, direction.x * d, direction.y * d, 16, rocks);
+        if (this.debugEnabled) path.push({ ...pos });
         const protectedNow = t < Math.max(p.invincible, dash ? 0.3 : 0);
         let danger = 0;
         const trace = traces[i - 1];
@@ -226,6 +231,7 @@ export class CombatPolicy extends LegacyPolicy {
           danger += e.weight * Math.max(0, this.config.clearance - gap) * 0.35;
           danger += Math.max(0, 130 - gap) * 0.008;
         }
+        const enemyDanger = danger;
         if (!protectedNow)
           for (const b of trace.bullets) {
             const relativeStart = { x: b.bx - prev.x, y: b.by - prev.y };
@@ -234,10 +240,12 @@ export class CombatPolicy extends LegacyPolicy {
               segmentDistance({ x: 0, y: 0 }, relativeStart, relativeEnd) - b.r;
             danger += Math.max(0, 22 - gap) * (gap < 4 ? 10 : 0.6) * b.weight;
           }
+        const bulletDanger = danger - enemyDanger;
         if (!protectedNow)
           for (const z of trace.zones)
             if (zoneContains(z, pos, 23))
               danger += Math.max(1, z.damage / 20) * 200;
+        const zoneDanger = danger - enemyDanger - bulletDanger;
         for (const f of s.environment?.fields || [])
           if (
             f.kind === "eclipse" &&
@@ -261,6 +269,16 @@ export class CombatPolicy extends LegacyPolicy {
           (this.config.nearTerm
             ? 1 / (0.12 + t * 2)
             : 1.2 - (t / horizon) * 0.5);
+        if (parts) {
+          const weight = this.config.nearTerm
+            ? 1 / (0.12 + t * 2)
+            : 1.2 - (t / horizon) * 0.5;
+          parts.enemies += enemyDanger * weight;
+          parts.bullets += bulletDanger * weight;
+          parts.zones += zoneDanger * weight;
+          parts.environment +=
+            (danger - enemyDanger - bulletDanger - zoneDanger) * weight;
+        }
       }
       const progress =
         (distance(p, this.goal) - distance(pos, this.goal)) /
@@ -280,6 +298,8 @@ export class CombatPolicy extends LegacyPolicy {
         distance(pos, p) < speed * horizon * 0.35 && (dir.x || dir.y) ? 8 : 0;
       return {
         dir,
+        path,
+        parts,
         dash,
         risk,
         early,
@@ -291,19 +311,52 @@ export class CombatPolicy extends LegacyPolicy {
           inertia * this.config.inertia,
       };
     };
-    let best = dirs
+    const candidates = dirs
       .map((d) => evaluate(d, false))
-      .sort((a, b) => a.score - b.score)[0];
+      .sort((a, b) => a.score - b.score);
+    let best = candidates[0];
     if (
       p.dashCd <= 0 &&
       p.invincible < 0.15 &&
       (best.early > 30 || best.risk > 110)
     ) {
-      const escaped = dirs
+      const escapes = dirs
         .filter((d) => d.x || d.y)
         .map((d) => evaluate(d, true))
-        .sort((a, b) => a.score - b.score)[0];
+        .sort((a, b) => a.score - b.score);
+      const escaped = escapes[0];
+      if (this.debugEnabled) candidates.push(...escapes);
       if (escaped.score + 8 < best.score) best = escaped;
+    }
+    if (this.debugEnabled) {
+      const nearest = enemies.reduce<(typeof enemies)[number] | undefined>(
+        (a, b) => (!a || distance(b.e, p) < distance(a.e, p) ? b : a),
+        undefined,
+      );
+      this.debug = {
+        time: s.time,
+        origin: { x: p.x, y: p.y },
+        goal: { ...this.goal },
+        algorithm: "predictive",
+        selected: candidates.indexOf(best),
+        candidates: candidates.map((c) => ({
+          direction: { ...c.dir },
+          dash: c.dash,
+          path: c.path,
+          score: c.score,
+          risk: c.risk,
+          early: c.early,
+          parts: c.parts,
+        })),
+        dangers: zones
+          .slice(0, 32)
+          .map((z) => ({ ...z, shape: z.shape && { ...z.shape } })),
+        nearestEnemy: nearest && {
+          kind: nearest.e.kind,
+          distance: distance(nearest.e, p),
+          damage: nearest.e.damage,
+        },
+      };
     }
     this.heading = best.dir;
     const target = closest(p, s.enemies as Enemy[], 650);
