@@ -6,6 +6,12 @@ import type { Enemy, Input } from "../core/types";
 import { ENEMIES } from "../data/content";
 // readonly observations are structurally compatible with geometry; no mutations here.
 export class LegacyPolicy implements Policy {
+  protected debugEnabled = false;
+  debug?: import("./diagnostics").DecisionDebug;
+  setDebug(enabled: boolean) {
+    this.debugEnabled = enabled;
+    if (!enabled) this.debug = undefined;
+  }
   readonly name: string = "legacy";
   choose(s: Observation): CardDecision {
     const affinity =
@@ -68,6 +74,19 @@ export class LegacyPolicy implements Policy {
       s.zones.some(
         (z) => z.enemy && z.delay < 0.35 && distance(z, p) < z.r + 20,
       );
+    if (this.debugEnabled)
+      this.debug = {
+        time: s.time,
+        origin: { x: p.x, y: p.y },
+        goal: { ...goal },
+        algorithm: "legacy",
+        selected: 0,
+        candidates: [{ direction: { ...dir }, dash: danger, path: [] }],
+        dangers: s.zones
+          .filter((z) => z.enemy && distance(z, p) < z.r + 50)
+          .map((z) => ({ ...z, shape: z.shape && { ...z.shape } })),
+        immediateDanger: danger,
+      };
     return {
       x: dir.x,
       y: dir.y,

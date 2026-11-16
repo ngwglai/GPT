@@ -37,9 +37,9 @@ npx tsx tools/world-visual.ts # 构建后截图及三地图浏览器压力
 
 ## AI 自动玩家实验室
 
-新增独立 `/ai.html` 入口，可观看旧策略、新战斗AI、战斗+构筑AI自动对局，支持四地图、三角色、标准/无尽、固定种子、暂停与逐步高速模拟。实验室不读写手动存档，默认游戏入口保持原有操作。无渲染测试复用真实 World，全部成绩使用正常规则；没有将旧无敌压力测试当成生存成绩。
+独立 [AI 实验室](https://ngwglai.github.io/GPT/RogueSurvivor/ai.html) 可观看 Legacy、Combat V3、Build V4 自动对局，支持四地图、三角色、标准/无尽、固定种子、0.5～8倍、暂停/继续/重开、原画面与音乐。可展开实际候选路线/风险、选牌评分和成功施法记录，查看有界本地历史并导出JSON。实验室不读写手动存档，默认游戏入口保持原有操作。无渲染测试复用真实 World，全部成绩使用正常规则；没有将旧无敌压力测试当成生存成绩。
 
-运行与算法见 [AI-PLAYER.md](AI-PLAYER.md)，旧代码分析见 [AI-LEGACY-ANALYSIS.md](AI-LEGACY-ANALYSIS.md)，独立种子对照、迭代和无尽成绩见 [AI-REPORT.md](AI-REPORT.md)。
+观看、倍速、记录、部署和验证说明见 [AI-VISUALIZATION.md](AI-VISUALIZATION.md)。运行与算法见 [AI-PLAYER.md](AI-PLAYER.md)，旧代码分析见 [AI-LEGACY-ANALYSIS.md](AI-LEGACY-ANALYSIS.md)，独立种子对照、迭代和无尽成绩见 [AI-REPORT.md](AI-REPORT.md)。
 
 ```bash
 npm run ai:check

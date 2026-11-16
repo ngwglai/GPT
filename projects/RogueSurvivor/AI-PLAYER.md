@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-访问终端地址下的 `/ai.html`，选择策略、角色、地图、标准或无尽模式和种子，点击“开始新对局”。此入口复用 Phaser `GameScene` 和原战斗画面，自动移动、施法、选牌、合法刷新和星火复活；可以暂停或重新开局，不读取或写入手动游戏的 IndexedDB。“快速模拟 30 秒”逐一执行 1800 个正常固定步，跳过中间绘制后展示结果，仍执行选牌、施法、碰撞与复活动画计时；不会直接增加游戏时间或属性。默认 `index.html` 仍为原手动游戏。实验室静音；后台页自动暂停。演示按正常速度运行，不能将其软件渲染帧率等同于无渲染测试吞吐。
+访问终端地址下的 `/ai.html`，选择策略、角色、地图、标准或无尽模式、种子和0.5～8倍速度，点击“开始新对局”。此入口复用 Phaser `GameScene` 和原战斗画面及音频，自动移动、施法、选牌、合法刷新和星火复活；支持暂停/继续/重开、实际路线/卡牌评分/施法日志、独立本地历史与JSON导出，不读写手动游戏IndexedDB。固定逻辑60Hz、决策20Hz，性能不足显示实测倍速并放慢模拟；“快速模拟30秒”分帧执行1800步，不阻塞整批。后台自动暂停。完整使用及新增回归验证见 [AI-VISUALIZATION.md](AI-VISUALIZATION.md)。
 
 ```bash
 npm run build
@@ -33,7 +33,7 @@ npm run ai:benchmark -- --policies legacy,combat-v3,build-v4 --seeds 11,29,83 --
 npx tsx tools/ai/report.ts validation/ai-player/example ../../work/ai/example
 ```
 
-`npm run ai:acceptance -- validation/ai-player/holdout` 复核本次完整验收：至少24个独立种子配对、四地图三角色覆盖、60/20 Hz、1800秒正常规则、通关至少击杀4 Boss；两种新策略必须在配对生存计分95%区间下界、符号检验、平均波次及通关数上优于旧策略。失败返回非零，不重试或剔除失败种子。
+在 PR #52 原提交下，`npm run ai:acceptance -- validation/ai-player/holdout` 复核当时完整验收（源码指纹绑定历史版本，新增诊断后的checkout需使用新的实验目录，见可视化说明）：至少24个独立种子配对、四地图三角色覆盖、60/20 Hz、1800秒正常规则、通关至少击杀4 Boss；两种新策略必须在配对生存计分95%区间下界、符号检验、平均波次及通关数上优于旧策略。失败返回非零，不重试或剔除失败种子。
 
 生成可阅读的 `summary.json`、本地展开的 `matches.json` 及包含全部遥测的 `runs.json.gz`（完整构筑/选牌亦在压缩档中；展开文件不入库，CSV提供简洁逐局索引）；归档写入后重新解压核对。评估器内部的估算值不是实际战斗成绩。
 

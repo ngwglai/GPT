@@ -1750,3 +1750,11 @@ td {
   outline: 2px solid #a9eccb;
   outline-offset: 2px;
 }
+
+/* An additive link; the lab owns separate state and storage. */
+.ai-entry {
+  color: var(--accent, #b7d6ad);
+  font-size: 13px;
+  padding: 8px 10px;
+  white-space: nowrap;
+}

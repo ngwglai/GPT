@@ -428,8 +428,10 @@ export class GameScene extends Phaser.Scene {
       .setDepth(8)
       .setAlpha(0.85);
   }
-  update(_time: number, delta: number) {
-    if (!this.ready) return;
+  protected advanceSimulation(delta: number): {
+    dt: number;
+    simulated: boolean;
+  } {
     const dt = Math.min(delta / 1000, 0.1);
     let simulated = false;
     if (
@@ -453,6 +455,11 @@ export class GameScene extends Phaser.Scene {
       this.accumulator = 0;
       this.queued = { dash: false, skills: [false, false, false] };
     }
+    return { dt, simulated };
+  }
+  update(_time: number, delta: number) {
+    if (!this.ready) return;
+    const { dt, simulated } = this.advanceSimulation(delta);
     if (this.world) {
       const s = this.world.s,
         p = s.player;
