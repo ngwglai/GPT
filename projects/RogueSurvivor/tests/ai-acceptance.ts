@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 /** Evaluate completed experiments; never manufactures matches or retries losing seeds. */
 import { readFileSync, writeFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
@@ -9,9 +10,20 @@ if (!dir) throw Error("Usage: npm run ai:acceptance -- REPORT_DIRECTORY");
 const rows: MatchResult[] = JSON.parse(
   gunzipSync(readFileSync(join(dir, "runs.json.gz"))).toString(),
 );
+const manifest = JSON.parse(readFileSync(join(dir, "manifest.json"), "utf8"));
 const summary = summarize(rows),
   checks: Record<string, boolean> = {};
 const baseline = summary.groups.find((g) => g.policy === "legacy");
+checks.frozenSourceMatches = Object.entries(
+  manifest.sources as Record<string, string>,
+).every(
+  ([file, hash]) =>
+    createHash("sha256").update(readFileSync(file)).digest("hex") === hash,
+);
+checks.completeSchedule =
+  manifest.jobs.length === rows.length &&
+  new Set(rows.map((r) => [r.policy, r.map, r.character, r.seed].join(":")))
+    .size === rows.length;
 checks.threeGroups = summary.groups.length === 3 && !!baseline;
 checks.independentSeeds =
   !!baseline &&

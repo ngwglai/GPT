@@ -1,5 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": { "types": ["vite/client", "node"] },
-  "include": ["src/ai/**/*.ts", "tools/ai/**/*.ts", "tests/ai.test.ts", "tests/ai-acceptance.ts"]
+  "include": [
+    "src/ai/**/*.ts",
+    "tools/ai/**/*.ts",
+    "tests/ai.test.ts",
+    "tests/ai-acceptance.ts"
+  ]
 }

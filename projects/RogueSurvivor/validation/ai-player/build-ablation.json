@@ -1,0 +1,9 @@
+{
+  "pairs": 24,
+  "buildOnlyVictory": 7,
+  "combatOnlyVictory": 0,
+  "bothVictories": 16,
+  "neitherVictory": 1,
+  "exactMcNemarTwoSidedP": 0.015625,
+  "meanFasterSecondsAmongBothVictories": 250.28020833310578
+}

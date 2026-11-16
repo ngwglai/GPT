@@ -27,7 +27,7 @@ npm run ai:benchmark -- --policies legacy,combat-v3,build-v4 --seeds 11,29,83 --
 
 当前实际容量以 `src/data/content.ts` 为准：800敌人、1200弹道、240领域；测试不降低容量，高密度局可能显著变慢。建议普通电脑使用 `--workers 2`，机器较弱可用1；机器执行速度不改变游戏内计时或规则。
 
-原始每局 JSON 保留所有选择/刷新及候选分数、最终完整角色属性/武器/技能/卡牌、各来源输出、全部受击、复活、每分钟检查点和终局敌人信息。输出目录中的 `manifest.json` 记录固定调度、Node 版本和相关源码 SHA256；`--resume` 仅允许在源码及调度完全相同时恢复。更换策略必须用新目录。不要在同一输出目录混入不同实验。
+原始每局 JSON 保留所有选择/刷新及候选分数、最终完整角色属性/武器/技能/卡牌、各来源输出、全部受击、复活、每分钟检查点和终局敌人信息。输出目录中的 `manifest.json` 记录固定调度、Node 版本和相关源码 SHA256；`--resume` 仅允许在源码及调度完全相同时恢复；验收也核对源码指纹和完整调度。SHA按字节计算，换行转换也会判不同；Windows等平台可在当前checkout重新执行benchmark→report→acceptance。更换策略必须用新目录。不要在同一输出目录混入不同实验。
 
 ```bash
 npx tsx tools/ai/report.ts validation/ai-player/example ../../work/ai/example
