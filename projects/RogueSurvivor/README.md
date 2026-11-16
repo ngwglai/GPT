@@ -35,6 +35,17 @@ npx tsx tools/world-visual.ts # 构建后截图及三地图浏览器压力
 
 不支持直接双击 `dist/index.html`，请使用 HTTP 服务。Linux 缺少浏览器系统依赖时执行 `npx playwright install --with-deps chromium`。可通过环境变量 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` 指定已有 Chromium；常规用户无需设置。
 
+## AI 自动玩家实验室
+
+新增独立 `/ai.html` 入口，可观看旧策略、新战斗AI、战斗+构筑AI自动对局，支持四地图、三角色、标准/无尽、固定种子、暂停与逐步高速模拟。实验室不读写手动存档，默认游戏入口保持原有操作。无渲染测试复用真实 World，全部成绩使用正常规则；没有将旧无敌压力测试当成生存成绩。
+
+运行与算法见 [AI-PLAYER.md](AI-PLAYER.md)，旧代码分析见 [AI-LEGACY-ANALYSIS.md](AI-LEGACY-ANALYSIS.md)，独立种子对照、迭代和无尽成绩见 [AI-REPORT.md](AI-REPORT.md)。
+
+```bash
+npm run ai:check
+npm run ai:benchmark -- --policies legacy,combat-v3,build-v4 --seeds 11,29,83 --workers 2
+```
+
 ## 星火与动态角色
 
 每击败一只正式Boss获得1次星火，初始0，可累积。生命归零先完整播放战败；有星火可选择复活，消耗1次，完整站起后恢复50%生命并获得3秒无敌，清除附近240像素敌弹，保留当前波次和场上敌人。HUD及结算显示星火统计。

@@ -382,3 +382,9 @@
 - 多个Linux检查在Playwright系统依赖安装前因默认Azure Ubuntu镜像DNS失败；共享准备动作固定官方HTTPS归档，保留签名验证、依赖与原有测试，覆盖聚合Pages。未修改其他项目业务功能。最终检查与部署见[PR #44](https://github.com/ngwglai/GPT/pull/44)。
 
 - 官方Ubuntu归档同样DNS失败后，撤回临时镜像列表动作，改用摘要固定的微软Playwright预装Linux环境运行原测试；Windows原生验收保留。
+
+### RogueSurvivor 独立 AI 自动玩家（2026-11-16，验收运行中）
+
+- 复用原 World 实现预测移动、技能和边际构筑AI，独立 `/ai.html`，不改游戏核心/数值/手动入口和存档。
+- 50局探索归档，近期碰撞检查版三角色9/9；72局未见种子三组对照与正常无尽挑战运行中，不以探索代替验收。
+- 已通过461单元、严格AI类型、构建、24生产Chromium与54隐私回归；完整结论待 [AI-REPORT.md](projects/RogueSurvivor/AI-REPORT.md)。

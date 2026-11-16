@@ -1,0 +1,73 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #102c28;
+  color: #edebd2;
+  font:
+    14px/1.5 system-ui,
+    sans-serif;
+}
+#game {
+  position: fixed;
+  inset: 0;
+}
+aside {
+  position: relative;
+  width: min(340px, 94vw);
+  max-height: 95dvh;
+  overflow: auto;
+  margin: 16px;
+  padding: 20px;
+  background: #122b29eb;
+  border: 1px solid #6a8b75;
+  border-radius: 12px;
+}
+h1 {
+  font-size: 22px;
+  margin: 0;
+}
+p {
+  color: #adbfaf;
+}
+label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 8px 0;
+}
+select,
+input,
+button {
+  font: inherit;
+  border: 1px solid #65856f;
+  border-radius: 6px;
+  color: #f5f1d4;
+  background: #254b3f;
+  padding: 7px;
+}
+select,
+input {
+  width: 185px;
+}
+button {
+  cursor: pointer;
+  margin: 7px 5px 10px 0;
+}
+output {
+  display: block;
+  padding: 12px 0;
+}
+a {
+  color: #b4ebca;
+}
+ol {
+  padding-left: 22px;
+  max-height: 220px;
+  overflow: auto;
+}
+canvas {
+  display: block;
+}

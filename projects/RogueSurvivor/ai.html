@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI 自动玩家 · 星烬远征</title></head>
+<body><div id="game"></div><aside><h1>AI 自动玩家实验室</h1><p>正常规则 · 独立演示 · 不读写游戏存档</p><form id="setup">
+<label>策略<select name="policy"><option value="build">战斗 + 构筑 AI</option><option value="combat">新版战斗 + 旧选牌</option><option value="legacy">原有自动玩家</option></select></label>
+<label>角色<select name="character"><option value="ranger">逐星游侠</option><option value="knight">余烬守卫</option><option value="mage">月棘术士</option></select></label>
+<label>地图<select name="map"><option value="forest">星光森林</option><option value="cavern">水晶洞窟</option><option value="garden">糖果庭院</option><option value="eclipse">月蚀遗迹</option></select></label>
+<label>模式<select name="mode"><option value="standard">标准 20 波</option><option value="endless">无尽</option></select></label>
+<label>种子<input name="seed" type="number" min="0" max="4294967295" value="101"></label><button type="submit">开始新对局</button><button type="button" id="pause">暂停</button><button type="button" id="advance">快速模拟 30 秒</button></form>
+<output id="status" aria-live="polite">准备就绪</output><details><summary>选牌记录</summary><ol id="choices"></ol></details><a href="./index.html">返回手动游戏</a></aside><script type="module" src="/src/ai/demo.ts"></script></body></html>

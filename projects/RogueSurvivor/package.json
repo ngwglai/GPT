@@ -17,6 +17,10 @@
     "simulate:economy": "tsx tools/economy-check.ts",
     "simulate:builds": "tsx tools/build-check.ts",
     "simulate:expeditions": "tsx tools/expedition-check.ts",
+    "ai:acceptance": "tsx tests/ai-acceptance.ts",
+    "ai:check": "tsc --noEmit -p tsconfig.ai.json",
+    "ai:benchmark": "tsx tools/ai/benchmark.ts",
+    "ai:report": "tsx tools/ai/report.ts",
     "report:growth": "tsx tools/enemy-growth-report.ts"
   },
   "dependencies": {
@@ -24,6 +28,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
+    "@types/node": "^22.20.5",
     "prettier": "^3.9.10",
     "tsx": "^4.21.0",
     "typescript": "~5.9.3",
