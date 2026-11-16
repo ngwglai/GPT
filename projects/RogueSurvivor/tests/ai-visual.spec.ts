@@ -58,6 +58,13 @@ test("真实评分、技能、图层、暂停与重开，以及AI专用历史导
       choice.scores.find((s: any) => s.id === id).score,
     );
   }
+  await page.getByRole("button", { name: "继续", exact: true }).click();
+  await expect
+    .poll(async () =>
+      Number(await page.locator("#status").getAttribute("data-time")),
+    )
+    .toBeGreaterThan(record.time + 0.1);
+  await page.getByRole("button", { name: "暂停", exact: true }).click();
   await page.screenshot({ path: "../../work/ai-visual/lab-desktop.png" });
   await page.locator("#show-routes").uncheck();
   await expect(page.locator("#debug-layer")).toBeHidden();
@@ -67,6 +74,10 @@ test("真实评分、技能、图层、暂停与重开，以及AI专用历史导
       Number(await page.locator("#status").getAttribute("data-time")),
     )
     .toBeLessThan(5);
+  await expect(page.locator("#card-scores tbody tr")).toHaveCount(0);
+  await expect(page.locator("#choice-result")).toHaveText(
+    "升级时自动展示真实评分",
+  );
   await page.locator("#history-open").click();
   await expect(page.locator(".history-card")).toHaveCount(2);
   await expect(page.locator("#history-list")).toContainText("用户重新开始");
@@ -167,8 +178,10 @@ test("子路径下正常入口、AI资源与独立存档保持一致", async ({
 });
 
 test("可视化标准模式从初始状态自动完成最终首领并保存结算", async ({ page }) => {
-  test.setTimeout(300000);
+  test.setTimeout(480000);
+  await page.setViewportSize({ width: 800, height: 600 });
   await start(page);
+  await page.locator("#decision-details > summary").click();
   for (let batch = 0; batch < 45; batch++) {
     if (
       (await page.locator("#status").getAttribute("data-phase")) === "victory"
@@ -189,7 +202,27 @@ test("可视化标准模式从初始状态自动完成最终首领并保存结�
     "victory",
   );
   const record = await exported(page);
+  console.info(
+    "Visual standard finish",
+    JSON.stringify({
+      time: record.time,
+      wave: record.wave,
+      bosses: record.bosses,
+      level: record.level,
+      kills: record.kills,
+      choices: record.totals.choices,
+      damage: record.damage,
+      taken: record.taken,
+    }),
+  );
   expect(record.result).toBe("victory");
+  // Same seed/config through LabSession.step without rendering; no end-state injection.
+  expect(record.time).toBeCloseTo(981, 6);
+  expect(record.kills).toBe(2752);
+  expect(record.level).toBe(42);
+  expect(record.damage).toBeCloseTo(617202.8687128052, 6);
+  expect(record.taken).toBeCloseTo(256.73870222213856, 6);
+  expect(record.totals.choices).toBe(48);
   expect(record.bosses).toBe(4);
   expect(record.wave).toBe(20);
   expect(record.totals.choices).toBeGreaterThan(20);

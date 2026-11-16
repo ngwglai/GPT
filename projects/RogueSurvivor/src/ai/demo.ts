@@ -374,7 +374,11 @@ function renderChoice() {
   );
   const body = get<HTMLTableElement>("card-scores").tBodies[0];
   body.replaceChildren();
-  if (!choice) return;
+  if (!choice) {
+    body.dataset.sequence = "";
+    text("choice-result", "升级时自动展示真实评分");
+    return;
+  }
   text(
     "choice-result",
     choice.refreshed
