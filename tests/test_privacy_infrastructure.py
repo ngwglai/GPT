@@ -1,11 +1,12 @@
 """Exercise real Git objects, fresh checkouts and private configuration using synthetic data."""
 
-import base64
 import contextlib
+import csv
 import io
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import unittest
@@ -100,31 +101,31 @@ class InfrastructureTests(unittest.TestCase):
         folder = Path(self.temp.name) / "shared-acl-fixture"
         folder.mkdir()
 
-        def run_native(args, operation, env=None):
-            result = subprocess.run(args, env=env, capture_output=True, text=True)
+        def run_native(args, operation):
+            result = subprocess.run(args, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, operation)
             return result.stdout.strip()
 
-        def powershell(script, path):
-            command = "$ErrorActionPreference = 'Stop'; $p = $env:PRIVACY_TEST_ACL_PATH; " + script
-            encoded = base64.b64encode(command.encode("utf-16-le")).decode("ascii")
-            return run_native(
-                ["powershell.exe", "-NoProfile", "-NonInteractive", "-EncodedCommand", encoded],
-                "Native Windows ACL inspection failed",
-                dict(os.environ, PRIVACY_TEST_ACL_PATH=str(path)),
+        def dacl(path):
+            output = folder.parent / "captured-dacl.txt"
+            output.unlink(missing_ok=True)
+            run_native(
+                ["icacls.exe", str(path), "/save", str(output)],
+                "Could not export the actual NTFS DACL",
             )
+            data = output.read_text(encoding="utf-16-le").lstrip("\ufeff")
+            return next(line for line in data.splitlines() if line.startswith("D:"))
 
-        descriptor = """
-(Get-Acl -LiteralPath $p).GetSecurityDescriptorSddlForm(
-    [System.Security.AccessControl.AccessControlSections]::Access)
-"""
-        owner = powershell("[System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value", folder)
+        identity = run_native(
+            ["whoami.exe", "/user", "/fo", "csv", "/nh"], "Could not read the runner account SID",
+        )
+        _, owner = next(csv.reader([identity]))
         self.assertTrue(owner.startswith("S-1-"), "Windows account SID unavailable")
         run_native(
             ["icacls.exe", str(folder), "/grant", "*S-1-5-11:(OI)(CI)(RX)"],
             "Could not apply shared parent ACL",
         )
-        parent_acl = powershell(descriptor, folder)
+        parent_acl = dacl(folder)
         self.assertTrue(any(f";;;{sid})" in parent_acl for sid in ("AU", "S-1-5-11")),
                         "Expected authenticated users on the parent ACL")
         for name, terms, expected in (
@@ -143,22 +144,20 @@ class InfrastructureTests(unittest.TestCase):
                     ["icacls.exe", str(source), "/inheritance:r"],
                     "Could not remove inherited file rules",
                 )
-                private_acl = powershell("""
-$owner = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
-$acl = Get-Acl -LiteralPath $p
-$rules = @($acl.GetAccessRules($true, $true, [System.Security.Principal.SecurityIdentifier]))
-if (!$acl.AreAccessRulesProtected -or $rules.Count -ne 1 -or
-    $rules[0].IdentityReference.Value -ne $owner.Value -or $rules[0].IsInherited -or
-    $rules[0].AccessControlType -ne 'Allow') {
-    throw 'Expected a single explicit owner access rule'
-}
-""" + descriptor, source)
+                private_acl = dacl(source)
                 self.assertTrue(private_acl.startswith("D:P"), "Expected a protected file DACL")
+                rules = re.findall(r"\(([^()]*)\)", private_acl)
+                self.assertEqual(len(rules), 1, "Expected a single private file ACE")
+                kind, flags, _, _, _, sid = rules[0].split(";")
+                self.assertTrue(kind == "A" and "ID" not in flags, "Expected an explicit allow rule")
+                # SDDL may abbreviate the built-in local administrator account.
+                self.assertTrue(sid == owner or (sid == "LA" and owner.endswith("-500")),
+                                "The private file ACE does not belong to the runner")
                 entries = {entry.name for entry in folder.iterdir()}
                 self.assertEqual(self.initialize("--denylist", str(source)), expected)
                 self.assertEqual(source.read_bytes(), raw)
-                self.assertTrue(powershell(descriptor, source) == private_acl, "File DACL changed")
-                self.assertTrue(powershell(descriptor, folder) == parent_acl, "Parent DACL changed")
+                self.assertTrue(dacl(source) == private_acl, "File DACL changed")
+                self.assertTrue(dacl(folder) == parent_acl, "Parent DACL changed")
                 self.assertEqual({entry.name for entry in folder.iterdir()}, entries)
 
     def test_malformed_terms_and_unknown_metadata_are_not_repaired(self):
