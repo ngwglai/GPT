@@ -223,6 +223,9 @@ export function runMatch(o: MatchOptions) {
     if (frames > Math.ceil(o.seconds * hz) + 2)
       throw Error("nonadvancing match");
   }
+  // Presentation can resolve a lethal final frame without advancing match time.
+  while (w.s.phase === "dying" || w.s.phase === "reviving")
+    w.advancePresentation(dt);
   validateRun(structuredClone(w.s));
   const hits = w.hits,
     last = hits.at(-1);
@@ -245,7 +248,7 @@ export function runMatch(o: MatchOptions) {
     seconds: w.s.time,
     limitSeconds: o.seconds,
     phase: w.s.phase,
-    censored: w.s.phase === "playing",
+    censored: w.s.time >= o.seconds - 1e-8 && !dead && w.s.phase !== "victory",
     victory: w.s.phase === "victory",
     wave: w.s.wave!.number,
     level: w.s.player.level,

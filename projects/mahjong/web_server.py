@@ -104,23 +104,37 @@ class LocalTable:
                 "dealer": int(self.dealer),
                 "result": public_result,
             }
+            settlement = state.result.settlement
+            next_dealer = state.result.next_dealer
+            chosen_seed = self._choose_seed(seed)
+            self.engine.start_round(PLAYER_IDS, dealer=next_dealer, seed=chosen_seed, manual_dice_roll=True)
+
             self.history.append(record)
             self.previous_result = record
-
-            settlement = state.result.settlement
             if settlement.status == "CALCULATED":
                 for seat, delta in settlement.transfers.items():
                     self.total_scores[seat] += delta
             else:
                 self.score_pending = True
-
-            next_dealer = state.result.next_dealer
-            chosen_seed = self._choose_seed(seed)
-            self.engine.start_round(PLAYER_IDS, dealer=next_dealer, seed=chosen_seed, manual_dice_roll=True)
             self.seed = chosen_seed
             self.dealer = next_dealer
             self.round_no += 1
             return self.snapshot()
+
+    def scoring_view(self) -> dict:
+        """Include the current result until it enters the completed-round ledger."""
+        with self._lock:
+            state = self.engine.state
+            settlement = state.result.settlement if state and state.result else None
+            transfers = settlement.transfers if settlement and settlement.status == "CALCULATED" else {}
+            pending = self.score_pending or (settlement is not None and settlement.status != "CALCULATED")
+            configured = all(getattr(self.engine.scoring.config, name) is not None
+                             for name in ("base_ping_hu", "shelf_bonus", "dealer_multiplier"))
+            return {
+                "status": "PENDING_CONFIGURATION" if pending or not configured else "READY",
+                "totals": {str(int(seat)): str(value + transfers.get(seat, 0))
+                           for seat, value in self.total_scores.items()},
+            }
 
     def snapshot(self) -> dict:
         """Merge four legitimate player views for the explicit all-open test mode."""
@@ -161,8 +175,7 @@ class LocalTable:
                     "previous_result": self.previous_result,
                     "history": list(self.history),
                     "scoring": {
-                        "status": "PENDING_CONFIGURATION" if self.score_pending or any(getattr(self.engine.scoring.config, name) is None for name in ("base_ping_hu", "shelf_bonus", "dealer_multiplier")) else "READY",
-                        "totals": {str(int(seat)): str(value) for seat, value in self.total_scores.items()},
+                        **self.scoring_view(),
                         "note": "已启用示例默认计分；流局附加结算等未定义地方规则仍会标记为待配置。",
                     },
                 },

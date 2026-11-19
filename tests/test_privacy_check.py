@@ -1,6 +1,7 @@
 """All identities and credentials below are synthetic, generated inside temp repos."""
 
 import contextlib
+import gzip
 import importlib.util
 import io
 import json
@@ -192,14 +193,13 @@ class PrivacyTests(unittest.TestCase):
                 self.assertIn("noncanonical-committer", result.stdout)
                 self.assertNotIn(SAMPLE_PRIVATE, result.stdout + result.stderr)
 
-    def test_actual_pre_push_hook_forwards_remote_and_rejects_new_private_data(self):
+    def test_actual_pre_push_hook_scans_new_ref_and_rejects_private_data(self):
         shutil.copytree(ROOT / "scripts", self.repo / "scripts", ignore=shutil.ignore_patterns("__pycache__"))
         shutil.copytree(ROOT / ".githooks", self.repo / ".githooks")
         self.write("base.txt", "safe")
         self.command("git", "commit", "--quiet", "-m", "Base")
         self.write("legacy.txt", "safe")
-        bad_env = dict(self.env, GIT_COMMITTER_EMAIL=SAMPLE_PRIVATE)
-        self.command("git", "commit", "--quiet", "-m", "Legacy", env=bad_env)
+        self.command("git", "commit", "--quiet", "-m", "Legacy")
         legacy = self.command("git", "rev-parse", "HEAD")
         self.command("git", "update-ref", "refs/remotes/origin/main", legacy)
         self.write("new.txt", "safe")
@@ -309,6 +309,31 @@ class PrivacyTests(unittest.TestCase):
         self.write("old.bundle", "synthetic archive")
         self.assertIn("private-history-backup", self.check("--staged").stdout)
 
+    def test_archive_policy_scans_bounded_text_and_recognizes_history_formats(self):
+        def blob(payload):
+            path = self.repo / "fixture"
+            path.write_bytes(payload)
+            return self.command("git", "hash-object", "-w", "fixture")
+
+        with patch.object(privacy, "git", side_effect=lambda *args: subprocess.check_output(
+            ["git", *args], cwd=self.repo, env=self.env
+        )):
+            checker = privacy.Check(SAMPLE_NOREPLY, ("Fictional Private Marker",))
+            checker.blob(blob(gzip.compress(b'{"runs": []}')), "report.json.gz")
+            self.assertEqual(checker.issues, [])
+            checker.blob(blob(gzip.compress(b"Fictional Private Marker")), "report.json.gz")
+            self.assertEqual(checker.issues[-1]["kind"], "known-private-identity")
+            checker.blob(blob(b"# v3 git bundle\n"), "ref:refs/tags/fixture")
+            self.assertEqual(checker.issues[-1]["kind"], "private-history-backup")
+
+            limited = privacy.Check(SAMPLE_NOREPLY, max_bytes=128)
+            compressed = gzip.compress(b"x" * 4096)
+            self.assertLess(len(compressed), limited.max_bytes)
+            limited.blob(blob(compressed), "oversized.txt.gz")
+            self.assertEqual(limited.issues[-1]["kind"], "unscanned-archive")
+            limited.blob(blob(gzip.compress(b"short")[:-8]), "truncated.txt.gz")
+            self.assertEqual(limited.issues[-1]["kind"], "unscanned-archive")
+
     def test_annotated_tag_metadata(self):
         self.write("a.txt", "safe")
         self.command("git", "commit", "--quiet", "-m", "Sample")
@@ -326,7 +351,7 @@ class PrivacyTests(unittest.TestCase):
         self.assertEqual(self.check("--pre-push", input=data).returncode, 0)
         self.assertEqual(self.check("--pre-push", input="bad input\n").returncode, 2)
 
-    def test_pre_push_new_branch_excludes_remote_history(self):
+    def test_pre_push_new_branch_scans_history_even_with_tracking_refs(self):
         self.write("base.txt", "safe")
         self.command("git", "commit", "--quiet", "-m", "Base")
 
@@ -343,9 +368,11 @@ class PrivacyTests(unittest.TestCase):
         sha = self.command("git", "rev-parse", "HEAD")
         data = f"refs/heads/feature/new {sha} refs/heads/compressionlab {'0' * 40}\n"
         result = self.check("--pre-push", "--remote-name", "origin", input=data)
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("noncanonical-committer", result.stdout)
+        self.assertEqual(self.check("--pre-push", input=f"refs/heads/main {sha} refs/heads/main {legacy}\n").returncode, 0)
 
-        # A bad commit added after the remote baseline must still be rejected.
+        # A bad commit added after the local tracking ref must still be rejected.
         bad_env = dict(self.env, GIT_AUTHOR_NAME="Fictional Person", GIT_AUTHOR_EMAIL=SAMPLE_PRIVATE,
                        GIT_COMMITTER_NAME="Fictional Person", GIT_COMMITTER_EMAIL=SAMPLE_PRIVATE)
         self.write("bad.txt", "safe")
@@ -358,7 +385,7 @@ class PrivacyTests(unittest.TestCase):
         self.assertIn("noncanonical-committer", result.stdout)
         self.assertNotIn(SAMPLE_PRIVATE, result.stdout + result.stderr)
 
-    def test_pre_push_new_branch_requires_remote_name_for_scoped_mode(self):
+    def test_pre_push_without_remote_name_scans_full_history(self):
         self.write("base.txt", "safe")
         self.command("git", "commit", "--quiet", "-m", "Base")
         self.write("legacy.txt", "safe")

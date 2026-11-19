@@ -276,10 +276,13 @@ export function histogram(
   if (s.min === null || s.max === null) return [];
   if (!Number.isInteger(bins) || bins < 1 || bins > 50)
     throw new Error("直方图区间数需要 1–50");
-  const width = s.max === s.min ? 1 : (s.max - s.min) / bins;
-  const result = Array.from({ length: s.max === s.min ? 1 : bins }, (_, i) => ({
+  if (s.min === s.max) return [{ start: s.min, end: s.min + 1, count: xs.length }];
+  const width = (s.max - s.min) / bins;
+  if (!Number.isFinite(width) || width <= 0)
+    return [{ start: s.min, end: s.max, count: xs.length }];
+  const result = Array.from({ length: bins }, (_, i) => ({
     start: s.min! + i * width,
-    end: s.min! + (i + 1) * width,
+    end: i === bins - 1 ? s.max! : s.min! + (i + 1) * width,
     count: 0,
   }));
   xs.forEach(

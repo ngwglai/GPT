@@ -8,6 +8,7 @@ import { CombatPolicy, predictedZone, COMBAT_V3 } from "../src/ai/combat";
 import { BuildPolicy, evaluateCards, BUILD_V3 } from "../src/ai/build";
 import { LegacyPolicy } from "../src/ai/legacy";
 import { observe } from "../src/ai/types";
+import { matchesSchedule } from "../tools/ai/manifest";
 import { runMatch } from "../tools/ai/runner";
 import { simulate } from "./simulate";
 import { zoneContains } from "../src/core/attackGeometry";
@@ -152,4 +153,27 @@ describe("predictive motion and build choices", () => {
     expect(d.refresh).toBe(false);
     expect(JSON.stringify(s)).toBe(before);
   });
+});
+
+it("censors a capped upgrade and checks the complete benchmark task", () => {
+  const job = {
+    policy: "build-v4",
+    character: "ranger",
+    map: "forest",
+    seed: 7,
+    mode: "standard",
+    hz: 60,
+    decisionHz: 20,
+    seconds: 13.066666666666896,
+  } as const;
+  const row = runMatch(job);
+  expect(row).toMatchObject({
+    phase: "upgrade",
+    censored: true,
+    victory: false,
+  });
+  expect(matchesSchedule([job], [row])).toBe(true);
+  expect(matchesSchedule([job], [{ ...row, seed: 8 }])).toBe(false);
+  expect(matchesSchedule([job], [{ ...row, limitSeconds: 13 }])).toBe(false);
+  expect(matchesSchedule([job, job], [row, row])).toBe(false);
 });

@@ -13,6 +13,7 @@ export function useSimulation(id: ExperimentId, light: boolean) {
   const [snapshot, setSnapshot] = useState(() => session.snapshot());
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const driver = useRef<GasDriver | null>(null);
+  const invalidateCanvas = useRef<() => void>(() => {});
   const workerSnapshot = useRef<ReturnType<Session['snapshot']> | null>(null);
 
   const pause = useCallback(() => {
@@ -20,8 +21,12 @@ export function useSimulation(id: ExperimentId, light: boolean) {
     if (driver.current) {
       setPausing(true);
       driver.current.post({ action: 'pause' });
-    } else setRunning(false);
-  }, [clock]);
+    } else {
+      setRunning(false);
+      setSnapshot(session.snapshot());
+    }
+    invalidateCanvas.current();
+  }, [clock, session]);
   const restart = useCallback(
     (next: Config) => {
       clock.reset();
@@ -44,6 +49,8 @@ export function useSimulation(id: ExperimentId, light: boolean) {
       setConfig({ ...session.config });
       driver.current?.post({ action: 'update', patch });
       clock.resync();
+      if (!useWorker) setSnapshot(session.snapshot());
+      invalidateCanvas.current();
     }
   }
 
@@ -53,6 +60,7 @@ export function useSimulation(id: ExperimentId, light: boolean) {
     else {
       clock.play();
       setRunning(true);
+      invalidateCanvas.current();
     }
   }
 
@@ -64,11 +72,13 @@ export function useSimulation(id: ExperimentId, light: boolean) {
     for (let i = 0; i < count; i++) clock.singleStep(() => session.tick());
     session.record();
     setSnapshot(session.snapshot());
+    invalidateCanvas.current();
   }
 
   const refresh = () => {
     session.record();
     setSnapshot(session.snapshot());
+    invalidateCanvas.current();
   };
 
   useEffect(() => {
@@ -115,6 +125,7 @@ export function useSimulation(id: ExperimentId, light: boolean) {
         setConfig({ ...session.config });
       }
       if (data.action !== 'advance' || gas.fault) setSnapshot(data.snapshot);
+      invalidateCanvas.current();
       if (data.action === 'pause' || gas.fault) {
         clock.pause();
         setRunning(false);
@@ -130,6 +141,7 @@ export function useSimulation(id: ExperimentId, light: boolean) {
       const failed = session.snapshot();
       workerSnapshot.current = failed;
       setSnapshot(failed);
+      invalidateCanvas.current();
     };
     connection.post({ action: 'init', config: session.config });
     return () => {
@@ -148,7 +160,10 @@ export function useSimulation(id: ExperimentId, light: boolean) {
     let width = 0,
       height = 0,
       lastSnapshot = -Infinity,
-      frameId = 0;
+      frameId: number | undefined;
+    const schedule = () => {
+      if (!document.hidden && frameId === undefined) frameId = requestAnimationFrame(frame);
+    };
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
       width = rect.width;
@@ -157,17 +172,23 @@ export function useSimulation(id: ExperimentId, light: boolean) {
       canvas.width = Math.round(width * ratio);
       canvas.height = Math.round(height * ratio);
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      schedule();
     };
     const observer = new ResizeObserver(resize);
-    observer.observe(canvas);
-    resize();
     const onVisibility = () => {
       clock.resync();
+      if (document.hidden && frameId !== undefined) {
+        cancelAnimationFrame(frameId);
+        frameId = undefined;
+      }
+      schedule();
     };
     document.addEventListener('visibilitychange', onVisibility);
     clock.resync();
     const frame = (time: number) => {
-      if (!document.hidden) {
+      frameId = undefined;
+      if (document.hidden) return;
+      if (clock.running) {
         const rate = session.id === 'diffusion' ? 60 : session.config.rate;
         const connection = driver.current;
         if (connection) {
@@ -193,17 +214,20 @@ export function useSimulation(id: ExperimentId, light: boolean) {
             setRunning(false);
           }
         }
-        if (width > 36 && height > 36) drawSimulation(ctx, width, height, session, light);
-        if (time - lastSnapshot >= 100) {
+        if (!clock.running || time - lastSnapshot >= 100) {
           setSnapshot(workerSnapshot.current ?? session.snapshot());
           lastSnapshot = time;
         }
       }
-      frameId = requestAnimationFrame(frame);
+      if (width > 36 && height > 36) drawSimulation(ctx, width, height, session, light);
+      if (clock.running) schedule();
     };
-    frameId = requestAnimationFrame(frame);
+    invalidateCanvas.current = schedule;
+    observer.observe(canvas);
+    resize();
     return () => {
-      cancelAnimationFrame(frameId);
+      invalidateCanvas.current = () => {};
+      if (frameId !== undefined) cancelAnimationFrame(frameId);
       observer.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);
     };

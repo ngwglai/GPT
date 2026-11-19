@@ -66,8 +66,11 @@ def main():
     if sys.platform != "win32":
         parser.error("--windows-launcher requires native Windows")
     # Exercise installation and launch from a path containing spaces and Unicode.
-    with tempfile.TemporaryDirectory(prefix="ConstraintLab 验收 ") as temporary:
-        copied = Path(temporary) / "project"
+    # Resolve the runner's temp directory before CMD, npm and Vite derive
+    # their roots. Windows may otherwise mix an 8.3 alias with the long path.
+    temp_root = Path(tempfile.gettempdir()).resolve(strict=True)
+    with tempfile.TemporaryDirectory(prefix="ConstraintLab 验收 ", dir=temp_root) as temporary:
+        copied = Path(temporary).resolve(strict=True) / "project"
         shutil.copytree(project, copied, ignore=shutil.ignore_patterns(
             ".venv", "node_modules", "dist", "build", "*.egg-info",
             "__pycache__", ".pytest_cache", "test-results", "server.log",

@@ -1,5 +1,4 @@
-import { createHash } from "node:crypto";
-import { mkdirSync, writeFileSync, readFileSync, readdirSync } from "node:fs";
+import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { resolve, join } from "node:path";
 import {
   Worker,
@@ -14,6 +13,11 @@ import {
   type MatchResult,
 } from "./runner";
 import { summarize } from "./statistics";
+import {
+  hashBenchmarkSources,
+  matchesSchedule,
+  sourceFingerprint,
+} from "./manifest";
 const arg = (key: string, fallback: string) =>
   process.argv.includes(key)
     ? process.argv[process.argv.indexOf(key) + 1]
@@ -55,28 +59,8 @@ if (!isMainThread) {
       })),
     );
   }
-  function files(dir: string): string[] {
-    return readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
-      e.isDirectory() ? files(join(dir, e.name)) : [join(dir, e.name)],
-    );
-  }
-  const sources = [
-    ...files("src/core"),
-    ...files("src/data"),
-    ...files("src/ai"),
-    ...files("tools/ai"),
-  ].filter((f) => /\.(ts|mjs)$/.test(f));
-  const hashes = Object.fromEntries(
-    sources
-      .sort()
-      .map((file) => [
-        file,
-        createHash("sha256").update(readFileSync(file)).digest("hex"),
-      ]),
-  );
-  const fingerprint = createHash("sha256")
-    .update(JSON.stringify(hashes))
-    .digest("hex");
+  const hashes = hashBenchmarkSources(process.cwd());
+  const fingerprint = sourceFingerprint(hashes);
   const manifest = {
     schema: 1,
     engineBase: "232a8e235c106e88f718e014b9d5bc17065a431f",
@@ -101,7 +85,6 @@ if (!isMainThread) {
         "Resume rejected: source or schedule changed; use a new output folder.",
       );
   }
-  writeFileSync(manifestFile, JSON.stringify(manifest, null, 2) + "\n");
   if (
     ![20, 60].includes(jobs[0]?.hz || 0) ||
     ![10, 20].includes(jobs[0]?.decisionHz || 0) ||
@@ -133,6 +116,7 @@ if (!isMainThread) {
     throw Error("Invalid policy, character, map, mode, seed or worker count");
   if (new Set(jobs.map((j) => JSON.stringify(j))).size !== jobs.length)
     throw Error("Duplicate match configuration");
+  writeFileSync(manifestFile, JSON.stringify(manifest, null, 2) + "\n");
   const rows: MatchResult[] = [];
   let index = 0;
   async function lane() {
@@ -159,7 +143,7 @@ if (!isMainThread) {
           })()
         : null;
       const row: MatchResult =
-        result ||
+        (result && matchesSchedule([job], [result]) ? result : null) ||
         (await new Promise((done, fail) => {
           const worker = new Worker(new URL("./worker.mjs", import.meta.url), {
             workerData: job,

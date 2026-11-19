@@ -1,17 +1,19 @@
-"""Exercise real Git objects, fresh checkouts and private migration using synthetic data."""
+"""Exercise real Git objects, fresh checkouts and private configuration using synthetic data."""
 
 import contextlib
+import csv
 import io
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import unittest
 from unittest.mock import patch
 
 import test_privacy_check as base
-from privacy_config import LEGACY_PUBLIC_TERM, migrate_denylist
+from privacy_config import LEGACY_PUBLIC_TERM
 
 
 class InfrastructureTests(unittest.TestCase):
@@ -22,7 +24,7 @@ class InfrastructureTests(unittest.TestCase):
 
     def private_source(self, terms=None):
         path = Path(self.temp.name) / "private.json"
-        data = {"terms": terms if terms is not None else [LEGACY_PUBLIC_TERM, "Fictional Private Marker", "Fictional Private Marker"],
+        data = {"terms": terms if terms is not None else ["Fictional Private Marker", "Fictional Private Marker"],
                 "unrecognized_metadata": {"preserve": True}}
         raw = json.dumps(data, indent=3).encode()
         path.write_bytes(raw)
@@ -56,20 +58,9 @@ class InfrastructureTests(unittest.TestCase):
         self.assertEqual(self.initialize("--install-hooks", env=dict(self.env, PRIVACY_DENYLIST=str(path))), 0)
         self.assertEqual(self.command("git", "config", "--local", "privacy.denylist"), str(path.resolve()))
         self.assertEqual(self.command("git", "config", "--local", "core.hooksPath"), ".githooks")
-        corrected = json.loads(path.read_bytes())
-        self.assertEqual(corrected, dict(data, terms=data["terms"][1:]))
-        backups = list((path.parent / ".privacy-migration-backups").iterdir())
-        self.assertEqual(len(backups), 1)
-        self.assertEqual(backups[0].read_bytes(), raw)
-        if os.name != "nt":
-            self.assertEqual(path.stat().st_mode & 0o777, 0o600)
-            self.assertEqual(backups[0].stat().st_mode & 0o777, 0o600)
-            self.assertEqual(backups[0].parent.stat().st_mode & 0o777, 0o700)
-        # A second initialization is a no-op, including original backup bytes.
-        after = path.read_bytes()
         self.assertEqual(self.initialize("--install-hooks"), 0)
-        self.assertEqual(path.read_bytes(), after)
-        self.assertEqual(len(list(backups[0].parent.iterdir())), 1)
+        self.assertEqual(path.read_bytes(), raw)
+        self.assertFalse((path.parent / ".privacy-migration-backups").exists())
         self.write("public.txt", LEGACY_PUBLIC_TERM)
         self.command("git", "commit", "--quiet", "-m", "Public system fixture")
         self.write("private.txt", data["terms"][1])
@@ -78,13 +69,15 @@ class InfrastructureTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertNotIn(data["terms"][1], result.stdout + result.stderr)
 
-    def test_restored_legacy_snapshot_is_migrated_again_without_dropping_unknown_terms(self):
-        path, raw, data = self.private_source()
+    def test_legacy_source_requires_operator_correction_without_writes(self):
+        path, raw, data = self.private_source([LEGACY_PUBLIC_TERM, "Fictional Private Marker"])
+        self.assertEqual(self.initialize("--denylist", str(path)), 2)
+        self.assertEqual(path.read_bytes(), raw)
+        self.assertEqual(list(path.parent.glob(".privacy*")), [])
+        corrected = dict(data, terms=data["terms"][1:])
+        path.write_text(json.dumps(corrected), encoding="utf-8")
         self.assertEqual(self.initialize("--denylist", str(path)), 0)
-        path.write_bytes(raw)  # Simulate a new Codex session restored from an old snapshot.
-        self.assertEqual(self.initialize(), 0)
-        self.assertEqual(json.loads(path.read_bytes())["terms"], data["terms"][1:])
-        self.assertEqual(len(list((path.parent / ".privacy-migration-backups").iterdir())), 2)
+        self.assertEqual(json.loads(path.read_bytes()), corrected)
 
     def test_missing_source_does_not_initialize_or_silently_disable_private_checks(self):
         self.command("git", "config", "--unset", "privacy.email")
@@ -97,27 +90,75 @@ class InfrastructureTests(unittest.TestCase):
         self.assertEqual(self.initialize(env=dict(self.env, PRIVACY_DENYLIST=str(path))), 2)
         self.assertEqual(self.check("--staged").returncode, 2)
 
-    def test_migration_changes_only_exact_reviewed_term(self):
-        terms = [LEGACY_PUBLIC_TERM, LEGACY_PUBLIC_TERM.upper(), "GitHub", "noreply",
-                 "fictional" + "@github.com", " " + LEGACY_PUBLIC_TERM, "Fictional Private Marker"]
-        path, _, data = self.private_source(terms)
-        migrate_denylist(path, [self.repo])
-        self.assertEqual(json.loads(path.read_bytes()), dict(data, terms=terms[1:]))
-
-    def test_failed_backup_preserves_original_and_releases_lock(self):
-        path, raw, _ = self.private_source()
-        with patch("privacy_config.tempfile.NamedTemporaryFile", side_effect=OSError("synthetic failure")):
-            self.assertEqual(self.initialize("--denylist", str(path)), 2)
+    def test_initialization_preserves_other_terms_and_metadata(self):
+        path, raw, _ = self.private_source([LEGACY_PUBLIC_TERM.upper(), "GitHub", "noreply",
+                                            " " + LEGACY_PUBLIC_TERM, "Fictional Private Marker"])
+        self.assertEqual(self.initialize("--denylist", str(path)), 0)
         self.assertEqual(path.read_bytes(), raw)
-        self.assertFalse(path.with_name(path.name + ".migration.lock").exists())
 
-    def test_existing_migration_lock_is_not_removed(self):
-        path, raw, _ = self.private_source()
-        lock = path.with_name(path.name + ".migration.lock")
-        lock.write_text("synthetic lock", encoding="utf-8")
-        self.assertEqual(self.initialize("--denylist", str(path)), 2)
-        self.assertEqual(path.read_bytes(), raw)
-        self.assertTrue(lock.exists())
+    @unittest.skipUnless(os.name == "nt", "requires native Windows NTFS ACLs")
+    def test_windows_private_acl_and_shared_directory_are_unchanged(self):
+        folder = Path(self.temp.name) / "shared-acl-fixture"
+        folder.mkdir()
+
+        def run_native(args, operation):
+            result = subprocess.run(args, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, operation)
+            return result.stdout.strip()
+
+        def dacl(path):
+            output = folder.parent / "captured-dacl.txt"
+            output.unlink(missing_ok=True)
+            run_native(
+                ["icacls.exe", str(path), "/save", str(output)],
+                "Could not export the actual NTFS DACL",
+            )
+            data = output.read_text(encoding="utf-16-le").lstrip("\ufeff")
+            return next(line for line in data.splitlines() if line.startswith("D:"))
+
+        identity = run_native(
+            ["whoami.exe", "/user", "/fo", "csv", "/nh"], "Could not read the runner account SID",
+        )
+        _, owner = next(csv.reader([identity]))
+        self.assertTrue(owner.startswith("S-1-"), "Windows account SID unavailable")
+        run_native(
+            ["icacls.exe", str(folder), "/grant", "*S-1-5-11:(OI)(CI)(RX)"],
+            "Could not apply shared parent ACL",
+        )
+        parent_acl = dacl(folder)
+        self.assertTrue(any(f";;;{sid})" in parent_acl for sid in ("AU", "S-1-5-11")),
+                        "Expected authenticated users on the parent ACL")
+        for name, terms, expected in (
+            ("legacy.json", [LEGACY_PUBLIC_TERM, "Fictional Private Marker"], 2),
+            ("current.json", ["Fictional Private Marker"], 0),
+        ):
+            with self.subTest(source=name):
+                source = folder / name
+                raw = json.dumps({"terms": terms}).encode()
+                source.write_bytes(raw)
+                run_native(
+                    ["icacls.exe", str(source), "/grant:r", f"*{owner}:(F)"],
+                    "Could not grant owner access",
+                )
+                run_native(
+                    ["icacls.exe", str(source), "/inheritance:r"],
+                    "Could not remove inherited file rules",
+                )
+                private_acl = dacl(source)
+                self.assertTrue(private_acl.startswith("D:P"), "Expected a protected file DACL")
+                rules = re.findall(r"\(([^()]*)\)", private_acl)
+                self.assertEqual(len(rules), 1, "Expected a single private file ACE")
+                kind, flags, _, _, _, sid = rules[0].split(";")
+                self.assertTrue(kind == "A" and "ID" not in flags, "Expected an explicit allow rule")
+                # SDDL may abbreviate the built-in local administrator account.
+                self.assertTrue(sid == owner or (sid == "LA" and owner.endswith("-500")),
+                                "The private file ACE does not belong to the runner")
+                entries = {entry.name for entry in folder.iterdir()}
+                self.assertEqual(self.initialize("--denylist", str(source)), expected)
+                self.assertEqual(source.read_bytes(), raw)
+                self.assertTrue(dacl(source) == private_acl, "File DACL changed")
+                self.assertTrue(dacl(folder) == parent_acl, "Parent DACL changed")
+                self.assertEqual({entry.name for entry in folder.iterdir()}, entries)
 
     def test_malformed_terms_and_unknown_metadata_are_not_repaired(self):
         path, _, _ = self.private_source()

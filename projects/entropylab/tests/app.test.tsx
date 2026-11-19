@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import App from '../src/App';
 
 beforeEach(() => {
@@ -60,6 +60,30 @@ describe('application interaction', () => {
     fireEvent.click(screen.getByRole('button', { name: '重置模拟' }));
     expect(screen.getByRole('status', { name: '模拟状态' }).textContent).toBe('已暂停');
     expect(metric('模拟时间')).toBe('0.0');
+  });
+  it('schedules no idle frames and repaints after a paused single step', () => {
+    const clearRect = vi.fn();
+    const context = new Proxy({ clearRect }, {
+      get: (target, key) => key === 'clearRect' ? target.clearRect : () => {},
+    }) as unknown as CanvasRenderingContext2D;
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(context);
+    const bounds = vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect')
+      .mockReturnValue({ width: 320, height: 240 } as DOMRect);
+    try {
+      render(<App />);
+      const frames = vi.mocked(requestAnimationFrame);
+      expect(frames).toHaveBeenCalledTimes(1);
+      act(() => frames.mock.calls[0][0](100));
+      expect(clearRect).toHaveBeenCalledTimes(1);
+      expect(frames).toHaveBeenCalledTimes(1);
+      fireEvent.click(screen.getByRole('button', { name: '单步执行' }));
+      expect(frames).toHaveBeenCalledTimes(2);
+      act(() => frames.mock.calls[1][0](200));
+      expect(clearRect).toHaveBeenCalledTimes(2);
+      expect(frames).toHaveBeenCalledTimes(2);
+    } finally {
+      bounds.mockRestore();
+    }
   });
   it('updates divider and parameters, restores defaults, and restarts on count change', () => {
     render(<App />);

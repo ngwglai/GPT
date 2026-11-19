@@ -159,7 +159,10 @@ class GameEngine:
         if not p.is_declared_ting:
             return False
         tiles = p.concealed_tiles + ([extra] if extra is not None else [])
-        if not p.has_completed_first_gold_shelf and any(t.type_id == s.gold_tile_type for t in tiles):
+        if not p.has_completed_first_gold_shelf and (
+            any(t.type_id == s.gold_tile_type for t in tiles)
+            or any(tile.type_id == s.gold_tile_type for meld in p.melds for tile in meld.tiles)
+        ):
             return False
         return bool(check_player_hu(self.solver, p, tiles, s.gold_tile_type))
 

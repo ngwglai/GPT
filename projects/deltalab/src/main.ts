@@ -44,7 +44,8 @@ function message(text = '', error = false) { el('message').hidden = !text; el('m
 function guard(action: () => void) { try { action(); message(); } catch (e) { message(e instanceof Error ? e.message : '操作失败', true); } }
 function stop() { if (timer !== undefined) clearTimeout(timer); timer = undefined; el('play').textContent = '播放'; el('pause').setAttribute('disabled', ''); }
 function drafts() { draft = Object.fromEntries(state.graph.nodes.filter(n => n.kind === 'input').map(n => [n.id, String(state.values[n.id])])); }
-function clearRun() { stop(); report = undefined; execution = undefined; cursor = 0; viewBase = state; }
+let importRevision = 0;
+function clearRun() { importRevision++; stop(); report = undefined; execution = undefined; cursor = 0; viewBase = state; }
 function replace(next: Snapshot) { clearRun(); state = next; initial = structuredClone(next); viewBase = next; drafts(); selected = ''; render(); editor(); }
 function getUpdates(): Updates {
   return Object.fromEntries(Object.entries(draft).map(([id, value]) => {
@@ -53,6 +54,7 @@ function getUpdates(): Updates {
   }));
 }
 function prepare() {
+  importRevision++;
   stop();
   const next = verify(state, getUpdates()); // Atomic: retain old UI/state if numeric validation fails.
   report = next;
@@ -161,16 +163,23 @@ select('node-select').addEventListener('change', () => { selected = select('node
 el('graph').addEventListener('click', e => { const node = (e.target as Element).closest('[data-node]'); if (node) { selected = node.getAttribute('data-node')!; select('node-select').value = selected; editor(); renderPlayback(); } });
 el('graph').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const node = (e.target as Element).closest<SVGElement>('[data-node]'); if (node) { e.preventDefault(); node.dispatchEvent(new MouseEvent('click', { bubbles: true })); } } });
 input('import').addEventListener('change', async () => {
-  const file = input('import').files?.[0]; if (!file) return;
+  const field = input('import');
+  const file = field.files?.[0];
+  if (!file) return;
+  field.value = '';
+  const revision = ++importRevision;
   try {
     if (file.size > MAX_JSON_BYTES) throw new Error('JSON 超过 512 KiB 上限');
-    const data = importExperiment(await file.text());
+    const content = await file.text();
+    if (revision !== importRevision) return;
+    const data = importExperiment(content);
     const next = restore(data); currentPreset = data.parameters.preset; currentSeed = data.seed; currentSize = data.parameters.size;
     select('strategy').value = data.parameters.strategy; input('seed').value = String(currentSeed); input('size').value = String(currentSize);
     if (currentPreset !== 'custom') select('preset').value = currentPreset;
     replace(next); message('JSON 已导入；全部缓存由图结构和输入重新计算。');
-  } catch (e) { message(e instanceof Error ? e.message : '导入失败', true); }
-  finally { input('import').value = ''; }
+  } catch (e) {
+    if (revision === importRevision) message(e instanceof Error ? e.message : '导入失败', true);
+  }
 });
 let dark = false;
 try { dark = localStorage.getItem('deltalab-theme') === 'dark'; } catch { /* Storage may be unavailable offline. */ }

@@ -9,7 +9,7 @@ import re
 import subprocess
 import sys
 
-from privacy_config import migrate_denylist
+from privacy_config import LEGACY_PUBLIC_TERM, read_denylist
 
 
 def run(args):
@@ -59,7 +59,10 @@ def main(argv=None):
                        and os.access(Path(root) / ".githooks" / name, os.X_OK)
                        for name in ("pre-commit", "commit-msg", "pre-push")):
                 raise ValueError("tracked privacy hooks are missing")
-        private_path, migrated = migrate_denylist(source, [root, run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"]).strip()])
+        private_path, _, private_data = read_denylist(source, [root, run(["git", "rev-parse", "--path-format=absolute", "--git-common-dir"]).strip()])
+        if LEGACY_PUBLIC_TERM in private_data["terms"]:
+            print("Private configuration contains the documented legacy public term. Correct the source in its private storage and retry. No file was rewritten.", file=sys.stderr)
+            return 2
         for key, value in {
             "user.name": "ngwglai", "user.email": email,
             "author.name": "ngwglai", "author.email": email,
@@ -73,7 +76,7 @@ def main(argv=None):
                 raise ValueError("environment identity override detected; local config cannot override process variables")
         if args.install_hooks:
             run(["git", "config", "--local", "core.hooksPath", ".githooks"])
-        print("Private configuration validated; reviewed legacy correction applied with verified backup." if migrated else "Private configuration validated; no migration needed.")
+        print("Private configuration validated without rewriting it.")
         print("Confirmed account-owned noreply identity configured locally; no global settings changed.")
         return 0
     except (ValueError, OSError, KeyError, TypeError):

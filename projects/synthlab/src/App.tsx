@@ -9,19 +9,24 @@ import { WorkerClient } from './worker-client';
 const labels = { verified: '有限域验证通过', 'no-solution': '有界范围无解', 'budget-exhausted': '资源预算耗尽', cancelled: '已取消', 'invalid-input': '非法输入', 'internal-error': '内部异常', 'worker-error': 'Worker 故障' };
 const budgetLabels: Record<keyof Budget, string> = { maxNodes: 'AST 节点上限', maxCandidates: '总候选预算', maxStored: '每轮代表上限', timeMs: '总时间预算（毫秒）', maxIterations: 'CEGIS 迭代上限', verifyLimit: '每轮验证数量上限' };
 export function App() {
-  const initial = preset('Max2');
-  const [c, setC] = useState<Config>(initial);
-  const [name, setName] = useState<Name>('Max2');
-  const [examples, setExamples] = useState(JSON.stringify(initial.examples, null, 2));
-  const [constants, setConstants] = useState(JSON.stringify(initial.constants));
+  const [baseline, setBaseline] = useState(() => preset('Max2'));
+  const [c, setC] = useState<Config>(baseline);
+  const [name, setName] = useState<Name | 'imported'>('Max2');
+  const [examples, setExamples] = useState(JSON.stringify(baseline.examples, null, 2));
+  const [constants, setConstants] = useState(JSON.stringify(baseline.constants));
   const [specAst, setSpecAst] = useState('{"op":"var","index":0}');
   const [json, setJson] = useState(''); const [error, setError] = useState('');
   const [running, setRunning] = useState(false); const [result, setResult] = useState<Result>();
   const [snapshot, setSnapshot] = useState<Snapshot>(emptySnapshot());
   const [dark, setDark] = useState(() => window.matchMedia('(prefers-color-scheme: dark)').matches);
   const client = useRef<WorkerClient | undefined>(undefined);
-  useEffect(() => () => client.current?.dispose(), []);
+  const importRevision = useRef(0);
+  useEffect(() => () => {
+    importRevision.current++;
+    client.current?.dispose();
+  }, []);
   function invalidate() {
+    importRevision.current++;
     client.current?.dispose(); client.current = undefined; setRunning(false); setResult(undefined); setSnapshot(emptySnapshot()); setError('');
   }
   function edit(next: Config) { invalidate(); setC(next); }
@@ -41,7 +46,26 @@ export function App() {
   }
   function importText(text: string) {
     invalidate();
-    try { load(importExperiment(text)); setJson(text); } catch (e) { setError(e instanceof Error ? e.message : '导入失败'); }
+    try {
+      const next = importExperiment(text);
+      setName(next.spec.kind === 'builtin' ? next.spec.name : 'imported');
+      setBaseline(next);
+      load(next);
+      setJson(text);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '导入失败');
+    }
+  }
+  async function importFile(file: File) {
+    invalidate();
+    const revision = importRevision.current;
+    if (file.size > MAX_IMPORT_BYTES) { setError('JSON 超过 2 MiB'); return; }
+    try {
+      const text = await file.text();
+      if (revision === importRevision.current) importText(text);
+    } catch {
+      if (revision === importRevision.current) setError('文件读取失败');
+    }
   }
   function download() {
     try {
@@ -54,7 +78,7 @@ export function App() {
   return <div className={dark ? 'app dark' : 'app'}>
     <header><div><p className="eyebrow">PROGRAM SYNTHESIS LABORATORY / v0.1</p><h1>SynthLab <span>程序合成实验室</span></h1><p>让程序从样例中生长，用真实反例修正猜想。</p></div><button onClick={() => setDark(!dark)} aria-label="切换主题">{dark ? '浅色主题' : '深色主题'}</button></header>
     <main><aside>
-      <section><h2>01 / 实验配置</h2><label>内置案例<select value={name} onChange={e => { const n = e.target.value as Name; setName(n); load(preset(n)); }}>{NAMES.map(n => <option key={n}>{n}</option>)}</select></label><p className="note">{lessons[name]}</p>
+      <section><h2>01 / 实验配置</h2><label>内置案例<select value={name} onChange={e => { const n = e.target.value as Name; const next = preset(n); setName(n); setBaseline(next); load(next); }}>{NAMES.map(n => <option key={n}>{n}</option>)}{name === 'imported' && <option value="imported" disabled>已导入的自定义案例</option>}</select></label><p className="note">{name === 'imported' ? '重置会恢复导入的配置。' : lessons[name]}</p>
         <label>目标规格<select value={c.spec.kind === 'builtin' ? c.spec.name : 'expression'} onChange={e => edit({ ...c, spec: e.target.value === 'expression' ? { kind: 'expression', ast: { op: 'var', index: 0 } } : { kind: 'builtin', name: e.target.value as Name } })}>{NAMES.map(n => <option key={n}>{n}</option>)}<option value="expression">受限 AST 表达式</option></select></label>
         {c.spec.kind === 'expression' && <label>规格 AST<textarea value={specAst} onChange={e => { invalidate(); setSpecAst(e.target.value); }}/></label>}
         <label>变量数量<select value={c.variables} onChange={e => edit({ ...c, variables: Number(e.target.value) })}><option value="1">1（x）</option><option value="2">2（x, y）</option></select></label>
@@ -63,10 +87,10 @@ export function App() {
         <fieldset><legend>DSL 运算符</legend><div className="operators">{OPS.map(op => <label key={op}><input type="checkbox" checked={c.operators.includes(op)} onChange={e => edit({ ...c, operators: e.target.checked ? [...c.operators, op] : c.operators.filter(v => v !== op) })}/>{op}</label>)}</div></fieldset>
         <div className="fields">{(Object.keys(budgetLabels) as (keyof Budget)[]).map(k => <label key={k}>{budgetLabels[k]}<input type="number" value={c.budget[k]} onChange={e => edit({ ...c, budget: { ...c.budget, [k]: Number(e.target.value) } })}/></label>)}</div>
         <fieldset><legend>验证域（各变量的整数区间）</legend><div className="fields"><label>域下界<input type="number" value={c.domain.min} onChange={e => edit({ ...c, domain: { ...c.domain, min: Number(e.target.value) } })}/></label><label>域上界<input type="number" value={c.domain.max} onChange={e => edit({ ...c, domain: { ...c.domain, max: Number(e.target.value) } })}/></label></div></fieldset>
-        <div className="actions"><button className="primary" disabled={running} onClick={start}>开始合成</button><button disabled={!running} onClick={() => client.current?.cancel()}>取消</button><button onClick={() => load(preset(name))}>重置</button></div>
+        <div className="actions"><button className="primary" disabled={running} onClick={start}>开始合成</button><button disabled={!running} onClick={() => client.current?.cancel()}>取消</button><button onClick={() => load(baseline)}>重置</button></div>
         <p className="note">全部计算在本地 Worker 中运行。更改配置会清除旧结论。</p>
       </section>
-      <section><h2>JSON / 实验交换</h2><label>实验 JSON<textarea aria-label="实验 JSON" rows={4} value={json} onChange={e => { invalidate(); setJson(e.target.value); }}/></label><div className="actions"><button onClick={() => importText(json)}>导入 JSON</button><button onClick={download}>导出 JSON</button></div><label className="file">导入文件<input type="file" accept=".json,application/json" onChange={async e => { invalidate(); const f = e.target.files?.[0]; if (!f) return; if (f.size > MAX_IMPORT_BYTES) { setError('JSON 超过 2 MiB'); return; } try { importText(await f.text()); } catch { setError('文件读取失败'); } }}/></label><p className="note">导入只恢复配置；导出中的历史结果不会被当作有效结论。</p></section>
+      <section><h2>JSON / 实验交换</h2><label>实验 JSON<textarea aria-label="实验 JSON" rows={4} value={json} onChange={e => { invalidate(); setJson(e.target.value); }}/></label><div className="actions"><button onClick={() => importText(json)}>导入 JSON</button><button onClick={download}>导出 JSON</button></div><label className="file">导入文件<input type="file" accept=".json,application/json" onChange={e => { const file = e.target.files?.[0]; e.target.value = ''; if (file) void importFile(file); }} /></label><p className="note">导入只恢复配置；导出中的历史结果不会被当作有效结论。</p></section>
     </aside><article>
       {error && <div role="alert" className="alert">{error}</div>}
       <section className="candidate"><div className="section-top"><h2>02 / 当前候选程序</h2><span className={`badge ${result?.status === 'verified' ? 'pass' : ''}`} role="status">{running ? 'Worker 搜索中' : result ? labels[result.status] : '等待实验'}</span></div><pre data-testid="candidate">{view.candidate ? format(view.candidate) : '从一个样例开始，寻找一个程序。'}</pre><p>{result?.message ?? '按节点数递增枚举，保留每种类型与观察签名的最小代表。'}</p>{view.candidate && <details><summary>真实 AST</summary><pre>{JSON.stringify(view.candidate, null, 2)}</pre></details>}</section>
