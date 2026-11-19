@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "local-mahjong-engine"
+version = "0.5.0"
+description = "Deterministic four-player local Mahjong engine with continuous local four-seat web test UI with manual dice, visible wall and presentation hooks"
+requires-python = ">=3.11"
+dependencies = ["aiohttp>=3.13.5,<4"]
+
+[tool.setuptools.packages.find]
+include = ["mahjong*"]

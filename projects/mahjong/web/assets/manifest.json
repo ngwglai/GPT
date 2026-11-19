@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "tiles": {},
+  "table": {},
+  "ui": {},
+  "dice": {},
+  "bgm": { 
+"game": "bgm/1.mp3"
+},
+  "sfx": {},
+  "voice": {
+    "tiles": {
+    "0": "voice/tiles/0.mp3",
+    "1": "voice/tiles/1.mp3",
+    "2": "voice/tiles/2.mp3",
+    "3": "voice/tiles/3.mp3",
+    "4": "voice/tiles/4.mp3",
+    "5": "voice/tiles/5.mp3",
+    "6": "voice/tiles/6.mp3",
+    "7": "voice/tiles/7.mp3",
+    "8": "voice/tiles/8.mp3",
+
+    "9": "voice/tiles/9.mp3",
+    "10": "voice/tiles/10.mp3",
+    "11": "voice/tiles/11.mp3",
+    "12": "voice/tiles/12.mp3",
+    "13": "voice/tiles/13.mp3",
+    "14": "voice/tiles/14.mp3",
+    "15": "voice/tiles/15.mp3",
+    "16": "voice/tiles/16.mp3",
+    "17": "voice/tiles/17.mp3",
+
+    "18": "voice/tiles/18.mp3",
+    "19": "voice/tiles/19.mp3",
+    "20": "voice/tiles/20.mp3",
+    "21": "voice/tiles/21.mp3",
+    "22": "voice/tiles/22.mp3",
+    "23": "voice/tiles/23.mp3",
+    "24": "voice/tiles/24.mp3",
+    "25": "voice/tiles/25.mp3",
+    "26": "voice/tiles/26.mp3",
+
+    "27": "voice/tiles/27.mp3",
+    "28": "voice/tiles/28.mp3",
+    "29": "voice/tiles/29.mp3",
+    "30": "voice/tiles/30.mp3",
+    "31": "voice/tiles/31.mp3",
+    "32": "voice/tiles/32.mp3",
+    "33": "voice/tiles/33.mp3"
+},
+    "actions": {
+      "chi": "voice/actions/chi.mp3",
+      "peng": "voice/actions/peng.mp3",
+      "gang": "voice/actions/gang.mp3",
+      "ting": "voice/actions/ting.mp3",
+      "gold_shelved": "voice/actions/gold_shelved.mp3",
+      "hu": "voice/actions/hu.mp3"
+},
+    "wins": {}
+  },
+  "effects": {}
+}

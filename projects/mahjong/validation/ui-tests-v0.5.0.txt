@@ -1,0 +1,6 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> local-mahjong-ui-tests@0.5.0 test:ui
+> node tests/ui_smoke.cjs http://127.0.0.1:18765
+
+PASS: four DOM clients, create/join/seats, dealer dice, 16 synchronized moves, private hands, wall, XSS escaping, disconnect/reload, local mode and public orphan pickup without a draw. No script errors.

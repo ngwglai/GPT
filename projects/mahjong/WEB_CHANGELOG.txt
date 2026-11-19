@@ -1,0 +1,42 @@
+0.2.0 Web 测试版
+
+- 增加零第三方依赖的本地 HTTP 服务 web_server.py。
+- 增加一页式四家明牌麻将桌：北上、南下、东左、西右。
+- 四家手牌、摸牌、副露、已上金的牌、报听状态、听口、牌河全部可视。
+- 手牌点击后只显示服务器 legal_actions 中存在的操作。
+- 支持打牌、报听、上金、吃、碰、明杠、暗杠、补杠、胡、过。
+- 支持多人响应窗口和“未响应者全部过”。
+- 支持指定随机种子/庄家新开一局，便于复现问题。
+- 测试服务器只合并四份 TableService/player_view，不向浏览器暴露 GameState、完整墙序、event_log。
+- 清理已废弃的 GOLD_ACTION、KEEP_GOLD、gold_queue、initializing_gold 与 shelf_replacement 残留。
+- 金规则保持：不能普通弃牌；首次上金前不能胡；上金占一次出牌，不补牌、不响应，直接轮到下家。
+
+
+0.2.1 报听暗牌
+
+- 新增 PlayerState.ting_tile。
+- 宣告听牌的牌不再进入普通牌河，不设置 current_discard，不建立吃碰杠胡响应窗口。
+- 报听后直接轮到下家摸牌。
+- ting_tile 计入 136 张实体牌守恒，但不计入 13/14 张结构手牌、胡牌或听口计算。
+- player_view：本人看到真实 ting_tile；其他玩家只收到 {hidden: true}。
+- TING_DECLARED 日志保留真实牌 ID；不再同时产生 TILE_DISCARDED。
+- Web 玩家区域增加独立的“报听牌”显示位。
+
+0.3.0 连续牌局
+- 本局结束后主按钮自动切换为“下一局”。
+- 庄家胡牌/流局连庄；闲家胡牌时庄家顺延一位。
+- 下一局自动生成新 Seed，并保留上一局 Seed/结果。
+- 页面显示局数、上一局摘要和计分待配置状态。
+- 增加“按设置重置整场”调试入口。
+- 预留跨局累计计分槽，只接受 CALCULATED 的 Settlement，不虚构地方计分。
+
+0.3.1 联机前表现层基础
+- Web 新局不再立即发牌：进入 ROLLING_DICE，只有庄家拥有 ROLL_DICE 操作。
+- 骰子/牌墙仍由服务器 Seed 决定；同 Seed + 同庄家可完整复现骰子、开牌位置与初始手牌。
+- 掷骰前隐藏骰子结果、开牌位置、金指示牌与金；庄家操作后才公开并发牌。
+- player_view 增加安全 wall_view：四面各 17 墩、上下层存在状态、开牌墩、正常摸牌端、杠后补牌端、保留牌墙与墙上实牌数；绝不返回未摸牌 type/id。
+- Web 中央增加四边双层牌墙可视化，随发牌、摸牌和杠后补牌实时消耗。
+- 增加 presentation.js：AssetManager / AudioManager / AnimationManager / NotificationManager / PresentationEventBus。
+- 增加安全 presentation_events；不直接暴露 event_log、Seed、初始手牌或实体牌 ID。
+- 预建 assets/tiles、table、ui、dice、bgm、sfx、voice、effects 目录与 manifest.json；素材缺失时继续使用 CSS/文字回退。
+- 增加 BGM / 音效 / 语音三路独立开关与音量设置。

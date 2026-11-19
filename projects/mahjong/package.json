@@ -1,0 +1,9 @@
+{
+  "name": "local-mahjong-ui-tests",
+  "version": "0.5.0",
+  "private": true,
+  "description": "Optional development-only DOM integration tests; not required to play",
+  "scripts": {"test:ui": "node tests/ui_smoke.cjs"},
+  "devDependencies": {"jsdom": "30.0.1"},
+  "engines": {"node": ">=22.19.0"}
+}
