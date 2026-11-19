@@ -14,6 +14,28 @@ class WebServerBoundaryTests(unittest.TestCase):
             "type": action["type"], "tile_ids": action["tile_ids"],
         })
 
+    def test_current_round_totals_are_visible_and_carried_once(self):
+        from mahjong.game.service import TableService
+        from web_server import PLAYER_IDS
+        from .helpers import build_fixture, PlayerFixture
+        from .test_gold import WAIT
+
+        table = LocalTable(seed=42)
+        build_fixture(table.engine, {Seat.EAST: PlayerFixture(WAIT + [31], declared=True,
+                                                             last_draw_type=31)}, gold=33)
+        for seat, player in table.engine.state.players.items():
+            player.player_id = PLAYER_IDS[seat]
+        table.service = TableService(table.engine)
+        snap = table.snapshot()
+        result = table.act(seat=Seat.EAST, payload={
+            "round_id": snap["round_id"], "revision": snap["revision"],
+            "type": "HU", "tile_ids": [],
+        })
+        expected = {"0": "6", "1": "-2", "2": "-2", "3": "-2"}
+        self.assertEqual(result["match"]["scoring"]["totals"], expected)
+        self.assertEqual(table.scoring_view()["totals"], expected)
+        self.assertEqual(table.next_round(seed=43)["match"]["scoring"]["totals"], expected)
+
     def test_snapshot_merges_four_player_views(self):
         table = LocalTable(seed=42)
         snap = table.snapshot()

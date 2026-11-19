@@ -207,6 +207,12 @@ npx tsx tools/ai/report.ts validation/ai-player/replay ../../work/ai/replay
 npm run ai:acceptance -- validation/ai-player/replay
 ```
 
+复验已提交的 holdout 时，请把 `974365751cdd84a217f9f71af676316d1294db15`（#52 合并提交）的 `projects/RogueSurvivor/` 目录作为第二个参数传给当前验收工具。工具仍逐文件验证清单中的源码摘要，并核对完整任务清单。直接复验当前源码生成的结果时省略第二个参数。
+
+```bash
+npm run ai:acceptance -- /path/to/copied/holdout /path/to/frozen/checkout/projects/RogueSurvivor
+```
+
 证据目录：`validation/ai-player/{training,holdout,endless,endless-extended}/`。每组summary.json含分层与区间，results.csv提供逐局指标；完整每局JSON保存在runs.json.gz，含属性/构筑/选牌、全部候选评分、受伤、现场、每分钟轨迹统计和来源输出；解压即标准JSON。holdout、endless、endless-extended的manifest.json记录源码SHA256、固定调度与Node版本；延长批次的原调度与预算变更见同目录BUDGET.json。`acceptance.json`逐项检验至少24独立配对、覆盖、规则、两组改进及置信下界，不重试失败种子。
 
 ## 已知问题与后续

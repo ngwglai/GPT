@@ -183,6 +183,7 @@ func draw_home() -> void:
 	seed_input.max_length = 24
 	seed_input.context_menu_enabled = false
 	seed_input.text = seed_text
+	seed_input.text_changed.connect(func(value: String): seed_text = value)
 	seed_input.add_theme_stylebox_override("normal",box_style(Color("122330"),Color(MINT,0.4)))
 	layer.add_child(seed_input)
 	button(L.t("THREAT %d  +") % difficulty,Rect2(322,604,160,46),func(): capture_seed(); difficulty=(difficulty+1)%5; redraw())
@@ -238,7 +239,7 @@ func draw_map() -> void:
 			var kind: String = game.s.map[row][lane]
 			var visited: bool = row < game.s.path.size() and game.s.path[row] == lane
 			var color := CORAL if kind in ["elite","boss"] else (GOLD if kind == "shop" else MINT)
-			button(("+ " if visited else "")+names[kind],Rect2(351+row*112,208+lane*145,90,64),func(): act(game.travel(row,lane)); selected_target=0,game.reachable(row,lane),color)
+			button(("+ " if visited else "")+names[kind],Rect2(351+row*112,208+lane*145,90,64),func(): selected_target=0; act(game.travel(row,lane)),game.reachable(row,lane),color)
 	label_at(L.t("SEED %s   /   Reach the core. Survive. Adapt.") % game.s.seed,Rect2(351,680,850,30),14,MUTED)
 
 func draw_combat() -> void:

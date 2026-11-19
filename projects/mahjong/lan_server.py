@@ -107,10 +107,7 @@ class Room:
                 'match_id': self.table.match_id, 'round_no': self.table.round_no,
                 'previous_result': record(self.table.previous_result),
                 'history': [record(r) for r in self.table.history],
-                'scoring': {'status': 'PENDING_CONFIGURATION' if self.table.score_pending or
-                            any(getattr(self.table.engine.scoring.config, k) is None
-                                for k in ('base_ping_hu', 'shelf_bonus', 'dealer_multiplier')) else 'READY',
-                            'totals': {str(int(s)): str(v) for s, v in self.table.total_scores.items()}},
+                'scoring': self.table.scoring_view(),
             }
         return {'type': 'state', 'room_version': self.version,
                 'room': {'code': self.code, 'started': self.table is not None,

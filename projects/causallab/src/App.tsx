@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   addEdge,
   descendants,
@@ -126,6 +126,7 @@ export default function App() {
     [weight, setWeight] = useState(1);
   const [importText, setImportText] = useState(""),
     [importMode, setImportMode] = useState("model");
+  const importRevision = useRef(0);
   let modelError = "",
     settingsError = "";
   try {
@@ -141,6 +142,7 @@ export default function App() {
     }
   const valid = !modelError && !settingsError;
   function clear() {
+    importRevision.current++;
     setRun(null);
     setIntervention(null);
     setError("");
@@ -184,6 +186,7 @@ export default function App() {
     });
   }
   function importContent(content: string) {
+    importRevision.current++;
     attempt(() => {
       const loaded =
         importMode === "model"
@@ -962,7 +965,10 @@ export default function App() {
                   <select
                     aria-label="导入类型"
                     value={importMode}
-                    onChange={(e) => setImportMode(e.target.value)}
+                    onChange={(e) => {
+                      importRevision.current++;
+                      setImportMode(e.target.value);
+                    }}
                   >
                     <option value="model">模型 JSON</option>
                     <option value="experiment">实验参数 JSON</option>
@@ -977,15 +983,22 @@ export default function App() {
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
+                      const revision = ++importRevision.current;
+                      e.target.value = "";
                       if (file.size > MAX_IMPORT_BYTES) {
                         setError("导入文件不能超过 64 KiB");
                         return;
                       }
                       void file
                         .text()
-                        .then(importContent)
-                        .catch(() => setError("文件读取失败"));
-                      e.target.value = "";
+                        .then((content) => {
+                          if (revision === importRevision.current)
+                            importContent(content);
+                        })
+                        .catch(() => {
+                          if (revision === importRevision.current)
+                            setError("文件读取失败");
+                        });
                     }}
                   />
                 </label>

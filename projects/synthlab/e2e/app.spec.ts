@@ -30,7 +30,20 @@ test('bounded no-solution differs from resource exhaustion', async ({ page }) =>
   await run(page); await expect(page.getByRole('status')).toHaveText('资源预算耗尽');
 });
 test('cancel immediately terminates real Worker without claiming success', async ({ page }) => {
-  await choose(page, 'Sign'); await run(page); await page.getByRole('button', { name: '取消', exact: true }).click();
+  // Keep the real worker pending until the cancellation has been observed.
+  let release!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  await page.route('**/assets/synth.worker-*.js', async route => {
+    await held;
+    await route.continue().catch(() => {}); // Termination can abort the request.
+  });
+  try {
+    await choose(page, 'Sign');
+    await run(page);
+    await page.getByRole('button', { name: '取消', exact: true }).click();
+  } finally {
+    release();
+  }
   await expect(page.getByRole('status')).toHaveText('已取消'); await expect(page.getByText(/完整通过（仅有限域）/)).toHaveCount(0);
   await expect(page.getByRole('button', { name: '开始合成', exact: true })).toBeEnabled();
 });
@@ -47,6 +60,22 @@ test('export download and import restore config without trusting historical resu
   await page.getByRole('button', { name: '导入 JSON', exact: true }).click();
   await expect(page.getByRole('status')).toHaveText('等待实验'); await expect(page.getByText(/完整通过（仅有限域）/)).toHaveCount(0);
   await run(page); await expect(page.getByRole('status')).toHaveText('有限域验证通过');
+});
+test('import keeps the case selector and reset baseline in sync', async ({ page }) => {
+  await choose(page, 'Sign');
+  const pending = page.waitForEvent('download');
+  await page.getByRole('button', { name: '导出 JSON', exact: true }).click();
+  await pending;
+  const json = page.getByLabel('实验 JSON', { exact: true });
+  const exported = await json.inputValue();
+  await choose(page, 'Max2');
+  await json.fill(exported);
+  await page.getByRole('button', { name: '导入 JSON', exact: true }).click();
+  await expect(page.getByLabel('内置案例')).toHaveValue('Sign');
+  await expect(page.getByLabel('目标规格')).toHaveValue('Sign');
+  await page.getByLabel('目标规格').selectOption('Abs');
+  await page.getByRole('button', { name: '重置', exact: true }).click();
+  await expect(page.getByLabel('目标规格')).toHaveValue('Sign');
 });
 test('invalid file import clears prior verification', async ({ page }) => {
   await choose(page, 'Max2'); await run(page); await expect(page.getByRole('status')).toHaveText('有限域验证通过');

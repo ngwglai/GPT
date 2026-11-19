@@ -62,6 +62,19 @@ class GoldTests(unittest.TestCase):
         self.assertFalse(any(a.type == ActionType.DISCARD and a.tile_ids == (e.state.players[E].last_drawn_tile.instance_id,)
                              for a in e.legal_actions(E)))
 
+    def test_first_shelf_required_when_gold_is_in_a_meld(self):
+        from mahjong.core.player import MeldType
+
+        hand = [9, 10, 11, 18, 19, 20, 27, 27, 27, 31, 31]
+        for meld in ((MeldType.CHI, [0, 1, 2], E), (MeldType.AN_GANG, [2] * 4, None)):
+            for completed in (False, True):
+                with self.subTest(meld=meld[0], first_shelf_completed=completed):
+                    e = engine()
+                    build_fixture(e, {S: PlayerFixture(hand, melds=[meld], declared=True,
+                                                      first_shelf_completed=completed,
+                                                      last_draw_type=31)}, current=S, gold=2)
+                    self.assertEqual(has(e, S, ActionType.HU), completed)
+
     def test_cannot_shelve_old_gold_after_ting(self):
         e = engine()
         build_fixture(e,{E:PlayerFixture(WAIT[:-1]+[33,31],declared=True,shelves=1,last_draw_type=31)},gold=33)

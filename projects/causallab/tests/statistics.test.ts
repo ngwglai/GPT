@@ -96,6 +96,9 @@ describe("independent small arithmetic fixtures", () => {
     expect(h.map((x) => x.count)).toEqual([2, 3]);
     expect(histogram([2, 2, 2])).toEqual([{ start: 2, end: 3, count: 3 }]);
     expect(histogram([])).toEqual([]);
+    expect(histogram([0, Number.MIN_VALUE])).toEqual([
+      { start: 0, end: Number.MIN_VALUE, count: 2 },
+    ]);
   });
   it("critical values converge to normal and grow for tiny samples", () => {
     expect(critical95(1)).toBeGreaterThan(12);

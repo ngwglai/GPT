@@ -5,7 +5,10 @@ from collections import Counter
 import hashlib
 import json
 from pathlib import Path
+import gzip
+import io
 import re
+import zlib
 import subprocess
 import sys
 
@@ -29,6 +32,12 @@ LEGACY_SYNTHETIC_EMAIL_FIXTURES = {
         "tests/test_privacy_check.py", {"person" + "@" + "github.com"},
     ),
 }
+ARCHIVE_SUFFIXES = (".bundle", ".pack", ".zip", ".tar", ".tgz", ".7z", ".rar", ".xz", ".bz2", ".zst", ".lz4")
+ARCHIVE_MAGIC = (b"# v2 git bundle", b"# v3 git bundle", b"PACK\x00\x00\x00", b"PK\x03\x04",
+                 b"PK\x05\x06", b"PK\x07\x08", b"7z\xbc\xaf\x27\x1c",
+                 b"Rar!\x1a\x07", b"\xfd7zXZ\x00", b"BZh", b"\x28\xb5\x2f\xfd", b"\x04\x22\x4d\x18")
+GZIP_MAGIC = b"\x1f\x8b"
+
 SAMPLE_USERS = {"alice", "bob", "user", "username", "example", "exampleuser", "public", "default", "runner", "agent"}
 PATTERNS = {
     "github-credential": re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{50,})\b"),
@@ -115,11 +124,14 @@ class Check:
 
     def blob(self, oid, path):
         self.text(path, "tracked-path:" + path)
-        if path.endswith(".bundle") or re.search(r"(?:^|/)(?:privacy-private|privacy-backups)(?:/|$)", path):
+        if path.lower().endswith(ARCHIVE_SUFFIXES) or re.search(
+            r"(?:^|/)(?:privacy-private|privacy-backups|\.privacy-migration-backups)(?:/|$)", path
+        ):
             self.add("private-history-backup", path)
+            return
         fixture = LEGACY_SYNTHETIC_EMAIL_FIXTURES.get(oid)
         synthetic = fixture[1] if fixture and fixture[0] == path else ()
-        context = (oid, bool(synthetic))
+        context = (oid, bool(synthetic), path.lower().endswith(".gz"))
         if context in self.seen_blob_contexts:
             return
         self.seen_blob_contexts.add(context)
@@ -128,7 +140,26 @@ class Check:
         if size > self.max_bytes:
             self.add("unscanned-large-blob", path)
             return
-        self.text(git("cat-file", "blob", oid).decode("utf-8", "replace"), path, synthetic_emails=synthetic)
+        raw = git("cat-file", "blob", oid)
+        if raw.startswith(ARCHIVE_MAGIC) or raw[257:262] == b"ustar":
+            self.add("private-history-backup", path)
+            return
+        if raw.startswith(GZIP_MAGIC) or path.lower().endswith(".gz"):
+            try:
+                with gzip.GzipFile(fileobj=io.BytesIO(raw)) as archive:
+                    expanded = archive.read(self.max_bytes + 1)
+                decoded = expanded.decode("utf-8")
+                if not raw.startswith(GZIP_MAGIC) or len(expanded) > self.max_bytes or re.search(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", decoded):
+                    raise ValueError("gzip payload is not bounded plain text")
+            except (OSError, EOFError, ValueError, zlib.error):
+                self.add("unscanned-archive", path)
+                return
+            if expanded.startswith(ARCHIVE_MAGIC) or expanded[257:262] == b"ustar":
+                self.add("private-history-backup", path)
+                return
+            self.text(decoded, path)
+
+        self.text(raw.decode("utf-8", "replace"), path, synthetic_emails=synthetic)
 
     def prospective(self):
         for key in ("GIT_AUTHOR_IDENT", "GIT_COMMITTER_IDENT"):
@@ -147,7 +178,7 @@ class Check:
             else:
                 self.blob(oid, name)
 
-    def commits(self, revisions, exclude_remote=None):
+    def commits(self, revisions):
         if git("rev-parse", "--is-shallow-repository").strip() == b"true":
             raise ValueError("commit scans require complete ancestry")
         grafts = Path(git("rev-parse", "--git-path", "info/grafts").decode().strip())
@@ -155,14 +186,7 @@ class Check:
             raise ValueError("grafted history cannot establish complete ancestry")
         if any(value.startswith("-") for value in revisions):
             raise ValueError("revision cannot be an option")
-        rev_args = list(revisions)
-        if exclude_remote is not None:
-            if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", exclude_remote):
-                # URL/path pushes have no reliable tracking namespace. Scan fully.
-                exclude_remote = None
-            if exclude_remote is not None:
-                rev_args.extend(["--not", f"--remotes={exclude_remote}"])
-        for sha in git("rev-list", *rev_args, "--").decode().splitlines():
+        for sha in git("rev-list", *revisions, "--").decode().splitlines():
             if sha in self.seen_commits:
                 continue
             self.seen_commits.add(sha)
@@ -238,7 +262,7 @@ class Check:
         if commits:
             self.commits(commits)
 
-    def pre_push(self, rows, remote_name=None):
+    def pre_push(self, rows):
         for row in rows:
             fields = row.split()
             if len(fields) != 4 or not all(re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", fields[i]) for i in (1, 3)):
@@ -256,10 +280,8 @@ class Check:
             known = subprocess.run(["git", "--no-replace-objects", "cat-file", "-e", remote_sha + "^{commit}"], capture_output=True).returncode == 0
             if known:
                 self.commits([remote_sha + ".." + oid])
-            elif set(remote_sha) == {"0"} and remote_name:
-                self.commits([oid], exclude_remote=remote_name)
             else:
-                # An unknown nonzero remote tip cannot justify excluding ancestors.
+                # Only a locally available old ID supplied by Git establishes a baseline.
                 self.commits([oid])
 
 
@@ -270,7 +292,7 @@ def main(argv=None):
     parser.add_argument("--commits", action="append", default=[], metavar="REVISION_RANGE")
     parser.add_argument("--message-file", type=Path)
     parser.add_argument("--pre-push", action="store_true", help="consume Git pre-push stdin and check outgoing ancestry")
-    parser.add_argument("--remote-name", help="named remote passed by the pre-push hook; used to exclude existing remote-tracking history when creating a new ref")
+    parser.add_argument("--remote-name", help=argparse.SUPPRESS)
     parser.add_argument("--denylist", type=Path, help="private JSON file with a terms list; never commit this file")
     parser.add_argument("--max-bytes", type=int, default=5 * 1024 * 1024, help="larger blobs fail as unscanned")
     parser.add_argument("--json", action="store_true")
@@ -305,7 +327,7 @@ def main(argv=None):
         if args.commits:
             check.commits(args.commits)
         if args.pre_push:
-            check.pre_push(sys.stdin, args.remote_name)
+            check.pre_push(sys.stdin)
         summary = {"ok": not check.issues, "private_denylist_loaded": denylist is not None, "commits_checked": len(check.seen_commits), "blobs_checked": len(check.seen_blobs),
                    "counts": dict(Counter(issue["kind"] for issue in check.issues)), "findings": check.issues}
         if args.json:

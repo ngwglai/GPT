@@ -891,13 +891,19 @@ async function action(id: string) {
     case "reset-asset": {
       const next = { ...assetPack.assets };
       delete next[assetId];
-      await persistAssets(next);
-      assetManager();
-      await reloadArt();
+      busy = true;
+      try {
+        await persistAssets(next);
+        assetManager();
+        await reloadArt();
+      } finally {
+        busy = false;
+      }
       break;
     }
     case "apply-asset": {
-      const current = assetPack.assets[assetId];
+      const selectedId = assetId;
+      const current = assetPack.assets[selectedId];
       if (!current) break;
       const num = (id: string) =>
         Number(
@@ -918,10 +924,21 @@ async function action(id: string) {
           : {}),
       };
       await validateAsset(a);
-      await persistAssets({ ...assetPack.assets, [assetId]: a });
-      assetManager();
-      await reloadArt();
-      notify("资源配置已应用");
+      if (
+        busy ||
+        screen !== "assets" ||
+        assetPack.assets[selectedId] !== current
+      )
+        break;
+      busy = true;
+      try {
+        await persistAssets({ ...assetPack.assets, [selectedId]: a });
+        assetManager();
+        await reloadArt();
+        notify("资源配置已应用");
+      } finally {
+        busy = false;
+      }
       break;
     }
   }
@@ -947,7 +964,8 @@ app.addEventListener("input", (e) => {
 });
 app.addEventListener("change", async (e) => {
   const el = e.target as HTMLInputElement;
-  if (!["asset-file", "pack-file"].includes(el.id) || !el.files?.[0]) return;
+  if (busy || !["asset-file", "pack-file"].includes(el.id) || !el.files?.[0])
+    return;
   busy = true;
   try {
     if (el.id === "asset-file") {
