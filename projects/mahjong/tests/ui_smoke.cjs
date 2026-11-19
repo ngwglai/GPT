@@ -4,7 +4,7 @@
 const assert = require('node:assert/strict');
 const {JSDOM, VirtualConsole} = require('jsdom');
 const base = process.argv[2] || 'http://127.0.0.1:8765';
-const clients = [], errors = [];
+const clients = [], errors = [], dialogs = [];
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function wait(fn, label) {
   const start = Date.now();
@@ -22,7 +22,8 @@ async function create(page = '/lan.html', saved = null) {
     beforeParse(window) {
       window.fetch = (url, opts) => fetch(new URL(url, base), opts);
       window.WebSocket = class extends WebSocket { constructor(url) { super(url); sockets.push(this); } };
-      window.confirm = () => true;
+      window.alert = () => dialogs.push('alert');
+      window.confirm = () => { dialogs.push('confirm'); return true; };
       window.HTMLElement.prototype.scrollIntoView = function() {};
       // jsdom has no audio player. Other browser/script errors still fail the test.
       window.HTMLMediaElement.prototype.play = async function() {};
@@ -36,6 +37,7 @@ async function create(page = '/lan.html', saved = null) {
   return c;
 }
 const visible = el => el && !el.closest('.hidden');
+const toggle = (c, seat) => c.d.querySelector(`[data-orphan-pickup="${seat}"]`);
 const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision (\d+)/)?.[1]);
 (async () => {
   const a = await create();
@@ -80,15 +82,24 @@ const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision
       assert(c.d.querySelector('.river-south')?.textContent.includes(`${['东','南','西','北'][viewer]}家牌河`), 'own river must stay inside the bottom wall');
       assert.equal(c.d.querySelectorAll('.wall-layer').length, 136);
       assert.equal(c.d.querySelectorAll('#roster b').length, 0, 'nickname must be escaped');
+      assert.equal(c.d.querySelectorAll('[data-orphan-pickup]').length, 1, 'only the owner sees a toggle');
+      assert(toggle(c, viewer));
     }
   }
   checkHands();
+  toggle(seats[2], 2).click();
+  await wait(() => toggle(seats[2], 2).getAttribute('aria-pressed') === 'true', 'owner opted in');
+  assert.equal(rev(seats[2]), 1);
+  assert.equal(a.d.querySelector('#seat-2 .orphan-ready'), null);
   const saved = seats[2].dom.window.localStorage.getItem('mahjong.lan.session.v040');
   const before = seats[2].d.querySelector('#seat-2 .hand').textContent;
   seats[2].close();
   await wait(() => a.d.querySelector('#seat-2').textContent.includes('断线'), 'disconnect');
   seats[2] = await create('/lan.html', saved);
   await wait(() => rev(seats[2]) === 1, 'refresh restores current state');
+  assert.equal(toggle(seats[2], 2).getAttribute('aria-pressed'), 'true');
+  toggle(seats[2], 2).click();
+  await wait(() => toggle(seats[2], 2).getAttribute('aria-pressed') === 'false', 'owner opted out');
   assert.equal(seats[2].d.querySelector('#yourSeat').textContent, '你是西家');
   assert.equal(seats[2].d.querySelector('#seat-2 .hand').textContent, before);
   for (let step = 0; step < 16; step++) {
@@ -121,6 +132,10 @@ const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision
   await wait(() => !local.d.querySelector('#center').textContent.includes(`round ${originalRound}`), 'fixed local seed');
   local.d.querySelector('[data-action-key="ROLL_DICE:"]').click();
   await wait(() => local.d.querySelectorAll('button.tile[data-tile]').length === 53, 'local all-open hands');
+  assert.equal(local.d.querySelectorAll('[data-orphan-pickup][aria-pressed="false"]').length, 4);
+  toggle(local, 1).click();
+  await wait(() => toggle(local, 1).getAttribute('aria-pressed') === 'true', 'local south opts in');
+  assert.equal(rev(local), 1, 'intent does not consume a game revision');
   const orphanTypes = new Set([0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33]);
   const orphan = [...local.d.querySelectorAll('#seat-0 .hand button.tile.clickable:not(.gold)')]
     .find(tile => orphanTypes.has(Math.floor(Number(tile.dataset.tile) / 4)));
@@ -131,12 +146,15 @@ const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision
   local.d.querySelector('#seat-0 [data-action-key^="DISCARD:"]').click();
   await wait(() => local.d.querySelector('#seat-1 [data-action-key="PICK_ORPHAN:"]'), 'direct pickup action');
   const pick = local.d.querySelector('#seat-1 [data-action-key="PICK_ORPHAN:"]');
-  assert.match(pick.textContent, /拾幺牌.*锁定十三幺/);
+  assert.match(pick.textContent, /拾牌.*锁定十三幺/);
   pick.click();
   await wait(() => rev(local) === 3, 'pickup response submitted');
   if (visible(local.d.querySelector('#timeoutBtn'))) local.d.querySelector('#timeoutBtn').click();
   await wait(() => local.d.querySelector('#seat-1 .orphans-row .tile'), 'public orphan zone');
   assert.equal(local.d.querySelector('.orphans-row [data-tile]'), null);
+  assert.equal(toggle(local, 1), null, 'locked pickup cannot be toggled');
+  assert.match(local.d.querySelector('#seat-1 .orphan-locked').textContent, /已锁定/);
+  assert.equal(dialogs.length, 0, 'pickup play never opens a dialog');
   assert.equal(local.d.querySelector(`#seat-1 .hand [data-tile="${discardedId}"]`), null);
   assert.equal(local.d.querySelectorAll('.wall-layer.present').length, wallBefore);
   assert.equal(local.d.querySelectorAll('.river-east .river-tiles .tile').length, 0);

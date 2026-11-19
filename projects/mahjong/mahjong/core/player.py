@@ -38,6 +38,7 @@ class PlayerState:
     last_draw_source: str | None = None
     picked_orphans: list[Tile] = field(default_factory=list)
     last_orphan_pick_cycle: int | None = None
+    orphan_pickup_enabled: bool = False
 
     @property
     def shelf_count(self) -> int:

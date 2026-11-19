@@ -120,7 +120,7 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
             for seat in range(4):
                 p = view['players'][str(seat)]
                 self.assertEqual(p['concealed_count'], len(self.room.table.engine.state.players[Seat(seat)].concealed_tiles))
-                for key in ('concealed_tiles', 'current_waits', 'declared_waits', 'last_drawn_tile'):
+                for key in ('concealed_tiles', 'current_waits', 'declared_waits', 'last_drawn_tile', 'orphan_pickup_enabled'):
                     self.assertEqual(key in p, seat == viewer, (seat, viewer, key))
                 if seat != viewer and p['ting_tile']:
                     self.assertEqual(p['ting_tile'], {'hidden': True})
@@ -316,10 +316,76 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(self.views[0]['player_view']['players']['0']['ting_tile'])
         self.assert_private()
 
+    async def test_orphan_pickup_intent_only_updates_owner_and_survives_reconnect(self):
+        await self.setup_room()
+        public = self.views[0]
+        extra = await self.open_socket(self.credentials[1])
+        version = (await self.read(extra))['room_version']
+        await self.all_states(lambda m: m['room_version'] == version)
+        original = self.views[1]['player_view']
+        command = {'type': 'orphan_pickup', 'round_id': original['round_id'], 'enabled': True}
+        self.assertFalse(original['players']['1']['orphan_pickup_enabled'])
+        await self.reject(1, {**command, 'seat': 0})
+        await self.reject(1, {**command, 'round_id': 'previous-round'})
+        await self.reject(1, {**command, 'enabled': 1})
+        await self.clients[1].send_json(command)
+        own = await self.read(self.clients[1], lambda m: m['player_view']['players']['1']['orphan_pickup_enabled'])
+        self.assertEqual(await self.read(extra), own)
+        self.assertEqual((own['room_version'], own['player_view']['revision']), (version, original['revision']))
+        self.assertEqual(own['player_view']['presentation_events'], original['presentation_events'])
+        for seat in (0, 2, 3):
+            with self.assertRaises(asyncio.TimeoutError):
+                await self.clients[seat].receive_json(timeout=0.12)
+
+        await extra.close()
+        await self.clients[1].close()
+        self.clients[1] = await self.open_socket(self.credentials[1])
+        self.views[1] = await self.read(self.clients[1])
+        self.assertTrue(self.views[1]['player_view']['players']['1']['orphan_pickup_enabled'])
+        self.assertNotIn('orphan_pickup_enabled', public['player_view']['players']['1'])
+        await self.act(0, 'ROLL_DICE')
+        self.assert_private()
+
+    async def test_closing_lone_orphan_pickup_broadcasts_normal_draw(self):
+        await self.setup_room()
+        await self.fixture({W: PlayerFixture([3], orphan_pickup_enabled=True)}, gold=4, discard=(E, 0))
+        before = self.views[0]
+        self.assertEqual(before['player_view']['phase'], 'WAITING_FOR_RESPONSES')
+        await self.clients[2].send_json({'type': 'orphan_pickup', 'round_id': 'debug', 'enabled': False})
+        await self.all_states(lambda m: m['room_version'] == before['room_version'] + 1)
+        for state in self.views.values():
+            view = state['player_view']
+            self.assertEqual((view['phase'], view['current_player'], view['revision']), ('TURN_ACTION', 1, 1))
+            self.assertEqual(view['players']['2']['picked_orphans'], [])
+            self.assertEqual(view['wall_view']['tiles_present'], before['player_view']['wall_view']['tiles_present'] - 1)
+        self.assert_private()
+
+    async def test_local_orphan_pickup_http_input_and_round_reset(self):
+        async with self.http.get(self.url + '/api/table') as response:
+            before = (await response.json())['table']
+        body = {'seat': 1, 'round_id': before['round_id'], 'enabled': True}
+        for bad in ({'seat': True}, {'round_id': 'previous-round'}, {'enabled': 1}, {'player_id': 'other'}):
+            await self.post('/api/orphan-pickup', {**body, **bad}, 400)
+        update = (await self.post('/api/orphan-pickup', body))['table']
+        self.assertTrue(update['players']['1']['orphan_pickup_enabled'])
+        self.assertEqual(update['revision'], before['revision'])
+        async with self.http.get(self.url + '/api/table') as response:
+            self.assertEqual((await response.json())['table'], update)
+        new = (await self.post('/api/new-round', {'seed': 42}))['table']
+        self.assertFalse(any(p['orphan_pickup_enabled'] for p in new['players'].values()))
+        await self.post('/api/orphan-pickup', body, 400)
+
     async def test_orphan_pickup_stays_public_through_reconnect_and_win(self):
         await self.setup_room()
         hand = sorted(ORPHANS - {0, 8}) + [27, 1]
-        await self.fixture({S: PlayerFixture(hand), W: PlayerFixture([8])}, gold=4, discard=(E, 0))
+        await self.fixture({S: PlayerFixture(hand), W: PlayerFixture([8], orphan_pickup_enabled=True)},
+                           gold=4, discard=(E, 0))
+        self.assertFalse(self.views[1]['player_view']['legal_actions'])
+        await self.reject(1, {'type': 'action', 'intent': {
+            'round_id': 'debug', 'revision': 0, 'type': 'PICK_ORPHAN', 'tile_ids': [],
+        }})
+        await self.clients[1].send_json({'type': 'orphan_pickup', 'round_id': 'debug', 'enabled': True})
+        self.views[1] = await self.read(self.clients[1], lambda m: m['player_view']['players']['1']['orphan_pickup_enabled'])
         walls_before = self.views[0]['player_view']['wall_view']
         await self.act(1, 'PICK_ORPHAN')
         await self.act(2, 'PASS')
@@ -335,6 +401,8 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         self.clients[1] = await self.open_socket(self.credentials[1])
         self.views[1] = await self.read(self.clients[1])
         self.assertEqual(self.views[1]['player_view']['players']['1']['picked_orphans'], [0])
+        self.assertFalse(self.views[1]['player_view']['players']['1']['orphan_pickup_enabled'])
+        await self.reject(1, {'type': 'orphan_pickup', 'round_id': 'debug', 'enabled': False})
         await self.act(1, 'DECLARE_TING')
         await self.act(2, 'DISCARD')
         await self.act(1, 'HU')
@@ -343,6 +411,13 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(view['result']['patterns'], ['thirteen_orphans'])
             self.assertEqual(view['players']['1']['picked_orphans'], [0])
         self.assert_private()
+        final = self.views[0]['player_view']
+        await self.clients[0].send_json({'type': 'next_round', 'round_id': final['round_id'], 'revision': final['revision']})
+        await self.all_states(lambda m: m['player_view']['round_id'] != final['round_id'])
+        for seat, state in self.views.items():
+            players = state['player_view']['players']
+            self.assertFalse(players[str(seat)]['orphan_pickup_enabled'])
+            self.assertTrue(all(not p['picked_orphans'] for p in players.values()))
 
     async def test_complete_round_over_four_sockets_and_next_round(self):
         await self.setup_room()

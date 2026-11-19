@@ -2,7 +2,7 @@ const actionNames = {
   ROLL_DICE: "掷骰子",
   DISCARD: "打出", DECLARE_TING: "报听并打出", SHELVE_GOLD: "上金",
   CHI: "吃", PENG: "碰", MING_GANG: "明杠", AN_GANG: "暗杠", BU_GANG: "补杠",
-  HU: "胡", PASS: "过", PICK_ORPHAN: "拾幺牌"
+  HU: "胡", PASS: "过", PICK_ORPHAN: "拾牌"
 };
 const actionStyles = {
   ROLL_DICE:"dice", PASS:"pass", HU:"hu", MING_GANG:"gang", AN_GANG:"gang", BU_GANG:"gang",
@@ -150,6 +150,18 @@ async function performAction(seat, action) {
   } catch (e) { showNotice(e.message); await loadTable(true); }
   finally { setBusy(false); }
 }
+async function setOrphanPickup(seat, enabled) {
+  if (window.LanGame) return window.LanGame.setOrphanPickup(enabled);
+  if (busy) return;
+  try {
+    setBusy(true);
+    const next = await api("/api/orphan-pickup", {method:"POST", body:JSON.stringify({
+      seat, round_id:table.round_id, enabled
+    })});
+    acceptTable(next); showNotice("");
+  } catch (e) { showNotice(e.message); }
+  finally { setBusy(false); }
+}
 async function timeoutResponses() {
   if (!table || busy) return;
   try {
@@ -202,7 +214,8 @@ function actionLabel(seat, action) {
   if (action.type === "ROLL_DICE") return "掷骰子";
   if (["DISCARD","DECLARE_TING"].includes(action.type) && action.tile_ids.length) return `${base} ${nameById.get(action.tile_ids[0]) || ""}`;
   if (action.type === "PICK_ORPHAN" && table.pending_claim) {
-    return `${base} ${tileName(table.pending_claim.tile_type)}（锁定十三幺）`;
+    const firstPickup = !p.picked_orphans?.length;
+    return `${base} ${tileName(table.pending_claim.tile_type)}${firstPickup ? "（锁定十三幺）" : ""}`;
   }
   if (["CHI","PENG","MING_GANG","AN_GANG","BU_GANG"].includes(action.type)) {
     const own = action.tile_ids.map(id => nameById.get(id) || `#${id}`).join(" ");
@@ -214,9 +227,10 @@ function renderActions(seat) {
   const actions = legalForSeat(seat);
   if (!actions.length) return "";
   const selectedActions = selected.seat === seat && selected.tileId != null ? actions.filter(a => a.tile_ids.includes(selected.tileId)) : [];
-  const globals = actions.filter(a => ["ROLL_DICE","HU","PASS","PICK_ORPHAN"].includes(a.type));
+  const globals = actions.filter(a => ["ROLL_DICE","HU"].includes(a.type));
   const multi = actions.filter(a => ["CHI","PENG","MING_GANG","AN_GANG","BU_GANG"].includes(a.type));
-  const unique = new Map([...globals, ...multi, ...selectedActions].map(action => [actionKey(action), action]));
+  const optionalResponses = ["PICK_ORPHAN", "PASS"].flatMap(type => actions.filter(a => a.type === type));
+  const unique = new Map([...globals, ...multi, ...selectedActions, ...optionalResponses].map(action => [actionKey(action), action]));
   if (!unique.size) return `<span class="action-hint">选一张牌，再确认操作</span>`;
   return [...unique].map(([key, action]) => {
     const kind = actionStyles[action.type] || "";
@@ -226,6 +240,11 @@ function renderActions(seat) {
 function playerZone(label, rowClass, content) {
   if (!content) return "";
   return `<div class="player-zone"><div class="section-label">${label}</div><div class="${rowClass}">${content}</div></div>`;
+}
+function orphanPickupControl(seat, player) {
+  const enabled = player.orphan_pickup_enabled;
+  if (typeof enabled !== "boolean" || player.picked_orphans?.length || table.phase === "ROUND_END") return "";
+  return `<button type="button" class="ghost orphan-toggle" data-orphan-pickup="${seat}" aria-pressed="${enabled}">${enabled ? "关闭" : "开启"}十三幺拾牌</button>`;
 }
 function renderPlayer(seat) {
   const p = table.players[String(seat)];
@@ -238,14 +257,16 @@ function renderPlayer(seat) {
   el.classList.toggle("active", active);
   el.classList.toggle("responding", responding);
   el.classList.toggle("concealed-player", !Array.isArray(p.concealed_tiles));
+  const picked = p.picked_orphans || [];
   const status = [
     table.dealer === seat ? badge("庄", "dealer") : "",
     viewerSeat === seat ? badge("你", "self") : "",
     p.declared_ting ? badge("已听", "ting") : "",
+    picked.length ? badge("十三幺·已锁定", "orphan-locked") :
+      p.orphan_pickup_enabled ? badge("十三幺·待拾", "orphan-ready") : "",
     p.has_completed_first_gold_shelf || p.shelf_count > 0 ? badge("已上金", "gold-ok") : "",
     window.LanGame ? (p.connected ? badge("在线", "online", "online") : badge("断线", "offline", "offline")) : "",
   ].join("");
-  const picked = p.picked_orphans || [];
   const waits = p.declared_ting && p.current_waits ? `听口 ${p.current_waits.map(tileName).join("、") || "—"}` : "";
   const phaseBadge = rolling && active ? "等待掷骰" : active ? "当前出牌" : responding ? "等待响应" : "";
   const zones = [
@@ -255,7 +276,7 @@ function renderPlayer(seat) {
     playerZone("报听牌", "ting-row", renderTingTile(p)),
   ].join("");
   const hand = renderHand(seat,p) || `<span class="action-hint">${rolling ? "尚未发牌" : "暂无手牌"}</span>`;
-  const actions = renderActions(seat);
+  const actions = renderActions(seat) + orphanPickupControl(seat, p);
   const markup = `
     <div class="player-head">
       <div class="player-title"><span class="wind">${seatNames[seat]}</span><div class="player-identity">
@@ -273,13 +294,15 @@ function renderPlayer(seat) {
   const focused = el.contains(document.activeElement) ? document.activeElement : null;
   const focusedTile = focused?.dataset.tile;
   const focusedAction = focused?.dataset.actionKey;
+  const focusedPickup = focused?.dataset.orphanPickup;
   el.innerHTML = markup;
   el.renderedMarkup = markup;
   el.querySelector(".hand").scrollLeft = scrollLeft;
-  if (focusedTile || focusedAction) {
+  if (focusedTile || focusedAction || focusedPickup) {
     const replacement = [...el.querySelectorAll("button")].find(button => focusedTile
       ? button.dataset.tile === focusedTile
-      : button.dataset.actionKey === focusedAction);
+      : focusedAction ? button.dataset.actionKey === focusedAction
+      : button.dataset.orphanPickup === focusedPickup);
     replacement?.focus({preventScroll:true});
   }
 }
@@ -412,8 +435,13 @@ function renderCenter() {
 }
 function bindTableEvents() {
   document.querySelector(".table-shell").addEventListener("click", event => {
-    const button = event.target.closest("button[data-tile], button[data-action-key]");
+    const button = event.target.closest("button[data-tile], button[data-action-key], button[data-orphan-pickup]");
     if (!button || button.disabled || busy) return;
+    if (button.hasAttribute("data-orphan-pickup")) {
+      const seat = Number(button.dataset.orphanPickup);
+      setOrphanPickup(seat, button.getAttribute("aria-pressed") !== "true");
+      return;
+    }
     if (button.dataset.actionKey) {
       const seat = Number(button.dataset.actionSeat);
       const action = legalForSeat(seat).find(a => actionKey(a) === button.dataset.actionKey);

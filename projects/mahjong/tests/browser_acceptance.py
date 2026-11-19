@@ -38,6 +38,10 @@ def action_button(page, seat, kind, tile_ids=None):
     return page.locator(f'#seat-{int(seat)} [data-action-key^="{key}"]').first
 
 
+def pickup_toggle(page, seat):
+    return page.locator(f'[data-orphan-pickup="{int(seat)}"]')
+
+
 async def play_action(page, seat, action, select_tile=False):
     if select_tile:
         await page.locator(f'#seat-{int(seat)} [data-tile="{action.tile_ids[0]}"]').click()
@@ -70,6 +74,13 @@ async def fits(page):
 
 
 async def local_cases(page, app, url, output):
+    dialogs = []
+
+    async def on_dialog(dialog):
+        dialogs.append(dialog.type)
+        await dialog.dismiss()
+
+    page.on("dialog", on_dialog)
     await page.goto(url)
     await expect(page.get_by_role("heading", name="青雀麻将")).to_be_visible()
     await capture(page, output, "01-home")
@@ -94,12 +105,32 @@ async def local_cases(page, app, url, output):
     orphan = next(a for a in engine.legal_actions(E)
                   if a.type == ActionType.DISCARD and a.tile_ids[0] // 4 in ORPHANS)
     await play_action(page, E, orphan, select_tile=True)
+    await expect(page.locator(".table-details")).to_contain_text("revision 2")
+    await expect(page.locator('[data-action-key^="PICK_ORPHAN:"]')).to_have_count(0)
+    await expect(page.locator(".claim-message")).not_to_be_visible()
+    assert not dialogs
+
+    await page.locator("#newRoundBtn").click()
+    await expect(action_button(page, E, "ROLL_DICE")).to_be_visible()
+    await pickup_toggle(page, S).click()
+    await expect(pickup_toggle(page, S)).to_have_attribute("aria-pressed", "true")
+    await expect(page.locator("#seat-1 .orphan-ready")).to_be_visible()
+    await page.reload()
+    await expect(pickup_toggle(page, S)).to_have_attribute("aria-pressed", "true")
+    await action_button(page, E, "ROLL_DICE").click()
+    await expect(page.locator(".hand [data-tile]")).to_have_count(53)
+    engine = app[LOCAL].engine
+    await play_action(page, E, orphan, select_tile=True)
     await expect(page.locator(".claim-message")).to_contain_text("等待响应")
     await expect(action_button(page, S, "PICK_ORPHAN")).to_contain_text("锁定十三幺")
     await action_button(page, S, "PICK_ORPHAN").click()
+    await expect(page.locator(".table-details")).to_contain_text("revision 3")
     if await page.locator("#timeoutBtn").is_visible():
         await page.locator("#timeoutBtn").click()
     await expect(page.locator("#seat-1 .orphans-row .tile")).to_have_count(1)
+    await expect(page.locator("#seat-1 .orphan-locked")).to_be_visible()
+    await expect(pickup_toggle(page, S)).to_have_count(0)
+    assert not dialogs
     assert await page.locator("#seat-1 .orphans-row [data-tile]").count() == 0
     await capture(page, output, "07-orphan-pickup")
     for width, height in ((1920, 1080), (1366, 768), (1024, 768), (390, 844)):
@@ -126,6 +157,8 @@ async def local_cases(page, app, url, output):
     await page.keyboard.press("Escape")
     await expect(panel).not_to_be_visible()
     await page.reload()
+    await expect(page.locator("#seat-1 .orphan-locked")).to_be_visible()
+    await expect(pickup_toggle(page, S)).to_have_count(0)
     await page.locator(".sound-settings summary").click()
     await expect(page.locator("#bgmVolume")).to_have_value("0.2")
     for checkbox in ("bgmEnabled", "sfxEnabled", "voiceEnabled"):
@@ -203,6 +236,8 @@ async def lan_cases(browser, app, url, output, watch):
             await expect(page.locator(".player:not(.my-seat) .hand [data-tile]")).to_have_count(0)
             await expect(page.locator(".player:not(.my-seat) .hand .tile-back")).to_have_count(39 if viewer == 0 else 40)
             assert "Seed" not in await page.locator("#center").text_content()
+            await expect(page.locator('[data-orphan-pickup]')).to_have_count(1)
+            await expect(pickup_toggle(page, viewer)).to_have_attribute("aria-pressed", "false")
             await fits(page)
         await capture(host, output, "05-lan-dealt")
         await capture(pages[1], output, "09-lan-phone")
@@ -215,11 +250,15 @@ async def lan_cases(browser, app, url, output, watch):
         for page in pages:
             await expect(page.locator(".table-details")).to_contain_text("revision 2")
 
+        await pickup_toggle(pages[2], W).click()
+        await expect(pickup_toggle(pages[2], W)).to_have_attribute("aria-pressed", "true")
+        await expect(host.locator("#seat-2 .orphan-ready")).to_have_count(0)
         await pages[2].evaluate("window.acceptanceSocket.close()")
         await expect(host.locator("#seat-2 .badge.offline")).to_be_visible()
         await expect(pages[2].locator("#connectionStatus")).to_contain_text("已连接")
         await pages[2].reload()
         await expect(pages[2].locator("#seat-2.my-seat button[data-tile]").first).to_be_visible()
+        await expect(pickup_toggle(pages[2], W)).to_have_attribute("aria-pressed", "true")
         await expect(host.locator("#seat-2 .badge.online")).to_be_visible()
         pages[2].once("dialog", lambda dialog: dialog.accept())
         await pages[2].locator("#leaveRoom").click()
@@ -227,6 +266,37 @@ async def lan_cases(browser, app, url, output, watch):
         await expect(host.locator("#seat-2 .badge.offline")).to_be_visible()
         await pages[2].locator("#resumeRoom").click()
         await expect(pages[2].locator("#seat-2.my-seat")).to_be_visible()
+
+        await room_fixture(room, {
+            S: PlayerFixture([1, 2]), W: PlayerFixture([6], orphan_pickup_enabled=True),
+        }, gold=4, discard=(E, 0))
+        phone = pages[1]
+        await expect(action_button(phone, S, "CHI")).to_be_enabled()
+        await expect(action_button(phone, S, "PICK_ORPHAN")).to_have_count(0)
+        await pickup_toggle(phone, S).tap()
+        await expect(phone.locator('[data-action-key="PICK_ORPHAN:"]')).to_have_count(1)
+        await expect(action_button(phone, S, "CHI")).to_be_enabled()
+        await expect(action_button(phone, S, "PASS")).to_be_enabled()
+        await expect(host.locator("#seat-1 .orphan-ready")).to_have_count(0)
+        bounds = await action_button(phone, S, "PICK_ORPHAN").bounding_box()
+        assert bounds and bounds["height"] >= 44 and 0 <= bounds["x"] <= bounds["x"] + bounds["width"] <= 390
+        await fits(phone)
+        await capture(phone, output, "12-phone-orphan-ready")
+        await pickup_toggle(phone, S).tap()
+        await expect(action_button(phone, S, "PICK_ORPHAN")).to_have_count(0)
+        await expect(action_button(phone, S, "CHI")).to_be_enabled()
+        await pickup_toggle(phone, S).tap()
+        await action_button(phone, S, "PICK_ORPHAN").tap()
+        await expect(action_button(phone, S, "PICK_ORPHAN")).to_have_count(0)
+        await action_button(pages[2], W, "PASS").click()
+        for page in pages:
+            await expect(page.locator("#seat-1 .orphan-locked")).to_be_visible()
+            await expect(page.locator("#seat-1 .orphans-row .tile")).to_have_count(1)
+        await expect(pickup_toggle(phone, S)).to_have_count(0)
+        await capture(phone, output, "13-phone-orphan-locked")
+        await phone.reload()
+        await expect(phone.locator("#seat-1 .orphan-locked")).to_be_visible()
+        await expect(pickup_toggle(phone, S)).to_have_count(0)
 
         await room_fixture(room, {E: PlayerFixture(WAIT+[7], last_draw_type=7)}, gold=33)
         await expect(host.locator("#seat-0 .hand button.drawn")).to_be_enabled()

@@ -13,7 +13,11 @@ def run_demo(seed: int = 42, rounds: int = 1):
     dealer=Seat.EAST
     summaries=[]
     for i in range(rounds):
-        engine.start_round({seat:f"bot-{int(seat)}" for seat in Seat},dealer,seed=seed+i)
+        player_ids = {seat: f"bot-{int(seat)}" for seat in Seat}
+        state = engine.start_round(player_ids, dealer, seed=seed+i)
+        # Keep the demo bots' existing set of available claims and action policy.
+        for seat, player_id in player_ids.items():
+            engine.set_orphan_pickup(seat, True, expected_round_id=state.round_id, actor_id=player_id)
         commands=0
         while engine.state.phase!=GamePhase.ROUND_END:
             available=[(seat,engine.legal_actions(seat)) for seat in Seat]

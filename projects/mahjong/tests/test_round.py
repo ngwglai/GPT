@@ -1,6 +1,7 @@
 from copy import deepcopy
 import json
 import unittest
+from unittest.mock import patch
 
 from mahjong import *
 from mahjong.__main__ import run_demo
@@ -156,3 +157,12 @@ class RoundTests(unittest.TestCase):
     def test_complete_random_legal_rounds_second_seed(self):
         summaries=run_demo(seed=101,rounds=3)
         self.assertTrue(all(x["result"]["type"] in {"HU","DRAW"} for x in summaries))
+
+    def test_demo_bots_keep_their_existing_pickup_option(self):
+        observed = engine()
+        with patch("mahjong.__main__.GameEngine", return_value=observed):
+            summary = run_demo(seed=42, rounds=1)
+        self.assertIn(summary[0]["result"]["type"], {"HU", "DRAW"})
+        pickups = [event for event in observed.state.event_log if event.event_type == EventType.ORPHAN_PICKED]
+        self.assertTrue(pickups)
+        self.assertTrue(all(observed.state.players[event.player].picked_orphans for event in pickups))

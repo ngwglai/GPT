@@ -26,6 +26,7 @@ class PlayerFixture:
     last_draw_type: int | None = None
     last_draw_source: str = "NORMAL"
     picked_orphans: list[int] = field(default_factory=list)
+    orphan_pickup_enabled: bool = False
 
 
 def build_fixture(engine: GameEngine, players: dict[Seat, PlayerFixture], *,
@@ -66,6 +67,7 @@ def build_fixture(engine: GameEngine, players: dict[Seat, PlayerFixture], *,
         p = PlayerState(str(int(seat)), seat, tiles_from_types(f.hand, used))
         p.melds = [Meld(kind, tiles_from_types(types, used), source) for kind, types, source in f.melds]
         p.picked_orphans = tiles_from_types(f.picked_orphans, used)
+        p.orphan_pickup_enabled = f.orphan_pickup_enabled
         p.shelf_tiles = tiles_from_types([gold] * f.shelves, used)
         p.has_completed_first_gold_shelf = f.first_shelf_completed or bool(f.shelves)
         p.is_declared_ting = f.declared

@@ -1,4 +1,4 @@
-"""Existing multi-round LocalTable plus the unified v0.5.0 server entry point.
+"""Existing multi-round LocalTable plus the unified Web server entry point.
 
 Rule authority remains GameEngine / TableService. LAN transport is in lan_server.
 """
@@ -10,7 +10,7 @@ import threading
 from pathlib import Path
 from decimal import Decimal
 
-from mahjong import GameEngine, RuleConfig, ScoreConfig, ScoreEngine, Seat, IllegalAction
+from mahjong import GameEngine, RuleConfig, ScoreConfig, ScoreEngine, Seat, IllegalAction, __version__
 from mahjong.game.service import TableService
 
 ROOT = Path(__file__).resolve().parent
@@ -188,6 +188,12 @@ class LocalTable:
             self.service.handle_intent(PLAYER_IDS[seat], payload)
             return self.snapshot()
 
+    def set_orphan_pickup(self, *, seat: Seat, round_id: str, enabled: bool) -> dict:
+        with self._lock:
+            assert self.service is not None
+            self.service.set_orphan_pickup(PLAYER_IDS[seat], round_id, enabled)
+            return self.snapshot()
+
     def timeout_responses(self, *, round_id: str, revision: int) -> dict:
         with self._lock:
             assert self.service is not None
@@ -195,7 +201,7 @@ class LocalTable:
             return self.snapshot()
 
 def main():
-    parser = argparse.ArgumentParser(description="麻将 v0.5.0：单机测试与局域网四人联机")
+    parser = argparse.ArgumentParser(description=f"麻将 v{__version__}：单机测试与局域网四人联机")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--seed", type=int, default=None, help="固定开局随机种子，便于复现")

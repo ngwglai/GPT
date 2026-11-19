@@ -16,7 +16,7 @@ import socket
 import time
 
 from aiohttp import web, WSMsgType
-from mahjong import Seat, IllegalAction
+from mahjong import Seat, IllegalAction, __version__
 from web_server import LocalTable, PLAYER_IDS, WEB_ROOT
 
 LOG = logging.getLogger(__name__)
@@ -121,7 +121,8 @@ class Room:
                     'can_choose_seat': self.table is None,
                 }, 'player_view': table}
 
-    def command(self, member, data):
+    def command(self, member, data) -> bool:
+        """Return whether this update is shared with all seats."""
         if not isinstance(data, dict):
             raise ClientError('请求必须是 JSON 对象。')
         kind = data.get('type')
@@ -145,6 +146,14 @@ class Room:
             if not self.table or member.seat is None:
                 raise ClientError('牌局尚未开始。')
             self.table.service.handle_intent(PLAYER_IDS[Seat(member.seat)], data['intent'])
+        elif kind == 'orphan_pickup':
+            fields(data, ('type', 'round_id', 'enabled'))
+            if not self.table or member.seat is None:
+                raise ClientError('牌局尚未开始。')
+            revision = self.table.engine.state.revision
+            self.table.service.set_orphan_pickup(PLAYER_IDS[Seat(member.seat)], data['round_id'], data['enabled'])
+            if self.table.engine.state.revision == revision:
+                return False
         elif kind == 'next_round':
             fields(data, ('type', 'round_id', 'revision'))
             if not self.view(member)['controls']['can_next_round']:
@@ -155,16 +164,18 @@ class Room:
             self.table.next_round()
         elif kind == 'sync':
             fields(data, ('type',))
-            return
+            return True
         else:
             raise ClientError('不支持的操作。')
         self.touch()
+        return True
 
-    async def broadcast(self):
+    async def broadcast(self, only: Member | None = None):
         # Serialize messages under lock; bound slow clients so one phone cannot
         # indefinitely block the other seats. No shared all-open payload exists.
         deliveries = []
-        for member in self.members.values():
+        recipients = (only,) if only is not None else self.members.values()
+        for member in recipients:
             if member.connected:
                 payload = self.view(member)
                 for ws in tuple(member.sockets):
@@ -283,8 +294,8 @@ async def websocket(request):
                             asyncio.create_task(peer.close())
                         await room.broadcast()
                         break
-                    room.command(member, data)
-                    await room.broadcast()
+                    shared = room.command(member, data)
+                    await room.broadcast(only=None if shared else member)
             except (ClientError, IllegalAction, ValueError, TypeError, KeyError) as exc:
                 await room.send(ws, {'type': 'error', 'error': str(exc)})
                 async with room.lock:
@@ -345,6 +356,12 @@ async def local_api(request):
                 if type(seat) is not int or seat not in range(4):
                     raise ClientError('seat must be 0..3')
                 result = table.act(seat=Seat(seat), payload=data)
+            elif request.path == '/api/orphan-pickup':
+                fields(data, ('seat', 'round_id', 'enabled'))
+                seat = data['seat']
+                if type(seat) is not int or seat not in range(4):
+                    raise ClientError('seat must be 0..3')
+                result = table.set_orphan_pickup(seat=Seat(seat), round_id=data['round_id'], enabled=data['enabled'])
             elif request.path == '/api/timeout-responses':
                 fields(data, ('round_id', 'revision'))
                 result = table.timeout_responses(**data)
@@ -384,7 +401,7 @@ async def shutdown(app):
 
 
 async def health(request):
-    return web.json_response({'ok': True, 'version': '0.5.0'})
+    return web.json_response({'ok': True, 'version': __version__})
 
 
 def create_app(seed=None, dealer=Seat.EAST):
@@ -399,7 +416,7 @@ def create_app(seed=None, dealer=Seat.EAST):
     app.router.add_post('/api/rooms/join', join_room)
     app.router.add_get('/ws/{code}', websocket)
     app.router.add_get('/api/table', local_api)
-    for path in ('new-round', 'next-round', 'action', 'timeout-responses'):
+    for path in ('new-round', 'next-round', 'action', 'orphan-pickup', 'timeout-responses'):
         app.router.add_post('/api/' + path, local_api)
     app.router.add_get('/{path:.*}', static_file)
     return app
@@ -410,7 +427,7 @@ def run(args):
     import webbrowser
     shown_host = '127.0.0.1' if args.host in {'0.0.0.0', '::'} else args.host
     url = f'http://{shown_host}:{args.port}/'
-    print(f'麻将 v0.5.0 已启动，本机入口：{url}', flush=True)
+    print(f'麻将 v{__version__} 已启动，本机入口：{url}', flush=True)
     if args.host == '0.0.0.0':
         addresses = set()
         with suppress(OSError):

@@ -40,6 +40,11 @@ class TableService:
             return self.engine.submit(action, expected_revision=payload["revision"],
                                       expected_round_id=payload["round_id"],actor_id=authenticated_player_id)
 
+    def set_orphan_pickup(self, authenticated_player_id: str, round_id: str, enabled: bool) -> None:
+        with self._lock:
+            seat = self._seat(authenticated_player_id)
+            self.engine.set_orphan_pickup(seat, enabled, expected_round_id=round_id, actor_id=authenticated_player_id)
+
     def timeout_responses(self, round_id: str, revision: int):
         """Trusted timer; use current window revision, not an arbitrary client call."""
         with self._lock:

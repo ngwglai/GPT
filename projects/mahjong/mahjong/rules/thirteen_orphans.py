@@ -30,7 +30,8 @@ def pickup_action(state: GameState, seat: Seat) -> Action | None:
             or tile is None or tile.type_id not in ORPHANS or tile.type_id == state.gold_tile_type):
         return None
     player = state.players[seat]
-    if (player.is_declared_ting or player.melds or not player.concealed_tiles
+    if (not (player.orphan_pickup_enabled or orphans_locked(player))
+            or player.is_declared_ting or player.melds or not player.concealed_tiles
             or player.last_orphan_pick_cycle == state.pickup_cycle):
         return None
 
@@ -55,6 +56,7 @@ def claim_pickup(state: GameState, action: Action) -> Tile:
     state.discards.pop()
     player = state.players[action.seat]
     player.picked_orphans.append(discard.tile)
+    player.orphan_pickup_enabled = False
     player.last_orphan_pick_cycle = state.pickup_cycle
     player.last_drawn_tile = player.last_draw_source = None
     advance_pickup_cycle(state, action.seat)
