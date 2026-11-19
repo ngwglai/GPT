@@ -95,7 +95,7 @@
 @media (hover: hover) {
   .tile.clickable:hover:not(:disabled):not(.selected) { transform: translateY(-2px); border-color: #f7c572; }
 }
-.loading [data-action-key], .loading .tile.clickable, .loading #timeoutBtn, .loading #newRoundBtn, .loading #resetMatchBtn { pointer-events: none; opacity: .6; }
+.loading [data-action-key], .loading [data-orphan-pickup], .loading .tile.clickable, .loading #timeoutBtn, .loading #newRoundBtn, .loading #resetMatchBtn { pointer-events: none; opacity: .6; }
 .player-zones { display: flex; align-items: start; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .player-zone { min-width: 0; padding: 3px 6px 6px; border-radius: 6px; background: #081c1580; }
 .section-label, .meld-name { color: var(--muted); font-size: 11px; }
@@ -117,6 +117,10 @@
 .action-btn.ting { border-color: #e6c5f5; background: #dbc2eb; color: #392145; }
 .action-btn.shelf { border-color: #f7db9e; background: #ebc978; }
 .action-btn.orphan { border-color: #a7daba; background: #adddc0; color: #233c28; }
+.orphan-toggle { min-height: 38px; padding: 6px 9px; font-size: 12px; }
+.orphan-toggle[aria-pressed="true"]:not(:disabled) { color: #cffade; border-color: #82c8a0; background: #305e49; }
+.badge.orphan-ready { color: #cef5dc; background: #305e49; }
+.badge.orphan-locked { color: #ffdbae; background: #594832; }
 .action-hint { color: var(--muted); font-size: 11px; }
 .action-area .action-hint { color: #e8c687; font-size: 12px; }
 
@@ -388,7 +392,7 @@
   .east .hand .tile:not(.small), .west .hand .tile:not(.small) { --tile-width: 35px; }
   .hand .tile.drawn { margin-left: 4px; }
   .hand .tile-image-fallback { font-size: 14px; }
-  .action-btn { min-height: 44px; padding-inline: 10px; }
+  .action-btn, .orphan-toggle { min-height: 44px; padding-inline: 10px; }
   .center-board { padding: 6px; border-radius: 11px; }
   .stat { padding: 4px 1px; }
   .stat b { font-size: 13px; }

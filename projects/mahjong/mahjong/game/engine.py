@@ -301,6 +301,51 @@ class GameEngine:
             raise
         return self.player_view(action.seat)
 
+    def set_orphan_pickup(self, seat: Seat, enabled: bool, *, expected_round_id: str, actor_id: str) -> None:
+        """Change a seat's private intent under the same lock used for ordinary actions."""
+        s = self.state
+        if s is None or expected_round_id != s.round_id:
+            raise IllegalAction("stale round ID")
+        if not isinstance(seat, Seat) or seat not in s.players or actor_id != s.players[seat].player_id:
+            raise IllegalAction("actor does not own this seat")
+        if type(enabled) is not bool:
+            raise IllegalAction("pickup intent must be a boolean")
+        if s.phase not in {P.ROLLING_DICE, P.TURN_ACTION, P.WAITING_FOR_RESPONSES}:
+            raise IllegalAction("牌局未在进行中")
+        player = s.players[seat]
+        if orphans_locked(player):
+            raise IllegalAction("十三幺路线已锁定")
+        if player.orphan_pickup_enabled == enabled:
+            return
+
+        backup = deepcopy(s)
+        try:
+            player.orphan_pickup_enabled = enabled
+            self._refresh_pickup_response(seat, enabled)
+        except Exception:
+            self.state = backup
+            raise
+
+    def _refresh_pickup_response(self, seat: Seat, enabled: bool) -> None:
+        s = self.state
+        if s.phase != P.WAITING_FOR_RESPONSES or s.response_kind != "DISCARD" or s.current_discarder == seat:
+            return
+        submitted = s.pending_responses.get(seat)
+        if submitted is None:
+            choices = self._response_actions(seat)
+            if choices:
+                s.response_options[seat] = choices
+            else:
+                s.response_options.pop(seat, None)
+        elif submitted.type == A.PICK_ORPHAN and not enabled:
+            # Withdrawing an unawarded pickup is a final pass for this discard.
+            s.pending_responses[seat] = Action(A.PASS, seat)
+
+        if len(s.pending_responses) == len(s.response_options):
+            self._resolve_responses()
+            self.assert_invariants()
+            s.revision += 1
+
     def _execute(self, action: Action):
         s = self.state
         if s.phase == P.WAITING_FOR_RESPONSES:
@@ -584,6 +629,7 @@ class GameEngine:
                 data["declared_waits"] = sorted(p.declared_waits)
                 data["current_waits"] = sorted(p.current_waits)
                 data["has_completed_first_gold_shelf"] = p.has_completed_first_gold_shelf
+                data["orphan_pickup_enabled"] = p.orphan_pickup_enabled
                 data["last_drawn_tile"] = p.last_drawn_tile.instance_id if p.last_drawn_tile else None
             players[int(seat)] = data
         result = None

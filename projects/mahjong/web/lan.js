@@ -32,7 +32,7 @@
       const el = $(`seat-${seat}`);
       el.classList.toggle('my-seat', state?.you.seat === seat);
       el.querySelectorAll('button').forEach(btn => {
-        if (btn.dataset.actionKey || btn.classList.contains('clickable')) {
+        if (btn.dataset.actionKey || btn.hasAttribute('data-orphan-pickup') || btn.classList.contains('clickable')) {
           btn.disabled = awaiting || socket?.readyState !== WebSocket.OPEN;
         }
       });
@@ -144,6 +144,11 @@
   }
   window.LanGame = {
     decorate,
+    setOrphanPickup(enabled) {
+      if (!state?.player_view) return;
+      showNotice('');
+      send({type:'orphan_pickup', round_id:state.player_view.round_id, enabled});
+    },
     act(action) {
       if (!state?.player_view) return;
       showNotice('');
