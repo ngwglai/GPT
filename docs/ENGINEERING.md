@@ -2,22 +2,27 @@
 
 ## CI
 
-`.github/workflows/ci.yml` 在所有 PR、`main` / `feature/constraintlab` 推送及手动触发时运行。仅使用读取仓库权限，不向测试进程保存 checkout 凭据；Actions 固定到核实过的发布版本提交，任务有超时限制。
+`.github/workflows/ci.yml` 在所有 PR、`main` / `feature/constraintlab` 推送及手动触发时运行。仅使用读取仓库权限，不向测试进程保存 checkout 凭据，Actions 固定到核实过的发布版本，任务有超时限制。
 
-- 隐私：在 Linux / Windows × Python 3.11 / 3.12 运行根目录标准库回归（含新 checkout、旧快照重迁移、真实 hooks、detached HEAD、嵌套标签及失败关闭），以及 `privacy_check.py --all-history`。CI 的公开 noreply 策略来自仓库身份脚本对账号邮箱接口的实际核验，不需要给 PR 提供私人邮箱接口权限。隐私任务明确报告无私人词表，不能代替开发环境的私有检查。每个开发 checkout（包括旧快照恢复）仍须独立运行 `configure_git_identity.py --install-hooks`。
+- **变更检测**：根 CI 首先运行轻量的 `changes` Job。PR 使用 base...head，push 使用 before..after；`workflow_dispatch`、缺失/无法读取的提交范围，以及未知工作流/项目/根级配置文件均安全回退为全量项目测试。变更映射由标准库脚本 `scripts/ci_changed_projects.py` 维护，并由根隐私测试中的单元测试覆盖。
+- **项目隔离**：项目目录或对应独立工作流变化时，只运行对应项目。聚合 Pages 工作流变化会运行 EntropyLab 与 RogueSurvivor；RogueLab 继续由自己的路径过滤工作流负责。ConstraintLab 的存在性检查始终运行，项目不存在时允许其测试跳过。
+- **共享变更**：根 `ci.yml`、共享 Actions、变更检测脚本及根级依赖/构建配置变化会触发全部根 CI 项目。隐私检查始终运行，不因项目选择而跳过；隐私脚本、根测试或隐私规范变化不会额外启动无关项目测试。
+- **合并门禁**：`CI required` 始终运行。它要求变更检测、隐私检查、布局检查成功；每个被选中的项目必须成功，未选中的项目必须为 skipped，ConstraintLab 不存在时也必须为 skipped。检测失败不会被当作“没有项目变化”。
+- **完整复验**：手动选择 `workflow_dispatch` 会运行所有根 CI 项目。main push 也按合并提交的 before..after 变更范围选择受影响项目；PR 已完成的相同变更不再导致每次合并都无差别重跑所有项目。
+- **隐私**：在 Linux / Windows × Python 3.11 / 3.12 运行根目录标准库回归（含新 checkout、旧快照重迁移、真实 hooks、detached HEAD、嵌套标签及失败关闭），以及 `privacy_check.py --all-history`。CI 的公开 noreply 策略来自仓库身份脚本对账号邮箱接口的实际核验，不需要给 PR 提供私人邮箱接口权限。隐私任务明确报告无私人词表，不能代替开发环境的私有检查。每个开发 checkout（包括旧快照恢复）仍须独立运行 `configure_git_identity.py --install-hooks`。
 - RepoScope：Linux / Windows × Python 3.11 / 3.12；unittest、ruff F 类检查、wheel 构建、真实 CLI 双报告。Windows 按原测试条件跳过 POSIX 权限与 FIFO 两项，不能将跳过项算作通过。
-- ConstraintLab：仅在 checkout 中存在该独立项目时运行；Linux / Windows 的 Python 测试、ruff、wheel、锁文件安装、TypeScript/Vite 构建、Playwright 浏览器流程和多规模实验。服务采用源码 editable 安装，与 README 和启动脚本一致；wheel 只提供 Python 核心/API，不带前端。
+- ConstraintLab：仅在 checkout 中存在该独立项目且变更检测选中时运行；Linux / Windows 的 Python 测试、ruff、wheel、锁文件安装、TypeScript/Vite 构建、Playwright 浏览器流程和多规模实验。服务采用源码 editable 安装，与 README 和启动脚本一致；wheel 只提供 Python 核心/API，不带前端。
 - Windows 浏览器验收：复制项目到含空格及中文的临时路径，执行原生 `start-windows.cmd`，等待真实页面可用，再运行完整 E2E。结束时清理整个服务进程树。此项是 Windows 原生自动验收，不等同于在用户电脑上人工双击验收。
 - QQ Mail MCP：Node.js 24、npm ci、Playwright Chromium 安装、类型检查、OAuth/IMAP/MIME 测试、Workers dry-run 构建与项目隐私基线。使用项目工作目录与锁文件缓存，不访问 Cloudflare Secrets，不部署；项目测试需 Chromium，缺失即失败。
-- EntropyLab / CompressionLab：通过可复用工作流分别运行 Linux/Windows 的 npm 锁文件安装、完整依赖审计、lint、typecheck/build、Vitest 和生产 Chromium E2E；EntropyLab 另保留 Linux 计算基准。两个工作流可手动运行，所有 PR 与 main 推送由根 CI 调用，避免路径过滤漏检和重复执行。
-- 依赖：四个 Node 项目都执行包含开发依赖的 `npm audit --audit-level=moderate`；Python 项目先固定升级 pip 26.2.1 / setuptools 84.0.0，再执行 `pip check` 和 `pip-audit`，检查失败不会忽略。审计器对 editable 项目本身不查公共漏洞库，其已安装第三方依赖仍逐项检查；项目源码由测试和审查覆盖。
+- EntropyLab / CompressionLab：通过可复用工作流分别运行 Linux/Windows 的 npm 锁文件安装、完整依赖审计、lint、typecheck/build、Vitest 和生产 Chromium E2E；EntropyLab 另保留 Linux 计算基准。
 - ModelCheckLab：独立可复用工作流，Linux/Windows 原生 Node.js 22；锁文件安装与完整依赖审计、lint、类型、真实 BFS/100种子独立参考差分、生产构建、Chromium Worker/导入导出/回放 E2E，不部署。
 - SynthLab：独立可复用工作流，Linux/Windows 原生 Node.js 22；锁文件安装、完整依赖审计、lint/typecheck、独立小语法穷举和50种子规格对照、生产构建、真实Worker Chromium E2E，预算/取消/故障与有限域结论独立，不部署。
 - DeltaLab：独立可复用工作流，Linux/Windows 原生 Node.js 22；锁文件安装与完整依赖审计、lint/typecheck、150种子增量差分及1000节点运算计数、生产构建、Chromium 编辑/回放/导入导出/窄屏 E2E，不部署。
 - AgentTrustLab：独立可复用工作流，Linux/Windows 原生 Node.js 22；锁文件安装、完整审计、lint/typecheck、独立授权矩阵与指标/安全数据测试、生产构建、Chromium 配置/确认/重放/导入导出/离线/窄屏 E2E。所有操作为本地模拟，不连接真实工具、不部署。
 - CalibrationLab：独立可复用工作流，Linux/Windows 原生 Node.js 22；锁文件安装/完整依赖审计、lint/typecheck、手算评分/固定种子统计/PAVA 穷举与泄漏隔离单元测试、生产构建、Chromium 控制/校准/真实下载/窄屏/离线 E2E；不部署。
 - CompilerLab：独立可复用工作流，Linux/Windows 原生 Node.js 22；锁文件安装与完整审计、lint/typecheck、独立 AST 解释器/原与优化 VM 的160固定种子差分、小整数独立算术 oracle、生产构建、真实 Chromium 阶段/优化/单步/诊断/窄屏 E2E，不部署。
-- `CI required` 汇总全部适用任务；任一必需任务失败或取消均失败。只有项目确实不存在时，允许跳过其独立任务。失败时保留服务日志与浏览器失败信息供排查。
+- `CI required` 汇总所有适用任务；被选中的任务失败或取消均失败。未受影响的项目必须明确为 skipped，不允许静默成功。失败时保留服务日志与浏览器失败信息供排查。
+- RogueLab 由独立的 `.github/workflows/roguelab.yml` 负责 Linux/Windows Godot 导出与实际 Web/Windows 启动验收；其项目目录、工作流文件及 Pages 聚合工作流变化由该工作流自己的 paths 规则触发。
 
 配置存在不代表运行成功，验收应引用对应提交的 Actions 运行链接。不得用旧提交结果代替新提交验证。
 
@@ -61,6 +66,6 @@ Pages 在 main 的相关变更后继续构建并测试，只有显式 `workflow_
 
 ## 私有环境维护（2026-10-19）
 
-环境创建者应通过私有持久存储/挂载恢复词表，并注入 `PRIVACY_DENYLIST` 路径，然后执行 `python scripts/configure_git_identity.py --install-hooks`。重建 checkout、恢复旧快照及更换容器都重复此步骤；幂等迁移负责纠正已审定的公共系统误列，不能仅依赖上一轮对话中手工修改过的私有文件。来源优先级、权限、备份及故障处理见 [PRIVACY.md](PRIVACY.md)。不要把私人数据写入启动脚本、工作流、Actions artifacts、缓存或公开日志。
+环境创建者应通过私有持久存储/挂载恢复词表，并注入 `PRIVACY_DENYLIST` 路径，然后执行 `python scripts/configure_git_identity.py --install-hooks`。重建 checkout、恢复旧快照及更换容器都重复此步骤；幂等迁移负责纠正已审定的公共系统误列，不能仅依赖上一轮对话中手工修改过的私有文件。环境变量可能覆盖本地 Git 配置；不得打印 `git config`、完整身份或环境变量值来排查。来源优先级、权限、备份及故障处理见 [PRIVACY.md](PRIVACY.md)。不要把私人数据写入启动脚本、工作流、Actions artifacts、缓存或公开日志。
 
 本次可验证的边界：仓库已提供持久的初始化逻辑和合成重建回归，当前环境实际迁移并通过完整扫描；环境平台模板未开放配置接口，无法从仓库内证明或修改它的存储持久化机制。没有私有来源的新环境须报错并恢复来源，不可自动生成或缩减词表。

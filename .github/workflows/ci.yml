@@ -14,6 +14,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Detect affected projects
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      all: ${{ steps.detect.outputs.all }}
+      reposcope: ${{ steps.detect.outputs.reposcope }}
+      constraintlab: ${{ steps.detect.outputs.constraintlab }}
+      qq_mail_mcp: ${{ steps.detect.outputs.qq_mail_mcp }}
+      entropylab: ${{ steps.detect.outputs.entropylab }}
+      compressionlab: ${{ steps.detect.outputs.compressionlab }}
+      matchuplab: ${{ steps.detect.outputs.matchuplab }}
+      causallab: ${{ steps.detect.outputs.causallab }}
+      modelchecklab: ${{ steps.detect.outputs.modelchecklab }}
+      synthlab: ${{ steps.detect.outputs.synthlab }}
+      adversarylab: ${{ steps.detect.outputs.adversarylab }}
+      deltalab: ${{ steps.detect.outputs.deltalab }}
+      agenttrustlab: ${{ steps.detect.outputs.agenttrustlab }}
+      calibrationlab: ${{ steps.detect.outputs.calibrationlab }}
+      compilerlab: ${{ steps.detect.outputs.compilerlab }}
+      rogue_survivor: ${{ steps.detect.outputs.rogue_survivor }}
+      mahjong: ${{ steps.detect.outputs.mahjong }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Detect changed project scopes
+        id: detect
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: python scripts/ci_changed_projects.py --event "$EVENT_NAME" --base "$BASE_SHA" --head "$HEAD_SHA" --output "$GITHUB_OUTPUT"
+
   privacy:
     name: Privacy and identity (${{ matrix.os }}, Python ${{ matrix.python }})
     timeout-minutes: 10
@@ -44,6 +83,8 @@ jobs:
 
   reposcope:
     name: RepoScope (${{ matrix.os }}, Python ${{ matrix.python }})
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.reposcope == 'true'
     timeout-minutes: 20
     runs-on: ${{ matrix.os }}
     strategy:
@@ -87,8 +128,8 @@ jobs:
 
   constraintlab:
     name: ConstraintLab (${{ matrix.os }})
-    needs: layout
-    if: needs.layout.outputs.constraintlab == 'true'
+    needs: [layout, changes]
+    if: needs.layout.outputs.constraintlab == 'true' && (needs.changes.outputs.all == 'true' || needs.changes.outputs.constraintlab == 'true')
     timeout-minutes: 20
     runs-on: ${{ matrix.os }}
     strategy:
@@ -145,6 +186,8 @@ jobs:
 
   qq-mail-mcp:
     name: QQ Mail MCP
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.qq_mail_mcp == 'true'
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:2f05f8a734509a7b3f26a912639488ee08f58a7b292d14d62271bcff9038768f
     timeout-minutes: 15
@@ -174,105 +217,170 @@ jobs:
       - run: npm run privacy
 
   entropylab:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.entropylab == 'true'
     name: EntropyLab
     uses: ./.github/workflows/entropylab.yml
 
   compressionlab:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.compressionlab == 'true'
     name: CompressionLab
     uses: ./.github/workflows/compressionlab.yml
 
   matchuplab:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.matchuplab == 'true'
     name: MatchupLab
     uses: ./.github/workflows/matchuplab.yml
 
   causallab:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.causallab == 'true'
     name: CausalLab
     uses: ./.github/workflows/causallab.yml
 
   modelchecklab:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.modelchecklab == 'true'
     name: ModelCheckLab
     uses: ./.github/workflows/modelchecklab.yml
 
   synthlab:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.synthlab == 'true'
     name: SynthLab
     uses: ./.github/workflows/synthlab.yml
 
   adversarylab:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.adversarylab == 'true'
     name: AdversaryLab
     uses: ./.github/workflows/adversarylab.yml
 
   deltalab:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.deltalab == 'true'
     name: DeltaLab
     uses: ./.github/workflows/deltalab.yml
 
   agenttrustlab:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.agenttrustlab == 'true'
     name: AgentTrustLab
     uses: ./.github/workflows/agenttrustlab.yml
 
   calibrationlab:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.calibrationlab == 'true'
     name: CalibrationLab
     uses: ./.github/workflows/calibrationlab.yml
 
   compilerlab:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.compilerlab == 'true'
     name: CompilerLab
     uses: ./.github/workflows/compilerlab.yml
 
   rogue-survivor:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.rogue_survivor == 'true'
     name: RogueSurvivor
     uses: ./.github/workflows/rogue-survivor.yml
 
   mahjong:
+    needs: changes
+    if: needs.changes.outputs.all == 'true' || needs.changes.outputs.mahjong == 'true'
     name: Mahjong
     uses: ./.github/workflows/mahjong.yml
 
   required:
     name: CI required
     if: always()
-    needs: [privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab, adversarylab, deltalab, agenttrustlab, calibrationlab, compilerlab, rogue-survivor, mahjong]
+    needs: [changes, privacy, reposcope, layout, constraintlab, qq-mail-mcp, entropylab, compressionlab, matchuplab, causallab, modelchecklab, synthlab, adversarylab, deltalab, agenttrustlab, calibrationlab, compilerlab, rogue-survivor, mahjong]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Require all applicable checks
         env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          ALL_CHANGED: ${{ needs.changes.outputs.all }}
           MAHJONG_RESULT: ${{ needs.mahjong.result }}
+          MAHJONG_CHANGED: ${{ needs.changes.outputs.mahjong }}
           ROGUE_SURVIVOR_RESULT: ${{ needs.rogue-survivor.result }}
+          ROGUE_SURVIVOR_CHANGED: ${{ needs.changes.outputs.rogue_survivor }}
           COMPILERLAB_RESULT: ${{ needs.compilerlab.result }}
+          COMPILERLAB_CHANGED: ${{ needs.changes.outputs.compilerlab }}
           CALIBRATIONLAB_RESULT: ${{ needs.calibrationlab.result }}
+          CALIBRATIONLAB_CHANGED: ${{ needs.changes.outputs.calibrationlab }}
           AGENTTRUSTLAB_RESULT: ${{ needs.agenttrustlab.result }}
+          AGENTTRUSTLAB_CHANGED: ${{ needs.changes.outputs.agenttrustlab }}
           DELTALAB_RESULT: ${{ needs.deltalab.result }}
+          DELTALAB_CHANGED: ${{ needs.changes.outputs.deltalab }}
           ADVERSARYLAB_RESULT: ${{ needs.adversarylab.result }}
+          ADVERSARYLAB_CHANGED: ${{ needs.changes.outputs.adversarylab }}
           SYNTHLAB_RESULT: ${{ needs.synthlab.result }}
+          SYNTHLAB_CHANGED: ${{ needs.changes.outputs.synthlab }}
           MODELCHECKLAB_RESULT: ${{ needs.modelchecklab.result }}
+          MODELCHECKLAB_CHANGED: ${{ needs.changes.outputs.modelchecklab }}
           CAUSALLAB_RESULT: ${{ needs.causallab.result }}
+          CAUSALLAB_CHANGED: ${{ needs.changes.outputs.causallab }}
           MATCHUPLAB_RESULT: ${{ needs.matchuplab.result }}
+          MATCHUPLAB_CHANGED: ${{ needs.changes.outputs.matchuplab }}
           ENTROPYLAB_RESULT: ${{ needs.entropylab.result }}
+          ENTROPYLAB_CHANGED: ${{ needs.changes.outputs.entropylab }}
           COMPRESSIONLAB_RESULT: ${{ needs.compressionlab.result }}
+          COMPRESSIONLAB_CHANGED: ${{ needs.changes.outputs.compressionlab }}
           QQ_MAIL_MCP_RESULT: ${{ needs.qq-mail-mcp.result }}
+          QQ_MAIL_MCP_CHANGED: ${{ needs.changes.outputs.qq_mail_mcp }}
           PRIVACY_RESULT: ${{ needs.privacy.result }}
           REPOSCOPE_RESULT: ${{ needs.reposcope.result }}
+          REPOSCOPE_CHANGED: ${{ needs.changes.outputs.reposcope }}
           LAYOUT_RESULT: ${{ needs.layout.result }}
           HAS_CONSTRAINTLAB: ${{ needs.layout.outputs.constraintlab }}
           CONSTRAINTLAB_RESULT: ${{ needs.constraintlab.result }}
+          CONSTRAINTLAB_CHANGED: ${{ needs.changes.outputs.constraintlab }}
         run: |
-          test "$MAHJONG_RESULT" = success
-          test "$ROGUE_SURVIVOR_RESULT" = success
-          test "$COMPILERLAB_RESULT" = success
-          test "$CALIBRATIONLAB_RESULT" = success
-          test "$AGENTTRUSTLAB_RESULT" = success
-          test "$DELTALAB_RESULT" = success
-          test "$ADVERSARYLAB_RESULT" = success
-          test "$SYNTHLAB_RESULT" = success
-          test "$MODELCHECKLAB_RESULT" = success
-          test "$CAUSALLAB_RESULT" = success
-          test "$MATCHUPLAB_RESULT" = success
-          test "$ENTROPYLAB_RESULT" = success
-          test "$COMPRESSIONLAB_RESULT" = success
-          test "$QQ_MAIL_MCP_RESULT" = success
+          set -eu
+          test "$CHANGES_RESULT" = success
           test "$PRIVACY_RESULT" = success
-          test "$REPOSCOPE_RESULT" = success
           test "$LAYOUT_RESULT" = success
+
+          require_project() {
+            name="$1"
+            result="$2"
+            changed="$3"
+            if test "$ALL_CHANGED" = true || test "$changed" = true; then
+              if test "$result" != success; then
+                echo "$name was required but finished as $result"
+                return 1
+              fi
+            else
+              if test "$result" != skipped; then
+                echo "$name was not selected but finished as $result"
+                return 1
+              fi
+            fi
+          }
+
+          require_project "RepoScope" "$REPOSCOPE_RESULT" "$REPOSCOPE_CHANGED"
+          require_project "QQ Mail MCP" "$QQ_MAIL_MCP_RESULT" "$QQ_MAIL_MCP_CHANGED"
+          require_project "EntropyLab" "$ENTROPYLAB_RESULT" "$ENTROPYLAB_CHANGED"
+          require_project "CompressionLab" "$COMPRESSIONLAB_RESULT" "$COMPRESSIONLAB_CHANGED"
+          require_project "MatchupLab" "$MATCHUPLAB_RESULT" "$MATCHUPLAB_CHANGED"
+          require_project "CausalLab" "$CAUSALLAB_RESULT" "$CAUSALLAB_CHANGED"
+          require_project "ModelCheckLab" "$MODELCHECKLAB_RESULT" "$MODELCHECKLAB_CHANGED"
+          require_project "SynthLab" "$SYNTHLAB_RESULT" "$SYNTHLAB_CHANGED"
+          require_project "AdversaryLab" "$ADVERSARYLAB_RESULT" "$ADVERSARYLAB_CHANGED"
+          require_project "DeltaLab" "$DELTALAB_RESULT" "$DELTALAB_CHANGED"
+          require_project "AgentTrustLab" "$AGENTTRUSTLAB_RESULT" "$AGENTTRUSTLAB_CHANGED"
+          require_project "CalibrationLab" "$CALIBRATIONLAB_RESULT" "$CALIBRATIONLAB_CHANGED"
+          require_project "CompilerLab" "$COMPILERLAB_RESULT" "$COMPILERLAB_CHANGED"
+          require_project "RogueSurvivor" "$ROGUE_SURVIVOR_RESULT" "$ROGUE_SURVIVOR_CHANGED"
+          require_project "Mahjong" "$MAHJONG_RESULT" "$MAHJONG_CHANGED"
+
           if test "$HAS_CONSTRAINTLAB" = true; then
-            test "$CONSTRAINTLAB_RESULT" = success
+            require_project "ConstraintLab" "$CONSTRAINTLAB_RESULT" "$CONSTRAINTLAB_CHANGED"
           else
             test "$CONSTRAINTLAB_RESULT" = skipped
           fi
