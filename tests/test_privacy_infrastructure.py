@@ -1,5 +1,6 @@
 """Exercise real Git objects, fresh checkouts and private configuration using synthetic data."""
 
+import base64
 import contextlib
 import io
 import json
@@ -99,30 +100,33 @@ class InfrastructureTests(unittest.TestCase):
         folder = Path(self.temp.name) / "shared-acl-fixture"
         folder.mkdir()
 
-        def powershell(script, path):
-            result = subprocess.run(
-                ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command",
-                 "$ErrorActionPreference = 'Stop'; $p = $env:PRIVACY_TEST_ACL_PATH; " + script],
-                env=dict(os.environ, PRIVACY_TEST_ACL_PATH=str(path)),
-                capture_output=True, text=True,
-            )
-            self.assertEqual(result.returncode, 0, "Native Windows ACL operation failed")
+        def run_native(args, operation, env=None):
+            result = subprocess.run(args, env=env, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, operation)
             return result.stdout.strip()
+
+        def powershell(script, path):
+            command = "$ErrorActionPreference = 'Stop'; $p = $env:PRIVACY_TEST_ACL_PATH; " + script
+            encoded = base64.b64encode(command.encode("utf-16-le")).decode("ascii")
+            return run_native(
+                ["powershell.exe", "-NoProfile", "-NonInteractive", "-EncodedCommand", encoded],
+                "Native Windows ACL inspection failed",
+                dict(os.environ, PRIVACY_TEST_ACL_PATH=str(path)),
+            )
 
         descriptor = """
 (Get-Acl -LiteralPath $p).GetSecurityDescriptorSddlForm(
     [System.Security.AccessControl.AccessControlSections]::Access)
 """
-        powershell("""
-$acl = Get-Acl -LiteralPath $p
-$shared = [System.Security.Principal.SecurityIdentifier]::new('S-1-5-11')
-$rule = [System.Security.AccessControl.FileSystemAccessRule]::new(
-    $shared, 'ReadAndExecute', 'ContainerInherit,ObjectInherit', 'None', 'Allow')
-$acl.SetAccessRule($rule)
-Set-Acl -LiteralPath $p -AclObject $acl
-""", folder)
+        owner = powershell("[System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value", folder)
+        self.assertTrue(owner.startswith("S-1-"), "Windows account SID unavailable")
+        run_native(
+            ["icacls.exe", str(folder), "/grant", "*S-1-5-11:(OI)(CI)(RX)"],
+            "Could not apply shared parent ACL",
+        )
         parent_acl = powershell(descriptor, folder)
-        self.assertRegex(parent_acl, r";;;(?:AU|S-1-5-11)\)")
+        self.assertTrue(any(f";;;{sid})" in parent_acl for sid in ("AU", "S-1-5-11")),
+                        "Expected authenticated users on the parent ACL")
         for name, terms, expected in (
             ("legacy.json", [LEGACY_PUBLIC_TERM, "Fictional Private Marker"], 2),
             ("current.json", ["Fictional Private Marker"], 0),
@@ -131,16 +135,16 @@ Set-Acl -LiteralPath $p -AclObject $acl
                 source = folder / name
                 raw = json.dumps({"terms": terms}).encode()
                 source.write_bytes(raw)
+                run_native(
+                    ["icacls.exe", str(source), "/grant:r", f"*{owner}:(F)"],
+                    "Could not grant owner access",
+                )
+                run_native(
+                    ["icacls.exe", str(source), "/inheritance:r"],
+                    "Could not remove inherited file rules",
+                )
                 private_acl = powershell("""
 $owner = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
-$acl = Get-Acl -LiteralPath $p
-$acl.SetAccessRuleProtection($true, $false)
-foreach ($rule in $acl.GetAccessRules($true, $false, [System.Security.Principal.SecurityIdentifier])) {
-    $acl.RemoveAccessRuleSpecific($rule)
-}
-$acl.AddAccessRule([System.Security.AccessControl.FileSystemAccessRule]::new(
-    $owner, 'FullControl', 'Allow'))
-Set-Acl -LiteralPath $p -AclObject $acl
 $acl = Get-Acl -LiteralPath $p
 $rules = @($acl.GetAccessRules($true, $true, [System.Security.Principal.SecurityIdentifier]))
 if (!$acl.AreAccessRulesProtected -or $rules.Count -ne 1 -or
