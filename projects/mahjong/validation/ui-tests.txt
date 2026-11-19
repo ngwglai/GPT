@@ -1,0 +1,1 @@
+PASS: four DOM clients, create/join/seats, dealer dice, 16 synchronized moves, private hands, wall, XSS escaping, disconnect/reload, original local mode. No script errors.

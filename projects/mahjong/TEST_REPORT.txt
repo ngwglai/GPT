@@ -1,0 +1,27 @@
+v0.3.1 测试报告
+
+执行：python -m unittest discover -q
+结果：113 tests，全部通过（OK）。
+
+新增 0.3.1 覆盖：
+- Web 新局先进入 ROLLING_DICE，掷骰前四家均未发牌。
+- 只有庄家拥有 ROLL_DICE；其他座位提交该操作会被拒绝。
+- 掷骰前骰子、开牌墙/列、金指示牌和金均不公开。
+- 掷骰前实体牌墙显示 136 张；掷骰并完成初始发牌后为 83 张。
+- 同 Seed + 同庄家手动掷骰后，骰子、开牌位置、金、牌墙状态与四家初始手牌完全一致。
+- wall_view 不包含墙内隐藏牌 type、instance_id 或墙序。
+- presentation_events 不暴露 shuffle seed、初始 hands 或原始 event_log 私有负载。
+- 原有金、报听、吃碰杠胡、响应优先级、牌墙、胡牌求解、连续庄家和计分接口测试继续全部通过。
+
+JavaScript / Python 静态检查：
+- node --check web/app.js：通过。
+- node --check web/presentation.js：通过。
+- python -m py_compile web_server.py mahjong/game/engine.py mahjong/core/action.py：通过。
+
+随机局回归：
+- python -m mahjong demo --seed 12345 --rounds 10：连续 10 局完成，无状态机卡死。
+
+HTTP 烟雾测试：
+- GET /、/presentation.js、/assets/manifest.json、/api/health 均返回 200。
+- GET /api/table 初始返回 phase=ROLLING_DICE、dice=[null,null]、wall_view.tiles_present=136。
+- 通过 /api/action 由庄家提交 ROLL_DICE 后返回 phase=TURN_ACTION、公开骰子，墙上实牌=83，四家手牌数量为 14/13/13/13。

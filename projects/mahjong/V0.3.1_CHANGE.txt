@@ -1,0 +1,33 @@
+v0.3.1 联机前表现层基础版
+
+1. 庄家手动掷骰
+- Web 模式 start_round(..., manual_dice_roll=True)。
+- 新局阶段为 ROLLING_DICE，只有庄家 legal_actions 中出现 ROLL_DICE。
+- 掷骰前不发牌，不公开骰子、开牌位置、金指示牌和金。
+- 点击后才产生 DICE_ROLLED / GOLD_INDICATOR_REVEALED / DEAL_COMPLETED，并进入 TURN_ACTION。
+- 随机性仍完全由服务器 Seed 控制，可复现。
+
+2. 实体牌墙公开视图
+- 四面各 17 墩、上下两层。
+- 显示 present / reserved / indicator / normal_cursor / gang_cursor。
+- 公开开牌位置、摸牌游标、杠后补牌游标和墙上实牌数量。
+- wall_view 不包含任何隐藏牌 type、instance_id 或墙序。
+
+3. 前端牌墙
+- 中央区域绘制四边双层牌墙。
+- 掷骰前显示完整 136 张。
+- 发牌后对应实体槽位消失；后续摸牌/杠补继续实时变化。
+- 标记原始开牌墩、正常摸牌端、补牌端和金指示牌位置。
+
+4. 表现层与素材接口
+- 新增 presentation.js：AssetManager / AudioManager / AnimationManager / NotificationManager / PresentationEventBus。
+- 新增安全 presentation_events，供前端触发骰子、摸打牌、吃碰杠、报听、上金、胡牌、流局等表现。
+- 新增 web/assets/manifest.json 与完整目录骨架。
+- 素材不存在时自动回退，不影响游戏。
+- BGM / SFX / Voice 三路独立开关和音量设置已接好。
+
+5. 本版不包含
+- 正式麻将图片、BGM、语音包。
+- 华丽动画。
+- 局域网房间/多设备连接。
+- 新的特殊胡牌规则和地方计分数值。

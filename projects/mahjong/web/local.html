@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>本地麻将 · 四家明牌测试</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <strong>本地麻将</strong><a href="/">返回首页</a>
+      <span>四家明牌规则测试台 · v0.5.0</span>
+    </div>
+    <div class="round-controls">
+      <label>种子 <input id="seedInput" inputmode="numeric" placeholder="留空随机"></label>
+      <label>庄家
+        <select id="dealerSelect">
+          <option value="0">东</option><option value="1">南</option><option value="2">西</option><option value="3">北</option>
+        </select>
+      </label>
+      <button id="newRoundBtn" class="primary">重新开局</button>
+      <button id="resetMatchBtn" class="ghost">按设置重置整场</button>
+      <button id="timeoutBtn" class="ghost hidden">未响应者全部过</button>
+      <details class="sound-settings">
+        <summary>声音</summary>
+        <div class="sound-panel">
+          <label><span><input id="bgmEnabled" type="checkbox"> BGM</span><input id="bgmVolume" type="range" min="0" max="1" step="0.05"></label>
+          <label><span><input id="sfxEnabled" type="checkbox"> 音效</span><input id="sfxVolume" type="range" min="0" max="1" step="0.05"></label>
+          <label><span><input id="voiceEnabled" type="checkbox"> 语音</span><input id="voiceVolume" type="range" min="0" max="1" step="0.05"></label>
+          <small>当前素材目录为空；加入资源映射后自动生效。</small>
+        </div>
+      </details>
+    </div>
+  </header>
+
+  <main>
+    <div id="notice" class="notice hidden"></div>
+    <section class="table-shell">
+      <article id="seat-3" class="player north"></article>
+      <article id="seat-0" class="player east"></article>
+      <section id="center" class="center-board"></section>
+      <article id="seat-2" class="player west"></article>
+      <article id="seat-1" class="player south"></article>
+    </section>
+  </main>
+
+  <script src="/presentation.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

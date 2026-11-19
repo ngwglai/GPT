@@ -16,6 +16,7 @@
 
 | 项目 | 目录 | 状态 | 价值/用途 | 下一步 |
 | --- | --- | --- | --- | --- |
+| 本地麻将 v0.5.0 | [projects/mahjong](projects/mahjong/) | Testing | Python 麻将规则引擎、四家明牌调试和四人局域网联机 | 保留原版规则与素材，运行 Linux / Windows 迁移验收，见项目 README 和 PR 检查 |
 | 星烬远征 RogueSurvivor | [projects/RogueSurvivor](projects/RogueSurvivor/) | Completed | 浏览器俯视角动作肉鸽：自动攻击、主动技能、标准/无尽、存档与资源工坊 | AI可视化：三策略、0.5～8倍、真实路线/评分/施法日志、有界本地历史及JSON导出；双入口Pages，见AI-VISUALIZATION.md。独立AI：135局真实测试，正常旧0/24→战斗16/24→构筑23/24；无尽至少2小时/158波，完整置信区间与限制见AI-REPORT.md，PR #52。v1.9.0：Windows特效测试按资源就绪、真实冷却及新增绘制逐项同步，新增晚加载冲刺回归，保留原断言与游戏逻辑；验证见PR #48。24张原创特效与四帧命中序列、五武器/六技能、角色状态和七Boss主题材质、预算与工坊回退；见V1.9.0.md、EFFECTS.md。v1.8.3：普通怪与Boss时间成长改为集中线性公式、精英概率线性至48%、移除旧移动速度上限、保留全部既有玩法；数值及范围差异见V1.8.3.md、V1.8.3-BALANCE.md。v1.8.2：庭院只剩沉睡宝箱怪时0.8～2秒独立逃跑、留下正面糖果，可接近/攻击拦截；计时可恢复且不走击杀结算；见V1.8.2.md。v1.8.1：普通/Boss波70/90秒、18～30秒入场、清场5秒休整与可恢复倒计时、十二首地图音乐及逐曲播放增益；见V1.8.1.md、MUSIC.md。v1.8 星轨重铸：三级武器、10机制核心、伤害乘区、低频抽卡、Run v5迁移与等级补偿；规则及模拟限制见V1.8.md；保留触屏操作。v1.7 指尖远征：触屏摇杆、多点触控、原技能栏按钮、自动／定点瞄准、横竖屏与安全区域；实现及真机限制见V1.7.md。v1.6 星火重燃：三角色21组逐帧动画、战败演出、Boss星火复活、Run v4兼容；实现与限制见V1.6.md。v1.5 波次远征：固定预算、清场/超时推进、5/10/15/20波首领与等待队列、四地图歌单、23个CC0采样；规则和验证见V1.5.md，保留成长强度与容量。v1.4：四地图、17普通怪/7Boss、环境互动、抽卡音乐连续；保留卡牌/角色/资源工坊，验证与限制见V1.4.md，远端状态见Actions |
 | RogueLab | [projects/roguelab](projects/roguelab/) | Completed | Godot 4 三职业卡组肉鸽：三幕路线、遗物构筑、随机事件与首领；Web / Windows | PR #24；独立 Linux/Windows 验收通过，Web / 下载入口见 README；v1.1 完整简体中文；后续玩家反馈 |
 | CompilerLab | [projects/compilerlab](projects/compilerlab/) | Completed | 本地微型编译流水线、独立解释器与栈式 VM 语义对照 | PR #23；最终修复头253单元/14生产E2E、Linux/Windows与CI required已35/35通过；最新验收记录仍需完整CI成功，不部署 |
@@ -29,7 +30,7 @@
 | MatchupLab | [projects/matchuplab](projects/matchuplab/) | Completed | 本地对抗决策、探索利用与策略迁移实验；两博弈 / 四算法 / 多种子 | PR #10；Linux / Windows 全部验收通过，隐私阻塞已解除；按需本机验收，不部署 |
 | CompressionLab | [projects/compressionlab](projects/compressionlab/) | Completed | 纯本地字符压缩算法交互实验室；真实 trace 与编解码回环 | 旧推送阻塞已解除；完整本地复验通过，纳入维护 PR 自动验收 |
 | EntropyLab | [projects/entropylab](projects/entropylab/) | Completed | 浏览器内的计算物理与复杂系统交互实验室 | v1.1 已合并；依赖审计清零、完整复验通过，按需手动部署 |
-| ConstraintLab | [projects/constraintlab](projects/constraintlab/) | Completed | 本地 CSP 求解与算法实验平台 | 修复及整合 main 后 Linux/Windows 完整验收通过；按需扩展 |
+| ConstraintLab | [projects/constraintlab](projects/constraintlab/) | Completed | 本地 CSP 求解与算法实验平台 | Linux CI 改用原生 Ubuntu，安装 Chromium 系统依赖；双平台安装前检查 Python SSL，复验见 PR #54 |
 | RepoScope | [projects/reposcope](projects/reposcope/) | Completed | 面向 Windows 用户的离线仓库规模、技术栈与维护风险分析；HTML / Markdown 报告 | HTML 修复与 Linux/Windows CI 通过；按需扩展功能 |
 | QQ Mail MCP | [projects/qq-mail-mcp](projects/qq-mail-mcp/) | Testing | Cloudflare Workers 上的私人 QQ 邮箱只读 MCP，OAuth/DCR 与六个工具 | PR #6 已合并，62 项本地回归通过；真实邮箱验收和部署仍待安全本地配置 |
 
