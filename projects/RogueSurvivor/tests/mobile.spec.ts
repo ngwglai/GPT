@@ -261,12 +261,14 @@ test.describe("触屏战斗", () => {
     expect(s.player.x - 1800).toBeGreaterThan(30);
     expect(s.player.shield).toBeGreaterThan(0);
   });
-  test("定点瞄准、全部六技能可触发，菜单与读档不残留摇杆", async ({ page }) => {
-    for (const [primary, secondary] of [
-      ["fire", "ward"],
-      ["ice", "bloom"],
-      ["lance", "ward"],
-    ] as const) {
+  for (const [primary, secondary] of [
+    ["fire", "ward"],
+    ["ice", "bloom"],
+    ["lance", "ward"],
+  ] as const) {
+    test(`定点瞄准、技能触发及读档后摇杆复位（${primary}/${secondary}）`, async ({
+      page,
+    }) => {
       await resume(
         page,
         createRun("endless", "ranger", 1707, primary, secondary),
@@ -293,8 +295,8 @@ test.describe("触屏战斗", () => {
             parseFloat(el.style.getPropertyValue("--stick-x") || "0"),
           ),
       ).toBe(0);
-    }
-  });
+    });
+  }
 });
 test.describe("移动端完整菜单流程", () => {
   test.use({
