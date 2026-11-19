@@ -1,6 +1,6 @@
 # 本地麻将 v0.5.0
 
-本地麻将规则引擎、四家明牌调试页和四人局域网联机。v0.5.0 支持十三幺公开拾牌、连续牌局与刷新重连。规则由 Python 服务端执行。
+青雀麻将提供四家明牌练习和四人局域网联机。v0.5.0 支持十三幺公开拾牌、连续牌局与刷新重连，规则由 Python 服务端执行。Web 美术升级提供翡翠绒面牌桌、SVG 牌组和桌面、平板、手机布局。
 
 ## 安装与启动
 
@@ -15,7 +15,7 @@ python -m pip install -r requirements.txt
 python web_server.py
 ```
 
-打开 `http://127.0.0.1:8765/`。首页链接到四家明牌调试页 `/local.html` 和房间页 `/lan.html`。服务器可用 `--no-browser` 关闭自动打开浏览器。Windows 后台运行或重定向控制台输出时，可设置 `PYTHONIOENCODING=utf-8` 以输出中文启动信息。
+打开 `http://127.0.0.1:8765/`。首页可进入四家明牌练习 `/local.html`、联机大厅 `/lan.html` 和美术图鉴 `/asset-gallery.html`。服务器可用 `--no-browser` 关闭自动打开浏览器。Windows 后台运行或重定向控制台输出时，可设置 `PYTHONIOENCODING=utf-8` 以输出中文启动信息。
 
 ## 局域网四人联机
 
@@ -46,6 +46,10 @@ npm run test:ui -- http://127.0.0.1:8765
 ```
 
 前端测试使用 jsdom 和实际 HTTP/WebSocket 连接，覆盖四个客户端的房间与牌局同步。屏幕排版和音频播放需要真实浏览器验收。命令行引擎可用 `python -m mahjong demo --seed 42 --rounds 3` 试跑。
+
+## Web 美术与浏览器验收
+
+[美术升级说明](VISUAL-UPGRADE.md) 收录资产清单、布局与操作变化，以及 Playwright 验收和截图生成方式。
 
 ## 原版资料
 

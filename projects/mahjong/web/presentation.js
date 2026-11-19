@@ -15,6 +15,7 @@
     constructor(url = "/assets/manifest.json") {
       this.url = url;
       this.manifest = { version: 1 };
+      this.failedImages = new Set();
     }
 
     async load() {
@@ -36,8 +37,8 @@
         node = node[part];
       }
       if (typeof node !== "string" || !node) return null;
-      if (/^(?:https?:|data:|blob:|\/)/.test(node)) return node;
-      return `/assets/${node.replace(/^\.\//, "")}`;
+      const url = /^(?:https?:|data:|blob:|\/)/.test(node) ? node : `/assets/${node.replace(/^\.\//, "")}`;
+      return this.failedImages.has(url) ? null : url;
     }
   }
 
@@ -114,7 +115,10 @@
         this.bgm.loop = true;
         this.bgm.volume = this.settings.bgmVolume;
         this.currentBgmKey = key;
-        this.bgm.play().catch(() => {});
+        const track = this.bgm;
+        track.play().catch(() => {
+          if (this.bgm === track) this.stopBgm();
+        });
       } catch (_) {
         this.bgm = null;
         this.currentBgmKey = null;
@@ -271,20 +275,71 @@
       if (!node) continue;
       node[prop] = prop === "checked" ? Boolean(audio.settings[id]) : String(audio.settings[id]);
       const eventName = prop === "checked" ? "change" : "input";
-      node.addEventListener(eventName, () => audio.setSetting(id, prop === "checked" ? node.checked : Number(node.value)));
+      node.addEventListener(eventName, () => {
+        audio.setSetting(id, prop === "checked" ? node.checked : Number(node.value));
+        if (id === "bgmEnabled" && node.checked) startTableBgm();
+      });
     }
   }
 
-  async function init() {
-    await assets.load();
-    const tableBackground = assets.resolve("table", "background");
-    if (tableBackground) {
-      document.body.style.backgroundImage = `url(${JSON.stringify(tableBackground)})`;
-      document.body.style.backgroundSize = "cover";
-      document.body.style.backgroundAttachment = "fixed";
+  function atTable() {
+    const lanTable = document.getElementById("gameTable");
+    return document.body.classList.contains("game-mode") || Boolean(lanTable && !lanTable.classList.contains("hidden"));
+  }
+
+  function startTableBgm() {
+    if (!atTable() || audio.currentBgmKey) return;
+    const resultMusic = document.querySelector(".result-box") && assets.resolve("bgm", "result");
+    audio.playBgm(resultMusic ? "result" : "game");
+  }
+
+  function bindPanels() {
+    const panels = [...document.querySelectorAll(".top-details")];
+    document.addEventListener("click", event => {
+      for (const panel of panels) {
+        if (panel.open && !panel.contains(event.target)) panel.open = false;
+      }
+      startTableBgm();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key !== "Escape") return;
+      const panel = panels.find(details => details.open);
+      if (panel) {
+        panel.open = false;
+        panel.querySelector("summary").focus();
+      }
+    });
+  }
+
+  document.addEventListener("error", event => {
+    const image = event.target;
+    if (!image.classList?.contains("asset-image")) return;
+    assets.failedImages.add(image.getAttribute("src"));
+    image.remove();
+  }, true);
+
+  function applyArt() {
+    const properties = [
+      ["--home-art", assets.resolve("backgrounds", "home")],
+      ["--lobby-art", assets.resolve("backgrounds", "lobby")],
+      ["--table-felt", assets.resolve("table", "felt")],
+      ["--page-art", assets.resolve("table", "background")],
+    ];
+    for (const [name, path] of properties) {
+      if (path) document.body.style.setProperty(name, `url(${JSON.stringify(path)})`);
     }
-    bindAudioSettings();
+  }
+
+  let ready;
+  function init() {
+    ready ||= assets.load().then(() => {
+      applyArt();
+      bindAudioSettings();
+      bindPanels();
+    });
+    return ready;
   }
 
   window.MahjongPresentation = { assets, audio, animations, notifications, bus, init };
+  if (document.body.hasAttribute("data-art-preview")) init();
 })();

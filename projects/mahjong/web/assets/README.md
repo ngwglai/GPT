@@ -1,57 +1,18 @@
-# 素材目录
+# 青雀麻将素材
 
-`manifest.json` 是统一资源映射。路径可以写成 `/assets/...` 绝对路径，也可以直接写相对 `web/assets/` 的路径，例如：
+`manifest.json` 记录逻辑键与资源的对应关系。路径可相对本目录，浏览器也接受同源根路径。运行时只需要项目自带资源。
 
-```json
-{
-  "version": 1,
-  "tiles": {
-    "0": "tiles/1wan.png",
-    "33": "tiles/bai.png",
-    "back": "tiles/back.png"
-  },
-  "table": {
-    "background": "table/felt.jpg"
-  },
-  "dice": {
-    "1": "dice/1.png",
-    "6": "dice/6.png"
-  },
-  "bgm": {
-    "game": "bgm/game.mp3",
-    "result": "bgm/result.mp3"
-  },
-  "sfx": {
-    "dice": "sfx/dice.wav",
-    "draw": "sfx/draw.wav",
-    "tile_drop": "sfx/tile_drop.wav",
-    "chi": "sfx/chi.wav",
-    "peng": "sfx/peng.wav",
-    "gang": "sfx/gang.wav",
-    "hu": "sfx/hu.wav",
-    "round_draw": "sfx/round_draw.wav"
-  },
-  "voice": {
-    "tiles": {
-      "0": "voice/tiles/1wan.mp3"
-    },
-    "actions": {
-      "chi": "voice/actions/chi.mp3",
-      "peng": "voice/actions/peng.mp3",
-      "gang": "voice/actions/gang.mp3",
-      "ting": "voice/actions/ting.mp3",
-      "gold_shelved": "voice/actions/gold_shelved.mp3",
-      "hu": "voice/actions/hu.mp3"
-    },
-    "wins": {
-      "SEVEN_PAIRS": "voice/wins/seven_pairs.mp3"
-    }
-  },
-  "ui": {},
-  "effects": {}
-}
-```
+| 清单键 | 素材 |
+| --- | --- |
+| `backgrounds.home`、`backgrounds.lobby` | 首页牌桌、大厅茶室的 WebP 场景图 |
+| `table.felt` | 牌桌绒面 WebP |
+| `tiles.0` 至 `tiles.33`、`tiles.back` | SVG 牌面和暗牌。顺序为万、筒、条、东南西北、中发白 |
+| `dice.1` 至 `dice.6` | 六个点数的 SVG 骰面 |
+| `ui.icons` | 包含青雀、房主、在线、断线、声音等图标的 SVG 符号表 |
+| `bgm`、`voice`、`sfx` | 背景音乐、牌名及动作语音、合成事件音效 |
 
-牌型键使用后端 `patterns` 返回的英文标识。特殊胡牌语音存在时优先播放对应语音，否则自动回退到普通“胡”语音。
+可用 `table.background` 指定整页底图、用 `bgm.result` 指定结算音乐，并在 `voice.wins` 按后端牌型标识配置优先播放的胡牌语音。
 
-当前版本没有附带正式素材。映射缺失时，麻将牌、牌背、骰子和桌面都继续使用 CSS/文字回退，不影响规则测试。
+牌面 SVG 负责牌纹，牌体的厚度、金牌光晕和不同尺寸由 `table.css` 控制。整套矢量牌纹与骰面可用项目的 `tools/draw_game_assets.py` 重画。该脚本使用装有 fontTools 的 Python 和本机 Noto Serif CJK Bold，简体中文 TTC 通常指定 `--font-index 2`。现成 SVG 已把字形转成路径，游玩设备无需安装该字体。Noto 字体项目采用 SIL Open Font License 1.1。
+
+运行服务后访问 `/asset-gallery.html` 查看主要资源及组件。图片文件或清单缺失时，桌面留有底色，牌面与骰子会显示文字与数字。背景图由内置图像生成工具生成，牌面、骰子、图标及结算纹样由矢量和 CSS 绘制。详细资产清单与验收见项目美术升级说明。

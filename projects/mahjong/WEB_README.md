@@ -8,7 +8,7 @@
 - 原有素材管理、三路音量、动画、提示和事件总线继续使用 `web/presentation.js`。
 - 素材仍放在 `web/assets/`，映射仍是 `web/assets/manifest.json`。
 
-当前 Web 服务器用 Python 3.11+ 和 `requirements.txt`。以下也收录了旧版加入的功能。
+当前 Web 服务器用 Python 3.11+ 和 `requirements.txt`。新版页面与素材见 `VISUAL-UPGRADE.md`，下方保留旧版功能说明。
 
 ---
 
@@ -92,4 +92,4 @@ Web 新局现在先进入 `ROLLING_DICE`，四家都尚未发牌，只有庄家�
 - `NotificationManager`：轮到玩家、吃碰杠胡等短提示。
 - `PresentationEventBus`：消费服务器提供的安全 `presentation_events`，把游戏事件分发给声音、动画与提示。
 
-资源位于 `web/assets/`，映射入口是 `web/assets/manifest.json`。默认使用 CSS 文字牌面，包内附带 BGM 和语音。
+资源位于 `web/assets/`，映射入口是 `web/assets/manifest.json`。新版使用 SVG 牌纹与 CSS 牌体，牌图失败时显示文字牌面。包内附带 BGM、语音和合成事件音效。

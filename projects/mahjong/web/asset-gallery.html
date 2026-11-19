@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10261f">
+  <title>美术图鉴 · 青雀麻将</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/table.css">
+  <link rel="stylesheet" href="/lan.css">
+  <link rel="stylesheet" href="/gallery.css">
+</head>
+<body class="gallery-page">
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="青雀麻将首页">
+      <span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="/assets/icons/marks.svg#bird"></use></svg></span><strong>青雀麻将</strong>
+    </a>
+    <nav aria-label="主导航"><a class="nav-link" href="/">返回首页</a></nav>
+  </header>
+  <main class="gallery-content">
+    <div class="gallery-heading">
+      <h1>美术图鉴</h1>
+      <p>预览场景素材、完整牌面和实战组件。</p>
+      <nav class="gallery-nav" aria-label="图鉴目录">
+        <a href="#scenes">场景</a><a href="#tiles">麻将牌</a><a href="#components">桌面组件</a><a href="#phone">手机预览</a>
+      </nav>
+    </div>
+    <section class="gallery-section" id="scenes" aria-labelledby="scenes-title">
+      <h2 id="scenes-title">场景与材质</h2>
+      <div class="scene-grid">
+        <figure><div class="scene-preview scene-home" role="img" aria-label="暖光下立起麻将牌的翡翠牌桌"></div><figcaption>首页 · 茶间牌桌</figcaption></figure>
+        <figure><div class="scene-preview scene-lobby" role="img" aria-label="窗旁有四张椅子和一张麻将桌的茶室"></div><figcaption>大厅 · 四人茶室</figcaption></figure>
+        <figure><div class="scene-preview scene-felt" role="img" aria-label="带细密纹路的深翡翠绿绒布"></div><figcaption>牌桌 · 翡翠绒布</figcaption></figure>
+      </div>
+    </section>
+    <section class="gallery-section" id="tiles" aria-labelledby="tiles-title">
+      <h2 id="tiles-title">麻将牌与骰子</h2>
+      <div class="tile-catalog" id="catalog"></div>
+      <div class="gallery-samples">
+        <div><h3>暗牌和金牌</h3><div class="sample-list" id="specialTiles"></div></div>
+        <div><h3>骰子点数</h3><div class="sample-list" id="diceSamples"></div></div>
+      </div>
+    </section>
+    <section class="gallery-section" id="components" aria-labelledby="components-title">
+      <h2 id="components-title">桌面组件</h2>
+      <div class="gallery-samples">
+        <div><h3>按钮</h3>
+          <div class="sample-list">
+            <span class="primary">主按钮</span><span class="ghost">次按钮</span><span class="ghost quiet-danger">离开</span>
+            <span class="action-btn dice">掷骰子</span><span class="action-btn">打出</span><span class="action-btn hu">胡</span>
+            <span class="action-btn ting">报听并打出</span><span class="action-btn gang">明杠</span>
+            <span class="action-btn shelf">上金</span><span class="action-btn orphan">拾幺牌</span><span class="action-btn pass">过</span>
+            <button class="ghost" type="button" disabled>不可操作</button>
+          </div>
+        </div>
+        <div><h3>徽章与图标</h3><div class="sample-list" id="badgeSamples"></div><div class="sample-list" id="iconSamples"></div></div>
+      </div>
+      <div class="gallery-samples">
+        <div><h3>局域网席位</h3><div class="roster gallery-roster" id="seatSamples"></div></div>
+        <div><h3>中央信息板</h3><div class="center-board gallery-hud" id="hudSample"></div><div class="center-message gallery-message">东家打出 1条，等待响应</div></div>
+      </div>
+    </section>
+    <section class="gallery-section" id="phone" aria-labelledby="phone-title">
+      <h2 id="phone-title">手机竖屏 · 玩家席</h2>
+      <div class="phone-sample" id="phoneSample"></div>
+    </section>
+  </main>
+  <script src="/presentation.js"></script>
+  <script src="/components.js"></script>
+  <script src="/gallery.js"></script>
+</body>
+</html>
