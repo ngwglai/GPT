@@ -15,7 +15,7 @@ python -m pip install -r requirements.txt
 python web_server.py
 ```
 
-打开 `http://127.0.0.1:8765/`。首页链接到四家明牌调试页 `/local.html` 和房间页 `/lan.html`。服务器可用 `--no-browser` 关闭自动打开浏览器。
+打开 `http://127.0.0.1:8765/`。首页链接到四家明牌调试页 `/local.html` 和房间页 `/lan.html`。服务器可用 `--no-browser` 关闭自动打开浏览器。Windows 后台运行或重定向控制台输出时，可设置 `PYTHONIOENCODING=utf-8` 以输出中文启动信息。
 
 ## 局域网四人联机
 
