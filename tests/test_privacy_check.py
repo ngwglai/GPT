@@ -326,6 +326,14 @@ class PrivacyTests(unittest.TestCase):
             checker.blob(blob(b"# v3 git bundle\n"), "ref:refs/tags/fixture")
             self.assertEqual(checker.issues[-1]["kind"], "private-history-backup")
 
+            limited = privacy.Check(SAMPLE_NOREPLY, max_bytes=128)
+            compressed = gzip.compress(b"x" * 4096)
+            self.assertLess(len(compressed), limited.max_bytes)
+            limited.blob(blob(compressed), "oversized.txt.gz")
+            self.assertEqual(limited.issues[-1]["kind"], "unscanned-archive")
+            limited.blob(blob(gzip.compress(b"short")[:-8]), "truncated.txt.gz")
+            self.assertEqual(limited.issues[-1]["kind"], "unscanned-archive")
+
     def test_annotated_tag_metadata(self):
         self.write("a.txt", "safe")
         self.command("git", "commit", "--quiet", "-m", "Sample")

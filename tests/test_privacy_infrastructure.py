@@ -94,6 +94,69 @@ class InfrastructureTests(unittest.TestCase):
         self.assertEqual(self.initialize("--denylist", str(path)), 0)
         self.assertEqual(path.read_bytes(), raw)
 
+    @unittest.skipUnless(os.name == "nt", "requires native Windows NTFS ACLs")
+    def test_windows_private_acl_and_shared_directory_are_unchanged(self):
+        folder = Path(self.temp.name) / "shared-acl-fixture"
+        folder.mkdir()
+
+        def powershell(script, path):
+            result = subprocess.run(
+                ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command",
+                 "$ErrorActionPreference = 'Stop'; $p = $env:PRIVACY_TEST_ACL_PATH; " + script],
+                env=dict(os.environ, PRIVACY_TEST_ACL_PATH=str(path)),
+                capture_output=True, text=True,
+            )
+            self.assertEqual(result.returncode, 0, "Native Windows ACL operation failed")
+            return result.stdout.strip()
+
+        descriptor = """
+(Get-Acl -LiteralPath $p).GetSecurityDescriptorSddlForm(
+    [System.Security.AccessControl.AccessControlSections]::Access)
+"""
+        powershell("""
+$acl = Get-Acl -LiteralPath $p
+$shared = [System.Security.Principal.SecurityIdentifier]::new('S-1-5-11')
+$rule = [System.Security.AccessControl.FileSystemAccessRule]::new(
+    $shared, 'ReadAndExecute', 'ContainerInherit,ObjectInherit', 'None', 'Allow')
+$acl.SetAccessRule($rule)
+Set-Acl -LiteralPath $p -AclObject $acl
+""", folder)
+        parent_acl = powershell(descriptor, folder)
+        self.assertRegex(parent_acl, r";;;(?:AU|S-1-5-11)\)")
+        for name, terms, expected in (
+            ("legacy.json", [LEGACY_PUBLIC_TERM, "Fictional Private Marker"], 2),
+            ("current.json", ["Fictional Private Marker"], 0),
+        ):
+            with self.subTest(source=name):
+                source = folder / name
+                raw = json.dumps({"terms": terms}).encode()
+                source.write_bytes(raw)
+                private_acl = powershell("""
+$owner = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
+$acl = Get-Acl -LiteralPath $p
+$acl.SetAccessRuleProtection($true, $false)
+foreach ($rule in $acl.GetAccessRules($true, $false, [System.Security.Principal.SecurityIdentifier])) {
+    $acl.RemoveAccessRuleSpecific($rule)
+}
+$acl.AddAccessRule([System.Security.AccessControl.FileSystemAccessRule]::new(
+    $owner, 'FullControl', 'Allow'))
+Set-Acl -LiteralPath $p -AclObject $acl
+$acl = Get-Acl -LiteralPath $p
+$rules = @($acl.GetAccessRules($true, $true, [System.Security.Principal.SecurityIdentifier]))
+if (!$acl.AreAccessRulesProtected -or $rules.Count -ne 1 -or
+    $rules[0].IdentityReference.Value -ne $owner.Value -or $rules[0].IsInherited -or
+    $rules[0].AccessControlType -ne 'Allow') {
+    throw 'Expected a single explicit owner access rule'
+}
+""" + descriptor, source)
+                self.assertTrue(private_acl.startswith("D:P"), "Expected a protected file DACL")
+                entries = {entry.name for entry in folder.iterdir()}
+                self.assertEqual(self.initialize("--denylist", str(source)), expected)
+                self.assertEqual(source.read_bytes(), raw)
+                self.assertTrue(powershell(descriptor, source) == private_acl, "File DACL changed")
+                self.assertTrue(powershell(descriptor, folder) == parent_acl, "Parent DACL changed")
+                self.assertEqual({entry.name for entry in folder.iterdir()}, entries)
+
     def test_malformed_terms_and_unknown_metadata_are_not_repaired(self):
         path, _, _ = self.private_source()
         for data in (["not an object"], {"terms": [" "]}, {"terms": [7]}, {"other": []}):
