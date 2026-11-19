@@ -7,7 +7,10 @@
   let awaiting = false, joinBusy = false, firstState = true;
   const $ = id => document.getElementById(id);
   const hide = (id, value) => $(id).classList.toggle('hidden', value);
-  const status = text => { $('connectionStatus').textContent = text; };
+  const status = (text, kind = "") => {
+    $('connectionStatus').textContent = text;
+    $('connectionStatus').dataset.connection = kind;
+  };
   function save(value) {
     saved = value;
     try {
@@ -36,10 +39,15 @@
     }
     $('startGame').disabled = awaiting || !state?.controls.can_start;
     $('nextRound').disabled = awaiting || !state?.controls.can_next_round;
+    $('leaveRoom').disabled = awaiting || socket?.readyState !== WebSocket.OPEN;
+    $('roster').querySelectorAll('button').forEach(button => {
+      const member = state?.room.members.find(player => player.seat === Number(button.dataset.chooseSeat));
+      button.disabled = awaiting || !state?.controls.can_choose_seat || Boolean(member && member.member_id !== state.you.member_id);
+    });
   }
   function renderRoom() {
     const {room, you, controls} = state;
-    hide('joinPanel', true); hide('roomPanel', false); hide('leaveRoom', false);
+    hide('joinPanel', true); hide('roomPanel', Boolean(state.player_view)); hide('leaveRoom', false);
     hide('gameTable', !state.player_view); hide('focusHand', !state.player_view);
     hide('waitingControls', room.started); hide('playingHint', !room.started);
     hide('nextRound', !controls.can_next_round);
@@ -48,7 +56,7 @@
     $('roster').innerHTML = [0,1,2,3].map(seat => {
       const member = room.members.find(p => p.seat === seat);
       const mine = member?.member_id === you.member_id;
-      return `<button type="button" class="seat-choice ${mine ? 'chosen' : ''}" data-choose-seat="${seat}" ${!controls.can_choose_seat || (member && !mine) || awaiting ? 'disabled' : ''}><strong>${seatNames[seat]}家</strong><span>${member ? esc(member.nickname) : '空位 · 点击入座'}</span><small>${member ? `${member.host ? '房主 · ' : ''}${member.connected ? '在线' : '断线'}${mine ? ' · 你' : ''}` : '等待玩家'}</small></button>`;
+      return seatChoiceMarkup(seat, member, mine);
     }).join('');
     $('roster').querySelectorAll('[data-choose-seat]').forEach(btn => btn.addEventListener('click', () => send({type:'choose_seat', seat:Number(btn.dataset.chooseSeat)})));
     const unseated = room.members.filter(p => p.seat == null).map(p => p.nickname).join('、');
@@ -61,7 +69,7 @@
     if (socket) { socket.onclose = null; socket.close(); }
     stopped = false; firstState = true; state = null; awaiting = false;
     hide('joinPanel', true);
-    status('正在连接房间…');
+    status('正在连接房间…', 'waiting');
     const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws/${encodeURIComponent(saved.room_code)}`);
     socket = ws;
     ws.onopen = () => ws.send(JSON.stringify({type:'authenticate', session_token:saved.session_token}));
@@ -73,6 +81,7 @@
         awaiting = false; showNotice(message.error);
         if (message.invalid_session) {
           stopped = true; save(null); ws.close(); state = null;
+          hide('playingHint', true); status('尚未连接');
           hide('joinPanel', false); hide('roomPanel', true); hide('gameTable', true);
           hide('resumeRoom', true); hide('leaveRoom', true); hide('nextRound', true); hide('focusHand', true);
         }
@@ -83,6 +92,8 @@
         if (!message.resumable) save(null);
         hide('joinPanel', false); hide('roomPanel', true); hide('gameTable', true);
         hide('leaveRoom', true); hide('nextRound', true); hide('focusHand', true); hide('resumeRoom', !saved);
+        hide('playingHint', true);
+        window.MahjongPresentation?.audio.stopBgm();
         status('已离开');
         showNotice(message.resumable ? '座位仍为你保留。点击“返回原房间”可以继续，其他玩家会看到你已断线。' : '已离开房间。');
         return;
@@ -91,7 +102,7 @@
       if (state && message.room_version < state.room_version) return;
       if (firstState) showNotice('');
       state = message; awaiting = false; retry = 0;
-      status(`房间 ${state.room.code} · 已连接`);
+      status(`房间 ${state.room.code} · 已连接`, 'online');
       renderRoom();
       if (message.player_view) {
         // Adapt only the shape expected by the shared renderer. No rule inference.
@@ -105,12 +116,12 @@
       if (socket !== ws) return;
       awaiting = false; decorate();
       if (stopped || !saved) return;
-      status('连接中断，正在自动重连…');
+      status('连接中断，正在自动重连…', 'offline');
       showNotice('网络连接中断；座位和牌局保留，恢复连接后继续。');
       hide('joinPanel', false); hide('resumeRoom', false);
       retryTimer = setTimeout(connect, Math.min(8000, 700 * (2 ** retry++)));
     };
-    ws.onerror = () => { status('暂时无法连接服务器'); };
+    ws.onerror = () => { status('暂时无法连接服务器', 'offline'); };
   }
   async function join(create) {
     if (joinBusy) return;
@@ -151,7 +162,10 @@
     if (state?.room.started && !confirm('离开后仍保留你的座位，牌局可能等待你回来。确定暂时离开吗？')) return;
     send({type:'leave'});
   });
-  $('focusHand').addEventListener('click', () => $(`seat-${state.you.seat}`).scrollIntoView({behavior:'smooth', block:'center'}));
+  $('focusHand').addEventListener('click', () => scrollToSeat(state?.you.seat));
+  $('roomCode').addEventListener('keydown', event => {
+    if (event.key === 'Enter' && !event.isComposing) join(false);
+  });
   window.addEventListener('online', () => { if (!stopped && saved && socket?.readyState !== WebSocket.OPEN) connect(); });
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && !stopped && saved && socket?.readyState === WebSocket.CLOSED) connect();

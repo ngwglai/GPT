@@ -1,0 +1,51 @@
+.gallery-heading {
+  padding: 24px 0 19px;
+  border-bottom: 1px solid var(--line);
+}
+.gallery-heading h1 { color: #fff1d0; font: 800 clamp(32px, 5vw, 59px) / 1.2 var(--title-font); }
+.gallery-heading p { margin-top: 7px; color: var(--muted); }
+.gallery-nav, .sample-list { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.gallery-nav { margin-top: 10px; }
+.gallery-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 3px 10px; border-radius: 8px; color: var(--accent); background: #213b31; font-size: 13px; }
+.gallery-section { padding-block: 22px; border-bottom: 1px solid var(--line); scroll-margin-top: 65px; }
+.gallery-section h2 { margin-bottom: 12px; font: 700 23px / 1.3 var(--title-font); }
+.gallery-section h3 { margin-bottom: 7px; color: #e9d8b8; font-size: 15px; }
+.scene-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.scene-grid figure, .tile-group figure { margin: 0; overflow: hidden; }
+.scene-grid figure { border: 1px solid var(--line); border-radius: 11px; background: var(--panel); }
+.scene-grid figcaption { padding: 7px 9px; font-size: 13px; }
+.scene-preview { aspect-ratio: 3 / 2; }
+.scene-lobby { background-image: var(--lobby-art, url("/assets/backgrounds/tearoom.webp")); }
+.scene-felt { background-image: var(--table-felt, url("/assets/table/jade-felt.webp")); }
+.tile-catalog { display: grid; gap: 14px; }
+.tile-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #19382f;
+}
+.tile-group figure { display: grid; justify-items: center; gap: 5px; padding: 2px; }
+.tile-group figcaption { color: var(--muted); font-size: 12px; }
+.gallery-samples { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-top: 12px; }
+.gallery-samples > div { padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #19382f; }
+.gallery-samples .sample-list + .sample-list { margin-top: 10px; }
+.icon-sample { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: 12px; }
+.icon-sample .icon { color: var(--accent); }
+.gallery-roster { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.gallery-hud .status-card { margin: 0; }
+.gallery-message { margin: 10px 0 0; }
+.phone-sample {
+  width: min(390px, 100%);
+  padding: 9px;
+  border: 1px solid #506d5c;
+  border-radius: 18px;
+  background: #102720;
+}
+.phone-sample .action-btn { min-height: 44px; }
+.phone-sample .hand .tile { --tile-width: 38px; }
+@media (max-width: 740px) {
+  .scene-grid, .gallery-samples { grid-template-columns: minmax(0, 1fr); }
+}
