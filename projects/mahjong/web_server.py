@@ -15,6 +15,7 @@ from decimal import Decimal
 from mahjong import GameEngine, RuleConfig, ScoreConfig, ScoreEngine, Seat, IllegalAction, __version__
 from mahjong.game.service import TableService
 from mahjong.game.controllers import CONTROLLERS, Decision
+from mahjong.game.visibility import ting_presentation
 
 ROOT = Path(__file__).resolve().parent
 WEB_ROOT = ROOT / "web"
@@ -169,12 +170,14 @@ class LocalTable:
     def view_for(self, seat: Seat) -> dict:
         with self._lock:
             view = self.service.view_for(PLAYER_IDS[seat])
+            state = self.engine.state
+            view["players"][int(seat)].update(ting_presentation(
+                view, int(seat), state.players[seat], self.engine.solver))
             for position in Seat:
                 mode = self.control[position]
                 player = view["players"][int(position)]
                 player["controller"] = mode
                 # A hidden response option can reveal the hand or private pickup intent.
-                state = self.engine.state
                 public_turn = state.current_player == position and state.phase.name in {"TURN_ACTION", "ROLLING_DICE"}
                 player["ai_thinking"] = mode != "human" and (public_turn or (
                     position == seat and bool(view["legal_actions"])

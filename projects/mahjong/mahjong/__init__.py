@@ -6,7 +6,7 @@ from .game.engine import GameEngine
 from .rules.win import WinSolver
 from .rules.scoring import ScoreConfig, ScoreEngine
 
-__version__ = "0.7.2"
+__version__ = "0.8.0"
 
 __all__ = ["Action", "ActionType", "IllegalAction", "Seat", "RuleConfig", "GamePhase",
            "Tile", "make_deck", "tiles_from_types", "GameEngine", "WinSolver", "ScoreConfig", "ScoreEngine"]

@@ -16,36 +16,27 @@ let mutationEpoch = 0;
 let riversExpanded = false;
 let dockSeat = null;
 let inspectedSeat = null;
-const dockObserver = typeof ResizeObserver === "function" ? new ResizeObserver(([entry]) => {
-  document.body.style.setProperty("--hand-space", `${Math.ceil(entry.target.getBoundingClientRect().height)}px`);
-}) : null;
 const aiNames = {human:"人工", easy:"初级", normal:"普通", advanced:"高级"};
 let eventRoundId = null;
 let lastPresentationEventId = 0;
 let viewerSeat = null;
 const visualPositions = ["north", "east", "west", "south"];
 const winMethods = {SELF_DRAW:"自摸", DISCARD:"荣胡", ROB_GANG:"抢杠胡"};
+const winPatterns = {standard:"普通胡", seven_pairs:"七对", thirteen_orphans:"十三幺"};
 
 function scrollToSeat(seat) {
   if (seat == null) return;
   const player = document.getElementById(`seat-${seat}`);
-  const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-  player.scrollIntoView({behavior:reduceMotion ? "instant" : "smooth", block:"nearest"});
   player.focus({preventScroll:true});
 }
 
 function visualSeatMap() {
-  // Local all-open mode keeps the original fixed table.  In LAN mode the
-  // authenticated player is always rendered at the bottom; absolute winds
-  // and all rule/state values remain unchanged.
-  if (!Number.isInteger(viewerSeat) || viewerSeat < 0 || viewerSeat > 3) {
-    return {north:3, east:0, west:2, south:1};
-  }
+  const seat = viewerSeat ?? dockSeat ?? 0;
   return {
-    south: viewerSeat,
-    west: (viewerSeat + 1) % 4,
-    north: (viewerSeat + 2) % 4,
-    east: (viewerSeat + 3) % 4,
+    south: seat,
+    west: (seat + 1) % 4,
+    north: (seat + 2) % 4,
+    east: (seat + 3) % 4,
   };
 }
 function applySeatLayout() {
@@ -109,6 +100,9 @@ function acceptTable(nextTable, { initial = false } = {}) {
   const events = newPresentationEvents(nextTable, initial);
   const before = sameRound ? MahjongScene.snapshot(events) : null;
   table = nextTable;
+  if (selected.tileId != null && !legalForSeat(selected.seat).some(action => action.tile_ids.includes(selected.tileId))) {
+    selected = {seat:null,tileId:null};
+  }
   document.body.classList.add("table-live");
   render();
   MahjongScene.animate(events, before, last, table);
@@ -185,11 +179,8 @@ function placeHandDock() {
   const seat = next < 0 ? table.current_player : next;
   if (seat === dockSeat) return;
   document.getElementById(`seat-${dockSeat}`)?.classList.remove("dock-seat");
-  dockObserver?.disconnect();
   dockSeat = seat;
-  const target = document.getElementById(`seat-${seat}`);
-  target.classList.add("dock-seat");
-  dockObserver?.observe(target);
+  document.getElementById(`seat-${seat}`).classList.add("dock-seat");
 }
 async function loadTable(initial = false) {
   try {
@@ -275,13 +266,14 @@ function renderHand(seat, p) {
     if (b.id === last) return -1;
     return a.type - b.type || a.id - b.id;
   });
-  return hand.map(t => {
+  return hand.map((t, index) => {
     const ta = actions.filter(a => a.tile_ids.includes(t.id));
     const clickable = ta.length > 0;
     const isSelected = selected.seat === seat && selected.tileId === t.id;
     const cls = ["tile", tileClass(t.type), t.type === table.gold_tile_type ? "gold":"", t.id === last ? "drawn":"", clickable?"clickable":"", isSelected?"selected":""].filter(Boolean).join(" ");
     const acts = ta.map(a => actionNames[a.type] || a.type).join(" / ");
-    return `<button type="button" class="${cls}" data-seat="${seat}" data-tile="${t.id}" aria-pressed="${isSelected}" ${clickable?"":"disabled"} title="${tileName(t.type)}${acts?` · ${acts}`:""}">${MahjongTile.body(t.type)}</button>`;
+    const anchor = index === hand.length - 1 ? ` data-last-hand="${seat}"` : "";
+    return `<button type="button" class="${cls}" data-seat="${seat}" data-tile="${t.id}" data-motion="hand-${seat}-${t.id}" data-tile-face="${t.type}"${anchor} aria-pressed="${isSelected}" ${clickable?"":"disabled"} title="${tileName(t.type)}${acts?` · ${acts}`:""}">${MahjongTile.body(t.type)}</button>`;
   }).join("");
 }
 function renderMelds(p) {
@@ -325,11 +317,19 @@ function renderActions(seat) {
   const multi = actions.filter(a => ["CHI","PENG","MING_GANG","AN_GANG","BU_GANG"].includes(a.type));
   const optionalResponses = ["PICK_ORPHAN", "PASS"].flatMap(type => actions.filter(a => a.type === type));
   const unique = new Map([...globals, ...multi, ...selectedActions, ...optionalResponses].map(action => [actionKey(action), action]));
-  if (!unique.size) return `<span class="action-hint">选一张牌，再确认操作</span>`;
-  return [...unique].map(([key, action]) => {
+  const families = new Map();
+  for (const action of unique.values()) {
+    if (!families.has(action.type)) families.set(action.type, []);
+    families.get(action.type).push(action);
+  }
+  const button = (action, concise) => {
     const kind = actionStyles[action.type] || "";
-    return `<button class="action-btn ${kind}" type="button" data-action-seat="${seat}" data-action-key="${esc(key)}">${kind === "dice" ? icon("tiles") : ""}${esc(actionLabel(seat,action))}</button>`;
-  }).join("");
+    const label = actionLabel(seat, action);
+    const text = concise && !["CHI", "PICK_ORPHAN"].includes(action.type) ? actionNames[action.type] : label;
+    return `<button class="action-btn ${kind}" type="button" data-action-seat="${seat}" data-action-key="${esc(actionKey(action))}" title="${esc(label)}">${esc(text)}</button>`;
+  };
+  return [...families].map(([type, choices]) => choices.length === 1 ? button(choices[0], true) :
+    `<details class="action-family"><summary class="action-btn ${actionStyles[type] || ""}">${actionNames[type]}</summary><div class="action-choices">${choices.map(choice => button(choice, false)).join("")}</div></details>`).join("");
 }
 function playerZone(label, rowClass, content) {
   if (!content) return "";
@@ -341,13 +341,20 @@ function orphanPickupControl(seat, player) {
   return `<button type="button" class="ghost orphan-toggle" data-orphan-pickup="${seat}" aria-pressed="${enabled}">${enabled ? "关闭" : "开启"}十三幺拾牌</button>`;
 }
 function renderWaitHint(player) {
-  if (!player.declared_ting || !player.wait_hint?.length) return "";
-  const total = player.wait_hint.reduce((sum, entry) => sum + entry.remaining, 0);
-  const waits = player.wait_hint.map(({type, remaining, requires_shelf}) =>
-    `<span class="wait-choice${remaining ? "" : " exhausted"}" title="${requires_shelf ? "首次上金后可胡" : ""}">
+  const choice = selected.seat === player.seat && player.concealed_tiles?.find(tile => tile.id === selected.tileId);
+  const entries = player.declared_ting ? player.wait_hint : choice && player.ting_previews?.[choice.type];
+  if (!entries?.length) return "";
+  const total = entries.reduce((sum, entry) => sum + entry.remaining, 0);
+  const labels = entry => (entry.patterns || player.wait_patterns?.[entry.type] || []).map(name => winPatterns[name] || name);
+  const shapes = [...new Set(entries.flatMap(labels))];
+  const waits = entries.map(entry => {
+    const {type, remaining, requires_shelf} = entry;
+    const label = [tileName(type), ...labels(entry), requires_shelf ? "首次上金后可胡" : ""].filter(Boolean).join(" · ");
+    return `<span class="wait-choice${remaining ? "" : " exhausted"}" title="${esc(label)}">
       ${tileHTML(type,{small:true,gold:type===table.gold_tile_type})}
-      <span>${remaining ? `${remaining} 张` : "已见完"}</span>${requires_shelf ? "<small>需上金</small>" : ""}</span>`).join("");
-  return `<section class="wait-hint" aria-label="胡牌提示"><div class="wait-caption"><strong>可胡牌</strong><span>可见剩余 <b>${total}</b> 张</span></div><div class="wait-choices">${waits}</div></section>`;
+      <span>${remaining ? `${remaining} 张` : "已见完"}</span>${requires_shelf ? "<small>需上金</small>" : ""}</span>`;
+  }).join("");
+  return `<section class="wait-hint" aria-label="胡牌提示"><div class="wait-caption"><strong>${player.declared_ting ? "已听 · " : ""}可胡牌</strong><span>可见剩余 <b>${total}</b> 张</span>${shapes.length ? `<span class="wait-patterns">${esc(shapes.join(" / "))}</span>` : ""}</div><div class="wait-choices" tabindex="0" aria-label="听口">${waits}</div></section>`;
 }
 function renderDecision(player) {
   const entry = player.ai_decisions?.at(-1);
@@ -374,7 +381,7 @@ function renderPlayer(seat) {
   const managed = p.controller && p.controller !== "human";
   const aiStatus = p.ai_thinking ? "AI 思考中" : table.phase === "WAITING_FOR_RESPONSES" ? "AI 等待响应" : "AI 托管";
   const status = [
-    managed ? badge(aiStatus, "ai-badge") : "",
+    managed ? badge(aiStatus, "ai-badge") : window.LanGame ? "" : badge("人工", "human-badge"),
     table.dealer === seat ? badge("庄", "dealer") : "",
     viewerSeat === seat ? badge("你", "self") : "",
     p.declared_ting ? badge("已听", "ting") : "",
@@ -386,7 +393,7 @@ function renderPlayer(seat) {
   const canControl = !window.LanGame || seat === viewerSeat;
   const quickControl = canControl ? `<button type="button" class="ghost hand-control" data-ai-toggle="${seat}" aria-pressed="${Boolean(managed)}">${managed ? "人工接管" : "开启托管"}</button>` : "";
   const score = table.match?.scoring?.totals?.[String(seat)] ?? "—";
-  const phaseBadge = rolling && active ? "等待掷骰" : active ? "当前出牌" : responding ? "等待响应" : "";
+  const phaseBadge = rolling && active ? "掷骰" : active ? "出牌" : responding ? "响应" : "";
   const zones = [
     playerZone("副露", "meld-row", renderMelds(p)),
     playerZone(`上金 · ${p.shelf_count}`, "shelf-row", renderShelf(p)),
@@ -396,8 +403,7 @@ function renderPlayer(seat) {
   const hand = renderHand(seat,p) || `<span class="action-hint">${rolling ? "尚未发牌" : "暂无手牌"}</span>`;
   const actions = renderActions(seat);
   const tools = orphanPickupControl(seat, p) + quickControl;
-  const recordOpen = el.querySelector(".ai-record")?.open;
-  const drawnChanged = p.last_drawn_tile != null && p.last_drawn_tile !== el.lastDrawnTile;
+  const openDetails = [...el.querySelectorAll("details[open]")].map(details => details.className);
   const avatar = `${icon("bird")}<b>${seatNames[seat]}</b>`;
   const seatBadge = window.LanGame ? `<span class="seat-avatar">${avatar}</span>` :
     `<button class="seat-avatar" type="button" data-view-seat="${seat}" aria-label="查看${seatNames[seat]}家手牌">${avatar}</button>`;
@@ -405,19 +411,22 @@ function renderPlayer(seat) {
     <div class="player-head">
       <div class="player-title">${seatBadge}<div class="player-identity">
         <strong>${esc(p.nickname || `${seatNames[seat]}家`)}</strong>
-        <div class="player-sub"><b class="seat-points">${esc(score)}</b><span> · ${p.concealed_count} 张</span></div>
+        <div class="player-sub"><b class="seat-points">${esc(score)}</b></div>
       </div></div>
       <div class="player-badges">${status}${phaseBadge ? badge(phaseBadge, "turn-badge") : ""}</div>
     </div>
-    ${renderWaitHint(p)}
-    <div class="hand" aria-label="${seatNames[seat]}家手牌">${hand}</div>
-    ${actions ? `<div class="action-area" aria-label="${seatNames[seat]}家操作">${actions}</div>` : ""}
-    ${tools ? `<div class="seat-tools">${tools}</div>` : ""}
-    ${zones ? `<div class="player-zones">${zones}</div>` : ""}
-    ${renderDecision(p)}`;
+    <div class="dock-tools">
+      ${tools ? `<div class="seat-tools">${tools}</div>` : ""}
+      ${zones || p.ai_decisions?.length ? `<details class="player-inspector"><summary class="ghost">牌况</summary><div class="player-inspector-panel">
+        ${zones ? `<div class="player-zones">${zones}</div>` : ""}${renderDecision(p)}</div></details>` : ""}
+    </div>
+    <div class="decision-row">
+      ${renderWaitHint(p)}
+      ${actions ? `<div class="action-area" aria-label="${seatNames[seat]}家操作">${actions}</div>` : ""}
+    </div>
+    <div class="hand" style="--hand-slots:${Math.max(14, p.concealed_count)}" aria-label="${seatNames[seat]}家手牌">${hand}</div>`;
 
   if (markup === el.renderedMarkup) return;
-  const scrollLeft = el.querySelector(".hand")?.scrollLeft || 0;
   const waitsScrollLeft = el.querySelector(".wait-choices")?.scrollLeft || 0;
   const focused = el.contains(document.activeElement) ? document.activeElement : null;
   const focusedTile = focused?.dataset.tile;
@@ -426,12 +435,11 @@ function renderPlayer(seat) {
   const focusedControl = focused?.dataset.aiToggle;
   el.innerHTML = markup;
   el.renderedMarkup = markup;
-  const handRow = el.querySelector(".hand");
-  handRow.scrollLeft = drawnChanged && canControl ? handRow.scrollWidth : scrollLeft;
   const waitRow = el.querySelector(".wait-choices");
   if (waitRow) waitRow.scrollLeft = waitsScrollLeft;
-  el.lastDrawnTile = p.last_drawn_tile;
-  if (recordOpen && el.querySelector(".ai-record")) el.querySelector(".ai-record").open = true;
+  for (const details of el.querySelectorAll("details:not(.action-family)")) {
+    details.open = openDetails.includes(details.className);
+  }
   if (focusedTile || focusedAction || focusedPickup || focusedControl) {
     const replacement = [...el.querySelectorAll("button")].find(button => focusedTile
       ? button.dataset.tile === focusedTile
@@ -446,11 +454,15 @@ function renderRiver(seat, position) {
   const visible = all.filter(d => !d.claimed);
   const claimed = all.length - visible.length;
   const pending = table.pending_claim?.kind === "DISCARD" && table.pending_claim.source === seat;
+  const player = table.players[seat];
+  const publics = renderMelds(player) + renderShelf(player) +
+    (player.picked_orphans || []).map(type => tileHTML(type, {small:true})).join("") + renderTingTile(player);
   return `<div class="river river-${position}">
     <div class="river-title"><span>${seatNames[seat]}家牌河</span><span>${visible.length}${claimed ? ` · 已取走${claimed}` : ""}</span></div>
     <div class="river-tiles">${visible.map((d, i) => tileHTML(d.type, {
       small:true, gold:d.type===table.gold_tile_type, recent:pending && i===visible.length-1
     })).join("") || `<span class="action-hint">暂无弃牌</span>`}</div>
+    ${publics ? `<div class="river-title">桌面公开区域</div><div class="river-tiles">${publics}</div>` : ""}
   </div>`;
 }
 function previousRoundText(record) {
@@ -465,8 +477,7 @@ function previousRoundText(record) {
 function renderResult(result) {
   const won = result.type !== "DRAW";
   const method = winMethods[result.method] || result.method;
-  const labels = {standard:"普通胡", seven_pairs:"七对", thirteen_orphans:"十三幺"};
-  const patterns = result.patterns.map(name => labels[name] || name);
+  const patterns = result.patterns.map(name => winPatterns[name] || name);
   const title = won ? `${seatNames[result.winner]}家${method} · 胡牌` : "本局流局";
   const transfers = result.settlement?.status === "CALCULATED" ? result.settlement.transfers : null;
   return `<section class="result-box ${won ? "win" : "draw"}" aria-label="本局结算">
@@ -483,6 +494,7 @@ function renderResult(result) {
 }
 function renderCenter() {
   const el = document.getElementById("center");
+  const toolbar = document.getElementById("sceneToolbar");
   const claim = table.pending_claim;
   const pending = claim ? `${seatNames[claim.source]}家${claim.kind === "ROB_BU_GANG" ? "补杠" : "打出"} ${tileName(claim.tile_type)}，等待响应` : "";
   const phaseName = {ROLLING_DICE:"等待掷骰",TURN_ACTION:"出牌阶段",WAITING_FOR_RESPONSES:"响应阶段",ROUND_END:"本局结束"}[table.phase] || table.phase;
@@ -492,76 +504,71 @@ function renderCenter() {
   const score = seatNames.map((name, seat) =>
     `<span class="score-entry">${name} <b>${esc(scoring?.totals?.[String(seat)] ?? "—")}</b></span>`).join("");
   const scoringNote = scoring?.status === "PENDING_CONFIGURATION" ? "<span>计分待配置</span>" : "";
-  const debugOpen = el.querySelector(".table-details")?.open;
+  const debugOpen = toolbar.querySelector(".table-details")?.open;
   const player = table.phase === "ROUND_END" ? "—" : `${seatNames[table.current_player]}家`;
   const layout = visualSeatMap();
-  const stats = statusCard([
-    ["牌局", `第 ${match.round_no} 局`], ["庄家", `${seatNames[table.dealer]}家`],
-    ["当前阶段", phaseName], ["当前玩家", player], ["可摸牌", table.normal_tiles_remaining ?? "—"]
-  ]);
   const rolled = table.phase !== "ROLLING_DICE";
   const goldText = rolled && table.gold_indicator
     ? `金指示 ${tileName(table.gold_indicator.type)} · 金牌 ${tileName(table.gold_tile_type)} · 骰子 ${table.dice.join(" + ")}` : "";
   const opening = table.wall_view?.break_position;
   const breakText = opening ? `${seatNames[opening.side]}墙 ${opening.column} 号墩开墙` : "";
   const overhead = el.closest(".table-shell").classList.contains("overhead-view");
-  const markup = `
-    <div class="scene-toolbar">
-      ${stats}
+  const controls = `
+      <div class="scene-status${pending ? " claim-message" : ""}" role="status">${pending ? esc(pending) : esc(`${phaseName} · ${player}`)}
+      ${rolled && table.gold_indicator ? `<span class="gold-status">金 <b>${tileName(table.gold_tile_type)}</b></span>` : ""}</div>
       <div class="scene-controls">
-        <button class="ghost" type="button" data-view-toggle aria-pressed="${overhead}">${overhead ? "斜视" : "俯视"}</button>
+        <button class="ghost" type="button" data-view-toggle aria-pressed="${overhead}">${overhead ? "对局视角" : "完整桌面"}</button>
         <button class="ghost river-toggle" type="button" data-river-toggle aria-expanded="${riversExpanded}">${riversExpanded ? "收起牌河" : "查看牌河"}</button>
-      </div>
-    </div>
-    ${table.result ? renderResult(table.result) : ""}
-    ${pending ? `<div class="center-message claim-message" role="status">${esc(pending)}</div>` : ""}
+        <details class="table-details"${debugOpen ? " open" : ""}><summary class="ghost">详情</summary>
+          <div class="table-caption">
+            ${goldText ? `<p>${esc(goldText)}</p>` : ""}
+            <div class="table-footer"><div class="match-meta"><span>累计分</span>${score}${scoringNote}</div></div>
+            ${previous ? `<div class="previous-round">${esc(previous)}</div>` : ""}
+            <div>庄家 ${seatNames[table.dealer]} · 墙上实牌 ${table.wall_view?.tiles_present ?? "—"} · 本局杠数 ${table.gang_count}${breakText ? ` · ${esc(breakText)}` : ""} · round ${esc(table.round_id.slice(0,8))} · revision ${table.revision}${table.test_mode ? ` · Seed ${esc(table.test_mode.seed)}` : ""}</div>
+          </div>
+        </details>
+      </div>`;
+  if (toolbar.renderedMarkup !== controls) {
+    const focused = document.activeElement;
+    const focusSelector = focused?.hasAttribute("data-river-toggle") ? "[data-river-toggle]" :
+      focused?.hasAttribute("data-view-toggle") ? "[data-view-toggle]" : "";
+    toolbar.innerHTML = controls;
+    toolbar.renderedMarkup = controls;
+    if (focusSelector) toolbar.querySelector(focusSelector)?.focus({preventScroll:true});
+  }
+  const markup = `
     <div class="table-felt-wrap">${MahjongScene.markup(table, layout)}</div>
-    ${riversExpanded ? `<section class="river-inspector" aria-label="四家牌河">${Object.entries(layout).map(([side, seat]) => renderRiver(seat, side)).join("")}</section>` : ""}
-    <div class="table-caption">
-      ${goldText ? `<p>${esc(goldText)}</p>` : ""}
-      <div class="table-footer"><div class="match-meta"><span>累计分</span>${score}${scoringNote}</div></div>
-    </div>
-    ${previous ? `<div class="previous-round">${esc(previous)}</div>` : ""}
-    <details class="table-details"${debugOpen ? " open" : ""}><summary>牌局详情</summary>
-      <div>庄家 ${seatNames[table.dealer]} · 墙上实牌 ${table.wall_view?.tiles_present ?? "—"} · 本局杠数 ${table.gang_count}${breakText ? ` · ${esc(breakText)}` : ""} · round ${esc(table.round_id.slice(0,8))} · revision ${table.revision}${table.test_mode ? ` · Seed ${esc(table.test_mode.seed)}` : ""}</div>
-    </details>`;
+    ${table.result ? renderResult(table.result) : ""}
+    ${riversExpanded ? `<section class="river-inspector" aria-label="四家牌河" tabindex="0">${Object.entries(layout).map(([side, seat]) => renderRiver(seat, side)).join("")}</section>` : ""}`;
   if (el.renderedMarkup === markup) return;
-  const focused = document.activeElement;
-  const focusSelector = focused?.hasAttribute("data-river-toggle") ? "[data-river-toggle]" :
-    focused?.hasAttribute("data-view-toggle") ? "[data-view-toggle]" : "";
   el.innerHTML = markup;
   el.renderedMarkup = markup;
-  if (focusSelector) el.querySelector(focusSelector)?.focus({preventScroll:true});
 }
 function bindTableEvents() {
   document.querySelector(".table-shell").addEventListener("click", event => {
-    const sceneTile = event.target.closest("[data-scene-tile]");
-    if (sceneTile && !busy) {
-      const seat = Number(sceneTile.dataset.sceneSeat);
-      if (viewerSeat == null) {
-        inspectedSeat = seat;
-        placeHandDock();
-      }
-      document.querySelector(`#seat-${seat} .hand [data-tile="${sceneTile.dataset.sceneTile}"]`)?.click();
-      return;
-    }
+    if (!table) return;
     const seatTab = event.target.closest("[data-view-seat]");
     if (seatTab) {
       inspectedSeat = Number(seatTab.dataset.viewSeat);
-      placeHandDock();
+      selected = {seat:null,tileId:null};
+      MahjongScene.cancelFlights();
+      render();
       scrollToSeat(inspectedSeat);
       return;
     }
-    if (event.target.closest("[data-view-toggle]")) {
-      MahjongScene.setPerspective(event.currentTarget);
-      renderCenter();
+    const cameraButton = event.target.closest("[data-view-toggle]");
+    if (cameraButton) {
+      const full = MahjongScene.setPerspective(event.currentTarget);
+      cameraButton.textContent = full ? "对局视角" : "完整桌面";
+      cameraButton.setAttribute("aria-pressed", String(full));
+      document.getElementById("sceneToolbar").renderedMarkup = "";
       MahjongScene.mount(event.currentTarget);
       return;
     }
     if (event.target.closest("[data-river-toggle]")) {
       riversExpanded = !riversExpanded;
       renderCenter();
-      MahjongMesh.invalidate();
+      MahjongScene.mount(event.currentTarget);
       document.querySelector("[data-river-toggle]")?.focus({preventScroll:true});
       return;
     }
@@ -586,24 +593,26 @@ function bindTableEvents() {
     const seat = Number(button.dataset.seat);
     const tileId = Number(button.dataset.tile);
     const previousSeat = selected.seat;
-    selected = selected.seat === seat && selected.tileId === tileId ? {seat:null,tileId:null} : {seat,tileId};
+    if (previousSeat === seat && selected.tileId === tileId) {
+      const discard = legalForSeat(seat).find(action => action.type === "DISCARD" && action.tile_ids[0] === tileId);
+      if (discard) return performAction(seat, discard);
+      selected = {seat:null,tileId:null};
+    } else {
+      selected = {seat,tileId};
+    }
     if (previousSeat != null && previousSeat !== seat) renderPlayer(previousSeat);
     renderPlayer(seat);
-    event.currentTarget.querySelector(".scene-selected")?.classList.remove("scene-selected");
-    if (selected.tileId != null) {
-      event.currentTarget.querySelector(`[data-scene-tile="${tileId}"]`)?.classList.add("scene-selected");
-    }
-    MahjongMesh.invalidate();
+    MahjongScene.mount(event.currentTarget);
     window.LanGame?.decorate();
   });
 }
 function render() {
   if (!table) return;
+  placeHandDock();
   applySeatLayout();
   [0,1,2,3].forEach(renderPlayer);
   renderCenter();
   renderTableHud();
-  placeHandDock();
   MahjongScene.mount(document.querySelector(".table-shell"));
   if (window.LanGame) {
     window.LanGame.decorate();
@@ -631,11 +640,10 @@ async function boot() {
   document.getElementById("focusTurn").addEventListener("click", () => {
     if (!table) return;
     inspectedSeat = null;
-    placeHandDock();
-    const seat = table.phase === "WAITING_FOR_RESPONSES"
-      ? seatNames.findIndex((_, index) => legalForSeat(index).length > 0)
-      : table.current_player;
-    if (seat >= 0) scrollToSeat(seat);
+    selected = {seat:null,tileId:null};
+    MahjongScene.cancelFlights();
+    render();
+    scrollToSeat(dockSeat);
   });
   await loadTable(true);
 }

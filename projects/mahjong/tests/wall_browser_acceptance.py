@@ -137,10 +137,12 @@ async def check_dice(page, table, url, output):
 
 
 async def draw_from(page, table, action, position, *, source, output=None, name=None):
+    if action.type in (ActionType.DISCARD, ActionType.SHELVE_GOLD):
+        await page.locator(f'#seat-{int(action.seat)} [data-tile="{action.tile_ids[0]}"]').click()
     origin = await source_center(page, position)
     before = table.snapshot()["wall_view"]["tiles_present"]
     await capture_flight(page, "TILE_DRAWN", output)
-    await play_action(page, action.seat, action, select_tile=action.type in (ActionType.DISCARD, ActionType.SHELVE_GOLD))
+    await play_action(page, action.seat, action)
     await expect(wall_tile(page, position)).to_have_count(0)
     await expect(page.locator(".wall-layer")).to_have_count(before - 1)
     event = next(ev for ev in reversed(table.snapshot()["presentation_events"]) if ev["type"] == "TILE_DRAWN")

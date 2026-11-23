@@ -32,6 +32,10 @@ class ClientError(ValueError):
     pass
 
 
+class InvalidSession(ClientError):
+    pass
+
+
 def fields(data, required):
     if not isinstance(data, dict) or set(data) != set(required):
         raise ClientError('请求字段不正确，请刷新后重试。')
@@ -87,7 +91,7 @@ class Room:
 
     def authenticate(self, token):
         if not isinstance(token, str) or token not in self.members:
-            raise ClientError('身份已失效，请重新加入房间。')
+            raise InvalidSession('身份已失效，请重新加入房间。')
         return self.members[token]
 
     async def publish_ai(self):
@@ -212,7 +216,7 @@ def room_for(request, code):
         raise ClientError('请输入房间号。')
     room = request.app[ROOMS].get(code.strip().upper())
     if room is None:
-        raise ClientError('房间不存在或已过期。')
+        raise InvalidSession('房间不存在或已过期。')
     return room
 
 
@@ -286,6 +290,9 @@ async def websocket(request):
                 continue
             try:
                 data = json.loads(msg.data)
+                command_id = data.pop('command_id', None) if isinstance(data, dict) else None
+                if command_id is not None and (type(command_id) is not int or command_id < 1):
+                    raise ClientError('操作编号无效。')
                 async with room.lock:
                     # Recheck token: another tab may have explicitly left.
                     room.authenticate(member.token)
@@ -309,6 +316,8 @@ async def websocket(request):
                         break
                     shared = room.command(member, data)
                     await room.broadcast(only=None if shared else member)
+                    if command_id is not None:
+                        await room.send(ws, {'type': 'command_ack', 'command_id': command_id})
                     if room.ai and any(mode != 'human' for mode in room.table.control.values()):
                         room.ai.kick()
             except (ClientError, IllegalAction, ValueError, TypeError, KeyError) as exc:
@@ -316,8 +325,10 @@ async def websocket(request):
                 async with room.lock:
                     if member.token in room.members:
                         await room.send(ws, room.view(member))
-    except (ClientError, ValueError, TypeError, TimeoutError) as exc:
+    except InvalidSession as exc:
         await Room.send(ws, {'type': 'error', 'error': str(exc), 'invalid_session': True})
+    except (ValueError, TypeError, TimeoutError) as exc:
+        LOG.info("WebSocket authentication interrupted (%s)", type(exc).__name__)
     finally:
         if member is not None:
             async with room.lock:

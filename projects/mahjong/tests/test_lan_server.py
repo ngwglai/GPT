@@ -159,6 +159,14 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
             error = await self.read(ws, lambda m: m.get('type') == 'error')
             self.assertTrue(error['invalid_session'])
 
+    async def test_interrupted_authentication_leaves_saved_identity_valid(self):
+        c = await self.post('/api/rooms', {'nickname': '房主'})
+        async with self.http.ws_connect(self.url + '/ws/' + c['room_code']) as interrupted:
+            await interrupted.send_str('{')
+            self.assertEqual((await interrupted.receive(timeout=5)).type, web.WSMsgType.CLOSE)
+        recovered = await self.open_socket(c)
+        self.assertEqual((await self.read(recovered))['room']['code'], c['room_code'])
+
     async def test_identity_dealer_illegal_stale_and_hidden_data(self):
         await self.setup_room()
         command = self.intent(0, 'ROLL_DICE')
@@ -322,11 +330,15 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         from tests.test_gold import WAIT
         await self.setup_room()
         await self.fixture({E:PlayerFixture(WAIT+[7], last_draw_type=7)}, gold=33)
+        self.assertIn('ting_previews', self.views[0]['player_view']['players']['0'])
+        self.assertNotIn('ting_previews', self.views[1]['player_view']['players']['0'])
         await self.act(0, 'DECLARE_TING')
         own = self.views[0]['player_view']['players']['0']
         self.assertIsNotNone(own['ting_tile'])
         self.assertEqual([hint['type'] for hint in own['wait_hint']], own['current_waits'])
         self.assertTrue(own['wait_hint'])
+        self.assertTrue(own['wait_patterns'])
+        self.assertNotIn('wait_patterns', self.views[1]['player_view']['players']['0'])
         self.assert_private()
 
     async def test_owner_controls_managed_seat_across_reconnect(self):

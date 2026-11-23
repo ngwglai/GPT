@@ -162,8 +162,8 @@ async def measure(browser, app, url, size, output):
     if touch:
         await button.tap()
     else:
-        await page.locator(f'[data-scene-tile="{discard.tile_ids[0]}"]').click()
-    await expect(page.locator(".scene-selected")).to_have_count(1)
+        await button.click()
+    await expect(page.locator(".dock-seat .hand .selected")).to_have_count(1)
     await page.evaluate(WATCH_FLIGHTS)
     await page.evaluate(FRAME_SAMPLE)
     await play_action(page, E, discard)
@@ -180,7 +180,7 @@ async def measure(browser, app, url, size, output):
     layer = "top" if slot["layer"] == 0 else "bottom"
     assert set(draw["payload"]) == {"position", "source"}
     await expect(page.locator(f'[data-motion="wall-{slot["side"]}-{slot["column"]}-{layer}"]')).to_have_count(0)
-    await expect(page.locator(".scene-drawn")).to_have_count(1)
+    await expect(page.locator(".dock-seat .hand .drawn")).to_have_count(1)
     await fits(page)
     frames = sorted(await page.evaluate("window.frameSample"))
     assert len(frames) >= 2

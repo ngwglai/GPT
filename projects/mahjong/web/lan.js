@@ -3,14 +3,15 @@
   const key = 'mahjong.lan.session.v040';
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(key) || 'null'); } catch (_) { /* new session */ }
-  let socket = null, state = null, retryTimer = null, retry = 0, stopped = false;
-  let awaiting = false, joinBusy = false, firstState = true;
+  let socket = null, state = null, retryTimer, retry = 0, stopped = false;
+  let authenticated = false, pending = null, commandId = 0, joinBusy = false;
   const $ = id => document.getElementById(id);
   const hide = (id, value) => $(id).classList.toggle('hidden', value);
   const status = (text, kind = "") => {
     $('connectionStatus').textContent = text;
     $('connectionStatus').dataset.connection = kind;
   };
+  const ready = () => authenticated && socket?.readyState === WebSocket.OPEN;
   function save(value) {
     saved = value;
     try {
@@ -19,33 +20,34 @@
     } catch (_) { showNotice('浏览器未允许保存身份，关闭页面后可能无法自动重连。'); }
   }
   function send(data) {
-    if (socket?.readyState !== WebSocket.OPEN || !state) {
+    if (!ready() || !state) {
       showNotice('连接尚未恢复，请稍候。'); return;
     }
-    if (awaiting) return;
-    awaiting = true;
+    if (pending !== null) return;
+    pending = ++commandId;
+    socket.send(JSON.stringify({...data, command_id:pending}));
     decorate();
-    socket.send(JSON.stringify(data));
   }
   function decorate() {
+    const locked = pending !== null || !ready();
     for (const seat of [0,1,2,3]) {
       const el = $(`seat-${seat}`);
       el.classList.toggle('my-seat', state?.you.seat === seat);
       el.querySelectorAll('button').forEach(btn => {
         if (btn.dataset.actionKey || btn.hasAttribute('data-orphan-pickup') || btn.hasAttribute('data-ai-toggle') || btn.classList.contains('clickable')) {
-          btn.disabled = awaiting || socket?.readyState !== WebSocket.OPEN;
+          btn.disabled = locked;
         }
       });
     }
     $('controlSettings').querySelectorAll('select').forEach(select => {
-      select.disabled = awaiting || socket?.readyState !== WebSocket.OPEN;
+      select.disabled = locked;
     });
-    $('startGame').disabled = awaiting || !state?.controls.can_start;
-    $('nextRound').disabled = awaiting || !state?.controls.can_next_round;
-    $('leaveRoom').disabled = awaiting || socket?.readyState !== WebSocket.OPEN;
+    $('startGame').disabled = locked || !state?.controls.can_start;
+    $('nextRound').disabled = locked || !state?.controls.can_next_round;
+    $('leaveRoom').disabled = locked;
     $('roster').querySelectorAll('button').forEach(button => {
       const member = state?.room.members.find(player => player.seat === Number(button.dataset.chooseSeat));
-      button.disabled = awaiting || !state?.controls.can_choose_seat || Boolean(member && member.member_id !== state.you.member_id);
+      button.disabled = locked || !state?.controls.can_choose_seat || Boolean(member && member.member_id !== state.you.member_id);
     });
   }
   function renderRoom() {
@@ -67,23 +69,30 @@
     decorate();
   }
   function connect() {
-    if (!saved) return;
+    if (!saved || stopped || (socket && socket.readyState !== WebSocket.CLOSED)) return;
     clearTimeout(retryTimer);
-    if (socket) { socket.onclose = null; socket.close(); }
-    stopped = false; firstState = true; state = null; awaiting = false;
+    authenticated = false;
+    pending = null;
+    const session = saved;
     hide('joinPanel', true);
-    status('正在连接房间…', 'waiting');
-    const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws/${encodeURIComponent(saved.room_code)}`);
+    status(state ? '正在恢复连接…' : '正在连接房间…', 'waiting');
+    const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws/${encodeURIComponent(session.room_code)}`);
     socket = ws;
-    ws.onopen = () => ws.send(JSON.stringify({type:'authenticate', session_token:saved.session_token}));
+    ws.onopen = () => {
+      if (socket === ws) ws.send(JSON.stringify({type:'authenticate', session_token:session.session_token}));
+    };
     ws.onmessage = event => {
       if (socket !== ws) return;
       let message;
       try { message = JSON.parse(event.data); } catch (_) { showNotice('收到了无法识别的消息。'); return; }
+      if (message.type === 'command_ack') {
+        if (message.command_id === pending) { pending = null; decorate(); }
+        return;
+      }
       if (message.type === 'error') {
-        awaiting = false; showNotice(message.error);
+        pending = null; showNotice(message.error);
         if (message.invalid_session) {
-          stopped = true; save(null); ws.close(); state = null;
+          stopped = true; save(null); ws.close(); state = null; table = null;
           hide('tableHud', true); hide('controlMenu', true); document.body.classList.remove('table-live');
           hide('playingHint', true); status('尚未连接');
           hide('joinPanel', false); hide('roomPanel', true); hide('gameTable', true);
@@ -92,7 +101,7 @@
         decorate(); return;
       }
       if (message.type === 'left') {
-        stopped = true; awaiting = false; ws.close(); state = null; table = null;
+        stopped = true; pending = null; ws.close(); state = null; table = null;
         if (!message.resumable) save(null);
         hide('joinPanel', false); hide('roomPanel', true); hide('gameTable', true);
         hide('leaveRoom', true); hide('nextRound', true); hide('focusHand', true); hide('resumeRoom', !saved);
@@ -104,8 +113,9 @@
       }
       if (message.type !== 'state') return;
       if (state && message.room_version < state.room_version) return;
+      const firstState = !authenticated;
       if (firstState) showNotice('');
-      state = message; awaiting = false; retry = 0;
+      state = message; authenticated = true; retry = 0;
       status(`房间 ${state.room.code} · 已连接`, 'online');
       renderRoom();
       if (message.player_view) {
@@ -114,18 +124,18 @@
         window.MahjongView?.setViewerSeat(state.you.seat);
         acceptTable({...view, legal_actions:{[String(state.you.seat)]:view.legal_actions}}, {initial:firstState});
       }
-      firstState = false;
     };
     ws.onclose = () => {
       if (socket !== ws) return;
-      awaiting = false; decorate();
+      authenticated = false; pending = null; decorate();
       if (stopped || !saved) return;
       status('连接中断，正在自动重连…', 'offline');
       showNotice('网络连接中断；座位和牌局保留，恢复连接后继续。');
-      hide('joinPanel', false); hide('resumeRoom', false);
       retryTimer = setTimeout(connect, Math.min(8000, 700 * (2 ** retry++)));
     };
-    ws.onerror = () => { status('暂时无法连接服务器', 'offline'); };
+    ws.onerror = () => {
+      if (socket === ws) status('暂时无法连接服务器', 'offline');
+    };
   }
   async function join(create) {
     if (joinBusy) return;
@@ -139,8 +149,11 @@
       const res = await fetch(create ? '/api/rooms' : '/api/rooms/join', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error || '加入失败');
-      stopped = true; clearTimeout(retryTimer);
-      if (socket) { socket.onclose = null; socket.close(); }
+      clearTimeout(retryTimer);
+      const previous = socket;
+      socket = null;
+      previous?.close();
+      state = null; pending = null; stopped = false;
       save({room_code:data.room_code, session_token:data.session_token});
       showNotice(''); connect();
     } catch (e) { showNotice(e.message); }
@@ -167,7 +180,7 @@
   };
   $('createRoom').addEventListener('click', () => join(true));
   $('joinRoom').addEventListener('click', () => join(false));
-  $('resumeRoom').addEventListener('click', connect);
+  $('resumeRoom').addEventListener('click', () => { stopped = false; connect(); });
   $('startGame').addEventListener('click', () => send({type:'start'}));
   $('nextRound').addEventListener('click', () => {
     if (state?.player_view) send({type:'next_round', round_id:state.player_view.round_id, revision:state.player_view.revision});
@@ -180,10 +193,11 @@
   $('roomCode').addEventListener('keydown', event => {
     if (event.key === 'Enter' && !event.isComposing) join(false);
   });
-  window.addEventListener('online', () => { if (!stopped && saved && socket?.readyState !== WebSocket.OPEN) connect(); });
+  window.addEventListener('online', connect);
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && !stopped && saved && socket?.readyState === WebSocket.CLOSED) connect();
+    if (!document.hidden) connect();
   });
+  window.addEventListener('pageshow', event => { if (event.persisted) connect(); });
   (async () => {
     await window.MahjongPresentation?.init();
     if (saved?.room_code && saved?.session_token) connect();

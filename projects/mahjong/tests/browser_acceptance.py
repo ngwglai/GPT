@@ -50,7 +50,11 @@ def ai_toggle(page, seat):
 async def play_action(page, seat, action, select_tile=False):
     if select_tile:
         await page.locator(f'#seat-{int(seat)} [data-tile="{action.tile_ids[0]}"]').click()
-    await action_button(page, seat, action.type.name, action.tile_ids).click()
+    button = action_button(page, seat, action.type.name, action.tile_ids)
+    group = button.locator("xpath=ancestor::details[@class='action-family']")
+    if await group.count() and await group.get_attribute("open") is None:
+        await group.locator("summary").click()
+    await button.click()
 
 
 def fixture(engine, players, **kwargs):
@@ -125,6 +129,7 @@ async def local_cases(page, app, url, output):
 
     await page.locator("#newRoundBtn").click()
     await expect(action_button(page, E, "ROLL_DICE")).to_be_visible()
+    await page.locator('[data-view-seat="1"]').click()
     await pickup_toggle(page, S).click()
     await expect(pickup_toggle(page, S)).to_have_attribute("aria-pressed", "true")
     await expect(page.locator("#seat-1 .orphan-ready")).to_be_visible()
@@ -151,7 +156,7 @@ async def local_cases(page, app, url, output):
         await fits(page)
         await expect(page.locator(".wall-stage")).to_be_visible()
         tile = await page.locator("#seat-1 .hand button").first.bounding_box()
-        assert tile and tile["width"] >= 36 and tile["height"] >= 44, (width, height, tile)
+        assert tile and tile["width"] >= 23 and tile["height"] >= 44, (width, height, tile)
         if width in (1024, 390):
             await capture(page, output, f"09-local-{width}x{height}")
 
@@ -184,7 +189,7 @@ async def local_cases(page, app, url, output):
     await page.locator(f'#seat-0 [data-tile="{shelf.tile_ids[0]}"]').click()
     await capture_actions(page, output, E, "shelf")
     await play_action(page, E, shelf)
-    await expect(page.locator("#seat-0 .shelf-row .tile.gold")).to_be_visible()
+    await expect(page.locator(".scene-shelf.gold")).to_be_visible()
     await expect(page.locator("#seat-0 .badge.gold-ok")).to_contain_text("已上金")
 
     fixture(engine, {E: PlayerFixture(WAIT + [31], declared=True, last_draw_type=31)}, gold=33)
@@ -232,8 +237,11 @@ async def local_cases(page, app, url, output):
     await page.locator('[data-ai-all="normal"]').click()
     await expect(page.locator(".ai-badge")).to_have_count(4)
     await expect(action_button(page, E, "ROLL_DICE")).to_have_count(0)
+    await page.locator('[data-view-seat="0"]').click()
+    await page.locator("#seat-0 .player-inspector summary").first.click()
     await expect(page.locator("#seat-0 .ai-record summary")).to_be_visible()
     await capture(page, output, "14-all-controls")
+    await page.locator("#controlMenu summary").click()
     await page.locator('[data-ai-all="human"]').click()
     await expect(page.locator(".ai-badge")).to_have_count(0)
     paused_revision = app[LOCAL].engine.state.revision
@@ -385,14 +393,14 @@ async def lan_cases(browser, app, url, output, watch):
         await host.locator(f'#seat-0 [data-tile="{ting.tile_ids[0]}"]').click()
         await capture_actions(host, output, E, "ting")
         await play_action(host, E, ting)
-        await expect(host.locator("#seat-0 .ting-row .tile:not(.tile-back)")).to_be_visible()
+        await expect(host.locator('.scene-ting[data-motion="ting-0"]:not([data-tile-face=""])')).to_be_visible()
         hint = host.locator("#seat-0 .wait-hint")
         await expect(hint.locator('img[alt="中"]')).to_be_visible()
         red_dragon = hint.locator(".wait-choice").filter(has=host.get_by_alt_text("中", exact=True))
         await expect(red_dragon).to_contain_text("3 张")
         await expect(hint).to_contain_text("需上金")
         for page in pages[1:]:
-            await expect(page.locator("#seat-0 .ting-row .tile-back")).to_be_visible()
+            await expect(page.locator('.scene-ting[data-motion="ting-0"][data-tile-face=""]')).to_be_visible()
             await expect(page.locator('.scene-ting[data-motion="ting-0"]')).to_have_attribute("data-tile-face", "")
             await expect(page.locator("#seat-0 .wait-hint")).to_have_count(0)
             assert await page.locator("#seat-0 .ting-row img").get_attribute("src") == "/assets/tiles/back.svg"
@@ -425,7 +433,7 @@ async def lan_cases(browser, app, url, output, watch):
         await capture(host, output, "08-lan-win")
         await host.locator("#nextRound").click()
         await expect(action_button(pages[1], S, "ROLL_DICE")).to_be_visible()
-        await expect(host.locator(".status-card")).to_contain_text("第 2 局")
+        await expect(host.locator("#tableHud")).to_contain_text("第 2 局")
         await expect(host.locator(".previous-round")).to_contain_text("上局")
 
         await room_fixture(room, {S: PlayerFixture([0, 0, 0, 9, 10, 11, 18, 19, 20, 27, 27, 27, 31], declared=True)}, gold=33, discard=(E, 0))

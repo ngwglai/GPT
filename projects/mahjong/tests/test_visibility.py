@@ -2,7 +2,7 @@ import unittest
 
 from mahjong.core.player import MeldType
 from mahjong.game.debug import PlayerFixture, build_fixture
-from mahjong.game.visibility import visible_remaining
+from mahjong.game.visibility import ting_presentation, visible_remaining
 from mahjong.solver.thirteen_orphans import ORPHANS
 from tests.helpers import E, S, W, engine, choose, play
 from tests.test_gold import WAIT
@@ -20,8 +20,23 @@ class VisibilityTests(unittest.TestCase):
                                 {"type": 33, "remaining": 4, "requires_shelf": True}])
         self.assertEqual([p["type"] for p in hint], before["players"][int(E)]["current_waits"])
         self.assertNotIn("wait_hint", game.player_view(S)["players"][int(E)])
+        presentation = ting_presentation(before, int(E), game.state.players[E], game.solver)
+        self.assertEqual(presentation["wait_patterns"][31], ("standard",))
         play(game, choose(game, S, ActionType.DISCARD))
         self.assertEqual(game.player_view(E)["players"][int(E)]["wait_hint"][0]["remaining"], 2)
+
+    def test_ting_preview_uses_only_visible_tiles_and_is_private(self):
+        game = engine()
+        build_fixture(game, {E: PlayerFixture(WAIT + [8], last_draw_type=8),
+                             S: PlayerFixture([31, 31])}, gold=33, indicator_type=19)
+        view = game.player_view(E)
+        presentation = ting_presentation(view, int(E), game.state.players[E], game.solver)
+        options = presentation["ting_previews"][8]
+        self.assertEqual(options[0], {"type": 31, "remaining": 3,
+                                      "patterns": ("standard",), "requires_shelf": False})
+        self.assertTrue(any(a["type"] == "DECLARE_TING" and a["tile_ids"][0] // 4 == 8
+                            for a in view["legal_actions"]))
+        self.assertNotIn("ting_previews", game.player_view(S)["players"][int(E)])
 
     def test_zero_waits_remain_visible_and_hidden_copies_do_not_count(self):
         game = engine(hide_an_gang=True)

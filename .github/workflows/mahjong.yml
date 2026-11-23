@@ -86,6 +86,7 @@ jobs:
         run: |
           python -m tests.browser_acceptance --chromium /usr/bin/google-chrome
           python -m tests.wall_browser_acceptance --chromium /usr/bin/google-chrome
+          python -m tests.match_browser_acceptance --chromium /usr/bin/google-chrome
       - name: Chromium acceptance (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -94,6 +95,8 @@ jobs:
           python -m tests.browser_acceptance --chromium $chrome
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m tests.wall_browser_acceptance --chromium $chrome
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m tests.match_browser_acceptance --chromium $chrome
       - name: Windows batch launchers
         if: runner.os == 'Windows'
         shell: pwsh

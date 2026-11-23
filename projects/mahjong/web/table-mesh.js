@@ -5,6 +5,8 @@ const MahjongMesh = (() => {
   const images = new Map();
   const available = typeof Path2D === "function" && Boolean(document.createElement("canvas").getContext("2d"));
   const crest = "/assets/table/textures/celadon.webp";
+  // Local +z is the printed face, -z the back, -y the upper edge of
+  // the print, +y the lower edge, and ±x the side edges.
   const faces = [
     ["under", [4,7,6,5]], ["top", [0,1,2,3]], ["near", [3,2,6,7]],
     ["far", [1,0,4,5]], ["left", [0,3,7,4]], ["right", [2,1,5,6]]
@@ -171,5 +173,5 @@ const MahjongMesh = (() => {
     invalidate();
   }
 
-  return {available, mount, invalidate};
+  return {available, mount, invalidate, project};
 })();
