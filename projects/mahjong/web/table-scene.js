@@ -1,7 +1,12 @@
 /* Project the public table view. Coordinates are in logical table units, with +z
    pointing out of the felt. Slot IDs identify locations, never concealed tiles. */
 const MahjongScene = (() => {
-  const width = 1000;
+  const tableSize = {width:1014, length:704, rail:28, radius:37, top:6, base:-37};
+  const feltWidth = tableSize.width - tableSize.rail * 2;
+  const feltLength = tableSize.length - tableSize.rail * 2;
+  const handTile = {w:25, h:36, depth:11};
+  const cameraDistance = 1800;
+  const cameraAngles = {oblique:42, overhead:17, compact:26, "compact-overhead":12};
   const yaw = {south:0, west:90, north:180, east:-90};
   const travelKinds = new Set([
     "TILE_DRAWN", "TILE_DISCARDED", "CHI", "PENG", "GANG", "GOLD_SHELVED",
@@ -40,9 +45,18 @@ const MahjongScene = (() => {
   }
 
   function frame() {
-    const halfWidth = 431;
-    const halfDepth = 275;
-    const radius = 37;
+    const {width, length, rail, radius, top, base} = tableSize;
+    const halfWidth = width / 2;
+    const halfDepth = length / 2;
+    const innerRight = width - rail;
+    const innerBottom = length - rail;
+    const innerRadius = radius - 8;
+    const innerStart = rail + innerRadius;
+    const cutout = `M ${innerStart} ${rail} H ${innerRight - innerRadius}
+      Q ${innerRight} ${rail} ${innerRight} ${innerStart} V ${innerBottom - innerRadius}
+      Q ${innerRight} ${innerBottom} ${innerRight - innerRadius} ${innerBottom} H ${innerStart}
+      Q ${rail} ${innerBottom} ${rail} ${innerBottom - innerRadius} V ${innerStart}
+      Q ${rail} ${rail} ${innerStart} ${rail} Z`.replace(/\s+/g, " ");
     const points = [];
     for (let corner = 0; corner < 4; corner++) {
       const cx = corner < 2 ? halfWidth - radius : radius - halfWidth;
@@ -60,22 +74,56 @@ const MahjongScene = (() => {
       const length = Math.hypot(dx, dy) + 0.25;
       return `<span class="frame-facet" style="--x:${x}px;--y:${y}px;--length:${length}px;--angle:${angle}deg;--grain:${i * -53}px"></span>`;
     }).join("");
-    return `<div class="frame-floor"></div><div class="frame-base"></div>${sides}
-      <div class="frame-top"></div><div class="frame-inlay"></div><div class="scene-felt"></div>
-      <div class="scene-well"></div>`;
+    return `<div class="frame-floor" style="--height-z:${base - 6}px"></div>
+      <div class="frame-base" style="--height-z:${base}px"></div>${sides}
+      <div class="frame-top" style="--height-z:${top}px;clip-path:path(evenodd,'M 0 0 H ${width} V ${length} H 0 Z ${cutout}')"></div>
+      <div class="frame-inlay"></div><div class="scene-felt"></div><div class="scene-well"></div>`;
   }
   const frameMarkup = frame();
+
+  function frameProjection(angle) {
+    const radians = angle * Math.PI / 180;
+    const sin = Math.sin(radians);
+    const cos = Math.cos(radians);
+    const corners = [tableSize.top, tableSize.base].flatMap(z =>
+      [-tableSize.length / 2, tableSize.length / 2].map(y => {
+        const scale = cameraDistance / (cameraDistance - y * sin - z * cos);
+        return {x:tableSize.width / 2 * scale, y:(y * cos - z * sin) * scale};
+      }));
+    const top = Math.min(...corners.map(corner => corner.y));
+    const bottom = Math.max(...corners.map(corner => corner.y));
+    return {
+      width:Math.ceil(2 * Math.max(...corners.map(corner => corner.x))) + 16,
+      height:Math.ceil(bottom - top) + 16,
+      offset:(top + bottom) / 2
+    };
+  }
+
+  const projections = Object.entries(cameraAngles).map(([view, angle]) => [view, angle, frameProjection(angle)]);
+  const sceneWidth = Math.max(...projections.map(([, , projection]) => projection.width));
+  const stageGeometry = [
+    `--scene-width:${sceneWidth}px;--camera-distance:${cameraDistance}px`,
+    `--frame-width:${tableSize.width}px;--frame-length:${tableSize.length}px;--frame-radius:${tableSize.radius}px`,
+    `--felt-width:${feltWidth}px;--felt-length:${feltLength}px`,
+    `--frame-top:${tableSize.top}px;--frame-thickness:${tableSize.top - tableSize.base}px`,
+    ...projections.map(([view, angle, {height, offset}]) =>
+      `--${view}-tilt:${angle}deg;--${view}-height:${height}px;--${view}-offset:${offset}px;--${view}-aspect:${sceneWidth} / ${height}`)
+  ].join(";");
 
   // Column 0 is on the owner's left, even when the scene rotates for LAN.
   const wallLayers = ["top", "bottom"];
   const wallPaintOrder = [1, 0];
   const wallKey = ({side, column, layer}) => `wall-${side}-${column}-${wallLayers[layer]}`;
 
+  const wallGeometry = {
+    horizontal:{step:29, outward:183, w:27.6, h:30, depth:10.6},
+    vertical:{step:20, outward:300, w:18.7, h:30, depth:10.6}
+  };
+  const sideIsVertical = side => side === "east" || side === "west";
+
   function wallPosition(side, column) {
-    const vertical = side === "east" || side === "west";
-    return position(side, (column - 8) * (vertical ? 20 : 29), vertical ? 300 : 183, {
-      w:vertical ? 18.7 : 27.6, h:30, depth:10.6
-    });
+    const {step, outward, ...size} = wallGeometry[sideIsVertical(side) ? "vertical" : "horizontal"];
+    return position(side, (column - 8) * step, outward, size);
   }
 
   function wall(table, seat, side) {
@@ -116,8 +164,8 @@ const MahjongScene = (() => {
     const tiles = Array.isArray(p.concealed_tiles) ? [...p.concealed_tiles].sort((a,b) => {
       return (a.id === p.last_drawn_tile) - (b.id === p.last_drawn_tile) || a.type - b.type || a.id - b.id;
     }) : Array.from({length:p.concealed_count}, () => ({}));
-    const vertical = side === "east" || side === "west";
-    const step = vertical ? 21 : 27;
+    const step = handTile.w + 2;
+    const edge = (sideIsVertical(side) ? feltWidth : feltLength) / 2;
     const playable = new Set((table.legal_actions?.[seat] || []).flatMap(action => action.tile_ids));
     return tiles.map(({id, type}, i) => {
       const last = i === tiles.length - 1;
@@ -125,8 +173,8 @@ const MahjongScene = (() => {
       // The crest is on the underside of the ceramic tile. A standing far
       // hand is seen from behind, while local practice shows its visible faces.
       const pitch = type == null || side === "south" ? -74 : -17;
-      return tile(type, position(side, (i - (tiles.length - 1) / 2) * step + (drawn ? 8 : 0), vertical ? 369 : 236, {
-        z: pitch === -74 ? 19 : 10, w:step - 2, h:vertical ? 29 : 36, depth:11,
+      return tile(type, position(side, (i - (tiles.length - 1) / 2) * step + (drawn ? 8 : 0), edge - 24, {
+        ...handTile, z: pitch === -74 ? 19 : 10,
         pitch, classes:`scene-hand${type != null && type === table.gold_tile_type ? " gold" : ""}${drawn ? " scene-drawn" : ""}`,
         key:id == null ? `closed-${seat}-${i}` : `hand-${seat}-${id}`,
         extra:(last ? ` data-last-hand="${seat}"` : "") +
@@ -138,7 +186,7 @@ const MahjongScene = (() => {
   function river(table, seat, side) {
     const discards = table.discards.map((discard, index) => ({...discard, index}))
       .filter(d => d.seat === seat && !d.claimed);
-    const vertical = side === "east" || side === "west";
+    const vertical = sideIsVertical(side);
     const columns = side === "north" || side === "south" ? 8 : 7;
     const rows = Math.max(1, Math.ceil(discards.length / columns));
     const step = Math.min(35, (vertical ? 100 : 55) / Math.max(1, rows - 1));
@@ -168,34 +216,57 @@ const MahjongScene = (() => {
 
   function zones(table, seat, side) {
     const p = table.players[seat];
-    const vertical = side === "east" || side === "west";
-    const near = vertical ? 344 : 215;
-    const cells = p.melds.flatMap((m, i) => [
-      ...meldOrder(seat, m).map((t, j) => ({...t, key:`meld-${seat}-${i}-${j}`, classes:"scene-meld"})),
-      {gap:true}
-    ]);
-    p.shelf_tiles.forEach((type, i) => cells.push({type, key:`shelf-${seat}-${i}`, classes:"scene-shelf"}));
-    p.picked_orphans?.forEach((type, i) => cells.push({type, key:`orphan-${seat}-${i}`, classes:"scene-orphan"}));
-    if (p.ting_tile) cells.push({type:p.ting_tile.type, key:`ting-${seat}`, classes:"scene-ting"});
-    let offset = 0;
+    const vertical = sideIsVertical(side);
+    const wall = wallGeometry[vertical ? "vertical" : "horizontal"];
+    const wallEdge = wall.outward + wall.h / 2;
+    // Horizontal rows end at the side walls' outer line. Vertical rows can
+    // use the corners beyond that line without sharing space with either end.
+    const halfRow = vertical ? feltLength / 2 - 12 :
+      wallGeometry.vertical.outward + wallGeometry.vertical.h / 2;
+    const rowStep = handTile.h + 2;
+    const groups = [
+      ...p.melds.map((meld, i) => ({
+        category:"meld", tiles:meldOrder(seat, meld).map((t, j) => ({...t, key:`meld-${seat}-${i}-${j}`}))
+      })),
+      ...p.shelf_tiles.map((type, i) => ({category:"shelf", tiles:[{type, key:`shelf-${seat}-${i}`}]})),
+      ...(p.picked_orphans || []).map((type, i) => ({category:"orphan", tiles:[{type, key:`orphan-${seat}-${i}`}]}))
+    ];
+    if (p.ting_tile) groups.push({category:"ting", tiles:[{type:p.ting_tile.type, key:`ting-${seat}`}]});
+
+    const gap = 2;
+    const span = ({sideways}) => sideways ? handTile.h : handTile.w;
+    let used = 0;
     let row = 0;
-    const rowLimit = vertical ? 406 : 490;
-    return cells.map(({type, sideways, stacked, classes, key, gap}) => {
-      if (gap) {
-        offset += 7;
-        return "";
+    let lastCategory;
+    return groups.map(({category, tiles}) => {
+      // Keep a meld intact at a line break. Added kongs share the claimed
+      // tile's position and do not consume a second slot in the row.
+      const slots = tiles.filter(t => !t.stacked);
+      const groupWidth = slots.reduce((total, t) => total + span(t), 0) + gap * (slots.length - 1);
+      const separation = category !== lastCategory ? 12 : category === "meld" ? 8 : gap;
+      if (used && used + separation + groupWidth > halfRow * 2) {
+        row++;
+        used = 0;
       }
-      const span = sideways ? 26 : 19;
-      if (!stacked && offset + span > rowLimit) {
-        offset = 0;
-        row += 1;
-      }
-      const across = (vertical ? 203 : 245) - offset + (stacked ? span / 2 : -span / 2);
-      if (!stacked) offset += span;
-      return tile(type, position(side, across, near - row * 25, {
-        w:18, h:25, depth:8, z:stacked ? 12.5 : 4, angle:sideways ? 90 : 0, key,
-        classes:`${classes}${sideways ? " scene-claimed" : ""}${type != null && type === table.gold_tile_type ? " gold" : ""}`
-      }));
+      if (used) used += separation;
+      lastCategory = category;
+      const outward = wallEdge + handTile.h / 2 + 8 + row * rowStep;
+      let across;
+      let offset = used;
+      used += groupWidth;
+      return tiles.map(({type, sideways, stacked, key}) => {
+        if (!stacked) {
+          const width = span({sideways});
+          across = halfRow - offset - width / 2;
+          offset += width + gap;
+        }
+        const classes = `scene-${category}${sideways ? " scene-claimed" : ""}${stacked ? " scene-stacked" : ""}`;
+        return tile(type, position(side, across, outward, {
+          ...handTile, z:stacked ? handTile.depth * 1.5 + .6 : handTile.depth / 2,
+          angle:sideways ? 90 : 0, key,
+          classes:`${classes}${type != null && type === table.gold_tile_type ? " gold" : ""}`
+        }));
+      }).join("");
     }).join("");
   }
 
@@ -221,10 +292,11 @@ const MahjongScene = (() => {
       ${zones(table, seat, side)}${hand(table, seat, side)}`).join("");
     const empty = table.phase === "ROLLING_DICE";
     const markers = positions.map(([side, seat]) => {
-      const [x, y] = point(side, 0, side === "east" || side === "west" ? 416 : 260);
+      const edge = (sideIsVertical(side) ? feltWidth : feltLength) / 2;
+      const [x, y] = point(side, 0, edge + tableSize.rail / 2);
       return `<div class="scene-tag" style="--tag-x:${x}px;--tag-y:${y}px" aria-hidden="true">${seatNames[seat]}</div>`;
     }).join("");
-    return `<div class="wall-stage" aria-label="立体麻将桌">
+    return `<div class="wall-stage" style="${stageGeometry}" aria-label="立体麻将桌">
       <div class="scene-world"><div class="scene-camera"><div class="scene-plane">
         ${frameMarkup}${markers}${board}${center(table)}
       </div></div><canvas class="scene-sprites" aria-hidden="true"></canvas></div>
@@ -235,8 +307,10 @@ const MahjongScene = (() => {
   function fit(shell) {
     const stage = shell.querySelector(".wall-stage");
     if (!stage?.clientWidth) return;
-    shell.style.setProperty("--scene-scale", stage.clientWidth / width);
-    shell.style.setProperty("--stage-height", `${stage.clientHeight}px`);
+    const scale = String(stage.getBoundingClientRect().width / sceneWidth);
+    if (shell.style.getPropertyValue("--scene-scale") === scale) return;
+    shell.style.setProperty("--scene-scale", scale);
+    return true;
   }
 
   function mount(shell) {
@@ -246,9 +320,10 @@ const MahjongScene = (() => {
     observedShell = shell;
     if (typeof ResizeObserver === "function") {
       observer = new ResizeObserver(() => {
-        fit(shell);
-        cancelFlights();
-        MahjongMesh.invalidate();
+        if (fit(shell)) {
+          cancelFlights();
+          MahjongMesh.invalidate();
+        }
       });
       observer.observe(shell.querySelector("#center"), {box:"border-box"});
     }

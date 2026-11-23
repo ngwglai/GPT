@@ -555,7 +555,7 @@ function bindTableEvents() {
     if (event.target.closest("[data-view-toggle]")) {
       MahjongScene.setPerspective(event.currentTarget);
       renderCenter();
-      MahjongMesh.invalidate();
+      MahjongScene.mount(event.currentTarget);
       return;
     }
     if (event.target.closest("[data-river-toggle]")) {

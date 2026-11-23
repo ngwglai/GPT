@@ -1,6 +1,6 @@
-# 青雀麻将 v0.7.1
+# 青雀麻将 v0.7.2
 
-青雀麻将提供四家明牌练习和四人局域网联机。v0.7.0 加入具有真实透视的 2.5D 牌桌、六面麻将牌、双层牌墙与沿桌面移动的动作动画。继续支持三档 AI 托管、报听后的胡牌提示和可见剩余数量。规则由 Python 服务端执行。v0.7.1 修正开墙、金指示牌与双端取牌，统一服务端墙位和 2.5D 场景坐标。
+青雀麻将提供四家明牌练习和四人局域网联机。v0.7.0 加入具有真实透视的 2.5D 牌桌、六面麻将牌、双层牌墙与沿桌面移动的动作动画。继续支持三档 AI 托管、报听后的胡牌提示和可见剩余数量。规则由 Python 服务端执行。v0.7.1 修正开墙、金指示牌与双端取牌，统一服务端墙位和 2.5D 场景坐标。v0.7.2 扩大实体桌与桌布，统一四席控制按钮，并让副露、上金、十三幺拾牌和报听牌在桌面按实际牌宽排列。
 
 ## 安装与启动
 
@@ -83,12 +83,15 @@ python -m playwright install chromium
 python -m tests.browser_acceptance --screenshots browser-screenshots
 python -m tests.scene_acceptance --output scene-screenshots
 python -m tests.wall_browser_acceptance --output wall-screenshots
+python -m tests.layout_browser_acceptance --output layout-screenshots
 python -m tools.run_ai_matches --output ai-matches.json
 ```
 
 命令行引擎可用 `python -m mahjong demo --seed 42 --rounds 3` 试跑。
 
 ## Web 美术与浏览器验收
+
+[v0.7.2 桌面布局验收报告](VALIDATION-v0.7.2.md) 收录前后对比、七类视口和公开牌压力测试。
 
 [v0.7.1 牌墙验收报告](VALIDATION-v0.7.1.md) 收录混合取牌、全量回归和浏览器截图。
 

@@ -141,7 +141,7 @@ const MahjongMesh = (() => {
     }
     ctx.setTransform(resolution, 0, 0, resolution, 0, 0);
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    const sceneStyle = getComputedStyle(shell);
+    const sceneStyle = getComputedStyle(stage);
     const cameraStyle = getComputedStyle(world.querySelector(".scene-camera"));
     const tilt = radians(Number.parseFloat(sceneStyle.getPropertyValue("--camera-tilt")));
     const [originX, originY] = cameraStyle.perspectiveOrigin.split(" ").map(Number.parseFloat);
