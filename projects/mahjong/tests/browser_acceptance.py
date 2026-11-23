@@ -285,6 +285,7 @@ async def lan_cases(browser, app, url, output, watch):
             await expect(page.locator(".player.south")).to_have_attribute("id", f"seat-{viewer}")
             await expect(page.locator(".player:not(.my-seat) .hand [data-tile]")).to_have_count(0)
             await expect(page.locator(".player:not(.my-seat) .hand .tile-back")).to_have_count(39 if viewer == 0 else 40)
+            await expect(page.locator('.scene-hand[data-tile-face=""]')).to_have_count(39 if viewer == 0 else 40)
             assert "Seed" not in await page.locator("#center").text_content()
             await expect(page.locator('[data-orphan-pickup]')).to_have_count(1)
             await expect(pickup_toggle(page, viewer)).to_have_attribute("aria-pressed", "false")
@@ -377,6 +378,7 @@ async def lan_cases(browser, app, url, output, watch):
         await expect(hint).to_contain_text("需上金")
         for page in pages[1:]:
             await expect(page.locator("#seat-0 .ting-row .tile-back")).to_be_visible()
+            await expect(page.locator('.scene-ting[data-motion="ting-0"]')).to_have_attribute("data-tile-face", "")
             await expect(page.locator("#seat-0 .wait-hint")).to_have_count(0)
             assert await page.locator("#seat-0 .ting-row img").get_attribute("src") == "/assets/tiles/back.svg"
         discard = next(a for a in room.table.engine.legal_actions(S)
@@ -442,7 +444,7 @@ async def gallery_and_fallbacks(page, url, output):
     await page.goto(f"{url}local.html")
     await expect(page.locator("#center .wall-stage")).to_be_visible()
     await action_button(page, E, "ROLL_DICE").click()
-    await expect(page.locator(".hand .tile-image-fallback").first).to_be_visible()
+    await expect(page.locator(".dock-seat .hand .tile-image-fallback").first).to_be_visible()
     await fits(page)
 
 

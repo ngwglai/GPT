@@ -15,6 +15,7 @@ let tablePoll;
 let mutationEpoch = 0;
 let riversExpanded = false;
 let dockSeat = null;
+let inspectedSeat = null;
 const dockObserver = typeof ResizeObserver === "function" ? new ResizeObserver(([entry]) => {
   document.body.style.setProperty("--hand-space", `${Math.ceil(entry.target.getBoundingClientRect().height)}px`);
 }) : null;
@@ -87,34 +88,34 @@ function showNotice(msg) {
   el.textContent = msg;
   el.classList.toggle("hidden", !msg);
 }
-function dispatchPresentationEvents(nextTable, initial = false) {
-  const events = nextTable?.presentation_events || [];
-  if (eventRoundId !== nextTable?.round_id) {
-    eventRoundId = nextTable?.round_id || null;
+function newPresentationEvents(nextTable, initial) {
+  const events = nextTable.presentation_events || [];
+  if (eventRoundId !== nextTable.round_id) {
+    eventRoundId = nextTable.round_id;
     lastPresentationEventId = 0;
   }
-  if (initial) {
-    lastPresentationEventId = Math.max(0, ...events.map(e => e.id || 0));
-    return;
-  }
-  for (const event of events) {
-    if ((event.id || 0) <= lastPresentationEventId) continue;
-    window.MahjongPresentation?.bus?.emit(event, {
-      table: nextTable,
-      seatName: seat => seatNames[seat],
-      tileName,
-    });
-    lastPresentationEventId = Math.max(lastPresentationEventId, event.id || 0);
-  }
+  const fresh = initial ? [] : events.filter(event => event.id > lastPresentationEventId);
+  lastPresentationEventId = Math.max(lastPresentationEventId, ...events.map(event => event.id || 0));
+  return fresh;
 }
 function acceptTable(nextTable, { initial = false } = {}) {
-  if (nextTable.round_id !== table?.round_id) selected = {seat:null,tileId:null};
-  dispatchPresentationEvents(nextTable, initial);
   const last = table;
+  const sameRound = last?.round_id === nextTable.round_id;
+  if (!sameRound) {
+    selected = {seat:null,tileId:null};
+    inspectedSeat = null;
+  }
+  if (!sameRound || last.revision !== nextTable.revision) MahjongScene.cancelFlights();
+  const events = newPresentationEvents(nextTable, initial);
+  const before = sameRound ? MahjongScene.snapshot(events) : null;
   table = nextTable;
   document.body.classList.add("table-live");
   render();
-  if (last?.round_id === table.round_id) {
+  MahjongScene.animate(events, before, last, table);
+  for (const event of events) {
+    window.MahjongPresentation?.bus?.emit(event, {table, seatName:seat => seatNames[seat], tileName});
+  }
+  if (sameRound) {
     for (const seat of [0,1,2,3]) {
       if (last.players[seat]?.controller !== table.players[seat]?.controller) {
         window.MahjongPresentation?.animations?.flashSeat(seat, "control");
@@ -180,7 +181,7 @@ function renderTableHud() {
   }
 }
 function placeHandDock() {
-  const next = viewerSeat ?? seatNames.findIndex((_, seat) => legalForSeat(seat).length > 0);
+  const next = viewerSeat ?? inspectedSeat ?? seatNames.findIndex((_, seat) => legalForSeat(seat).length > 0);
   const seat = next < 0 ? table.current_player : next;
   if (seat === dockSeat) return;
   document.getElementById(`seat-${dockSeat}`)?.classList.remove("dock-seat");
@@ -235,6 +236,7 @@ async function performAction(seat, action) {
       seat, round_id:table.round_id, revision:table.revision, type:action.type, tile_ids:action.tile_ids
     })});
     selected = {seat:null,tileId:null};
+    inspectedSeat = null;
     acceptTable(next); showNotice("");
   } catch (e) { showNotice(e.message); await loadTable(true); }
   finally { setBusy(false); }
@@ -279,14 +281,17 @@ function renderHand(seat, p) {
     const isSelected = selected.seat === seat && selected.tileId === t.id;
     const cls = ["tile", tileClass(t.type), t.type === table.gold_tile_type ? "gold":"", t.id === last ? "drawn":"", clickable?"clickable":"", isSelected?"selected":""].filter(Boolean).join(" ");
     const acts = ta.map(a => actionNames[a.type] || a.type).join(" / ");
-    return `<button type="button" class="${cls}" data-seat="${seat}" data-tile="${t.id}" aria-pressed="${isSelected}" ${clickable?"":"disabled"} title="${tileName(t.type)}${acts?` · ${acts}`:""}">${tileFaceMarkup(t.type)}</button>`;
+    return `<button type="button" class="${cls}" data-seat="${seat}" data-tile="${t.id}" aria-pressed="${isSelected}" ${clickable?"":"disabled"} title="${tileName(t.type)}${acts?` · ${acts}`:""}">${MahjongTile.body(t.type)}</button>`;
   }).join("");
 }
 function renderMelds(p) {
   const labels = {CHI:"吃", PENG:"碰", MING_GANG:"明杠", AN_GANG:"暗杠", BU_GANG:"补杠", GANG:"杠"};
-  return p.melds.map(m => `<span class="meld"><span class="meld-name">${labels[m.type] || esc(m.type)}</span>${m.tiles
-    ? m.tiles.map(t => tileHTML(t,{small:true,gold:t===table.gold_tile_type})).join("")
-    : Array.from({length:m.count}, () => tileBackHTML("暗杠牌")).join("")}</span>`).join("");
+  return p.melds.map(m => {
+    const tiles = MahjongScene.meldOrder(p.seat, m).map(({type, sideways}) =>
+      type == null ? tileBackHTML("暗杠牌") :
+        tileHTML(type, {small:true, gold:type === table.gold_tile_type, sideways})).join("");
+    return `<span class="meld"><span class="meld-name">${labels[m.type] || esc(m.type)}</span>${tiles}</span>`;
+  }).join("");
 }
 function renderShelf(p) {
   return p.shelf_tiles.map(t => tileHTML(t,{small:true,gold:true})).join("");
@@ -393,9 +398,12 @@ function renderPlayer(seat) {
   const tools = orphanPickupControl(seat, p) + quickControl;
   const recordOpen = el.querySelector(".ai-record")?.open;
   const drawnChanged = p.last_drawn_tile != null && p.last_drawn_tile !== el.lastDrawnTile;
+  const avatar = `${icon("bird")}<b>${seatNames[seat]}</b>`;
+  const seatBadge = window.LanGame ? `<span class="seat-avatar">${avatar}</span>` :
+    `<button class="seat-avatar" type="button" data-view-seat="${seat}" aria-label="查看${seatNames[seat]}家手牌">${avatar}</button>`;
   const markup = `
     <div class="player-head">
-      <div class="player-title"><span class="seat-avatar">${icon("bird")}<b>${seatNames[seat]}</b></span><div class="player-identity">
+      <div class="player-title">${seatBadge}<div class="player-identity">
         <strong>${esc(p.nickname || `${seatNames[seat]}家`)}</strong>
         <div class="player-sub"><b class="seat-points">${esc(score)}</b><span> · ${p.concealed_count} 张</span></div>
       </div></div>
@@ -473,65 +481,6 @@ function renderResult(result) {
     }).join("")}</div>` : ""}
   </section>`;
 }
-function wallLayerHTML(layer, seat, column, layerName) {
-  const state = layer || {present:false};
-  const classes = [
-    "wall-layer", layerName, state.present ? "present" : "empty", state.reserved ? "reserved" : "",
-    state.indicator ? "indicator" : "", state.normal_cursor ? "normal-cursor" : "", state.gang_cursor ? "gang-cursor" : ""
-  ].filter(Boolean).join(" ");
-  const labels = [];
-  if (state.indicator) labels.push("金指示牌");
-  if (state.normal_cursor) labels.push("下一张正常摸牌");
-  if (state.gang_cursor) labels.push("下一张杠后补牌");
-  if (state.reserved) labels.push("保留牌墙");
-  const back = asset("tiles", "back");
-  const art = back && state.present ? `<img class="asset-image wall-image" src="${esc(back)}" alt="" draggable="false">` : "";
-  return `<span class="${classes}" data-wall-seat="${seat}" data-wall-column="${column}" data-wall-layer="${layerName}" title="${labels.join(" · ")}">${art}</span>`;
-}
-function renderWallSide(seat, position) {
-  const columns = [...(table.wall_view?.sides?.[String(seat)] || [])];
-  if (["north","west"].includes(position)) columns.reverse();
-  const breakPos = table.wall_view?.break_position;
-  const stacks = columns.map(c => {
-    const isBreak = breakPos && breakPos.side === seat && breakPos.column === c.column;
-    return `<span class="wall-stack ${isBreak ? "break-stack" : ""}" title="${seatNames[seat]}墙 第${c.column + 1}墩">
-      ${wallLayerHTML(c.bottom,seat,c.column,"bottom")}${wallLayerHTML(c.top,seat,c.column,"top")}
-    </span>`;
-  }).join("");
-  return `<div class="wall-side wall-${position}"><span class="wall-side-label">${seatNames[seat]}墙</span><div class="wall-stacks">${stacks}</div></div>`;
-}
-function renderWall() {
-  const rolled = table.phase !== "ROLLING_DICE";
-  const diceText = rolled ? `${table.dice[0]} + ${table.dice[1]} = ${table.dice[0] + table.dice[1]}` : "尚未掷骰";
-  const breakText = rolled ? `${seatNames[table.break_wall]}墙第 ${table.break_column + 1} 墩开牌` : `等待${seatNames[table.dealer]}家掷骰`;
-  const layout = visualSeatMap();
-  return `<div class="wall-stage">
-    ${renderWallSide(layout.north,"north")}
-    ${renderWallSide(layout.east,"east")}
-    <div class="wall-core">
-      ${renderRiver(layout.north,"north")}
-      ${renderRiver(layout.east,"east")}
-      <div class="wall-center-info">
-        ${renderGoldBox()}
-        <small>${esc(breakText)}${rolled ? ` · ${diceText}` : ""}</small>
-      </div>
-      ${renderRiver(layout.west,"west")}
-      ${renderRiver(layout.south,"south")}
-    </div>
-    ${renderWallSide(layout.west,"west")}
-    ${renderWallSide(layout.south,"south")}
-  </div>`;
-}
-function renderGoldBox() {
-  if (!table.gold_indicator || table.gold_tile_type == null) {
-    return `<div class="gold-box"><div class="gold-item"><span class="gold-label">金指示牌</span><span class="action-hint">掷骰后公开</span></div><div class="gold-item gold-dice"><span class="gold-label">骰子</span>${diceFaceHTML(null)}${diceFaceHTML(null)}</div></div>`;
-  }
-  return `<div class="gold-box">
-    <div class="gold-item"><span class="gold-label">金指示牌</span>${tileHTML(table.gold_indicator.type,{small:true})}</div>
-    <div class="gold-item"><span class="gold-label">金牌</span>${tileHTML(table.gold_tile_type,{small:true,gold:true})}</div>
-    <div class="gold-item gold-dice"><span class="gold-label">骰子</span>${diceFaceHTML(table.dice[0])}${diceFaceHTML(table.dice[1])}</div>
-  </div>`;
-}
 function renderCenter() {
   const el = document.getElementById("center");
   const claim = table.pending_claim;
@@ -545,27 +494,73 @@ function renderCenter() {
   const scoringNote = scoring?.status === "PENDING_CONFIGURATION" ? "<span>计分待配置</span>" : "";
   const debugOpen = el.querySelector(".table-details")?.open;
   const player = table.phase === "ROUND_END" ? "—" : `${seatNames[table.current_player]}家`;
-  el.innerHTML = `
-    ${statusCard([["牌局", `第 ${match.round_no} 局`], ["当前阶段", phaseName], ["当前玩家", player],
-      ["墙上实牌", table.wall_view?.tiles_present ?? "—"], ["本局杠数", table.gang_count]])}
+  const layout = visualSeatMap();
+  const stats = statusCard([
+    ["牌局", `第 ${match.round_no} 局`], ["庄家", `${seatNames[table.dealer]}家`],
+    ["当前阶段", phaseName], ["当前玩家", player], ["可摸牌", table.normal_tiles_remaining ?? "—"]
+  ]);
+  const rolled = table.phase !== "ROLLING_DICE";
+  const goldText = rolled && table.gold_indicator
+    ? `金指示 ${tileName(table.gold_indicator.type)} · 金牌 ${tileName(table.gold_tile_type)} · 骰子 ${table.dice.join(" + ")}` : "";
+  const breakText = rolled ? `${seatNames[table.break_wall]}墙第 ${table.break_column + 1} 墩开牌` : "";
+  const overhead = el.closest(".table-shell").classList.contains("overhead-view");
+  const markup = `
+    <div class="scene-toolbar">
+      ${stats}
+      <div class="scene-controls">
+        <button class="ghost" type="button" data-view-toggle aria-pressed="${overhead}">${overhead ? "斜视" : "俯视"}</button>
+        <button class="ghost river-toggle" type="button" data-river-toggle aria-expanded="${riversExpanded}">${riversExpanded ? "收起牌河" : "查看牌河"}</button>
+      </div>
+    </div>
     ${table.result ? renderResult(table.result) : ""}
     ${pending ? `<div class="center-message claim-message" role="status">${esc(pending)}</div>` : ""}
-    <div class="table-felt-wrap${riversExpanded ? " show-rivers" : ""}">${renderWall()}</div>
-    <button class="ghost river-toggle" type="button" data-river-toggle aria-expanded="${riversExpanded}">${riversExpanded ? "折叠牌河" : "展开牌河"}</button>
-    <div class="table-footer">
-      <div class="wall-legend" aria-label="牌墙图例"><span><i class="legend-normal"></i>摸牌端</span><span><i class="legend-tail"></i>补牌端</span><span><i class="legend-indicator"></i>金指示</span></div>
-      <div class="match-meta"><span>累计分</span>${score}${scoringNote}</div>
+    <div class="table-felt-wrap">${MahjongScene.markup(table, layout)}</div>
+    ${riversExpanded ? `<section class="river-inspector" aria-label="四家牌河">${Object.entries(layout).map(([side, seat]) => renderRiver(seat, side)).join("")}</section>` : ""}
+    <div class="table-caption">
+      ${goldText ? `<p>${esc(goldText)}</p>` : ""}
+      <div class="table-footer"><div class="match-meta"><span>累计分</span>${score}${scoringNote}</div></div>
     </div>
     ${previous ? `<div class="previous-round">${esc(previous)}</div>` : ""}
     <details class="table-details"${debugOpen ? " open" : ""}><summary>牌局详情</summary>
-      <div>庄家 ${seatNames[table.dealer]} · round ${esc(table.round_id.slice(0,8))} · revision ${table.revision}${table.test_mode ? ` · Seed ${esc(table.test_mode.seed)}` : ""}</div>
+      <div>庄家 ${seatNames[table.dealer]} · 墙上实牌 ${table.wall_view?.tiles_present ?? "—"} · 本局杠数 ${table.gang_count}${breakText ? ` · ${esc(breakText)}` : ""} · round ${esc(table.round_id.slice(0,8))} · revision ${table.revision}${table.test_mode ? ` · Seed ${esc(table.test_mode.seed)}` : ""}</div>
     </details>`;
+  if (el.renderedMarkup === markup) return;
+  const focused = document.activeElement;
+  const focusSelector = focused?.hasAttribute("data-river-toggle") ? "[data-river-toggle]" :
+    focused?.hasAttribute("data-view-toggle") ? "[data-view-toggle]" : "";
+  el.innerHTML = markup;
+  el.renderedMarkup = markup;
+  if (focusSelector) el.querySelector(focusSelector)?.focus({preventScroll:true});
 }
 function bindTableEvents() {
   document.querySelector(".table-shell").addEventListener("click", event => {
+    const sceneTile = event.target.closest("[data-scene-tile]");
+    if (sceneTile && !busy) {
+      const seat = Number(sceneTile.dataset.sceneSeat);
+      if (viewerSeat == null) {
+        inspectedSeat = seat;
+        placeHandDock();
+      }
+      document.querySelector(`#seat-${seat} .hand [data-tile="${sceneTile.dataset.sceneTile}"]`)?.click();
+      return;
+    }
+    const seatTab = event.target.closest("[data-view-seat]");
+    if (seatTab) {
+      inspectedSeat = Number(seatTab.dataset.viewSeat);
+      placeHandDock();
+      scrollToSeat(inspectedSeat);
+      return;
+    }
+    if (event.target.closest("[data-view-toggle]")) {
+      MahjongScene.setPerspective(event.currentTarget);
+      renderCenter();
+      MahjongMesh.invalidate();
+      return;
+    }
     if (event.target.closest("[data-river-toggle]")) {
       riversExpanded = !riversExpanded;
       renderCenter();
+      MahjongMesh.invalidate();
       document.querySelector("[data-river-toggle]")?.focus({preventScroll:true});
       return;
     }
@@ -593,6 +588,11 @@ function bindTableEvents() {
     selected = selected.seat === seat && selected.tileId === tileId ? {seat:null,tileId:null} : {seat,tileId};
     if (previousSeat != null && previousSeat !== seat) renderPlayer(previousSeat);
     renderPlayer(seat);
+    event.currentTarget.querySelector(".scene-selected")?.classList.remove("scene-selected");
+    if (selected.tileId != null) {
+      event.currentTarget.querySelector(`[data-scene-tile="${tileId}"]`)?.classList.add("scene-selected");
+    }
+    MahjongMesh.invalidate();
     window.LanGame?.decorate();
   });
 }
@@ -603,6 +603,7 @@ function render() {
   renderCenter();
   renderTableHud();
   placeHandDock();
+  MahjongScene.mount(document.querySelector(".table-shell"));
   if (window.LanGame) {
     window.LanGame.decorate();
     return;
@@ -628,6 +629,8 @@ async function boot() {
   document.getElementById("timeoutBtn").addEventListener("click", timeoutResponses);
   document.getElementById("focusTurn").addEventListener("click", () => {
     if (!table) return;
+    inspectedSeat = null;
+    placeHandDock();
     const seat = table.phase === "WAITING_FOR_RESPONSES"
       ? seatNames.findIndex((_, index) => legalForSeat(index).length > 0)
       : table.current_player;

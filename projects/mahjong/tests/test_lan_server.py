@@ -272,10 +272,18 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         await self.setup_room()
         await self.fixture({S:PlayerFixture([0]*3+[9,10,11,18,19,20,27,27,27,31], declared=True)}, gold=33, discard=(E,0))
         before = self.views[0]['player_view']['wall_view']['tiles_present']
+        occupied = {slot.position for slot in self.room.table.engine.state.wall.slots if not slot.drawn}
         await self.act(1, 'MING_GANG')
+        remaining = {slot.position for slot in self.room.table.engine.state.wall.slots if not slot.drawn}
+        removed, = occupied - remaining
         for state in self.views.values():
-            self.assertEqual(state['player_view']['gang_count'], 1)
-            self.assertEqual(state['player_view']['wall_view']['tiles_present'], before - 1)
+            view = state['player_view']
+            self.assertEqual(view['gang_count'], 1)
+            self.assertEqual(view['wall_view']['tiles_present'], before - 1)
+            draw = next(event for event in view['presentation_events'] if event['type'] == 'TILE_DRAWN')
+            self.assertEqual(draw['payload'], {'source':'GANG', 'position':{
+                'side':int(removed.side), 'column':removed.column, 'layer':int(removed.layer)
+            }})
         self.assert_private()
 
     async def test_an_gang_does_not_leak_in_animation_events(self):

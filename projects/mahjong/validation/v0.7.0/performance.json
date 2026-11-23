@@ -1,0 +1,184 @@
+{
+  "browser": "Chromium 154.0.8037.57",
+  "sample_ms": 950,
+  "environment": "Headless Linux, local server, Chromium device emulation for phone sizes",
+  "measurements": [
+    {
+      "viewport": "1920x1080",
+      "touch": false,
+      "cold_first_scene_ms": [
+        904,
+        476,
+        457
+      ],
+      "median_first_scene_ms": 476,
+      "frame_samples": 12,
+      "frame_interval_p50_ms": 83.3,
+      "frame_interval_p95_ms": 116.7,
+      "frame_interval_max_ms": 150.1,
+      "frame_intervals_over_32ms": 10,
+      "new_table_resources": [
+        {
+          "path": "/assets/table/backgrounds/club-room.webp",
+          "bytes": 37252
+        },
+        {
+          "path": "/assets/table/textures/walnut.webp",
+          "bytes": 19060
+        },
+        {
+          "path": "/assets/table/textures/felt.webp",
+          "bytes": 9850
+        },
+        {
+          "path": "/assets/table/decorations/dice-well.webp",
+          "bytes": 16088
+        },
+        {
+          "path": "/assets/table/textures/celadon.webp",
+          "bytes": 1918
+        }
+      ]
+    },
+    {
+      "viewport": "1366x768",
+      "touch": false,
+      "cold_first_scene_ms": [
+        1006,
+        795,
+        664
+      ],
+      "median_first_scene_ms": 795,
+      "frame_samples": 6,
+      "frame_interval_p50_ms": 150.0,
+      "frame_interval_p95_ms": 150,
+      "frame_interval_max_ms": 350,
+      "frame_intervals_over_32ms": 5,
+      "new_table_resources": [
+        {
+          "path": "/assets/table/backgrounds/club-room.webp",
+          "bytes": 37252
+        },
+        {
+          "path": "/assets/table/textures/walnut.webp",
+          "bytes": 19060
+        },
+        {
+          "path": "/assets/table/textures/felt.webp",
+          "bytes": 9850
+        },
+        {
+          "path": "/assets/table/decorations/dice-well.webp",
+          "bytes": 16088
+        },
+        {
+          "path": "/assets/table/textures/celadon.webp",
+          "bytes": 1918
+        }
+      ]
+    },
+    {
+      "viewport": "1024x768",
+      "touch": false,
+      "cold_first_scene_ms": [
+        1646,
+        783,
+        869
+      ],
+      "median_first_scene_ms": 869,
+      "frame_samples": 12,
+      "frame_interval_p50_ms": 58.3,
+      "frame_interval_p95_ms": 133.3,
+      "frame_interval_max_ms": 216.7,
+      "frame_intervals_over_32ms": 9,
+      "new_table_resources": [
+        {
+          "path": "/assets/table/backgrounds/club-room.webp",
+          "bytes": 37252
+        },
+        {
+          "path": "/assets/table/textures/walnut.webp",
+          "bytes": 19060
+        },
+        {
+          "path": "/assets/table/textures/felt.webp",
+          "bytes": 9850
+        },
+        {
+          "path": "/assets/table/decorations/dice-well.webp",
+          "bytes": 16088
+        },
+        {
+          "path": "/assets/table/textures/celadon.webp",
+          "bytes": 1918
+        }
+      ]
+    },
+    {
+      "viewport": "390x844",
+      "touch": true,
+      "cold_first_scene_ms": [
+        757,
+        416,
+        539
+      ],
+      "median_first_scene_ms": 539,
+      "frame_samples": 19,
+      "frame_interval_p50_ms": 50,
+      "frame_interval_p95_ms": 99.9,
+      "frame_interval_max_ms": 100.0,
+      "frame_intervals_over_32ms": 14,
+      "new_table_resources": [
+        {
+          "path": "/assets/table/textures/walnut.webp",
+          "bytes": 19060
+        },
+        {
+          "path": "/assets/table/textures/felt.webp",
+          "bytes": 9850
+        },
+        {
+          "path": "/assets/table/decorations/dice-well.webp",
+          "bytes": 16088
+        },
+        {
+          "path": "/assets/table/textures/celadon.webp",
+          "bytes": 1918
+        }
+      ]
+    },
+    {
+      "viewport": "844x390",
+      "touch": true,
+      "cold_first_scene_ms": [
+        1003,
+        584,
+        636
+      ],
+      "median_first_scene_ms": 636,
+      "frame_samples": 36,
+      "frame_interval_p50_ms": 16.7,
+      "frame_interval_p95_ms": 50,
+      "frame_interval_max_ms": 100,
+      "frame_intervals_over_32ms": 13,
+      "new_table_resources": [
+        {
+          "path": "/assets/table/textures/walnut.webp",
+          "bytes": 19060
+        },
+        {
+          "path": "/assets/table/textures/felt.webp",
+          "bytes": 9850
+        },
+        {
+          "path": "/assets/table/decorations/dice-well.webp",
+          "bytes": 16088
+        },
+        {
+          "path": "/assets/table/textures/celadon.webp",
+          "bytes": 1918
+        }
+      ]
+    }
+  ]
+}

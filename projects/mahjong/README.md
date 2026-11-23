@@ -1,6 +1,6 @@
-# 青雀麻将 v0.6.0
+# 青雀麻将 v0.7.0
 
-青雀麻将提供四家明牌练习和四人局域网联机。v0.6.0 增加三档 AI 托管、报听后的胡牌提示与可见剩余数量，升级翡翠牌桌和完整 SVG 牌组。规则由 Python 服务端执行。
+青雀麻将提供四家明牌练习和四人局域网联机。v0.7.0 加入具有真实透视的 2.5D 牌桌、六面麻将牌、双层牌墙与沿桌面移动的动作动画。继续支持三档 AI 托管、报听后的胡牌提示和可见剩余数量。规则由 Python 服务端执行。
 
 ## 安装与启动
 
@@ -25,6 +25,14 @@ python web_server.py
 
 服务器使用 HTTP 和 WebSocket，适用于可信局域网。房间状态保存在内存，重启即清空。进行中的座位绑定浏览器保存的身份，清除网站数据后无法恢复该座位。
 
+## 2.5D 牌桌
+
+- 点击手牌选中，再用下方操作区确认出牌、报听或上金。联机时自己的座位始终在下方。单机可点击任一座位的头像查看手牌，点「操作席」回到当前响应席位。
+- 「俯视」与「斜视」切换桌面角度。「查看牌河」按座位放大所有弃牌，可在手机上查看远处及侧面的牌面。
+- 手机竖屏将操作区固定在下方，横屏将操作区置于牌桌右侧。自己的手牌可横向滑动。浏览器启用「减少动态效果」时直接显示每次操作后的状态。
+- 顶部「余」显示规则允许的普通摸牌数。「牌局详情」另列墙上实牌总数，其中包含保留牌。桌面青色边标记正常摸牌端，暖金边标记杠后补牌端。
+- 建议使用支持 CSS 3D 的现代浏览器。游戏资源由本地服务提供，无须联网下载 3D 引擎。实际桌面需要的 ImageGen 素材约 80 KB。
+
 ## 托管与胡牌提示
 
 - 席位上的「开启托管」使用普通 AI，再点「人工接管」即可恢复手动操作。顶部「托管」可选初级、普通和高级。联机时只能切换自己的席位，刷新或重连会恢复该席位的控制方式。
@@ -47,6 +55,8 @@ python -m unittest -v tests.test_gold tests.test_win
 node --check web/app.js
 node --check web/lan.js
 node --check web/presentation.js
+node --check web/table-scene.js
+node --check web/table-mesh.js
 node --check tests/ui_smoke.cjs
 ```
 
@@ -63,6 +73,7 @@ npm run test:ui -- http://127.0.0.1:8765
 python -m pip install playwright==1.62.0
 python -m playwright install chromium
 python -m tests.browser_acceptance --screenshots browser-screenshots
+python -m tests.scene_acceptance --output scene-screenshots
 python -m tools.run_ai_matches --output ai-matches.json
 ```
 
@@ -70,7 +81,7 @@ python -m tools.run_ai_matches --output ai-matches.json
 
 ## Web 美术与浏览器验收
 
-[v0.6.0 验收报告](VALIDATION-v0.6.0.md) 收录牌面审查、自动对局结果、移动端和桌面截图。[美术升级说明](VISUAL-UPGRADE.md) 保留首轮青雀麻将资产的制作资料。
+[v0.7.0 验收报告](VALIDATION-v0.7.0.md) 收录实际浏览器截图、交互及性能结果。[2.5D 美术与渲染记录](TABLE-ART-v0.7.0.md) 收录原型对照、ImageGen 原图和上线资源。旧版规则与牌面审查见 [v0.6.0 验收报告](VALIDATION-v0.6.0.md)。
 
 ## 原版资料
 
