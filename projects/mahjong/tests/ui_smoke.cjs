@@ -80,8 +80,8 @@ const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision
       assert(!c.d.querySelector('#center').textContent.includes('Seed'));
       assert.equal(c.d.querySelectorAll('.my-seat').length, 1);
       assert(c.d.querySelector(`#seat-${viewer}`).classList.contains('south'), 'own seat must render at bottom');
-      assert(c.d.querySelector('.river-south')?.textContent.includes(`${['东','南','西','北'][viewer]}家牌河`), 'own river must stay inside the bottom wall');
-      assert.equal(c.d.querySelectorAll('.wall-layer').length, 136);
+      assert.equal(c.d.querySelector('.scene-river-side.river-south')?.dataset.riverSeat, String(viewer), 'own river must stay inside the bottom wall');
+      assert.equal(c.d.querySelectorAll('.wall-layer.present').length, Number(c.d.querySelector('#center').textContent.match(/墙上实牌 (\d+)/)?.[1]));
       assert.equal(c.d.querySelectorAll('#roster b').length, 0, 'nickname must be escaped');
       assert.equal(c.d.querySelectorAll('[data-orphan-pickup]').length, 1, 'only the owner sees a toggle');
       assert(toggle(c, viewer));
@@ -169,7 +169,7 @@ const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision
   assert.equal(dialogs.length, 0, 'pickup play never opens a dialog');
   assert.equal(local.d.querySelector(`#seat-1 .hand [data-tile="${discardedId}"]`), null);
   assert.equal(local.d.querySelectorAll('.wall-layer.present').length, wallBefore);
-  assert.equal(local.d.querySelectorAll('.river-east .river-tiles .tile').length, 0);
+  assert.equal(local.d.querySelectorAll('.scene-river-side.river-east .scene-river').length, 0);
   assert.equal(errors.length, 0, errors.join('\n'));
   console.log('PASS: four DOM clients, room setup, dealer dice, 16 synchronized moves, private hands, AI takeover, wall, XSS escaping, reconnect, local mode and orphan pickup. No script errors.');
 })().catch(e => { console.error(e); process.exitCode = 1; }).finally(() => clients.forEach(c => c.close()));

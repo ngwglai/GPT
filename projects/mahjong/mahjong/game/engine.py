@@ -119,7 +119,8 @@ class GameEngine:
         p.concealed_tiles.append(tile)
         if mark_last:
             p.last_drawn_tile, p.last_draw_source = tile, source
-        self._emit(E.TILE_DRAWN, seat, tile=tile.instance_id, source=source)
+        position = next(slot.position for slot in s.wall.slots if slot.tile == tile)
+        self._emit(E.TILE_DRAWN, seat, tile=tile.instance_id, source=source, position=self._position(position))
 
     def _shelve(self, seat: Seat, tile_id: int):
         """Shelving gold consumes the player's normal discard opportunity.
@@ -452,7 +453,8 @@ class GameEngine:
         s.current_discard = s.current_discarder = None
         s.pending_gang = None
         self._emit(E.GANG, action.seat, kind=action.type.name, tiles=list(action.tile_ids),
-                   discard=discard.instance_id if discard else None, total=s.total_gang_count)
+                   discard=discard.instance_id if discard else None, total=s.total_gang_count,
+                   source=int(source) if source is not None else None)
         tile = s.wall.draw_gang_replacement()
         self._acquire(action.seat, tile, "GANG")
         s.phase = P.TURN_ACTION
@@ -567,7 +569,7 @@ class GameEngine:
             elif kind == E.DEAL_COMPLETED:
                 payload = {}
             elif kind == E.TILE_DRAWN:
-                payload = {"source": raw.get("source")}
+                payload = {"source": raw.get("source"), "position": raw.get("position")}
             elif kind == E.TILE_DISCARDED:
                 payload = {"tile_type": raw["tile"] // 4, "declared_ting": bool(raw.get("declared_ting"))}
             elif kind == E.ORPHAN_PICKED:
@@ -576,6 +578,8 @@ class GameEngine:
                 payload = {"tile_types": [tile_id // 4 for tile_id in raw.get("tiles", ())], "source": raw.get("source")}
             elif kind in {E.GANG, E.GANG_PROPOSED}:
                 payload = {"kind": raw.get("kind"), "tile_types": [tile_id // 4 for tile_id in raw.get("tiles", ())]}
+                if raw.get("source") is not None:
+                    payload["source"] = raw["source"]
                 if self.rules.hide_an_gang and raw.get("kind") == "AN_GANG" and event.player != viewer:
                     payload = {"kind": "AN_GANG", "count": len(raw.get("tiles", ()))}
             elif kind == E.GOLD_SHELVED:
