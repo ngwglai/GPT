@@ -8,10 +8,14 @@ import argparse
 import secrets
 import threading
 from pathlib import Path
+from collections import deque
+from dataclasses import dataclass
 from decimal import Decimal
 
 from mahjong import GameEngine, RuleConfig, ScoreConfig, ScoreEngine, Seat, IllegalAction, __version__
 from mahjong.game.service import TableService
+from mahjong.game.controllers import CONTROLLERS, Decision
+from mahjong.game.visibility import ting_presentation
 
 ROOT = Path(__file__).resolve().parent
 WEB_ROOT = ROOT / "web"
@@ -36,6 +40,15 @@ def default_score_engine() -> ScoreEngine:
     ))
 
 
+@dataclass(frozen=True)
+class AITicket:
+    seat: Seat
+    mode: str
+    generation: int
+    view: dict
+    quad_pairs: bool
+
+
 class LocalTable:
     """Owns one local match and exposes only TableService views/intents.
 
@@ -57,6 +70,9 @@ class LocalTable:
         self.history: list[dict] = []
         self.total_scores = {seat: Decimal(0) for seat in Seat}
         self.score_pending = False
+        self.control_generation = {seat: 0 for seat in Seat}
+        self.control = {}
+        self.decisions = {}
         self.new_round(seed=seed, dealer=dealer)
 
     def _choose_seed(self, seed: int | None = None) -> int:
@@ -83,6 +99,8 @@ class LocalTable:
             self.history = []
             self.total_scores = {seat: Decimal(0) for seat in Seat}
             self.score_pending = False
+            self.control = {seat: "human" for seat in Seat}
+            self.decisions = {seat: deque(maxlen=8) for seat in Seat}
             return self.snapshot()
 
     def next_round(self, *, seed: int | None = None) -> dict:
@@ -119,6 +137,8 @@ class LocalTable:
             self.seed = chosen_seed
             self.dealer = next_dealer
             self.round_no += 1
+            for history in self.decisions.values():
+                history.clear()
             return self.snapshot()
 
     def scoring_view(self) -> dict:
@@ -136,11 +156,73 @@ class LocalTable:
                            for seat, value in self.total_scores.items()},
             }
 
+    def set_control(self, *, seat: Seat | None, round_id: str, mode: str) -> None:
+        with self._lock:
+            if round_id != self.engine.state.round_id:
+                raise IllegalAction("牌局已更新")
+            if not isinstance(mode, str) or mode not in CONTROLLERS:
+                raise IllegalAction("无效托管难度")
+            for target in Seat if seat is None else (seat,):
+                if self.control[target] != mode:
+                    self.control[target] = mode
+                    self.control_generation[target] += 1
+
+    def view_for(self, seat: Seat) -> dict:
+        with self._lock:
+            view = self.service.view_for(PLAYER_IDS[seat])
+            state = self.engine.state
+            view["players"][int(seat)].update(ting_presentation(
+                view, int(seat), state.players[seat], self.engine.solver))
+            for position in Seat:
+                mode = self.control[position]
+                player = view["players"][int(position)]
+                player["controller"] = mode
+                # A hidden response option can reveal the hand or private pickup intent.
+                public_turn = state.current_player == position and state.phase.name in {"TURN_ACTION", "ROLLING_DICE"}
+                player["ai_thinking"] = mode != "human" and (public_turn or (
+                    position == seat and bool(view["legal_actions"])
+                ))
+                if position == seat:
+                    player["ai_decisions"] = list(self.decisions[position])
+            return view
+
+    def ai_ticket(self) -> AITicket | None:
+        with self._lock:
+            for seat, mode in self.control.items():
+                if mode != "human" and self.engine.legal_actions(seat):
+                    view = self.service.view_for(PLAYER_IDS[seat])
+                    return AITicket(seat, mode, self.control_generation[seat], view, self.engine.rules.quad_as_two_pairs)
+        return None
+
+    def apply_ai(self, ticket: AITicket, decision: Decision | None) -> bool:
+        with self._lock:
+            state = self.engine.state
+            seat = ticket.seat
+            if (self.control[seat] != ticket.mode or self.control_generation[seat] != ticket.generation
+                    or state.round_id != ticket.view["round_id"] or state.revision != ticket.view["revision"]):
+                return False
+            if decision is None or decision.action not in ticket.view["legal_actions"]:
+                raise ValueError("AI controller must select an offered action")
+            intent = {"round_id": state.round_id, "revision": state.revision, **decision.action}
+            self.service.handle_intent(PLAYER_IDS[seat], intent)
+            self.decisions[seat].append({
+                "seat": int(seat), "difficulty": ticket.mode, "revision": ticket.view["revision"],
+                "hand": [tile["type"] for tile in ticket.view["players"][int(seat)]["concealed_tiles"]],
+                "options": ticket.view["legal_actions"], "chosen": decision.action, "reason": decision.reason,
+            })
+            return True
+
+    def human_act(self, *, seat: Seat, payload: dict) -> None:
+        with self._lock:
+            if self.control[seat] != "human":
+                raise IllegalAction("请先接管该席位")
+            self.service.handle_intent(PLAYER_IDS[seat], payload)
+
     def snapshot(self) -> dict:
         """Merge four legitimate player views for the explicit all-open test mode."""
         with self._lock:
             assert self.service is not None
-            views = {seat: self.service.view_for(PLAYER_IDS[seat]) for seat in Seat}
+            views = {seat: self.view_for(seat) for seat in Seat}
             base = views[Seat.EAST]
             players = {}
             legal_actions = {}
@@ -185,13 +267,18 @@ class LocalTable:
     def act(self, *, seat: Seat, payload: dict) -> dict:
         with self._lock:
             assert self.service is not None
-            self.service.handle_intent(PLAYER_IDS[seat], payload)
+            self.human_act(seat=seat, payload=payload)
             return self.snapshot()
 
-    def set_orphan_pickup(self, *, seat: Seat, round_id: str, enabled: bool) -> dict:
+    def update_orphan_pickup(self, *, seat: Seat, round_id: str, enabled: bool) -> None:
         with self._lock:
             assert self.service is not None
             self.service.set_orphan_pickup(PLAYER_IDS[seat], round_id, enabled)
+            self.control_generation[seat] += 1
+
+    def set_orphan_pickup(self, *, seat: Seat, round_id: str, enabled: bool) -> dict:
+        with self._lock:
+            self.update_orphan_pickup(seat=seat, round_id=round_id, enabled=enabled)
             return self.snapshot()
 
     def timeout_responses(self, *, round_id: str, revision: int) -> dict:

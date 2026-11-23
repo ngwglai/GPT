@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 66">
-<circle cx="15" cy="22" r="6.7" fill="#315c75"/><circle cx="15" cy="22" r="4.154" fill="none" stroke="#faf5df" stroke-width="0.8"/>
-<circle cx="35" cy="22" r="6.7" fill="#23674d"/><circle cx="35" cy="22" r="4.154" fill="none" stroke="#faf5df" stroke-width="0.8"/>
-<circle cx="15" cy="44" r="6.7" fill="#23674d"/><circle cx="15" cy="44" r="4.154" fill="none" stroke="#faf5df" stroke-width="0.8"/>
-<circle cx="35" cy="44" r="6.7" fill="#315c75"/><circle cx="35" cy="44" r="4.154" fill="none" stroke="#faf5df" stroke-width="0.8"/>
+<circle cx="15" cy="22" r="7.2" fill="#315c75"/><circle cx="15" cy="22" r="4.464" fill="none" stroke="#faf5df" stroke-width="1.15"/>
+<circle cx="35" cy="22" r="7.2" fill="#315c75"/><circle cx="35" cy="22" r="4.464" fill="none" stroke="#faf5df" stroke-width="1.15"/>
+<circle cx="15" cy="44" r="7.2" fill="#315c75"/><circle cx="15" cy="44" r="4.464" fill="none" stroke="#faf5df" stroke-width="1.15"/>
+<circle cx="35" cy="44" r="7.2" fill="#315c75"/><circle cx="35" cy="44" r="4.464" fill="none" stroke="#faf5df" stroke-width="1.15"/>
 </svg>

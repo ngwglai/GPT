@@ -17,16 +17,22 @@ import time
 
 from aiohttp import web, WSMsgType
 from mahjong import Seat, IllegalAction, __version__
-from web_server import LocalTable, PLAYER_IDS, WEB_ROOT
+from mahjong.game.autoplay import AutoRunner
+from web_server import LocalTable, WEB_ROOT
 
 LOG = logging.getLogger(__name__)
 ROOM_TTL = 24 * 60 * 60
 ROOMS = web.AppKey('rooms', dict)
 LOCAL = web.AppKey('local', LocalTable)
 LOCAL_LOCK = web.AppKey('local_lock', asyncio.Lock)
+LOCAL_AI = web.AppKey('local_ai', AutoRunner)
 
 
 class ClientError(ValueError):
+    pass
+
+
+class InvalidSession(ClientError):
     pass
 
 
@@ -63,6 +69,7 @@ class Room:
         self.host_id = None
         self.table: LocalTable | None = None
         self.lock = asyncio.Lock()
+        self.ai = None
         self.version = 0
         self.touched = time.monotonic()
 
@@ -84,8 +91,12 @@ class Room:
 
     def authenticate(self, token):
         if not isinstance(token, str) or token not in self.members:
-            raise ClientError('身份已失效，请重新加入房间。')
+            raise InvalidSession('身份已失效，请重新加入房间。')
         return self.members[token]
+
+    async def publish_ai(self):
+        self.touch()
+        await self.broadcast()
 
     def view(self, member):
         roster = [dict(member_id=p.member_id, nickname=p.name, seat=p.seat,
@@ -94,7 +105,7 @@ class Room:
         table = None
         if self.table and member.seat is not None:
             # One player's TableService view, never LocalTable.snapshot().
-            table = self.table.service.view_for(PLAYER_IDS[Seat(member.seat)])
+            table = self.table.view_for(Seat(member.seat))
             by_seat = {p.seat: p for p in self.members.values()}
             for seat, player in table['players'].items():
                 p = by_seat[seat]
@@ -141,17 +152,23 @@ class Room:
             if not self.view(member)['controls']['can_start']:
                 raise ClientError('需要四位玩家在线并入座，由房主开始。')
             self.table = LocalTable()
+            self.ai = AutoRunner(self.table, self.lock, self.publish_ai)
         elif kind == 'action':
             fields(data, ('type', 'intent'))
             if not self.table or member.seat is None:
                 raise ClientError('牌局尚未开始。')
-            self.table.service.handle_intent(PLAYER_IDS[Seat(member.seat)], data['intent'])
+            self.table.human_act(seat=Seat(member.seat), payload=data['intent'])
+        elif kind == 'control':
+            fields(data, ('type', 'round_id', 'mode'))
+            if not self.table or member.seat is None:
+                raise ClientError('牌局尚未开始。')
+            self.table.set_control(seat=Seat(member.seat), round_id=data['round_id'], mode=data['mode'])
         elif kind == 'orphan_pickup':
             fields(data, ('type', 'round_id', 'enabled'))
             if not self.table or member.seat is None:
                 raise ClientError('牌局尚未开始。')
             revision = self.table.engine.state.revision
-            self.table.service.set_orphan_pickup(PLAYER_IDS[Seat(member.seat)], data['round_id'], data['enabled'])
+            self.table.update_orphan_pickup(seat=Seat(member.seat), round_id=data['round_id'], enabled=data['enabled'])
             if self.table.engine.state.revision == revision:
                 return False
         elif kind == 'next_round':
@@ -199,7 +216,7 @@ def room_for(request, code):
         raise ClientError('请输入房间号。')
     room = request.app[ROOMS].get(code.strip().upper())
     if room is None:
-        raise ClientError('房间不存在或已过期。')
+        raise InvalidSession('房间不存在或已过期。')
     return room
 
 
@@ -273,6 +290,9 @@ async def websocket(request):
                 continue
             try:
                 data = json.loads(msg.data)
+                command_id = data.pop('command_id', None) if isinstance(data, dict) else None
+                if command_id is not None and (type(command_id) is not int or command_id < 1):
+                    raise ClientError('操作编号无效。')
                 async with room.lock:
                     # Recheck token: another tab may have explicitly left.
                     room.authenticate(member.token)
@@ -296,13 +316,19 @@ async def websocket(request):
                         break
                     shared = room.command(member, data)
                     await room.broadcast(only=None if shared else member)
+                    if command_id is not None:
+                        await room.send(ws, {'type': 'command_ack', 'command_id': command_id})
+                    if room.ai and any(mode != 'human' for mode in room.table.control.values()):
+                        room.ai.kick()
             except (ClientError, IllegalAction, ValueError, TypeError, KeyError) as exc:
                 await room.send(ws, {'type': 'error', 'error': str(exc)})
                 async with room.lock:
                     if member.token in room.members:
                         await room.send(ws, room.view(member))
-    except (ClientError, ValueError, TypeError, TimeoutError) as exc:
+    except InvalidSession as exc:
         await Room.send(ws, {'type': 'error', 'error': str(exc), 'invalid_session': True})
+    except (ValueError, TypeError, TimeoutError) as exc:
+        LOG.info("WebSocket authentication interrupted (%s)", type(exc).__name__)
     finally:
         if member is not None:
             async with room.lock:
@@ -362,11 +388,20 @@ async def local_api(request):
                 if type(seat) is not int or seat not in range(4):
                     raise ClientError('seat must be 0..3')
                 result = table.set_orphan_pickup(seat=Seat(seat), round_id=data['round_id'], enabled=data['enabled'])
+            elif request.path == '/api/control':
+                fields(data, ('seat', 'round_id', 'mode'))
+                seat = data['seat']
+                if seat is not None and (type(seat) is not int or seat not in range(4)):
+                    raise ClientError('seat must be 0..3 or null')
+                table.set_control(seat=None if seat is None else Seat(seat), round_id=data['round_id'], mode=data['mode'])
+                result = table.snapshot()
             elif request.path == '/api/timeout-responses':
                 fields(data, ('round_id', 'revision'))
                 result = table.timeout_responses(**data)
             else:
                 raise web.HTTPNotFound()
+        if request.method == 'POST' and any(mode != 'human' for mode in table.control.values()):
+            request.app[LOCAL_AI].kick()
     return web.json_response({'ok': True, 'table': result})
 
 
@@ -387,6 +422,8 @@ async def cleanup(app):
             now = time.monotonic()
             for code, room in list(app[ROOMS].items()):
                 if now - room.touched > ROOM_TTL and not any(p.connected for p in room.members.values()):
+                    if room.ai:
+                        await room.ai.close()
                     del app[ROOMS][code]
     task = asyncio.create_task(prune())
     yield
@@ -396,6 +433,7 @@ async def cleanup(app):
 
 
 async def shutdown(app):
+    await asyncio.gather(app[LOCAL_AI].close(), *(room.ai.close() for room in app[ROOMS].values() if room.ai))
     peers = [ws for room in app[ROOMS].values() for p in room.members.values() for ws in p.sockets]
     await asyncio.gather(*(ws.close(code=1001, message=b'Server shutdown') for ws in peers))
 
@@ -409,6 +447,7 @@ def create_app(seed=None, dealer=Seat.EAST):
     app[ROOMS] = {}
     app[LOCAL] = LocalTable(seed=seed, dealer=dealer)
     app[LOCAL_LOCK] = asyncio.Lock()
+    app[LOCAL_AI] = AutoRunner(app[LOCAL], app[LOCAL_LOCK])
     app.cleanup_ctx.append(cleanup)
     app.on_shutdown.append(shutdown)
     app.router.add_get('/api/health', health)
@@ -416,7 +455,7 @@ def create_app(seed=None, dealer=Seat.EAST):
     app.router.add_post('/api/rooms/join', join_room)
     app.router.add_get('/ws/{code}', websocket)
     app.router.add_get('/api/table', local_api)
-    for path in ('new-round', 'next-round', 'action', 'orphan-pickup', 'timeout-responses'):
+    for path in ('new-round', 'next-round', 'action', 'orphan-pickup', 'control', 'timeout-responses'):
         app.router.add_post('/api/' + path, local_api)
     app.router.add_get('/{path:.*}', static_file)
     return app

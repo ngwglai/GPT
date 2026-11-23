@@ -24,7 +24,7 @@ PIP_LAYOUTS = (
     ((15, 22), (35, 22), (15, 44), (35, 44)),
     ((14, 17), (36, 17), (25, 33), (14, 49), (36, 49)),
     tuple((x, y) for y in (15, 33, 51) for x in (16, 34)),
-    ((12, 13), (25, 22), (38, 13), (13, 34), (37, 34), (13, 52), (37, 52)),
+    ((11, 10), (25, 19), (39, 28), (15, 39), (35, 39), (15, 54), (35, 54)),
     tuple((x, y) for y in (12, 26, 40, 54) for x in (16, 34)),
     tuple((x, y) for y in (15, 33, 51) for x in (11, 25, 39)),
 )
@@ -50,13 +50,18 @@ def glyph(font, letter, x, y, width, height, color):
 
 
 def circles(rank):
-    radius = (15, 7.5, 6.5, 6.7, 5.6, 5.3, 4.7, 4.6, 4.5)[rank - 1]
+    radius = (17, 9, 7.8, 7.2, 6.8, 6.6, 5.4, 5.6, 5.4)[rank - 1]
     marks = []
     for i, (x, y) in enumerate(PIP_LAYOUTS[rank - 1]):
-        ink = RUBY if rank == 1 or (rank == 5 and i == 2) else BLUE if i % 3 == 0 else JADE
+        if rank == 1 or (rank == 5 and i == 2) or (rank == 9 and 3 <= i < 6):
+            ink = RUBY
+        elif rank == 8 or (rank == 7 and i < 3) or rank in (2, 4, 6):
+            ink = BLUE
+        else:
+            ink = JADE
         marks.append(
             f'<circle cx="{x}" cy="{y}" r="{radius}" fill="{ink}"/>'
-            f'<circle cx="{x}" cy="{y}" r="{radius * .62}" fill="none" stroke="#faf5df" stroke-width="{1.4 if rank == 1 else .8}"/>'
+            f'<circle cx="{x}" cy="{y}" r="{radius * .62}" fill="none" stroke="#faf5df" stroke-width="{2.2 if rank == 1 else 1.15}"/>'
         )
     if rank == 1:
         marks.append('<circle cx="25" cy="33" r="5" fill="#faf5df"/><circle cx="25" cy="33" r="2.5" fill="#a3322f"/>')
@@ -64,19 +69,20 @@ def circles(rank):
 
 
 BIRD = """
-<path d="M29 53q-5-1-8-7C11 45 8 34 9 22l10 8q0-8 3-11l4 10c5-1 9 1 11 5 4-6 1-12 4-17 3-5 9-4 8 1l-5 5c2 15-2 26-15 30Z" fill="#23674d"/>
-<path d="M12 31q8 11 18 10-7 2-12-1m9 10-4 8m8-7 1 5" fill="none" stroke="#8ab386" stroke-width="2" stroke-linecap="round"/>
-<path d="m43 15 3-5 1 4 3-3-1 6-6 2Z" fill="#a3322f"/>
-<circle cx="45.5" cy="18" r="1" fill="#f7efd7"/>
+<path d="M7 19c8 1 12 7 16 13 1-8 7-11 13-10 1-7 5-13 10-13 3 0 4 2 3 5l-4 4c1 13-4 25-16 30-6 2-12 0-17-4l-9-4 11-2C7 34 5 28 7 19Z" fill="#1b5a42"/>
+<path d="M13 25c5 12 13 15 20 12-5 5-13 6-19 2m16 9-4 9m9-11 2 11" fill="none" stroke="#157054" stroke-width="3" stroke-linecap="round"/>
+<path d="M13 27c4 7 10 10 17 9-3 5-10 5-16 1" fill="#f0e4be"/>
+<path d="m40 11 2-6 3 3 3-2v5Zm4 7 6-1-5 4Z" fill="#af3227"/>
+<circle cx="45" cy="13" r="1.2" fill="#fff3d4"/>
 """
 BAMBOO_LAYOUTS = {
-    2: ((25, 19), (25, 47)),
+    2: ((15, 33), (35, 33)),
     3: ((25, 16), (16, 46), (34, 46)),
     4: PIP_LAYOUTS[3],
     5: ((13, 17), (37, 17), (25, 33), (13, 49), (37, 49)),
     6: PIP_LAYOUTS[5],
-    7: ((25, 12), (12, 29), (25, 29), (38, 29), (12, 49), (25, 49), (38, 49)),
-    8: PIP_LAYOUTS[7],
+    7: ((25, 12), (11, 31), (25, 31), (39, 31), (11, 52), (25, 52), (39, 52)),
+    8: tuple((x, y) for y in (11, 26, 41, 56) for x in (15, 35)),
     9: PIP_LAYOUTS[8],
 }
 
@@ -87,19 +93,22 @@ def bamboo(rank):
     marks = []
     for i, (x, y) in enumerate(BAMBOO_LAYOUTS[rank]):
         ink = RUBY if (rank == 5 and i == 2) or (rank == 7 and i == 0) or (rank == 9 and i % 3 == 1) else JADE
+        height = 19 if rank == 2 else 7 if rank == 8 else 8
+        half = 4.3 if rank <= 6 else 3.8
+        angle = (12 if (i % 2) == ((i // 2) % 2) else -12) if rank == 8 else 0
         marks.append(
-            f'<g transform="translate({x} {y})" fill="{ink}">'
-            '<rect x="-3.7" y="-7" width="7.4" height="14" rx="2.8"/>'
-            '<path d="M-2.7 0H2.7" stroke="#f7efd7" stroke-width="1"/>'
-            '</g>'
+            f'<g transform="translate({x} {y}) rotate({angle})" fill="{ink}">'
+            f'<path d="M{-half} {-height}H{half}L3 -3 3 3 {half} {height}H{-half}L-3 3 -3 -3Z"/>'
+            f'<path d="M-2 {-height * 0.58:.2f}H2M-2 0H2M-2 {height * 0.58:.2f}H2" '
+            'stroke="#fff2d2" stroke-width="1.25" stroke-linecap="round"/></g>'
         )
     return "\n".join(marks)
 
 
 WHITE_DRAGON = """
-<path d="M13 12h24v42H13z" fill="none" stroke="#315c75" stroke-width="2.8"/>
-<path d="M17 16h16v34H17z" fill="none" stroke="#315c75" stroke-width="1.1"/>
-<path d="M17 20v-4h4m8 0h4v4m0 26v4h-4m-8 0h-4v-4" fill="none" stroke="#315c75" stroke-width="2.6"/>
+<path d="M10 11h30v44H10z" fill="none" stroke="#315c75" stroke-width="3.8"/>
+<path d="M15 16h20v34H15z" fill="none" stroke="#315c75" stroke-width="1.9"/>
+<path d="M15 21v-5h5m10 0h5v5m0 24v5h-5m-10 0h-5v-5" fill="none" stroke="#315c75" stroke-width="2.6"/>
 """
 TILE_BACK = """
 <defs><linearGradient id="jade" x2=".8" y2="1"><stop stop-color="#387e69"/><stop offset="1" stop-color="#103d36"/></linearGradient></defs>
@@ -108,7 +117,7 @@ TILE_BACK = """
 <rect x="7" y="7" width="36" height="52" rx="2" fill="none" stroke="#9dc6a5" opacity=".28"/>
 <path d="M25 18 38 33 25 48 12 33zM25 24l8 9-8 9-8-9z" fill="none" stroke="#afd2ab" opacity=".9"/>
 <path d="m25 29 4 4-4 4-4-4z" fill="#c4d6a1"/>
-<path d="M11 16v-5h5m18 0h5v5m0 34v5h-5m-18 0h-5v-5" fill="none" stroke="#afd2ab" opacity=".65"/>
+<path d="M11 16v-5h5m18 0h5v5m0 34v5h-5m-18 0h-5v-5" fill="none" stroke="#afd2ab" stroke-width="1.5" opacity=".75"/>
 """
 DICE_LAYOUTS = (
     ((16, 16),),
@@ -127,14 +136,14 @@ def main():
     args = parser.parse_args()
     with TTFont(args.font, fontNumber=args.font_index) as font:
         for i, letter in enumerate(CHINESE_NUMBERS):
-            wan = glyph(font, letter, 25, 21, 29, 20, INK)
-            wan += "\n" + glyph(font, "萬", 25, 44, 29, 23, RUBY)
+            wan = glyph(font, letter, 25, 20, 33, 22, INK)
+            wan += "\n" + glyph(font, "萬", 25, 45, 34, 25, RUBY)
             write_svg("tiles", i, "0 0 50 66", wan)
             write_svg("tiles", i + 9, "0 0 50 66", circles(i + 1))
             write_svg("tiles", i + 18, "0 0 50 66", bamboo(i + 1))
         for i, letter in enumerate("東南西北中發"):
             color = RUBY if letter == "中" else JADE if letter == "發" else INK
-            write_svg("tiles", i + 27, "0 0 50 66", glyph(font, letter, 25, 33, 35, 38, color))
+            write_svg("tiles", i + 27, "0 0 50 66", glyph(font, letter, 25, 33, 39, 44, color))
     write_svg("tiles", 33, "0 0 50 66", WHITE_DRAGON)
     write_svg("tiles", "back", "0 0 50 66", TILE_BACK)
     for rank, points in enumerate(DICE_LAYOUTS, 1):

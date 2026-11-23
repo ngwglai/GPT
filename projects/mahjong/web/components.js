@@ -34,12 +34,27 @@ function tileFaceMarkup(type) {
   const label = tileName(type);
   return imageWithFallback(asset("tiles", type), label, label, "tile-image");
 }
+class MahjongTile {
+  static body(type, {back = false, dice = false, label = "暗牌"} = {}) {
+    const concealed = back || (type == null && !dice);
+    const pips = (value, caption = "") => imageWithFallback(asset("dice", value), caption, value ?? "—", "dice-image");
+    const [near, right] = dice && type ? [[2,3],[6,3],[2,6],[2,1],[1,3],[5,3]][type - 1] : [];
+    const face = dice ? pips(type, `骰子 ${type}`) : concealed
+      ? imageWithFallback(asset("tiles", "back"), label, "暗", "tile-image") : tileFaceMarkup(type);
+    const surface = (name, value) => `<span class="${name}" aria-hidden="true">${value ? pips(value) : ""}</span>`;
+    return `<span class="tile-body${concealed ? " celadon-body" : ""}${dice ? " dice-body" : ""}">
+      <span class="tile-top">${face}</span>${surface("tile-under", dice && 7 - type)}
+      ${surface("tile-edge tile-edge-near", near)}${surface("tile-edge tile-edge-far", dice && 7 - near)}
+      ${surface("tile-edge tile-edge-left", dice && 7 - right)}${surface("tile-edge tile-edge-right", right)}
+    </span>`;
+  }
+}
 function tileBackHTML(label = "暗牌") {
-  return `<span class="tile small tile-back" title="${esc(label)}">${imageWithFallback(asset("tiles", "back"), label, "暗", "tile-image")}</span>`;
+  return `<span class="tile small tile-back" title="${esc(label)}">${MahjongTile.body(null, {label})}</span>`;
 }
 function tileHTML(type, opts = {}) {
-  const classes = ["tile", tileClass(type), opts.small ? "small" : "", opts.gold ? "gold" : "", opts.recent ? "recent" : ""].filter(Boolean).join(" ");
-  return `<span class="${classes}" title="${tileName(type)}">${tileFaceMarkup(type)}</span>`;
+  const classes = ["tile", tileClass(type), opts.small ? "small" : "", opts.gold ? "gold" : "", opts.recent ? "recent" : "", opts.sideways ? "claimed-tile" : ""].filter(Boolean).join(" ");
+  return `<span class="${classes}" title="${tileName(type)}">${MahjongTile.body(type)}</span>`;
 }
 function diceFaceHTML(value) {
   const image = value != null ? asset("dice", value) : null;

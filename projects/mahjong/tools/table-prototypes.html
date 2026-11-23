@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="zh-CN">
+  <meta charset="utf-8" /><title>青雀麻将 · 渲染原型</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background: #17211b;
+      color: #f5ebd2;
+      margin: 0;
+      padding: 26px;
+      font: 16px system-ui;
+    }
+    .panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .pane {
+      position: relative;
+      height: 425px;
+      background: #101a14;
+      overflow: hidden;
+      border: 1px solid #5a6350;
+    }
+    .camera {
+      position: absolute;
+      inset: 0;
+      perspective: 1050px;
+    }
+    .field {
+      position: absolute;
+      top: 48%;
+      left: 50%;
+      transform: rotateX(41deg);
+      transform-style: preserve-3d;
+    }
+    .rail,
+    .felt,
+    .foot {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      border-radius: 27px;
+    }
+    .rail,
+    .foot {
+      width: 460px;
+      height: 355px;
+      background: url(../web/assets/table/textures/walnut.webp) center/335px;
+      border: 1px solid #ae8556;
+    }
+    .foot {
+      transform: translate3d(-50%, -50%, -32px);
+      box-shadow: 0 0 45px #000a;
+    }
+    .felt {
+      width: 420px;
+      height: 315px;
+      transform: translate3d(-50%, -50%, 1px);
+      background:
+        radial-gradient(ellipse, #55975b1a, #021c13a0),
+        url(../web/assets/table/textures/felt.webp) center/250px;
+      border: 2px solid #c6a46a;
+      box-shadow: inset 0 0 30px #08180f;
+    }
+    .fascia {
+      position: absolute;
+      width: 420px;
+      height: 32px;
+      transform-origin: top;
+      transform: translate3d(-50%, 176px, 0) rotateX(-90deg);
+      background:
+        linear-gradient(#2420182d, #150d09b8),
+        url(../web/assets/table/textures/walnut.webp) center/335px;
+      border-radius: 0 0 18px 18px;
+    }
+    .well {
+      position: absolute;
+      width: 85px;
+      height: 85px;
+      transform: translate3d(-50%, -50%, 2px);
+    }
+    .box {
+      position: absolute;
+      width: 20px;
+      height: 29px;
+      transform-style: preserve-3d;
+    }
+    .box b,
+    .box em,
+    .box i {
+      position: absolute;
+      background: #efe3c9;
+      border-radius: 3px;
+      inset: 0;
+    }
+    .box b {
+      transform: translateZ(6px);
+      display: grid;
+      place-items: center;
+    }
+    .box img {
+      width: 86%;
+      height: 95%;
+    }
+    .box.back b {
+      background: #355343 url(../web/assets/table/textures/celadon.webp)
+        center/cover;
+    }
+    .box em {
+      height: 12px;
+      top: auto;
+      bottom: -6px;
+      transform: rotateX(-90deg);
+      background: #b5a68a;
+    }
+    .box i {
+      width: 12px;
+      left: auto;
+      right: -6px;
+      transform: rotateY(90deg);
+      background: #a99b7e;
+    }
+    p {
+      margin: 0 0 8px;
+      color: #dac49f;
+    }
+    h1 {
+      font-size: 21px;
+      margin: 0 0 24px;
+    }
+  </style>
+  <h1>青雀麻将 v0.7.0 · 同材质渲染原型</h1>
+  <div class="panels">
+    <div>
+      <p>CSS 3D + SVG</p>
+      <div class="pane">
+        <div class="camera">
+          <div class="field">
+            <div class="foot"></div>
+            <div class="fascia"></div>
+            <div class="rail"></div>
+            <div class="felt"></div>
+            <img
+              class="well"
+              src="../web/assets/table/decorations/dice-well.webp"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p>Three.js · WebGL 2</p>
+      <div class="pane" id="webgl"></div>
+    </div>
+  </div>
+  <script type="module">
+    import * as T from "../node_modules/three/build/three.module.js";
+    const field = document.querySelector(".field"),
+      area = document.querySelector("#webgl");
+    const scene = new T.Scene();
+    scene.background = new T.Color(0x101a14);
+    const render = new T.WebGLRenderer({ antialias: true });
+    render.setSize(area.clientWidth, area.clientHeight);
+    area.appendChild(render.domElement);
+    const camera = new T.PerspectiveCamera(
+      34,
+      area.clientWidth / area.clientHeight,
+      1,
+      2000,
+    );
+    camera.position.set(0, 565, 470);
+    camera.lookAt(0, 0, 0);
+    scene.add(new T.HemisphereLight(0xffecd0, 0x4c6457, 2.1));
+    const key = new T.DirectionalLight(0xffe5bd, 2);
+    key.position.set(-170, 360, 90);
+    scene.add(key);
+    const loader = new T.TextureLoader();
+    const tex = (src) => {
+      const t = loader.load("../web/assets/" + src, () =>
+        render.render(scene, camera),
+      );
+      t.colorSpace = T.SRGBColorSpace;
+      return t;
+    };
+    function mesh(w, h, d, x, y, z, material) {
+      const m = new T.Mesh(new T.BoxGeometry(w, h, d), material);
+      m.position.set(x, z, y);
+      scene.add(m);
+      return m;
+    }
+    const standard = (color, map = null) =>
+      new T.MeshStandardMaterial({ color, map, roughness: 0.84 });
+    mesh(
+      460,
+      32,
+      355,
+      0,
+      0,
+      -16,
+      standard(0xa87a57, tex("table/textures/walnut.webp")),
+    );
+    mesh(
+      420,
+      2,
+      315,
+      0,
+      0,
+      0,
+      standard(0x8d9277, tex("table/textures/felt.webp")),
+    );
+    const ring = new T.Mesh(
+      new T.CircleGeometry(42, 48),
+      new T.MeshBasicMaterial({
+        map: tex("table/decorations/dice-well.webp"),
+        transparent: true,
+      }),
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = 2;
+    scene.add(ring);
+    const side = standard(0xbdb095),
+      back = standard(0xc0c3ad, tex("table/textures/celadon.webp"));
+    const faces = new Map();
+    function tile(x, y, z, id, angle = 0) {
+      const el = document.createElement("div");
+      el.className = "box" + (id == null ? " back" : "");
+      el.style.transform =
+        "translate3d(" +
+        x +
+        "px," +
+        y +
+        "px," +
+        z +
+        "px) rotateZ(" +
+        angle +
+        "deg) translate(-50%,-50%)";
+      el.innerHTML =
+        "<em></em><i></i><b>" +
+        (id == null ? "" : '<img src="../web/assets/tiles/' + id + '.svg">') +
+        "</b>";
+      field.appendChild(el);
+      if (id != null && !faces.has(id)) {
+        const c = document.createElement("canvas");
+        c.width = 100;
+        c.height = 145;
+        const ctx = c.getContext("2d");
+        ctx.fillStyle = "#f5e9ce";
+        ctx.fillRect(0, 0, c.width, c.height);
+        const texture = new T.CanvasTexture(c);
+        texture.colorSpace = T.SRGBColorSpace;
+        faces.set(id, standard(0xffffff, texture));
+        const i = new Image();
+        i.onload = () => {
+          ctx.drawImage(i, 5, 7, 90, 131);
+          texture.needsUpdate = true;
+          render.render(scene, camera);
+        };
+        i.src = "../web/assets/tiles/" + id + ".svg";
+      }
+      const m = mesh(20, 12, 29, x, y, z, [
+        side,
+        side,
+        id == null ? back : faces.get(id),
+        side,
+        side,
+        side,
+      ]);
+      m.rotation.y = (-angle * Math.PI) / 180;
+    }
+    for (let i = 0; i < 11; i++)
+      for (const z of [6, 19]) {
+        tile((i - 5) * 21, -101, z, null);
+        tile((i - 5) * 21, 101, z, null);
+        tile(-143, (i - 5) * 18, z, null, 90);
+        tile(143, (i - 5) * 18, z, null, -90);
+      }
+    [0, 10, 14, 24, 32, 28].forEach((n, i) => tile((i - 2.5) * 22, 66, 6, n));
+    [17, 23, 33].forEach((n, i) => tile((i - 1) * 23, -63, 6, n, 180));
+    render.render(scene, camera);
+    document.body.dataset.ready = "true";
+  </script>
+</html>

@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 66">
-<circle cx="16" cy="12" r="4.6" fill="#315c75"/><circle cx="16" cy="12" r="2.852" fill="none" stroke="#faf5df" stroke-width="0.8"/>
-<circle cx="34" cy="12" r="4.6" fill="#23674d"/><circle cx="34" cy="12" r="2.852" fill="none" stroke="#faf5df" stroke-width="0.8"/>
-<circle cx="16" cy="26" r="4.6" fill="#23674d"/><circle cx="16" cy="26" r="2.852" fill="none" stroke="#faf5df" stroke-width="0.8"/>
-<circle cx="34" cy="26" r="4.6" fill="#315c75"/><circle cx="34" cy="26" r="2.852" fill="none" stroke="#faf5df" stroke-width="0.8"/>
-<circle cx="16" cy="40" r="4.6" fill="#23674d"/><circle cx="16" cy="40" r="2.852" fill="none" stroke="#faf5df" stroke-width="0.8"/>
-<circle cx="34" cy="40" r="4.6" fill="#23674d"/><circle cx="34" cy="40" r="2.852" fill="none" stroke="#faf5df" stroke-width="0.8"/>
-<circle cx="16" cy="54" r="4.6" fill="#315c75"/><circle cx="16" cy="54" r="2.852" fill="none" stroke="#faf5df" stroke-width="0.8"/>
-<circle cx="34" cy="54" r="4.6" fill="#23674d"/><circle cx="34" cy="54" r="2.852" fill="none" stroke="#faf5df" stroke-width="0.8"/>
+<circle cx="16" cy="12" r="5.6" fill="#315c75"/><circle cx="16" cy="12" r="3.472" fill="none" stroke="#faf5df" stroke-width="1.15"/>
+<circle cx="34" cy="12" r="5.6" fill="#315c75"/><circle cx="34" cy="12" r="3.472" fill="none" stroke="#faf5df" stroke-width="1.15"/>
+<circle cx="16" cy="26" r="5.6" fill="#315c75"/><circle cx="16" cy="26" r="3.472" fill="none" stroke="#faf5df" stroke-width="1.15"/>
+<circle cx="34" cy="26" r="5.6" fill="#315c75"/><circle cx="34" cy="26" r="3.472" fill="none" stroke="#faf5df" stroke-width="1.15"/>
+<circle cx="16" cy="40" r="5.6" fill="#315c75"/><circle cx="16" cy="40" r="3.472" fill="none" stroke="#faf5df" stroke-width="1.15"/>
+<circle cx="34" cy="40" r="5.6" fill="#315c75"/><circle cx="34" cy="40" r="3.472" fill="none" stroke="#faf5df" stroke-width="1.15"/>
+<circle cx="16" cy="54" r="5.6" fill="#315c75"/><circle cx="16" cy="54" r="3.472" fill="none" stroke="#faf5df" stroke-width="1.15"/>
+<circle cx="34" cy="54" r="5.6" fill="#315c75"/><circle cx="34" cy="54" r="3.472" fill="none" stroke="#faf5df" stroke-width="1.15"/>
 </svg>

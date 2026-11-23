@@ -120,7 +120,8 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
             for seat in range(4):
                 p = view['players'][str(seat)]
                 self.assertEqual(p['concealed_count'], len(self.room.table.engine.state.players[Seat(seat)].concealed_tiles))
-                for key in ('concealed_tiles', 'current_waits', 'declared_waits', 'last_drawn_tile', 'orphan_pickup_enabled'):
+                for key in ('concealed_tiles', 'current_waits', 'declared_waits', 'last_drawn_tile',
+                            'orphan_pickup_enabled', 'wait_hint', 'ai_decisions'):
                     self.assertEqual(key in p, seat == viewer, (seat, viewer, key))
                 if seat != viewer and p['ting_tile']:
                     self.assertEqual(p['ting_tile'], {'hidden': True})
@@ -157,6 +158,14 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
             ws = await self.open_socket({'room_code': code, 'session_token': 'forged'})
             error = await self.read(ws, lambda m: m.get('type') == 'error')
             self.assertTrue(error['invalid_session'])
+
+    async def test_interrupted_authentication_leaves_saved_identity_valid(self):
+        c = await self.post('/api/rooms', {'nickname': '房主'})
+        async with self.http.ws_connect(self.url + '/ws/' + c['room_code']) as interrupted:
+            await interrupted.send_str('{')
+            self.assertEqual((await interrupted.receive(timeout=5)).type, web.WSMsgType.CLOSE)
+        recovered = await self.open_socket(c)
+        self.assertEqual((await self.read(recovered))['room']['code'], c['room_code'])
 
     async def test_identity_dealer_illegal_stale_and_hidden_data(self):
         await self.setup_room()
@@ -271,10 +280,19 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         await self.setup_room()
         await self.fixture({S:PlayerFixture([0]*3+[9,10,11,18,19,20,27,27,27,31], declared=True)}, gold=33, discard=(E,0))
         before = self.views[0]['player_view']['wall_view']['tiles_present']
+        occupied = {slot.position for slot in self.room.table.engine.state.wall.slots if not slot.drawn}
         await self.act(1, 'MING_GANG')
+        remaining = {slot.position for slot in self.room.table.engine.state.wall.slots if not slot.drawn}
+        removed, = occupied - remaining
+        self.assertEqual((int(removed.side), removed.column, int(removed.layer)), (2, 16, 0))
         for state in self.views.values():
-            self.assertEqual(state['player_view']['gang_count'], 1)
-            self.assertEqual(state['player_view']['wall_view']['tiles_present'], before - 1)
+            view = state['player_view']
+            self.assertEqual(view['gang_count'], 1)
+            self.assertEqual(view['wall_view']['tiles_present'], before - 1)
+            draw = next(event for event in view['presentation_events'] if event['type'] == 'TILE_DRAWN')
+            self.assertEqual(draw['payload'], {'source':'GANG', 'position':{
+                'side':int(removed.side), 'column':removed.column, 'layer':int(removed.layer)
+            }})
         self.assert_private()
 
     async def test_an_gang_does_not_leak_in_animation_events(self):
@@ -312,9 +330,40 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         from tests.test_gold import WAIT
         await self.setup_room()
         await self.fixture({E:PlayerFixture(WAIT+[7], last_draw_type=7)}, gold=33)
+        self.assertIn('ting_previews', self.views[0]['player_view']['players']['0'])
+        self.assertNotIn('ting_previews', self.views[1]['player_view']['players']['0'])
         await self.act(0, 'DECLARE_TING')
-        self.assertIsNotNone(self.views[0]['player_view']['players']['0']['ting_tile'])
+        own = self.views[0]['player_view']['players']['0']
+        self.assertIsNotNone(own['ting_tile'])
+        self.assertEqual([hint['type'] for hint in own['wait_hint']], own['current_waits'])
+        self.assertTrue(own['wait_hint'])
+        self.assertTrue(own['wait_patterns'])
+        self.assertNotIn('wait_patterns', self.views[1]['player_view']['players']['0'])
         self.assert_private()
+
+    async def test_owner_controls_managed_seat_across_reconnect(self):
+        await self.setup_room()
+        command = {'type': 'control', 'round_id': self.room.table.engine.state.round_id, 'mode': 'normal'}
+        await self.reject(0, {**command, 'seat': 1})
+        await self.reject(1, {**command, 'round_id': 'stale'})
+        await self.clients[1].send_json(command)
+        await self.all_states(lambda m: m['player_view']['players']['1']['controller'] == 'normal')
+        self.assert_private()
+        await self.clients[1].close()
+        await self.read(self.clients[0], lambda m: not m['player_view']['players']['1']['connected'])
+        self.clients[1] = await self.open_socket(self.credentials[1])
+        resumed = await self.read(self.clients[1])
+        self.assertEqual(resumed['player_view']['players']['1']['controller'], 'normal')
+
+        await self.fixture({S: PlayerFixture([4], last_draw_type=4)}, gold=33, current=S)
+        self.room.ai.kick()
+        await self.all_states(lambda m: m['player_view']['revision'] == 1)
+        self.assert_private()
+        own = self.views[1]['player_view']['players']['1']
+        self.assertEqual(own['ai_decisions'][0]['hand'], [4])
+        self.assertEqual(own['ai_decisions'][0]['chosen']['type'], 'DISCARD')
+        await self.clients[1].send_json({**command, 'round_id': self.room.table.engine.state.round_id, 'mode': 'human'})
+        await self.all_states(lambda m: m['player_view']['players']['1']['controller'] == 'human')
 
     async def test_orphan_pickup_intent_only_updates_owner_and_survives_reconnect(self):
         await self.setup_room()

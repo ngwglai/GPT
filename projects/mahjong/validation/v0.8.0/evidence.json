@@ -1,0 +1,311 @@
+{
+  "browser": "154.0.8037.57",
+  "viewports": {
+    "1920x1080": {
+      "hand": {
+        "count": 14,
+        "width": 64,
+        "height": 83.828125,
+        "inViewport": true,
+        "singleRow": true,
+        "noOverlap": true,
+        "noScroll": true,
+        "bottom": true,
+        "drawGap": 17,
+        "normalGap": 4
+      },
+      "waitingHand": {
+        "count": 13,
+        "width": 64,
+        "height": 83.828125,
+        "inViewport": true,
+        "singleRow": true,
+        "noOverlap": true,
+        "noScroll": true,
+        "bottom": true,
+        "drawGap": 4,
+        "normalGap": 4
+      },
+      "match": {
+        "inStage": false,
+        "inViewport": false,
+        "clearPanels": true,
+        "noHorizontalScroll": true,
+        "public": true,
+        "standingBacks": true,
+        "scale": 1.68,
+        "riverWidth": 52.237060546875
+      },
+      "full": {
+        "inStage": true,
+        "inViewport": true,
+        "clearPanels": true,
+        "noHorizontalScroll": true,
+        "public": true,
+        "standingBacks": true,
+        "scale": 1.1656524335311544,
+        "riverWidth": 34.0892333984375
+      }
+    },
+    "1366x768": {
+      "hand": {
+        "count": 14,
+        "width": 64,
+        "height": 83.828125,
+        "inViewport": true,
+        "singleRow": true,
+        "noOverlap": true,
+        "noScroll": true,
+        "bottom": true,
+        "drawGap": 16.140625,
+        "normalGap": 3.140625
+      },
+      "waitingHand": {
+        "count": 13,
+        "width": 64,
+        "height": 83.828125,
+        "inViewport": true,
+        "singleRow": true,
+        "noOverlap": true,
+        "noScroll": true,
+        "bottom": true,
+        "drawGap": 3.140625,
+        "normalGap": 3.140625
+      },
+      "match": {
+        "inStage": false,
+        "inViewport": false,
+        "clearPanels": false,
+        "noHorizontalScroll": true,
+        "public": true,
+        "standingBacks": true,
+        "scale": 1.3602879212650658,
+        "riverWidth": 42.61627197265625
+      },
+      "full": {
+        "inStage": true,
+        "inViewport": true,
+        "clearPanels": true,
+        "noHorizontalScroll": true,
+        "public": true,
+        "standingBacks": true,
+        "scale": 0.7081888369755316,
+        "riverWidth": 20.71087646484375
+      }
+    },
+    "844x390": {
+      "hand": {
+        "count": 14,
+        "width": 40,
+        "height": 52.390625,
+        "inViewport": true,
+        "singleRow": true,
+        "noOverlap": true,
+        "noScroll": true,
+        "bottom": true,
+        "drawGap": 10.375,
+        "normalGap": 1.9375
+      },
+      "waitingHand": {
+        "count": 13,
+        "width": 40,
+        "height": 52.390625,
+        "inViewport": true,
+        "singleRow": true,
+        "noOverlap": true,
+        "noScroll": true,
+        "bottom": true,
+        "drawGap": 1.9375,
+        "normalGap": 1.9375
+      },
+      "match": {
+        "inStage": false,
+        "inViewport": true,
+        "clearPanels": true,
+        "noHorizontalScroll": true,
+        "public": true,
+        "standingBacks": true,
+        "scale": 0.5284806193992225,
+        "riverWidth": 16.686614990234375
+      },
+      "full": {
+        "inStage": true,
+        "inViewport": true,
+        "clearPanels": true,
+        "noHorizontalScroll": true,
+        "public": true,
+        "standingBacks": true,
+        "scale": 0.2067383561357142,
+        "riverWidth": 6.0460205078125
+      }
+    },
+    "390x844": {
+      "hand": {
+        "count": 14,
+        "width": 25.5,
+        "height": 44,
+        "inViewport": true,
+        "singleRow": true,
+        "noOverlap": true,
+        "noScroll": true,
+        "bottom": true,
+        "drawGap": 5,
+        "normalGap": 1
+      },
+      "waitingHand": {
+        "count": 13,
+        "width": 25.5,
+        "height": 44,
+        "inViewport": true,
+        "singleRow": true,
+        "noOverlap": true,
+        "noScroll": true,
+        "bottom": true,
+        "drawGap": 1,
+        "normalGap": 1
+      },
+      "match": {
+        "inStage": false,
+        "inViewport": false,
+        "clearPanels": true,
+        "noHorizontalScroll": true,
+        "public": true,
+        "standingBacks": true,
+        "scale": 0.38576118760855355,
+        "riverWidth": 11.598785400390625
+      },
+      "full": {
+        "inStage": true,
+        "inViewport": true,
+        "clearPanels": true,
+        "noHorizontalScroll": true,
+        "public": true,
+        "standingBacks": true,
+        "scale": 0.32803909451909036,
+        "riverWidth": 9.59344482421875
+      }
+    },
+    "1180x820": {
+      "hand": {
+        "count": 14,
+        "width": 64,
+        "height": 83.828125,
+        "inViewport": true,
+        "singleRow": true,
+        "noOverlap": true,
+        "noScroll": true,
+        "bottom": true,
+        "drawGap": 14.5,
+        "normalGap": 2.703125
+      },
+      "waitingHand": {
+        "count": 13,
+        "width": 64,
+        "height": 83.828125,
+        "inViewport": true,
+        "singleRow": true,
+        "noOverlap": true,
+        "noScroll": true,
+        "bottom": true,
+        "drawGap": 2.703125,
+        "normalGap": 2.703125
+      },
+      "match": {
+        "inStage": false,
+        "inViewport": false,
+        "clearPanels": false,
+        "noHorizontalScroll": true,
+        "public": true,
+        "standingBacks": true,
+        "scale": 1.210332621526563,
+        "riverWidth": 37.51361083984375
+      },
+      "full": {
+        "inStage": true,
+        "inViewport": true,
+        "clearPanels": true,
+        "noHorizontalScroll": true,
+        "public": true,
+        "standingBacks": true,
+        "scale": 0.784432769734802,
+        "riverWidth": 22.940582275390625
+      }
+    },
+    "820x1180": {
+      "hand": {
+        "count": 14,
+        "width": 43,
+        "height": 56.328125,
+        "inViewport": true,
+        "singleRow": true,
+        "noOverlap": true,
+        "noScroll": true,
+        "bottom": true,
+        "drawGap": 10.0625,
+        "normalGap": 1.875
+      },
+      "waitingHand": {
+        "count": 13,
+        "width": 43,
+        "height": 56.328125,
+        "inViewport": true,
+        "singleRow": true,
+        "noOverlap": true,
+        "noScroll": true,
+        "bottom": true,
+        "drawGap": 1.875,
+        "normalGap": 1.875
+      },
+      "match": {
+        "inStage": false,
+        "inViewport": false,
+        "clearPanels": true,
+        "noHorizontalScroll": true,
+        "public": true,
+        "standingBacks": true,
+        "scale": 0.8465314950298813,
+        "riverWidth": 25.452911376953125
+      },
+      "full": {
+        "inStage": true,
+        "inViewport": true,
+        "clearPanels": true,
+        "noHorizontalScroll": true,
+        "public": true,
+        "standingBacks": true,
+        "scale": 0.7265046613078159,
+        "riverWidth": 21.24652099609375
+      }
+    }
+  },
+  "transport": {
+    "syntheticTouchScale": 1,
+    "pageScales": [
+      1.75,
+      1,
+      2,
+      1
+    ],
+    "visualViewportEvents": 7,
+    "resizeEvents": 5,
+    "lifecycleEvents": [],
+    "simulatedVisibilityEvents": [
+      true,
+      false
+    ],
+    "socketsDuringVisualChanges": 1,
+    "closeCodes": [
+      1000,
+      1006
+    ],
+    "reconnects": 2,
+    "roundAndSeatStable": true,
+    "privateSeat": [
+      1
+    ],
+    "revisionBefore": 0,
+    "revisionAfter": 1,
+    "acceptedCommands": 1,
+    "pageErrors": []
+  }
+}

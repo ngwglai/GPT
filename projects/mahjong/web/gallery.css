@@ -17,17 +17,18 @@
 .scene-preview { aspect-ratio: 3 / 2; }
 .scene-lobby { background-image: var(--lobby-art, url("/assets/backgrounds/tearoom.webp")); }
 .scene-felt { background-image: var(--table-felt, url("/assets/table/jade-felt.webp")); }
-.tile-catalog { display: grid; gap: 14px; }
+.tile-catalog { display: grid; gap: 14px; max-width: 760px; }
 .tile-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 9px;
+  gap: clamp(5px, 1.1vw, 14px);
   padding: 11px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: #19382f;
 }
 .tile-group figure { display: grid; justify-items: center; gap: 5px; padding: 2px; }
+.tile-group .tile { --tile-width: clamp(37px, 4.8vw, 58px); }
 .tile-group figcaption { color: var(--muted); font-size: 12px; }
 .gallery-samples { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-top: 12px; }
 .gallery-samples > div { padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #19382f; }

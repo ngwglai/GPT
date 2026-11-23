@@ -19,12 +19,13 @@ from ..core.player import PlayerState, Meld, MeldType
 from ..core.seat import Seat, next_seat, previous_seat, turn_order
 from ..core.state import Discard, GamePhase as P, GameState, RuleConfig, RoundResult
 from ..core.tile import Tile, make_deck
-from ..core.wall import WallState, WallExhausted, validate_dice
+from ..core.wall import COLUMNS_PER_WALL, WallState, WallExhausted, validate_dice
 from ..rules.dealer import determine_next_dealer
 from ..rules.gold import get_opposite_tile
 from ..rules.gang import simulate_gang
 from ..rules.response import ResponseResolver
 from ..rules.scoring import HuEffect, ScoreEngine
+from .visibility import wait_hint
 from ..rules.thirteen_orphans import (
     advance_pickup_cycle, check_player_hu, claim_pickup, find_player_waits, orphans_locked, pickup_action,
 )
@@ -118,7 +119,8 @@ class GameEngine:
         p.concealed_tiles.append(tile)
         if mark_last:
             p.last_drawn_tile, p.last_draw_source = tile, source
-        self._emit(E.TILE_DRAWN, seat, tile=tile.instance_id, source=source)
+        position = next(slot.position for slot in s.wall.slots if slot.tile == tile)
+        self._emit(E.TILE_DRAWN, seat, tile=tile.instance_id, source=source, position=self._position(position))
 
     def _shelve(self, seat: Seat, tile_id: int):
         """Shelving gold consumes the player's normal discard opportunity.
@@ -451,7 +453,8 @@ class GameEngine:
         s.current_discard = s.current_discarder = None
         s.pending_gang = None
         self._emit(E.GANG, action.seat, kind=action.type.name, tiles=list(action.tile_ids),
-                   discard=discard.instance_id if discard else None, total=s.total_gang_count)
+                   discard=discard.instance_id if discard else None, total=s.total_gang_count,
+                   source=int(source) if source is not None else None)
         tile = s.wall.draw_gang_replacement()
         self._acquire(action.seat, tile, "GANG")
         s.phase = P.TURN_ACTION
@@ -514,31 +517,23 @@ class GameEngine:
     def _wall_public_view(self, reveal_break: bool) -> dict:
         """Public geometry only: never expose the types/IDs of undrawn wall tiles."""
         s = self.state
-        reserved = set()
-        if reveal_break:
-            limit = s.wall.normal_limit(s.total_gang_count)
-            reserved = {s.wall._order[i] for i in range(limit, 136)}
-        normal_cursor = s.wall.normal_draw_cursor if reveal_break else None
+        reserved = s.wall.reserved_positions(s.total_gang_count) if reveal_break else set()
+        normal_cursor = None
+        if reveal_break and not s.wall.is_normal_draw_exhausted(s.total_gang_count):
+            normal_cursor = s.wall.normal_draw_cursor
         gang_cursor = s.wall.gang_draw_cursor if reveal_break else None
-        sides = {}
-        for side in Seat:
-            columns = []
-            for column in range(17):
-                layers = {}
-                for layer_name, layer_value in (("top", 0), ("bottom", 1)):
-                    index = int(side) * 34 + column * 2 + layer_value
-                    slot = s.wall.slots[index]
-                    layers[layer_name] = {
-                        "present": not slot.drawn,
-                        "reserved": index in reserved,
-                        "indicator": bool(reveal_break and slot.is_gold_indicator),
-                        "normal_cursor": bool(normal_cursor is not None and slot.position == normal_cursor),
-                        "gang_cursor": bool(gang_cursor is not None and slot.position == gang_cursor),
-                    }
-                columns.append({"column": column, **layers})
-            sides[str(int(side))] = columns
+        sides = {side: [{"column": column} for column in range(COLUMNS_PER_WALL)] for side in Seat}
+        for slot in s.wall.slots:
+            position = slot.position
+            sides[position.side][position.column][position.layer.name.lower()] = {
+                "present": not slot.drawn,
+                "reserved": position in reserved,
+                "indicator": reveal_break and slot.is_gold_indicator,
+                "normal_cursor": position == normal_cursor,
+                "gang_cursor": position == gang_cursor,
+            }
         return {
-            "sides": sides,
+            "sides": {str(int(side)): columns for side, columns in sides.items()},
             "tiles_present": sum(not slot.drawn for slot in s.wall.slots),
             "break_position": self._position(s.wall.original_break_position) if reveal_break else None,
             "draw_cursor": self._position(normal_cursor) if normal_cursor is not None else None,
@@ -566,7 +561,7 @@ class GameEngine:
             elif kind == E.DEAL_COMPLETED:
                 payload = {}
             elif kind == E.TILE_DRAWN:
-                payload = {"source": raw.get("source")}
+                payload = {"source": raw.get("source"), "position": raw.get("position")}
             elif kind == E.TILE_DISCARDED:
                 payload = {"tile_type": raw["tile"] // 4, "declared_ting": bool(raw.get("declared_ting"))}
             elif kind == E.ORPHAN_PICKED:
@@ -575,6 +570,8 @@ class GameEngine:
                 payload = {"tile_types": [tile_id // 4 for tile_id in raw.get("tiles", ())], "source": raw.get("source")}
             elif kind in {E.GANG, E.GANG_PROPOSED}:
                 payload = {"kind": raw.get("kind"), "tile_types": [tile_id // 4 for tile_id in raw.get("tiles", ())]}
+                if raw.get("source") is not None:
+                    payload["source"] = raw["source"]
                 if self.rules.hide_an_gang and raw.get("kind") == "AN_GANG" and event.player != viewer:
                     payload = {"kind": "AN_GANG", "count": len(raw.get("tiles", ()))}
             elif kind == E.GOLD_SHELVED:
@@ -648,7 +645,7 @@ class GameEngine:
             pending_claim = {"kind": s.response_kind, "source": int(s.current_discarder), "tile_type": s.current_discard.type_id}
         dice_revealed = s.phase != P.ROLLING_DICE
         wall_view = self._wall_public_view(dice_revealed)
-        return {"round_id": s.round_id, "revision": s.revision, "phase": visible_phase,
+        view = {"round_id": s.round_id, "revision": s.revision, "phase": visible_phase,
                 "dealer": int(s.dealer), "current_player": int(s.current_player), "players": players,
                 "dice": [s.dice1, s.dice2] if dice_revealed else [None, None],
                 "break_wall": int(s.break_wall) if dice_revealed else None,
@@ -666,6 +663,8 @@ class GameEngine:
                 "discards": [{"seat": int(d.seat), "type": d.tile.type_id, "claimed": d.claimed} for d in s.discards],
                 "legal_actions": [{"type": a.type.name, "tile_ids": list(a.tile_ids)} for a in self.legal_actions(viewer)],
                 "result": result}
+        players[int(viewer)]["wait_hint"] = wait_hint(view, int(viewer))
+        return view
 
     def assert_invariants(self):
         """Physical conservation gate after every mutation, including debug states."""

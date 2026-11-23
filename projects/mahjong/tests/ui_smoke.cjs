@@ -38,7 +38,10 @@ async function create(page = '/lan.html', saved = null) {
 }
 const visible = el => el && !el.closest('.hidden');
 const toggle = (c, seat) => c.d.querySelector(`[data-orphan-pickup="${seat}"]`);
-const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision (\d+)/)?.[1]);
+const ai = (c, seat) => c.d.querySelector(`[data-ai-toggle="${seat}"]`);
+const details = c => c.d.querySelector('.table-details')?.textContent || '';
+const rev = c => Number(details(c).match(/revision (\d+)/)?.[1]);
+const idle = c => !c.d.querySelector('#leaveRoom').disabled;
 (async () => {
   const a = await create();
   a.d.querySelector('#nickname').value = '东家测试';
@@ -64,6 +67,7 @@ const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision
   await wait(() => seats.every(c => visible(c.d.querySelector('#gameTable'))), 'all tables');
   assert.equal(a.d.querySelectorAll('[data-action-key="ROLL_DICE:"]').length, 1);
   for (const c of seats.slice(1)) assert.equal(c.d.querySelectorAll('[data-action-key="ROLL_DICE:"]').length, 0);
+  await wait(() => idle(a), 'start acknowledgment');
   a.d.querySelector('[data-action-key="ROLL_DICE:"]').click();
   await wait(() => seats.every(c => rev(c) === 1), 'deal synchronization');
   function checkHands() {
@@ -76,17 +80,24 @@ const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision
           assert.equal(hand.querySelectorAll('.tile:not(.tile-back)').length, 0);
         }
       }
-      assert(!c.d.querySelector('#center').textContent.includes('Seed'));
+      assert(!details(c).includes('Seed'));
       assert.equal(c.d.querySelectorAll('.my-seat').length, 1);
       assert(c.d.querySelector(`#seat-${viewer}`).classList.contains('south'), 'own seat must render at bottom');
-      assert(c.d.querySelector('.river-south')?.textContent.includes(`${['东','南','西','北'][viewer]}家牌河`), 'own river must stay inside the bottom wall');
-      assert.equal(c.d.querySelectorAll('.wall-layer').length, 136);
+      assert.equal(c.d.querySelector('.scene-river-side.river-south')?.dataset.riverSeat, String(viewer), 'own river must stay inside the bottom wall');
+      assert.equal(c.d.querySelectorAll('.wall-layer.present').length, Number(details(c).match(/墙上实牌 (\d+)/)?.[1]));
       assert.equal(c.d.querySelectorAll('#roster b').length, 0, 'nickname must be escaped');
       assert.equal(c.d.querySelectorAll('[data-orphan-pickup]').length, 1, 'only the owner sees a toggle');
       assert(toggle(c, viewer));
     }
   }
   checkHands();
+  ai(seats[1], 1).click();
+  await wait(() => a.d.querySelector('#seat-1 .ai-badge'), 'public managed badge');
+  assert.equal(ai(a, 1), null, 'peer cannot control a managed seat');
+  assert.equal(ai(seats[1], 1).textContent, '人工接管');
+  await wait(() => idle(seats[1]), 'AI takeover acknowledgment');
+  ai(seats[1], 1).click();
+  await wait(() => !a.d.querySelector('#seat-1 .ai-badge'), 'manual control restored');
   toggle(seats[2], 2).click();
   await wait(() => toggle(seats[2], 2).getAttribute('aria-pressed') === 'true', 'owner opted in');
   assert.equal(rev(seats[2]), 1);
@@ -103,6 +114,7 @@ const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision
   assert.equal(seats[2].d.querySelector('#yourSeat').textContent, '你是西家');
   assert.equal(seats[2].d.querySelector('#seat-2 .hand').textContent, before);
   for (let step = 0; step < 16; step++) {
+    await wait(() => seats.every(idle), 'previous move acknowledgment');
     const revision = rev(seats[0]);
     let chosen = null;
     for (const c of seats) {
@@ -126,10 +138,15 @@ const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision
   }
   const local = await create('/local.html');
   await wait(() => local.d.querySelector('[data-action-key="ROLL_DICE:"]'), 'local mode');
-  const originalRound = local.d.querySelector('#center').textContent.match(/round ([a-f0-9]+)/)[1];
+  const originalRound = details(local).match(/round ([a-f0-9]+)/)[1];
   local.d.querySelector('#seedInput').value = '42';
   local.d.querySelector('#resetMatchBtn').click();
-  await wait(() => !local.d.querySelector('#center').textContent.includes(`round ${originalRound}`), 'fixed local seed');
+  await wait(() => !details(local).includes(`round ${originalRound}`), 'fixed local seed');
+  ai(local, 3).click();
+  await wait(() => ai(local, 3).getAttribute('aria-pressed') === 'true', 'local AI takeover');
+  assert.equal(rev(local), 0);
+  ai(local, 3).click();
+  await wait(() => ai(local, 3).getAttribute('aria-pressed') === 'false', 'local manual takeover');
   local.d.querySelector('[data-action-key="ROLL_DICE:"]').click();
   await wait(() => local.d.querySelectorAll('button.tile[data-tile]').length === 53, 'local all-open hands');
   assert.equal(local.d.querySelectorAll('[data-orphan-pickup][aria-pressed="false"]').length, 4);
@@ -157,7 +174,7 @@ const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision
   assert.equal(dialogs.length, 0, 'pickup play never opens a dialog');
   assert.equal(local.d.querySelector(`#seat-1 .hand [data-tile="${discardedId}"]`), null);
   assert.equal(local.d.querySelectorAll('.wall-layer.present').length, wallBefore);
-  assert.equal(local.d.querySelectorAll('.river-east .river-tiles .tile').length, 0);
+  assert.equal(local.d.querySelectorAll('.scene-river-side.river-east .scene-river').length, 0);
   assert.equal(errors.length, 0, errors.join('\n'));
-  console.log('PASS: four DOM clients, create/join/seats, dealer dice, 16 synchronized moves, private hands, wall, XSS escaping, disconnect/reload, local mode and public orphan pickup without a draw. No script errors.');
+  console.log('PASS: four DOM clients, room setup, dealer dice, 16 synchronized moves, private hands, AI takeover, wall, XSS escaping, reconnect, local mode and orphan pickup. No script errors.');
 })().catch(e => { console.error(e); process.exitCode = 1; }).finally(() => clients.forEach(c => c.close()));

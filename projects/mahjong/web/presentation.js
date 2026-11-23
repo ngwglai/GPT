@@ -141,10 +141,13 @@
       const node = document.getElementById(`seat-${seat}`);
       if (!node) return;
       const cls = `event-${kind.toLowerCase().replace(/[^a-z0-9_-]/g, "-")}`;
+      if (node.eventCue) node.classList.remove(node.eventCue);
+      clearTimeout(node.eventCueTimer);
       node.classList.remove("event-flash", cls);
       void node.offsetWidth;
       node.classList.add("event-flash", cls);
-      setTimeout(() => node.classList.remove("event-flash", cls), 520);
+      node.eventCue = cls;
+      node.eventCueTimer = setTimeout(() => node.classList.remove("event-flash", cls), 560);
     }
 
     flashCenter(kind = "action") {

@@ -1,0 +1,1995 @@
+{
+  "rounds": 102,
+  "elapsed_seconds": 207.05,
+  "by_mode": {
+    "easy": {
+      "HU": 2,
+      "DRAW": 34
+    },
+    "normal": {
+      "HU": 26,
+      "DRAW": 7
+    },
+    "advanced": {
+      "HU": 32,
+      "DRAW": 1
+    }
+  },
+  "actions": {
+    "ROLL_DICE": 102,
+    "DISCARD": 5702,
+    "CHI": 297,
+    "PASS": 839,
+    "SHELVE_GOLD": 111,
+    "PENG": 163,
+    "DECLARE_TING": 191,
+    "BU_GANG": 16,
+    "HU": 62,
+    "PICK_ORPHAN": 203,
+    "MING_GANG": 12,
+    "AN_GANG": 3
+  },
+  "max_actions": 149,
+  "rounds_detail": [
+    {
+      "seed": 1000,
+      "mode": "easy",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 57,
+        "CHI": 4,
+        "PASS": 7,
+        "SHELVE_GOLD": 2,
+        "PENG": 2,
+        "DECLARE_TING": 1,
+        "BU_GANG": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 76
+    },
+    {
+      "seed": 1001,
+      "mode": "easy",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 72,
+        "PASS": 7,
+        "CHI": 4,
+        "SHELVE_GOLD": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 86
+    },
+    {
+      "seed": 1002,
+      "mode": "easy",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 89,
+        "PICK_ORPHAN": 22,
+        "PASS": 22,
+        "PENG": 2,
+        "CHI": 2,
+        "SHELVE_GOLD": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 139
+    },
+    {
+      "seed": 1003,
+      "mode": "normal",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 24,
+        "PASS": 3,
+        "DECLARE_TING": 2,
+        "PENG": 1,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 33
+    },
+    {
+      "seed": 1004,
+      "mode": "normal",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 27,
+        "CHI": 4,
+        "PENG": 1,
+        "DECLARE_TING": 3,
+        "PASS": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 38
+    },
+    {
+      "seed": 1005,
+      "mode": "normal",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "seven_pairs"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 50,
+        "PASS": 24,
+        "DECLARE_TING": 2,
+        "CHI": 1,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 80
+    },
+    {
+      "seed": 1006,
+      "mode": "advanced",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 50,
+        "CHI": 3,
+        "PASS": 4,
+        "PENG": 3,
+        "DECLARE_TING": 4,
+        "SHELVE_GOLD": 1,
+        "HU": 2
+      },
+      "score_status": "READY",
+      "gameplay_actions": 68
+    },
+    {
+      "seed": 1007,
+      "mode": "advanced",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 14,
+        "CHI": 1,
+        "DECLARE_TING": 1,
+        "PASS": 1,
+        "PENG": 2,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 21
+    },
+    {
+      "seed": 1008,
+      "mode": "advanced",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 52,
+        "PASS": 18,
+        "CHI": 1,
+        "PENG": 4,
+        "DECLARE_TING": 4,
+        "SHELVE_GOLD": 1,
+        "MING_GANG": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 83
+    },
+    {
+      "seed": 1009,
+      "mode": "easy",
+      "round": 1,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 74,
+        "CHI": 4,
+        "PASS": 4,
+        "PENG": 2,
+        "SHELVE_GOLD": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 87
+    },
+    {
+      "seed": 1010,
+      "mode": "easy",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 71,
+        "CHI": 3,
+        "PENG": 2,
+        "PASS": 5,
+        "SHELVE_GOLD": 3,
+        "DECLARE_TING": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 86
+    },
+    {
+      "seed": 1011,
+      "mode": "easy",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 88,
+        "CHI": 4,
+        "PICK_ORPHAN": 13,
+        "PASS": 10,
+        "PENG": 3,
+        "SHELVE_GOLD": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 120
+    },
+    {
+      "seed": 1012,
+      "mode": "normal",
+      "round": 1,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 71,
+        "CHI": 3,
+        "PASS": 4,
+        "PENG": 2,
+        "DECLARE_TING": 3,
+        "BU_GANG": 1,
+        "SHELVE_GOLD": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 86
+    },
+    {
+      "seed": 1013,
+      "mode": "normal",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "seven_pairs"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 65,
+        "PASS": 9,
+        "CHI": 1,
+        "DECLARE_TING": 2,
+        "PENG": 1,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 81
+    },
+    {
+      "seed": 1014,
+      "mode": "normal",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 48,
+        "PASS": 10,
+        "DECLARE_TING": 3,
+        "PICK_ORPHAN": 2,
+        "CHI": 2,
+        "PENG": 1,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 69
+    },
+    {
+      "seed": 1015,
+      "mode": "advanced",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 50,
+        "CHI": 3,
+        "PASS": 5,
+        "PENG": 2,
+        "DECLARE_TING": 2,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 64
+    },
+    {
+      "seed": 1016,
+      "mode": "advanced",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 28,
+        "CHI": 2,
+        "DECLARE_TING": 4,
+        "PASS": 2,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 38
+    },
+    {
+      "seed": 1017,
+      "mode": "advanced",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 41,
+        "PASS": 17,
+        "CHI": 5,
+        "PENG": 1,
+        "DECLARE_TING": 4,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 70
+    },
+    {
+      "seed": 1018,
+      "mode": "easy",
+      "round": 1,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 74,
+        "PASS": 6,
+        "PENG": 2,
+        "CHI": 3,
+        "AN_GANG": 1,
+        "SHELVE_GOLD": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 88
+    },
+    {
+      "seed": 1019,
+      "mode": "easy",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 74,
+        "CHI": 3,
+        "PASS": 6,
+        "PENG": 4,
+        "BU_GANG": 1,
+        "DECLARE_TING": 1,
+        "SHELVE_GOLD": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 91
+    },
+    {
+      "seed": 1020,
+      "mode": "easy",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 90,
+        "PASS": 24,
+        "PICK_ORPHAN": 20,
+        "CHI": 4,
+        "SHELVE_GOLD": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 141
+    },
+    {
+      "seed": 1021,
+      "mode": "normal",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 66,
+        "PENG": 2,
+        "CHI": 4,
+        "DECLARE_TING": 2,
+        "PASS": 6,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 83
+    },
+    {
+      "seed": 1022,
+      "mode": "normal",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 70,
+        "CHI": 3,
+        "DECLARE_TING": 2,
+        "PASS": 10,
+        "SHELVE_GOLD": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 87
+    },
+    {
+      "seed": 1023,
+      "mode": "normal",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 7,
+        "CHI": 1,
+        "PASS": 3,
+        "DECLARE_TING": 1,
+        "HU": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 14
+    },
+    {
+      "seed": 1024,
+      "mode": "advanced",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 53,
+        "PENG": 2,
+        "CHI": 3,
+        "PASS": 3,
+        "BU_GANG": 1,
+        "DECLARE_TING": 3,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 68
+    },
+    {
+      "seed": 1025,
+      "mode": "advanced",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 19,
+        "PENG": 2,
+        "PASS": 4,
+        "DECLARE_TING": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 28
+    },
+    {
+      "seed": 1026,
+      "mode": "advanced",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 30,
+        "PASS": 21,
+        "CHI": 1,
+        "PENG": 2,
+        "DECLARE_TING": 2,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 58
+    },
+    {
+      "seed": 1027,
+      "mode": "easy",
+      "round": 1,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 74,
+        "CHI": 5,
+        "PASS": 4,
+        "SHELVE_GOLD": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 85
+    },
+    {
+      "seed": 1028,
+      "mode": "easy",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 73,
+        "CHI": 4,
+        "SHELVE_GOLD": 3,
+        "PENG": 2,
+        "PASS": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 85
+    },
+    {
+      "seed": 1029,
+      "mode": "easy",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 79,
+        "PICK_ORPHAN": 7,
+        "CHI": 4,
+        "PASS": 13,
+        "PENG": 1,
+        "SHELVE_GOLD": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 107
+    },
+    {
+      "seed": 1030,
+      "mode": "normal",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 23,
+        "CHI": 2,
+        "PASS": 4,
+        "DECLARE_TING": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 32
+    },
+    {
+      "seed": 1031,
+      "mode": "normal",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 34,
+        "CHI": 5,
+        "PASS": 3,
+        "DECLARE_TING": 3,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 47
+    },
+    {
+      "seed": 1032,
+      "mode": "normal",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 71,
+        "PICK_ORPHAN": 4,
+        "PASS": 16,
+        "DECLARE_TING": 3,
+        "AN_GANG": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 96
+    },
+    {
+      "seed": 1033,
+      "mode": "advanced",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 50,
+        "PENG": 3,
+        "CHI": 4,
+        "DECLARE_TING": 3,
+        "BU_GANG": 1,
+        "PASS": 1,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 65
+    },
+    {
+      "seed": 1034,
+      "mode": "advanced",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 25,
+        "PENG": 1,
+        "CHI": 1,
+        "DECLARE_TING": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 30
+    },
+    {
+      "seed": 1035,
+      "mode": "advanced",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 21,
+        "PASS": 6,
+        "PENG": 2,
+        "CHI": 2,
+        "DECLARE_TING": 2,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 35
+    },
+    {
+      "seed": 1036,
+      "mode": "easy",
+      "round": 1,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 73,
+        "CHI": 6,
+        "SHELVE_GOLD": 3,
+        "PASS": 5
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 88
+    },
+    {
+      "seed": 1037,
+      "mode": "easy",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 75,
+        "PENG": 2,
+        "CHI": 4,
+        "PASS": 3,
+        "SHELVE_GOLD": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 86
+    },
+    {
+      "seed": 1038,
+      "mode": "easy",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 91,
+        "PASS": 29,
+        "PICK_ORPHAN": 21,
+        "PENG": 2,
+        "CHI": 2,
+        "SHELVE_GOLD": 2,
+        "DECLARE_TING": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 149
+    },
+    {
+      "seed": 1039,
+      "mode": "normal",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 67,
+        "CHI": 2,
+        "DECLARE_TING": 4,
+        "PASS": 2,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 77
+    },
+    {
+      "seed": 1040,
+      "mode": "normal",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 47,
+        "PENG": 1,
+        "CHI": 3,
+        "PASS": 2,
+        "DECLARE_TING": 3,
+        "BU_GANG": 1,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 60
+    },
+    {
+      "seed": 1041,
+      "mode": "normal",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 33,
+        "PASS": 12,
+        "PENG": 2,
+        "CHI": 5,
+        "DECLARE_TING": 2,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 57
+    },
+    {
+      "seed": 1042,
+      "mode": "advanced",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 31,
+        "PASS": 1,
+        "DECLARE_TING": 3,
+        "CHI": 1,
+        "PENG": 1,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 40
+    },
+    {
+      "seed": 1043,
+      "mode": "advanced",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 52,
+        "PENG": 5,
+        "CHI": 3,
+        "BU_GANG": 1,
+        "DECLARE_TING": 3,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 66
+    },
+    {
+      "seed": 1044,
+      "mode": "advanced",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 58,
+        "PASS": 7,
+        "PICK_ORPHAN": 5,
+        "CHI": 4,
+        "PENG": 4,
+        "DECLARE_TING": 3,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 84
+    },
+    {
+      "seed": 1045,
+      "mode": "easy",
+      "round": 1,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 74,
+        "PASS": 6,
+        "SHELVE_GOLD": 3,
+        "CHI": 5,
+        "PENG": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 91
+    },
+    {
+      "seed": 1046,
+      "mode": "easy",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 77,
+        "CHI": 8,
+        "SHELVE_GOLD": 2,
+        "PASS": 1,
+        "PENG": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 90
+    },
+    {
+      "seed": 1047,
+      "mode": "easy",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 80,
+        "CHI": 2,
+        "PASS": 22,
+        "PICK_ORPHAN": 10,
+        "SHELVE_GOLD": 3,
+        "PENG": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 120
+    },
+    {
+      "seed": 1048,
+      "mode": "normal",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 28,
+        "PASS": 6,
+        "PENG": 2,
+        "DECLARE_TING": 2,
+        "CHI": 2,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 42
+    },
+    {
+      "seed": 1049,
+      "mode": "normal",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 69,
+        "PASS": 10,
+        "CHI": 1,
+        "DECLARE_TING": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 83
+    },
+    {
+      "seed": 1050,
+      "mode": "normal",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 57,
+        "CHI": 4,
+        "PASS": 1,
+        "DECLARE_TING": 4,
+        "PENG": 1,
+        "HU": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 69
+    },
+    {
+      "seed": 1051,
+      "mode": "advanced",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 19,
+        "PASS": 1,
+        "CHI": 1,
+        "PENG": 1,
+        "DECLARE_TING": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 25
+    },
+    {
+      "seed": 1052,
+      "mode": "advanced",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 45,
+        "PENG": 3,
+        "CHI": 3,
+        "DECLARE_TING": 3,
+        "PASS": 1,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 58
+    },
+    {
+      "seed": 1053,
+      "mode": "advanced",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 49,
+        "PASS": 19,
+        "CHI": 1,
+        "DECLARE_TING": 4,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 76
+    },
+    {
+      "seed": 1054,
+      "mode": "easy",
+      "round": 1,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 76,
+        "PASS": 6,
+        "CHI": 7,
+        "SHELVE_GOLD": 2,
+        "PENG": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 93
+    },
+    {
+      "seed": 1055,
+      "mode": "easy",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 73,
+        "SHELVE_GOLD": 4,
+        "PASS": 8,
+        "PENG": 3,
+        "CHI": 4
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 93
+    },
+    {
+      "seed": 1056,
+      "mode": "easy",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 80,
+        "PASS": 10,
+        "PENG": 1,
+        "CHI": 4,
+        "PICK_ORPHAN": 8,
+        "SHELVE_GOLD": 3
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 107
+    },
+    {
+      "seed": 1057,
+      "mode": "normal",
+      "round": 1,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 67,
+        "PASS": 5,
+        "CHI": 1,
+        "PENG": 1,
+        "DECLARE_TING": 4,
+        "BU_GANG": 1,
+        "SHELVE_GOLD": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 81
+    },
+    {
+      "seed": 1058,
+      "mode": "normal",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "seven_pairs"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 51,
+        "CHI": 4,
+        "PENG": 4,
+        "DECLARE_TING": 4,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 66
+    },
+    {
+      "seed": 1059,
+      "mode": "normal",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 27,
+        "PASS": 7,
+        "PENG": 3,
+        "CHI": 2,
+        "DECLARE_TING": 1,
+        "HU": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 42
+    },
+    {
+      "seed": 1060,
+      "mode": "advanced",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 43,
+        "CHI": 4,
+        "PASS": 3,
+        "DECLARE_TING": 4,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 57
+    },
+    {
+      "seed": 1061,
+      "mode": "advanced",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 51,
+        "PASS": 4,
+        "CHI": 1,
+        "DECLARE_TING": 3,
+        "PENG": 3,
+        "BU_GANG": 2,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 66
+    },
+    {
+      "seed": 1062,
+      "mode": "advanced",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 43,
+        "PASS": 21,
+        "CHI": 4,
+        "DECLARE_TING": 4,
+        "PENG": 2,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 76
+    },
+    {
+      "seed": 1063,
+      "mode": "easy",
+      "round": 1,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 74,
+        "PENG": 1,
+        "CHI": 5,
+        "SHELVE_GOLD": 2,
+        "PASS": 4,
+        "BU_GANG": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 88
+    },
+    {
+      "seed": 1064,
+      "mode": "easy",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 73,
+        "PASS": 6,
+        "CHI": 4,
+        "SHELVE_GOLD": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 85
+    },
+    {
+      "seed": 1065,
+      "mode": "easy",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 85,
+        "PASS": 22,
+        "PICK_ORPHAN": 16,
+        "CHI": 1,
+        "PENG": 1,
+        "SHELVE_GOLD": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 128
+    },
+    {
+      "seed": 1066,
+      "mode": "normal",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 23,
+        "PASS": 2,
+        "PENG": 3,
+        "DECLARE_TING": 4,
+        "CHI": 2,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 36
+    },
+    {
+      "seed": 1067,
+      "mode": "normal",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 44,
+        "PASS": 3,
+        "CHI": 1,
+        "DECLARE_TING": 4,
+        "SHELVE_GOLD": 1,
+        "MING_GANG": 1,
+        "PENG": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 57
+    },
+    {
+      "seed": 1068,
+      "mode": "normal",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 64,
+        "PASS": 22,
+        "PENG": 1,
+        "DECLARE_TING": 4,
+        "CHI": 2,
+        "BU_GANG": 1,
+        "MING_GANG": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 97
+    },
+    {
+      "seed": 1069,
+      "mode": "advanced",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 29,
+        "PENG": 4,
+        "DECLARE_TING": 4,
+        "MING_GANG": 1,
+        "PASS": 1,
+        "CHI": 1,
+        "BU_GANG": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 43
+    },
+    {
+      "seed": 1070,
+      "mode": "advanced",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 42,
+        "PASS": 4,
+        "CHI": 3,
+        "PENG": 3,
+        "DECLARE_TING": 4,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 58
+    },
+    {
+      "seed": 1071,
+      "mode": "advanced",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 71,
+        "PASS": 11,
+        "DECLARE_TING": 4,
+        "CHI": 4,
+        "PENG": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 92
+    },
+    {
+      "seed": 1072,
+      "mode": "easy",
+      "round": 1,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 74,
+        "SHELVE_GOLD": 2,
+        "CHI": 4,
+        "PASS": 5,
+        "PENG": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 88
+    },
+    {
+      "seed": 1073,
+      "mode": "easy",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 71,
+        "CHI": 3,
+        "PASS": 6,
+        "PENG": 1,
+        "SHELVE_GOLD": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 84
+    },
+    {
+      "seed": 1074,
+      "mode": "easy",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 83,
+        "PASS": 14,
+        "CHI": 5,
+        "PICK_ORPHAN": 12,
+        "SHELVE_GOLD": 3
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 118
+    },
+    {
+      "seed": 1075,
+      "mode": "normal",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 61,
+        "CHI": 1,
+        "PASS": 3,
+        "DECLARE_TING": 2,
+        "AN_GANG": 1,
+        "MING_GANG": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 71
+    },
+    {
+      "seed": 1076,
+      "mode": "normal",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 60,
+        "CHI": 3,
+        "PASS": 5,
+        "PENG": 2,
+        "DECLARE_TING": 4,
+        "MING_GANG": 1,
+        "HU": 2
+      },
+      "score_status": "READY",
+      "gameplay_actions": 78
+    },
+    {
+      "seed": 1077,
+      "mode": "normal",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 55,
+        "PASS": 18,
+        "CHI": 2,
+        "PENG": 1,
+        "DECLARE_TING": 3,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 82
+    },
+    {
+      "seed": 1078,
+      "mode": "advanced",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 46,
+        "PENG": 3,
+        "CHI": 3,
+        "DECLARE_TING": 3,
+        "BU_GANG": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 58
+    },
+    {
+      "seed": 1079,
+      "mode": "advanced",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 34,
+        "CHI": 4,
+        "PASS": 1,
+        "DECLARE_TING": 3,
+        "MING_GANG": 2,
+        "PENG": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 47
+    },
+    {
+      "seed": 1080,
+      "mode": "advanced",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 21,
+        "PASS": 15,
+        "CHI": 2,
+        "PENG": 1,
+        "DECLARE_TING": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 42
+    },
+    {
+      "seed": 1081,
+      "mode": "easy",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 54,
+        "CHI": 4,
+        "PASS": 4,
+        "SHELVE_GOLD": 2,
+        "PENG": 1,
+        "DECLARE_TING": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 68
+    },
+    {
+      "seed": 1082,
+      "mode": "easy",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 73,
+        "PASS": 8,
+        "PENG": 2,
+        "CHI": 4,
+        "SHELVE_GOLD": 2,
+        "DECLARE_TING": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 91
+    },
+    {
+      "seed": 1083,
+      "mode": "easy",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 87,
+        "PASS": 20,
+        "PICK_ORPHAN": 20,
+        "CHI": 2,
+        "SHELVE_GOLD": 4,
+        "PENG": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 135
+    },
+    {
+      "seed": 1084,
+      "mode": "normal",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 25,
+        "PASS": 6,
+        "CHI": 2,
+        "PENG": 1,
+        "DECLARE_TING": 2,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 38
+    },
+    {
+      "seed": 1085,
+      "mode": "normal",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 71,
+        "CHI": 3,
+        "PASS": 5,
+        "DECLARE_TING": 4,
+        "PENG": 2,
+        "MING_GANG": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 88
+    },
+    {
+      "seed": 1086,
+      "mode": "normal",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 53,
+        "PASS": 24,
+        "CHI": 2,
+        "PENG": 2,
+        "DECLARE_TING": 2,
+        "HU": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 85
+    },
+    {
+      "seed": 1087,
+      "mode": "advanced",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 39,
+        "PENG": 1,
+        "BU_GANG": 1,
+        "CHI": 3,
+        "PASS": 2,
+        "DECLARE_TING": 3,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 52
+    },
+    {
+      "seed": 1088,
+      "mode": "advanced",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 40,
+        "PENG": 2,
+        "CHI": 3,
+        "DECLARE_TING": 4,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 52
+    },
+    {
+      "seed": 1089,
+      "mode": "advanced",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 51,
+        "PASS": 22,
+        "CHI": 2,
+        "PENG": 3,
+        "DECLARE_TING": 4,
+        "MING_GANG": 1,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 86
+    },
+    {
+      "seed": 1090,
+      "mode": "easy",
+      "round": 1,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 76,
+        "PASS": 8,
+        "PENG": 1,
+        "CHI": 7,
+        "SHELVE_GOLD": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 95
+    },
+    {
+      "seed": 1091,
+      "mode": "easy",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 75,
+        "PASS": 2,
+        "CHI": 6,
+        "SHELVE_GOLD": 3,
+        "PENG": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 89
+    },
+    {
+      "seed": 1092,
+      "mode": "easy",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 89,
+        "PASS": 24,
+        "PICK_ORPHAN": 21,
+        "SHELVE_GOLD": 3,
+        "CHI": 3
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 141
+    },
+    {
+      "seed": 1093,
+      "mode": "normal",
+      "round": 1,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 69,
+        "PASS": 20,
+        "CHI": 1,
+        "DECLARE_TING": 2
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 93
+    },
+    {
+      "seed": 1094,
+      "mode": "normal",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "seven_pairs"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 59,
+        "PENG": 1,
+        "CHI": 2,
+        "PASS": 5,
+        "DECLARE_TING": 3,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 73
+    },
+    {
+      "seed": 1095,
+      "mode": "normal",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 55,
+        "PASS": 24,
+        "PENG": 2,
+        "CHI": 2,
+        "DECLARE_TING": 2,
+        "BU_GANG": 1,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 89
+    },
+    {
+      "seed": 1096,
+      "mode": "advanced",
+      "round": 1,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 19,
+        "CHI": 1,
+        "PASS": 1,
+        "PENG": 3,
+        "DECLARE_TING": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 27
+    },
+    {
+      "seed": 1097,
+      "mode": "advanced",
+      "round": 2,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 45,
+        "CHI": 2,
+        "DECLARE_TING": 3,
+        "SHELVE_GOLD": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 53
+    },
+    {
+      "seed": 1098,
+      "mode": "advanced",
+      "round": 3,
+      "result": "HU",
+      "patterns": [
+        "standard"
+      ],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 33,
+        "PASS": 21,
+        "CHI": 2,
+        "DECLARE_TING": 3,
+        "MING_GANG": 1,
+        "HU": 1
+      },
+      "score_status": "READY",
+      "gameplay_actions": 62
+    },
+    {
+      "seed": 1099,
+      "mode": "easy",
+      "round": 1,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 77,
+        "CHI": 7,
+        "PENG": 3,
+        "PASS": 3,
+        "SHELVE_GOLD": 3
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 94
+    },
+    {
+      "seed": 1100,
+      "mode": "easy",
+      "round": 2,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 76,
+        "PENG": 8,
+        "CHI": 3,
+        "SHELVE_GOLD": 4,
+        "PASS": 3
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 95
+    },
+    {
+      "seed": 1101,
+      "mode": "easy",
+      "round": 3,
+      "result": "DRAW",
+      "patterns": [],
+      "actions": {
+        "ROLL_DICE": 1,
+        "DISCARD": 86,
+        "PENG": 3,
+        "PICK_ORPHAN": 22,
+        "PASS": 18,
+        "CHI": 2,
+        "SHELVE_GOLD": 4
+      },
+      "score_status": "PENDING_CONFIGURATION",
+      "gameplay_actions": 136
+    }
+  ]
+}

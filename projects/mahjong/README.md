@@ -1,6 +1,6 @@
-# 本地麻将 v0.5.1
+# 青雀麻将 v0.8.0
 
-青雀麻将提供四家明牌练习和四人局域网联机。v0.5.1 支持主动开启十三幺拾牌、连续牌局与刷新重连，规则由 Python 服务端执行。Web 美术升级提供翡翠绒面牌桌、SVG 牌组和桌面、平板、手机布局。
+青雀麻将提供四家明牌练习和四人局域网联机。v0.8.0 加入内容导向的 2.5D 对局镜头、底部单行手牌和靠近手牌的触控操作。可随时切换完整桌面，报听预览由既有求解器生成，联机按原房间与席位恢复。规则由 Python 服务端执行。
 
 ## 安装与启动
 
@@ -25,6 +25,28 @@ python web_server.py
 
 服务器使用 HTTP 和 WebSocket，适用于可信局域网。房间状态保存在内存，重启即清空。进行中的座位绑定浏览器保存的身份，清除网站数据后无法恢复该座位。
 
+## 2.5D 牌桌
+
+- 点手牌选中并抬起，再点同一张牌或「打出」出牌。报听和上金需要点各自的按钮。吃、碰、杠、胡、过、拾牌只在存在合法操作时出现。同一种操作有多个组合时，点按钮选择组合。
+- 联机自己的席位始终在下方。单机点头像可以从该席位查看明牌与操作，点「操作席」回到当前行动或响应席。手牌在手机横屏、竖屏、平板和 PC 都在底部单行显示。
+- 「完整桌面」切换到包含桌框的观赏镜头，「对局视角」恢复近景。点「查看牌河」可放大弃牌与公开区域。开启系统「减少动态效果」后，页面直接显示操作后的状态。
+- 顶部「余」显示规则允许的普通摸牌数。「牌局详情」另列墙上实牌总数，其中包含保留牌。桌面青色边标记正常摸牌端，暖金边标记杠后补牌端。
+- 建议使用支持 CSS 3D 的现代浏览器。游戏资源由本地服务提供，无须联网下载 3D 引擎。实际桌面需要的 ImageGen 素材约 80 KB。
+
+## 牌墙规则
+
+玩家逆时针按东、南、西、北行动。正常摸牌沿物理墙顺时针，每面从 16 号墩摸到 0 号墩，再衔接东 → 南 → 西 → 北 → 东的下一面墙。杠后补牌从牌尾反向跨墩。两种取牌均从每墩上层开始。
+
+每家从自己的视角左端为 0、右端为 16。开墙墩为 `16 - 小骰子`，点数和 5 或 9 时从庄家对家墙开墙。金指示牌在开墙墙的上家墙，取 `大骰子 - 1` 号墩上层。翻开指示牌时它仍在墙上，之后可按规则正常取走。
+
+[牌墙规则](WALL-RULES.md) 收录完整发牌方法、死墙边界、四面墙路径图和骰子示例。
+
+## 托管与胡牌提示
+
+- 席位上的「开启托管」使用普通 AI，再点「人工接管」即可恢复手动操作。顶部「托管」可选初级、普通和高级。联机时只能切换自己的席位，刷新或重连会恢复该席位的控制方式。
+- 本地「托管」菜单中的「四家自动对局」会让四个席位使用普通 AI。「暂停托管」把四个席位交还人工。每局结束后可点「下一局」继续。
+- 选中可报听的牌时，手牌附近会预览听口、可见剩余和支持的胡牌型。报听后继续显示当前听口。零张显示「已见完」，受首次上金限制的听口显示「需上金」。可见剩余包含未知位置的牌，实际可摸数量取决于牌墙和对手手牌。
+
 ## 十三幺拾牌
 
 在自己席位的操作区点击「开启十三幺拾牌」。牌局默认关闭拾牌意向，幺九牌只有在存在合法操作时才会等待响应，界面没有独立拾牌弹窗。开启时会显示「十三幺·待拾」。有合法机会时，直接在普通操作区选择「拾牌」或「过」。首次实际取得弃牌后，席位显示「十三幺·已锁定」，拾来的牌公开保存在独立区域。本局余下的拾牌与胡牌遵循既有十三幺规则。
@@ -41,6 +63,8 @@ python -m unittest -v tests.test_gold tests.test_win
 node --check web/app.js
 node --check web/lan.js
 node --check web/presentation.js
+node --check web/table-scene.js
+node --check web/table-mesh.js
 node --check tests/ui_smoke.cjs
 ```
 
@@ -51,11 +75,30 @@ npm install --no-package-lock
 npm run test:ui -- http://127.0.0.1:8765
 ```
 
-前端测试使用 jsdom 和实际 HTTP/WebSocket 连接，覆盖四个客户端的房间同步、私人拾牌意向、重连和公开锁定，另有 Playwright 验收覆盖手机触控、普通操作共存及牌桌布局。命令行引擎可用 `python -m mahjong demo --seed 42 --rounds 3` 试跑。试玩机器人继续从各自的合法操作中选择，开局主动开启意向以保留原有策略。
+前端集成测试使用 jsdom 和真实 HTTP/WebSocket 连接。浏览器验收使用 Chromium，在项目目录运行：
+
+```bash
+python -m pip install playwright==1.62.0
+python -m playwright install chromium
+python -m tests.browser_acceptance --screenshots browser-screenshots
+python -m tests.scene_acceptance --output scene-screenshots
+python -m tests.wall_browser_acceptance --output wall-screenshots
+python -m tests.layout_browser_acceptance --output layout-screenshots
+python -m tests.match_browser_acceptance --output match-screenshots
+python -m tools.run_ai_matches --output ai-matches.json
+```
+
+命令行引擎可用 `python -m mahjong demo --seed 42 --rounds 3` 试跑。
 
 ## Web 美术与浏览器验收
 
-[美术升级说明](VISUAL-UPGRADE.md) 收录资产清单、布局与操作变化，以及 Playwright 验收和截图生成方式。
+[v0.8.0 技术实现与验收报告](VALIDATION-v0.8.0.md) 收录六类视口、真实浏览器截图、新旧对比、联机重连实测及手机复验步骤。
+
+[v0.7.2 桌面布局验收报告](VALIDATION-v0.7.2.md) 收录前后对比、七类视口和公开牌压力测试。
+
+[v0.7.1 牌墙验收报告](VALIDATION-v0.7.1.md) 收录混合取牌、全量回归和浏览器截图。
+
+[v0.7.0 验收报告](VALIDATION-v0.7.0.md) 收录实际浏览器截图、交互及性能结果。[2.5D 美术与渲染记录](TABLE-ART-v0.7.0.md) 收录原型对照、ImageGen 原图和上线资源。旧版规则与牌面审查见 [v0.6.0 验收报告](VALIDATION-v0.6.0.md)。
 
 ## 原版资料
 
