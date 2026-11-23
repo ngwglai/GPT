@@ -48,7 +48,16 @@ jobs:
           node --check web/app.js
           node --check web/lan.js
           node --check web/presentation.js
+          node --check web/components.js
+          node --check web/table-scene.js
+          node --check web/table-mesh.js
           node --check tests/ui_smoke.cjs
+      - name: Read project version
+        shell: pwsh
+        run: |
+          $version = python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])"
+          if ($LASTEXITCODE -ne 0 -or -not $version) { throw 'Mahjong project version could not be read' }
+          "MAHJONG_VERSION=$version" >> $env:GITHUB_ENV
       - name: Frontend integration
         shell: pwsh
         run: |
@@ -63,7 +72,7 @@ jobs:
                 Start-Sleep -Milliseconds 250
               }
             }
-            if (-not $health.ok -or $health.version -ne '0.6.0') { throw 'Mahjong health check failed' }
+            if (-not $health.ok -or $health.version -ne $env:MAHJONG_VERSION) { throw 'Mahjong health check failed' }
             npm run test:ui -- http://127.0.0.1:8765
             if ($LASTEXITCODE -ne 0) { throw 'Frontend integration failed' }
           } finally {
@@ -101,10 +110,10 @@ jobs:
                   Start-Sleep -Milliseconds 500
                 }
               }
-              if (-not $health.ok -or $health.version -ne '0.6.0') { throw "$($entry.Key) failed its health check" }
+              if (-not $health.ok -or $health.version -ne $env:MAHJONG_VERSION) { throw "$($entry.Key) failed its health check" }
               $listeners = Get-NetTCPConnection -State Listen -LocalPort 8765
               if ($entry.Value -notin $listeners.LocalAddress) { throw "$($entry.Key) bound to the wrong address" }
-              Write-Host "$($entry.Key) served v0.6.0 on $($entry.Value)"
+              Write-Host "$($entry.Key) served v$env:MAHJONG_VERSION on $($entry.Value)"
             } finally {
               if (-not $server.HasExited) {
                 taskkill.exe /PID $server.Id /T /F
