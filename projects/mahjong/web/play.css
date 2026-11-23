@@ -150,17 +150,17 @@
 @keyframes gold-light { 35% { filter:brightness(1.38); box-shadow:0 0 15px #efc66988; } }
 @keyframes control-in { from { opacity:.48; transform:translateY(3px); } }
 @media (min-width: 851px) {
-  .table-shell .player.north {
+  body:not(.table-live) .table-shell .player.north {
     display:grid;
     grid-template-columns:auto minmax(0, 1fr) auto;
     align-items:center;
     column-gap:10px;
   }
-  .north .player-head { grid-column:1; grid-row:1; max-width:160px; }
-  .north .hand { grid-column:2; grid-row:1; padding:3px 0 6px; }
-  .north .hand .tile:not(.small) { --tile-width:clamp(24px, 2.1vw, 37px); }
-  .north .seat-tools { grid-column:3; grid-row:1; flex-direction:column; align-items:stretch; margin:0; }
-  .north > :is(.wait-hint,.player-zones,.action-area,.ai-record) { grid-column:1 / -1; }
+  body:not(.table-live) .north .player-head { grid-column:1; grid-row:1; max-width:160px; }
+  body:not(.table-live) .north .hand { grid-column:2; grid-row:1; padding:3px 0 6px; }
+  body:not(.table-live) .north .hand .tile:not(.small) { --tile-width:clamp(24px, 2.1vw, 37px); }
+  body:not(.table-live) .north .seat-tools { grid-column:3; grid-row:1; flex-direction:column; align-items:stretch; margin:0; }
+  body:not(.table-live) .north > :is(.wait-hint,.player-zones,.action-area,.ai-record) { grid-column:1 / -1; }
 }
 @media (min-width: 851px) and (max-height: 820px) {
   .table-live .game-content { padding-block:8px 17px; }
