@@ -83,11 +83,17 @@ jobs:
           }
       - name: Chromium acceptance (Linux)
         if: runner.os == 'Linux'
-        run: python -m tests.browser_acceptance --chromium /usr/bin/google-chrome
+        run: |
+          python -m tests.browser_acceptance --chromium /usr/bin/google-chrome
+          python -m tests.wall_browser_acceptance --chromium /usr/bin/google-chrome
       - name: Chromium acceptance (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: python -m tests.browser_acceptance --chromium "$env:ProgramFiles\Google\Chrome\Application\chrome.exe"
+        run: |
+          $chrome = "$env:ProgramFiles\Google\Chrome\Application\chrome.exe"
+          python -m tests.browser_acceptance --chromium $chrome
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m tests.wall_browser_acceptance --chromium $chrome
       - name: Windows batch launchers
         if: runner.os == 'Windows'
         shell: pwsh

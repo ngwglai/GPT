@@ -66,28 +66,49 @@ const MahjongScene = (() => {
   }
   const frameMarkup = frame();
 
-  const wallKey = ({side, column, layer}) => `wall-${side}-${column}-${layer === 0 ? "top" : "bottom"}`;
+  // Column 0 is on the owner's left, even when the scene rotates for LAN.
+  const wallLayers = ["top", "bottom"];
+  const wallPaintOrder = [1, 0];
+  const wallKey = ({side, column, layer}) => `wall-${side}-${column}-${wallLayers[layer]}`;
+
+  function wallPosition(side, column) {
+    const vertical = side === "east" || side === "west";
+    return position(side, (column - 8) * (vertical ? 20 : 29), vertical ? 300 : 183, {
+      w:vertical ? 18.7 : 27.6, h:30, depth:10.6
+    });
+  }
 
   function wall(table, seat, side) {
     const columns = table.wall_view?.sides?.[seat] || [];
-    const vertical = side === "east" || side === "west";
-    return columns.map(({column, top, bottom}) => [bottom, top].map((slot, layer) => {
-      if (!slot?.present) return "";
-      const name = layer ? "top" : "bottom";
-      const classes = ["wall-layer", "present", slot.reserved && "reserved",
-        slot.normal_cursor && "normal-cursor", slot.gang_cursor && "gang-cursor", slot.indicator && "indicator"
-      ].filter(Boolean).join(" ");
-      const end = table.wall_view.break_position;
-      const mark = end?.side === seat && end.column === column && layer ? " break-stack" : "";
-      const type = slot.indicator ? table.gold_indicator?.type : null;
-      const label = slot.indicator ? "金指示牌" : slot.normal_cursor ? "下一张正常摸牌" :
-        slot.gang_cursor ? "下一张杠后补牌" : `${seatNames[seat]}墙 第 ${column + 1} 墩`;
-      return tile(type, position(side, (column - 8) * (vertical ? 19 : 23), vertical ? 312 : 183, {
-        z: layer && bottom?.present ? 16.4 : 5.3, w: vertical ? 17.7 : 21.6, h: 30, depth:10.6,
-        classes:classes + mark, label, key:wallKey({side:seat, column, layer:layer ? 0 : 1}),
-        extra:` data-wall-seat="${seat}" data-wall-column="${column}" data-wall-layer="${name}"`
-      }));
-    }).join("")).join("");
+    const tiles = columns.map(stack => {
+      const {column, bottom} = stack;
+      const geometry = wallPosition(side, column);
+      return wallPaintOrder.map(layer => {
+        const name = wallLayers[layer];
+        const slot = stack[name];
+        if (!slot?.present) return "";
+        const classes = ["wall-layer", "present", slot.reserved && "reserved",
+          slot.normal_cursor && "normal-cursor", slot.gang_cursor && "gang-cursor", slot.indicator && "indicator"
+        ].filter(Boolean).join(" ");
+        const type = slot.indicator ? table.gold_indicator?.type : null;
+        const label = slot.indicator ? "金指示牌" : slot.normal_cursor ? "下一张正常摸牌" :
+          slot.gang_cursor ? "下一张杠后补牌" : `${seatNames[seat]}墙 ${column} 号墩`;
+        return tile(type, {...geometry,
+          z:layer === 0 && bottom?.present ? 16.4 : 5.3,
+          classes, label, key:wallKey({side:seat, column, layer}),
+          extra:` data-wall-seat="${seat}" data-wall-column="${column}" data-wall-layer="${name}"`
+        });
+      }).join("");
+    }).join("");
+
+    const opening = table.wall_view?.break_position;
+    if (opening?.side !== seat) return tiles;
+    const {column} = opening;
+    const {x, y, w, h, angle} = wallPosition(side, column);
+    const label = `${seatNames[seat]}墙 ${column} 号墩开墙`;
+    return `${tiles}<span class="wall-break" data-break-seat="${seat}" data-break-column="${column}"
+      role="img" aria-label="${label}" title="${label}"
+      style="--x:${x}px;--y:${y}px;--w:${w}px;--h:${h}px;--yaw:${angle}deg"></span>`;
   }
 
   function hand(table, seat, side) {

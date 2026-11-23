@@ -138,8 +138,8 @@ class WebServerBoundaryTests(unittest.TestCase):
         self.assertEqual(out["discards"], [])
         self.assertEqual(out["current_player"], int(Seat.SOUTH))
 
-    def test_seed_8_exposes_shelve_and_shelve_skips_response(self):
-        table = LocalTable(seed=8)
+    def test_dealt_gold_exposes_shelve_and_shelve_skips_response(self):
+        table = LocalTable(seed=3)
         snap = self.roll_dice(table)
         shelf = next(a for a in snap["legal_actions"]["0"] if a["type"] == "SHELVE_GOLD")
         out = table.act(seat=Seat.EAST, payload={

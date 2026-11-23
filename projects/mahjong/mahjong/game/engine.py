@@ -19,7 +19,7 @@ from ..core.player import PlayerState, Meld, MeldType
 from ..core.seat import Seat, next_seat, previous_seat, turn_order
 from ..core.state import Discard, GamePhase as P, GameState, RuleConfig, RoundResult
 from ..core.tile import Tile, make_deck
-from ..core.wall import WallState, WallExhausted, validate_dice
+from ..core.wall import COLUMNS_PER_WALL, WallState, WallExhausted, validate_dice
 from ..rules.dealer import determine_next_dealer
 from ..rules.gold import get_opposite_tile
 from ..rules.gang import simulate_gang
@@ -517,31 +517,23 @@ class GameEngine:
     def _wall_public_view(self, reveal_break: bool) -> dict:
         """Public geometry only: never expose the types/IDs of undrawn wall tiles."""
         s = self.state
-        reserved = set()
-        if reveal_break:
-            limit = s.wall.normal_limit(s.total_gang_count)
-            reserved = {s.wall._order[i] for i in range(limit, 136)}
-        normal_cursor = s.wall.normal_draw_cursor if reveal_break else None
+        reserved = s.wall.reserved_positions(s.total_gang_count) if reveal_break else set()
+        normal_cursor = None
+        if reveal_break and not s.wall.is_normal_draw_exhausted(s.total_gang_count):
+            normal_cursor = s.wall.normal_draw_cursor
         gang_cursor = s.wall.gang_draw_cursor if reveal_break else None
-        sides = {}
-        for side in Seat:
-            columns = []
-            for column in range(17):
-                layers = {}
-                for layer_name, layer_value in (("top", 0), ("bottom", 1)):
-                    index = int(side) * 34 + column * 2 + layer_value
-                    slot = s.wall.slots[index]
-                    layers[layer_name] = {
-                        "present": not slot.drawn,
-                        "reserved": index in reserved,
-                        "indicator": bool(reveal_break and slot.is_gold_indicator),
-                        "normal_cursor": bool(normal_cursor is not None and slot.position == normal_cursor),
-                        "gang_cursor": bool(gang_cursor is not None and slot.position == gang_cursor),
-                    }
-                columns.append({"column": column, **layers})
-            sides[str(int(side))] = columns
+        sides = {side: [{"column": column} for column in range(COLUMNS_PER_WALL)] for side in Seat}
+        for slot in s.wall.slots:
+            position = slot.position
+            sides[position.side][position.column][position.layer.name.lower()] = {
+                "present": not slot.drawn,
+                "reserved": position in reserved,
+                "indicator": reveal_break and slot.is_gold_indicator,
+                "normal_cursor": position == normal_cursor,
+                "gang_cursor": position == gang_cursor,
+            }
         return {
-            "sides": sides,
+            "sides": {str(int(side)): columns for side, columns in sides.items()},
             "tiles_present": sum(not slot.drawn for slot in s.wall.slots),
             "break_position": self._position(s.wall.original_break_position) if reveal_break else None,
             "draw_cursor": self._position(normal_cursor) if normal_cursor is not None else None,

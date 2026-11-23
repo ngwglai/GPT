@@ -1,6 +1,6 @@
-# 青雀麻将 v0.7.0
+# 青雀麻将 v0.7.1
 
-青雀麻将提供四家明牌练习和四人局域网联机。v0.7.0 加入具有真实透视的 2.5D 牌桌、六面麻将牌、双层牌墙与沿桌面移动的动作动画。继续支持三档 AI 托管、报听后的胡牌提示和可见剩余数量。规则由 Python 服务端执行。
+青雀麻将提供四家明牌练习和四人局域网联机。v0.7.0 加入具有真实透视的 2.5D 牌桌、六面麻将牌、双层牌墙与沿桌面移动的动作动画。继续支持三档 AI 托管、报听后的胡牌提示和可见剩余数量。规则由 Python 服务端执行。v0.7.1 修正开墙、金指示牌与双端取牌，统一服务端墙位和 2.5D 场景坐标。
 
 ## 安装与启动
 
@@ -32,6 +32,14 @@ python web_server.py
 - 手机竖屏将操作区固定在下方，横屏将操作区置于牌桌右侧。自己的手牌可横向滑动。浏览器启用「减少动态效果」时直接显示每次操作后的状态。
 - 顶部「余」显示规则允许的普通摸牌数。「牌局详情」另列墙上实牌总数，其中包含保留牌。桌面青色边标记正常摸牌端，暖金边标记杠后补牌端。
 - 建议使用支持 CSS 3D 的现代浏览器。游戏资源由本地服务提供，无须联网下载 3D 引擎。实际桌面需要的 ImageGen 素材约 80 KB。
+
+## 牌墙规则
+
+玩家逆时针按东、南、西、北行动。正常摸牌沿物理墙顺时针，每面从 16 号墩摸到 0 号墩，再衔接东 → 南 → 西 → 北 → 东的下一面墙。杠后补牌从牌尾反向跨墩。两种取牌均从每墩上层开始。
+
+每家从自己的视角左端为 0、右端为 16。开墙墩为 `16 - 小骰子`，点数和 5 或 9 时从庄家对家墙开墙。金指示牌在开墙墙的上家墙，取 `大骰子 - 1` 号墩上层。翻开指示牌时它仍在墙上，之后可按规则正常取走。
+
+[牌墙规则](WALL-RULES.md) 收录完整发牌方法、死墙边界、四面墙路径图和骰子示例。
 
 ## 托管与胡牌提示
 
@@ -74,12 +82,15 @@ python -m pip install playwright==1.62.0
 python -m playwright install chromium
 python -m tests.browser_acceptance --screenshots browser-screenshots
 python -m tests.scene_acceptance --output scene-screenshots
+python -m tests.wall_browser_acceptance --output wall-screenshots
 python -m tools.run_ai_matches --output ai-matches.json
 ```
 
 命令行引擎可用 `python -m mahjong demo --seed 42 --rounds 3` 试跑。
 
 ## Web 美术与浏览器验收
+
+[v0.7.1 牌墙验收报告](VALIDATION-v0.7.1.md) 收录混合取牌、全量回归和浏览器截图。
 
 [v0.7.0 验收报告](VALIDATION-v0.7.0.md) 收录实际浏览器截图、交互及性能结果。[2.5D 美术与渲染记录](TABLE-ART-v0.7.0.md) 收录原型对照、ImageGen 原图和上线资源。旧版规则与牌面审查见 [v0.6.0 验收报告](VALIDATION-v0.6.0.md)。
 

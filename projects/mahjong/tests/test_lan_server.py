@@ -276,6 +276,7 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         await self.act(1, 'MING_GANG')
         remaining = {slot.position for slot in self.room.table.engine.state.wall.slots if not slot.drawn}
         removed, = occupied - remaining
+        self.assertEqual((int(removed.side), removed.column, int(removed.layer)), (2, 16, 0))
         for state in self.views.values():
             view = state['player_view']
             self.assertEqual(view['gang_count'], 1)

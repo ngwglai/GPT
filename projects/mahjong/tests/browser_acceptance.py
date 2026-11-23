@@ -277,6 +277,21 @@ async def lan_cases(browser, app, url, output, watch):
         await expect(host.locator("#startGame")).to_be_enabled()
         await capture(host, output, "02-lobby-seats")
         await host.locator("#startGame").click()
+        for viewer, page in enumerate(pages):
+            await expect(page.locator(".wall-layer")).to_have_count(136)
+            directions = await page.locator('.wall-layer[data-wall-layer="top"]').evaluate_all("""(tiles, viewer) => {
+                const coordinate = (seat, column) => {
+                    const node = tiles.find(t => Number(t.dataset.wallSeat) === seat &&
+                        Number(t.dataset.wallColumn) === column);
+                    return ["--x", "--y"].map(key => parseFloat(node.style.getPropertyValue(key)));
+                };
+                return [0, 1, 2, 3].map(offset => {
+                    const seat = (viewer + offset) % 4;
+                    const first = coordinate(seat, 0);
+                    return coordinate(seat, 16).map((number, axis) => Math.sign(number - first[axis]));
+                });
+            }""", viewer)
+            assert directions == [[1, 0], [0, 1], [-1, 0], [0, -1]], (viewer, directions)
         await action_button(host, E, "ROLL_DICE").click()
         for viewer, page in enumerate(pages):
             await expect(page.locator(".wall-stage")).to_be_visible()
