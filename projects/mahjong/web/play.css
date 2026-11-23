@@ -206,6 +206,15 @@
   }
   .table-shell .dock-seat .hand .tile:not(.small) { --tile-width:42px; }
   .table-shell .player:not(.dock-seat) .hand .tile:not(.small) { --tile-width:27px; }
+  .table-shell .dock-seat .wait-hint { flex-wrap:nowrap; }
+  .table-shell .dock-seat .wait-choices {
+    flex-wrap:nowrap;
+    min-inline-size:0;
+    overflow-x:auto;
+    scrollbar-width:thin;
+    padding:1px 3px 5px;
+  }
+  .table-shell .dock-seat .wait-choice { flex:none; }
   .table-shell .dock-seat .action-area { align-items:stretch; }
   .action-area .action-btn { min-height:44px; }
   .seat-tools button { min-height:40px; }

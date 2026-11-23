@@ -46,7 +46,7 @@ AI 输入为本席视图和合法动作。服务器在同一把牌桌锁内核�
 | [同种子桌面前后对比](validation/v0.6.0/comparison.webp) | v0.5.1 与 v0.6.0，单机种子 42、发牌后 |
 | [桌面实战](validation/v0.6.0/desktop.webp) · [平板](validation/v0.6.0/tablet.webp) · [手机](validation/v0.6.0/phone.webp) | 联机牌桌、横屏及竖屏的手牌与操作区 |
 | [四家自动对局](validation/v0.6.0/ai.webp) · [手机接管](validation/v0.6.0/phone-ai.webp) | 托管难度、AI 标记与人工接管 |
-| [胡牌提示](validation/v0.6.0/waits.webp) | 公开打出一张红中后由 3 张变为 2 张，白板标记需上金 |
+| [胡牌提示](validation/v0.6.0/waits.webp) · [手机多听口](validation/v0.6.0/phone-many-waits.webp) | 红中由 3 张变为 2 张，白板标记需上金。手机横向查看 14 种理论胡牌时，胡牌按钮仍完整显示 |
 | [实战动作](validation/v0.6.0/actions.webp) | 掷骰、出牌、报听、上金、吃、碰、杠、胡、过和十三幺拾牌的按钮 |
 
 复验命令和依赖见 [README](README.md)。

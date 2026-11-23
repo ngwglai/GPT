@@ -14,7 +14,7 @@ from mahjong import ActionType
 from mahjong.core.player import MeldType
 from mahjong.game.debug import PlayerFixture, build_fixture
 from mahjong.solver.thirteen_orphans import ORPHANS
-from tests.helpers import E, N, S, W
+from tests.helpers import E, N, S, W, set_next
 from tests.test_gold import WAIT
 from web_server import PLAYER_IDS
 
@@ -205,6 +205,26 @@ async def local_cases(page, app, url, output):
     await expect(page.locator(".result-box.draw")).to_contain_text("下局庄家 东家")
     await capture(page, output, "08-local-draw")
 
+    # A locked thirteen-orphans seat can have a long wait list, pickup and gold rows at once.
+    orphans = sorted(ORPHANS)
+    fixture(engine, {E: PlayerFixture(orphans[8:], picked_orphans=orphans[:8],
+                                      declared=True, shelves=1)}, gold=4)
+    set_next(engine, 31)
+    engine._draw_for(E)
+    await page.set_viewport_size({"width": 390, "height": 844})
+    await page.reload()
+    dock = page.locator(".dock-seat")
+    await expect(dock.locator(".wait-choice")).to_have_count(14)
+    waits = dock.locator(".wait-choices")
+    assert await waits.evaluate("list => list.scrollWidth > list.clientWidth")
+    hu = action_button(page, E, "HU")
+    bounds = await hu.bounding_box()
+    assert bounds and bounds["y"] + bounds["height"] <= 844, bounds
+    await capture(page, output, "17-phone-many-waits", full_page=False)
+    await hu.click()
+    await expect(page.locator(".result-box.win")).to_be_visible()
+
+    await page.set_viewport_size({"width": 1366, "height": 768})
     app[LOCAL].new_round(seed=42)
     await page.reload()
     await expect(action_button(page, E, "ROLL_DICE")).to_be_visible()

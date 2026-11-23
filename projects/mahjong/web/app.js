@@ -403,13 +403,14 @@ function renderPlayer(seat) {
     </div>
     ${renderWaitHint(p)}
     <div class="hand" aria-label="${seatNames[seat]}家手牌">${hand}</div>
-    ${zones ? `<div class="player-zones">${zones}</div>` : ""}
     ${actions ? `<div class="action-area" aria-label="${seatNames[seat]}家操作">${actions}</div>` : ""}
     ${tools ? `<div class="seat-tools">${tools}</div>` : ""}
+    ${zones ? `<div class="player-zones">${zones}</div>` : ""}
     ${renderDecision(p)}`;
 
   if (markup === el.renderedMarkup) return;
   const scrollLeft = el.querySelector(".hand")?.scrollLeft || 0;
+  const waitsScrollLeft = el.querySelector(".wait-choices")?.scrollLeft || 0;
   const focused = el.contains(document.activeElement) ? document.activeElement : null;
   const focusedTile = focused?.dataset.tile;
   const focusedAction = focused?.dataset.actionKey;
@@ -419,6 +420,8 @@ function renderPlayer(seat) {
   el.renderedMarkup = markup;
   const handRow = el.querySelector(".hand");
   handRow.scrollLeft = drawnChanged && canControl ? handRow.scrollWidth : scrollLeft;
+  const waitRow = el.querySelector(".wait-choices");
+  if (waitRow) waitRow.scrollLeft = waitsScrollLeft;
   el.lastDrawnTile = p.last_drawn_tile;
   if (recordOpen && el.querySelector(".ai-record")) el.querySelector(".ai-record").open = true;
   if (focusedTile || focusedAction || focusedPickup || focusedControl) {
