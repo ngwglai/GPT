@@ -17,20 +17,33 @@ from .test_gold import WAIT
 
 class RoundTests(unittest.TestCase):
     def test_exact_initial_deal_packet_order(self):
-        from mahjong.core.wall import WallState
-        wall=WallState(make_deck(),E,(1,2))
-        expected={s:[] for s in Seat}
-        for _ in range(3):
-            for seat in Seat:
-                expected[seat]+=[wall.draw_normal().instance_id for _ in range(4)]
-        for seat in Seat:
-            expected[seat].append(wall.draw_normal().instance_id)
-        expected[E].append(wall.draw_normal().instance_id)
-        e=engine()
-        e.start_round({s:str(int(s)) for s in Seat},seed=1,dice=(1,2),wall_tiles=make_deck())
-        event=next(ev for ev in e.state.event_log if ev.event_type==EventType.DEAL_COMPLETED)
-        self.assertEqual(event.payload["hands"],{int(s):v for s,v in expected.items()})
-        self.assertEqual([len(event.payload["hands"][int(s)]) for s in Seat],[14,13,13,13])
+        for dealer in (E, S, W, N):
+            with self.subTest(dealer=dealer):
+                # With (1, 2), the break is the opposite wall at column 15.
+                break_side = (int(dealer) + 2) % 4
+                physical_ids = [side * 34 + 2 * column + layer
+                                for side in (0, 1, 2, 3)
+                                for column in range(16, -1, -1)
+                                for layer in (0, 1)]
+                start = physical_ids.index(break_side * 34 + 30)
+                draws = iter(physical_ids[start:] + physical_ids[:start])
+                order = [Seat((int(dealer) + i) % 4) for i in range(4)]
+                expected = {int(seat): [] for seat in order}
+                for _ in range(3):
+                    for seat in order:
+                        expected[int(seat)].extend(next(draws) for _ in range(4))
+                for seat in order:
+                    expected[int(seat)].append(next(draws))
+                expected[int(dealer)].append(next(draws))
+                e = engine()
+                e.start_round({s: str(int(s)) for s in Seat}, dealer=dealer, seed=1,
+                              dice=(1, 2), wall_tiles=make_deck())
+                event = next(ev for ev in e.state.event_log if ev.event_type == EventType.DEAL_COMPLETED)
+                self.assertEqual(event.payload["hands"], expected)
+                self.assertEqual([len(expected[int(seat)]) for seat in order], [14, 13, 13, 13])
+                view = e.player_view(dealer)
+                self.assertEqual(view["wall_view"]["tiles_present"], 83)
+                self.assertEqual(view["normal_tiles_remaining"], 69)
 
     def test_repeatable_seed(self):
         a,b=engine(),engine()

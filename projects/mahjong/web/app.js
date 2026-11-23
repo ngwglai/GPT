@@ -502,7 +502,8 @@ function renderCenter() {
   const rolled = table.phase !== "ROLLING_DICE";
   const goldText = rolled && table.gold_indicator
     ? `金指示 ${tileName(table.gold_indicator.type)} · 金牌 ${tileName(table.gold_tile_type)} · 骰子 ${table.dice.join(" + ")}` : "";
-  const breakText = rolled ? `${seatNames[table.break_wall]}墙第 ${table.break_column + 1} 墩开牌` : "";
+  const opening = table.wall_view?.break_position;
+  const breakText = opening ? `${seatNames[opening.side]}墙 ${opening.column} 号墩开墙` : "";
   const overhead = el.closest(".table-shell").classList.contains("overhead-view");
   const markup = `
     <div class="scene-toolbar">

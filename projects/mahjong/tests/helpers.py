@@ -24,8 +24,7 @@ def has(e, seat, kind):
 def set_next(e, typ, tail=False):
     """Swap two undrawn physical wall tiles without touching ownership."""
     w = e.state.wall
-    indices = range(w.tail, w.head - 1, -1) if tail else range(w.head, w.tail + 1)
-    target = next(w.slots[w._order[i]] for i in indices if not w.slots[w._order[i]].drawn)
+    target = w.get_slot(w.gang_draw_cursor if tail else w.normal_draw_cursor)
     opposite_position = w.normal_draw_cursor if tail else w.gang_draw_cursor
     candidates = [s for s in w.slots if not s.drawn and s.tile.type_id == typ]
     donor = next((s for s in candidates if s.position != opposite_position), candidates[0])

@@ -306,7 +306,19 @@
 .scene-plane .wall-layer.indicator .tile-top { box-shadow: inset 0 0 0 2px #f3cb76; }
 .scene-plane .wall-layer.normal-cursor .tile-top { box-shadow: inset 0 0 0 1.5px #82d3b0; }
 .scene-plane .wall-layer.gang-cursor .tile-top { box-shadow: inset 0 0 0 1.5px #deaf67; }
-.scene-plane .wall-layer.break-stack .tile-edge-near { border-top: 2px solid #d4a769; }
+.scene-plane .wall-break {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--w);
+  height: var(--h);
+  transform-origin: 0 0;
+  transform: translate3d(var(--x), var(--y), calc(var(--tile-base-z) + 1px))
+    rotateZ(var(--yaw)) translate(-50%, -50%);
+  border: 2px dashed #e2bc78;
+  border-radius: 4px;
+  background: #d4a76924;
+}
 .scene-well {
   --width: 143px; --height: 143px; --height-z: 3px; --radius: 50%;
   background: #092d20 url("/assets/table/decorations/dice-well.webp") center / cover;
