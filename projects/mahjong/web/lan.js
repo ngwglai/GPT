@@ -32,11 +32,14 @@
       const el = $(`seat-${seat}`);
       el.classList.toggle('my-seat', state?.you.seat === seat);
       el.querySelectorAll('button').forEach(btn => {
-        if (btn.dataset.actionKey || btn.hasAttribute('data-orphan-pickup') || btn.classList.contains('clickable')) {
+        if (btn.dataset.actionKey || btn.hasAttribute('data-orphan-pickup') || btn.hasAttribute('data-ai-toggle') || btn.classList.contains('clickable')) {
           btn.disabled = awaiting || socket?.readyState !== WebSocket.OPEN;
         }
       });
     }
+    $('controlSettings').querySelectorAll('select').forEach(select => {
+      select.disabled = awaiting || socket?.readyState !== WebSocket.OPEN;
+    });
     $('startGame').disabled = awaiting || !state?.controls.can_start;
     $('nextRound').disabled = awaiting || !state?.controls.can_next_round;
     $('leaveRoom').disabled = awaiting || socket?.readyState !== WebSocket.OPEN;
@@ -81,6 +84,7 @@
         awaiting = false; showNotice(message.error);
         if (message.invalid_session) {
           stopped = true; save(null); ws.close(); state = null;
+          hide('tableHud', true); hide('controlMenu', true); document.body.classList.remove('table-live');
           hide('playingHint', true); status('尚未连接');
           hide('joinPanel', false); hide('roomPanel', true); hide('gameTable', true);
           hide('resumeRoom', true); hide('leaveRoom', true); hide('nextRound', true); hide('focusHand', true);
@@ -92,7 +96,7 @@
         if (!message.resumable) save(null);
         hide('joinPanel', false); hide('roomPanel', true); hide('gameTable', true);
         hide('leaveRoom', true); hide('nextRound', true); hide('focusHand', true); hide('resumeRoom', !saved);
-        hide('playingHint', true);
+        hide('playingHint', true); hide('tableHud', true); hide('controlMenu', true); document.body.classList.remove('table-live');
         window.MahjongPresentation?.audio.stopBgm();
         status('已离开');
         showNotice(message.resumable ? '座位仍为你保留。点击“返回原房间”可以继续，其他玩家会看到你已断线。' : '已离开房间。');
@@ -144,6 +148,11 @@
   }
   window.LanGame = {
     decorate,
+    setController(mode) {
+      if (!state?.player_view) return;
+      showNotice('');
+      send({type:'control', round_id:state.player_view.round_id, mode});
+    },
     setOrphanPickup(enabled) {
       if (!state?.player_view) return;
       showNotice('');

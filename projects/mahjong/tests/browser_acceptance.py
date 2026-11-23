@@ -11,6 +11,7 @@ from playwright.async_api import async_playwright, expect
 
 from lan_server import LOCAL, ROOMS, create_app
 from mahjong import ActionType
+from mahjong.core.player import MeldType
 from mahjong.game.debug import PlayerFixture, build_fixture
 from mahjong.solver.thirteen_orphans import ORPHANS
 from tests.helpers import E, N, S, W
@@ -42,6 +43,10 @@ def pickup_toggle(page, seat):
     return page.locator(f'[data-orphan-pickup="{int(seat)}"]')
 
 
+def ai_toggle(page, seat):
+    return page.locator(f'[data-ai-toggle="{int(seat)}"]')
+
+
 async def play_action(page, seat, action, select_tile=False):
     if select_tile:
         await page.locator(f'#seat-{int(seat)} [data-tile="{action.tile_ids[0]}"]').click()
@@ -64,9 +69,16 @@ async def room_fixture(room, players, **kwargs):
         return state
 
 
-async def capture(page, output, name):
+async def capture(page, output, name, full_page=True):
     if output:
-        await page.screenshot(path=output / f"{name}.png", full_page=True, animations="disabled")
+        await page.evaluate("window.scrollTo(0, 0)")
+        await page.screenshot(path=output / f"{name}.png", full_page=full_page, animations="disabled")
+
+
+async def capture_actions(page, output, seat, name):
+    if output:
+        await page.locator(f"#seat-{int(seat)} .action-area").screenshot(path=output / f"action-{name}.png",
+                                                                      animations="disabled")
 
 
 async def fits(page):
@@ -89,6 +101,7 @@ async def local_cases(page, app, url, output):
     await page.set_viewport_size({"width": 1366, "height": 768})
     await expect(action_button(page, E, "ROLL_DICE")).to_be_visible()
     await capture(page, output, "03-local-dice")
+    await capture_actions(page, output, E, "dice")
     assert await page.locator(".wall-layer.present").count() == 136
     await page.locator(".top-details").first.locator("summary").click()
     await page.locator("#seedInput").fill("42")
@@ -168,7 +181,9 @@ async def local_cases(page, app, url, output):
     fixture(engine, {E: PlayerFixture(WAIT + [33], last_draw_type=33)}, gold=33)
     await page.reload()
     shelf = next(a for a in engine.legal_actions(E) if a.type == ActionType.SHELVE_GOLD)
-    await play_action(page, E, shelf, select_tile=True)
+    await page.locator(f'#seat-0 [data-tile="{shelf.tile_ids[0]}"]').click()
+    await capture_actions(page, output, E, "shelf")
+    await play_action(page, E, shelf)
     await expect(page.locator("#seat-0 .shelf-row .tile.gold")).to_be_visible()
     await expect(page.locator("#seat-0 .badge.gold-ok")).to_contain_text("已上金")
 
@@ -189,6 +204,21 @@ async def local_cases(page, app, url, output):
     await expect(page.locator(".result-box.draw")).to_contain_text("本局流局")
     await expect(page.locator(".result-box.draw")).to_contain_text("下局庄家 东家")
     await capture(page, output, "08-local-draw")
+
+    app[LOCAL].new_round(seed=42)
+    await page.reload()
+    await expect(action_button(page, E, "ROLL_DICE")).to_be_visible()
+    await page.locator("#controlMenu summary").click()
+    await page.locator('[data-ai-all="normal"]').click()
+    await expect(page.locator(".ai-badge")).to_have_count(4)
+    await expect(action_button(page, E, "ROLL_DICE")).to_have_count(0)
+    await expect(page.locator("#seat-0 .ai-record summary")).to_be_visible()
+    await capture(page, output, "14-all-controls")
+    await page.locator('[data-ai-all="human"]').click()
+    await expect(page.locator(".ai-badge")).to_have_count(0)
+    paused_revision = app[LOCAL].engine.state.revision
+    await asyncio.sleep(.55)
+    assert app[LOCAL].engine.state.revision == paused_revision
 
 
 async def lan_cases(browser, app, url, output, watch):
@@ -240,8 +270,21 @@ async def lan_cases(browser, app, url, output, watch):
             await expect(pickup_toggle(page, viewer)).to_have_attribute("aria-pressed", "false")
             await fits(page)
         await capture(host, output, "05-lan-dealt")
-        await capture(pages[1], output, "09-lan-phone")
-        await pages[1].locator("#focusHand").tap()
+        await capture(pages[3], output, "05-lan-wide", full_page=False)
+        phone = pages[1]
+        await capture(phone, output, "09-lan-phone", full_page=False)
+        dock = await phone.locator(".dock-seat").bounding_box()
+        assert dock and abs(dock["y"] + dock["height"] - 844) < 1
+        await phone.locator("#focusHand").tap()
+        await expect(phone.locator("[data-ai-toggle]")).to_have_count(1)
+        await ai_toggle(phone, S).tap()
+        await expect(ai_toggle(phone, S)).to_have_attribute("aria-pressed", "true")
+        await expect(phone.locator("#seat-1")).to_have_class(re.compile(r"\bevent-control\b"))
+        await expect(host.locator("#seat-1 .ai-badge")).to_contain_text("AI 托管")
+        await expect(host.locator("#seat-1 .ai-record")).to_have_count(0)
+        await capture(phone, output, "14-phone-ai", full_page=False)
+        await ai_toggle(phone, S).tap()
+        await expect(host.locator("#seat-1 .ai-badge")).to_have_count(0)
 
         room = app[ROOMS][code]
         move = next(action for action in room.table.engine.legal_actions(E)
@@ -270,7 +313,6 @@ async def lan_cases(browser, app, url, output, watch):
         await room_fixture(room, {
             S: PlayerFixture([1, 2]), W: PlayerFixture([6], orphan_pickup_enabled=True),
         }, gold=4, discard=(E, 0))
-        phone = pages[1]
         await expect(action_button(phone, S, "CHI")).to_be_enabled()
         await expect(action_button(phone, S, "PICK_ORPHAN")).to_have_count(0)
         await pickup_toggle(phone, S).tap()
@@ -282,6 +324,7 @@ async def lan_cases(browser, app, url, output, watch):
         assert bounds and bounds["height"] >= 44 and 0 <= bounds["x"] <= bounds["x"] + bounds["width"] <= 390
         await fits(phone)
         await capture(phone, output, "12-phone-orphan-ready")
+        await capture_actions(phone, output, S, "orphan")
         await pickup_toggle(phone, S).tap()
         await expect(action_button(phone, S, "PICK_ORPHAN")).to_have_count(0)
         await expect(action_button(phone, S, "CHI")).to_be_enabled()
@@ -298,14 +341,34 @@ async def lan_cases(browser, app, url, output, watch):
         await expect(phone.locator("#seat-1 .orphan-locked")).to_be_visible()
         await expect(pickup_toggle(phone, S)).to_have_count(0)
 
-        await room_fixture(room, {E: PlayerFixture(WAIT+[7], last_draw_type=7)}, gold=33)
+        await room_fixture(room, {E: PlayerFixture(WAIT+[7], last_draw_type=7), S: PlayerFixture([31])},
+                           gold=33, indicator_type=19)
         await expect(host.locator("#seat-0 .hand button.drawn")).to_be_enabled()
-        ting = next(a for a in room.table.engine.legal_actions(E) if a.type == ActionType.DECLARE_TING)
-        await play_action(host, E, ting, select_tile=True)
+        ting = next(a for a in room.table.engine.legal_actions(E)
+                    if a.type == ActionType.DECLARE_TING and a.tile_ids[0] // 4 == 7)
+        await host.locator(f'#seat-0 [data-tile="{ting.tile_ids[0]}"]').click()
+        await capture_actions(host, output, E, "ting")
+        await play_action(host, E, ting)
         await expect(host.locator("#seat-0 .ting-row .tile:not(.tile-back)")).to_be_visible()
+        hint = host.locator("#seat-0 .wait-hint")
+        await expect(hint.locator('img[alt="中"]')).to_be_visible()
+        red_dragon = hint.locator(".wait-choice").filter(has=host.get_by_alt_text("中", exact=True))
+        await expect(red_dragon).to_contain_text("3 张")
+        await expect(hint).to_contain_text("需上金")
         for page in pages[1:]:
             await expect(page.locator("#seat-0 .ting-row .tile-back")).to_be_visible()
+            await expect(page.locator("#seat-0 .wait-hint")).to_have_count(0)
             assert await page.locator("#seat-0 .ting-row img").get_attribute("src") == "/assets/tiles/back.svg"
+        discard = next(a for a in room.table.engine.legal_actions(S)
+                       if a.type == ActionType.DISCARD and a.tile_ids[0] // 4 == 31)
+        await play_action(phone, S, discard, select_tile=True)
+        await expect(red_dragon).to_contain_text("2 张")
+        await capture(host, output, "15-wait-hint")
+        await room_fixture(room, {E: PlayerFixture(WAIT, declared=True),
+                                  S: PlayerFixture(melds=[(MeldType.PENG, [31] * 3, W)])},
+                           gold=33, indicator_type=19)
+        await expect(red_dragon).to_have_class(re.compile(r"\bexhausted\b"))
+        await expect(red_dragon).to_contain_text("已见完")
 
         await room_fixture(room, {
             S: PlayerFixture([0, 1]), W: PlayerFixture([2, 2]),
@@ -316,6 +379,7 @@ async def lan_cases(browser, app, url, output, watch):
             await expect(action_button(page, seat, "PASS")).to_be_enabled()
             await fits(page)
             await capture(page, output, f"06-lan-response-{kind.lower()}")
+            await capture_actions(page, output, seat, kind.lower())
         await action_button(pages[3], N, "HU").click()
         await action_button(pages[2], W, "PENG").click()
         await action_button(pages[1], S, "CHI").tap()
@@ -330,6 +394,7 @@ async def lan_cases(browser, app, url, output, watch):
         await room_fixture(room, {S: PlayerFixture([0, 0, 0, 9, 10, 11, 18, 19, 20, 27, 27, 27, 31], declared=True)}, gold=33, discard=(E, 0))
         await expect(action_button(pages[1], S, "MING_GANG")).to_be_enabled()
         await capture(pages[1], output, "06-lan-response-gang")
+        await capture_actions(pages[1], output, S, "gang")
         await action_button(pages[1], S, "MING_GANG").tap()
         await expect(host.locator("#seat-1 .meld-row .tile")).to_have_count(4)
     finally:
@@ -344,6 +409,10 @@ async def gallery_and_fallbacks(page, url, output):
     await expect(page.locator("#diceSamples img")).to_have_count(6)
     await page.wait_for_function("Array.from(document.images).every(i => i.complete && i.naturalWidth > 0)")
     await capture(page, output, "10-gallery")
+    if output:
+        await page.set_viewport_size({"width": 800, "height": 1100})
+        await page.add_style_tag(content=".gallery-page .topbar { position: static }")
+        await page.locator("#tiles").screenshot(path=output / "16-tiles-overview.png", animations="disabled")
     await page.set_viewport_size({"width": 390, "height": 844})
     await fits(page)
     await page.route("**/assets/tiles/*.svg", lambda route: route.abort())
@@ -371,9 +440,9 @@ async def run(args):
         browser = await playwright.chromium.launch(executable_path=args.chromium)
         page = watch(await browser.new_page(viewport={"width": 1920, "height": 1080}))
         await local_cases(page, app, url, args.screenshots)
-        print("PASS local: dice, deal, discard, pickup, gold, hu, draw, next round, responsive layout and sound settings", flush=True)
+        print("PASS local: dice, discard, pickup, gold, hu, draw, next round, AI autoplay/pause, responsive layout and sound", flush=True)
         await lan_cases(browser, app, url, args.screenshots, watch)
-        print("PASS LAN: four browser sessions, room seats, privacy, drop/reconnect/leave, ting, chi/peng/hu/gang, next round", flush=True)
+        print("PASS LAN: four sessions, mobile takeover, private wait counts, reconnect/leave, chi/peng/hu/gang, next round", flush=True)
         await page.set_viewport_size({"width": 1366, "height": 768})
         app[LOCAL].new_round(seed=42)
         await gallery_and_fallbacks(page, url, args.screenshots)

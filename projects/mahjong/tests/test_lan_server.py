@@ -120,7 +120,8 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
             for seat in range(4):
                 p = view['players'][str(seat)]
                 self.assertEqual(p['concealed_count'], len(self.room.table.engine.state.players[Seat(seat)].concealed_tiles))
-                for key in ('concealed_tiles', 'current_waits', 'declared_waits', 'last_drawn_tile', 'orphan_pickup_enabled'):
+                for key in ('concealed_tiles', 'current_waits', 'declared_waits', 'last_drawn_tile',
+                            'orphan_pickup_enabled', 'wait_hint', 'ai_decisions'):
                     self.assertEqual(key in p, seat == viewer, (seat, viewer, key))
                 if seat != viewer and p['ting_tile']:
                     self.assertEqual(p['ting_tile'], {'hidden': True})
@@ -313,8 +314,35 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         await self.setup_room()
         await self.fixture({E:PlayerFixture(WAIT+[7], last_draw_type=7)}, gold=33)
         await self.act(0, 'DECLARE_TING')
-        self.assertIsNotNone(self.views[0]['player_view']['players']['0']['ting_tile'])
+        own = self.views[0]['player_view']['players']['0']
+        self.assertIsNotNone(own['ting_tile'])
+        self.assertEqual([hint['type'] for hint in own['wait_hint']], own['current_waits'])
+        self.assertTrue(own['wait_hint'])
         self.assert_private()
+
+    async def test_owner_controls_managed_seat_across_reconnect(self):
+        await self.setup_room()
+        command = {'type': 'control', 'round_id': self.room.table.engine.state.round_id, 'mode': 'normal'}
+        await self.reject(0, {**command, 'seat': 1})
+        await self.reject(1, {**command, 'round_id': 'stale'})
+        await self.clients[1].send_json(command)
+        await self.all_states(lambda m: m['player_view']['players']['1']['controller'] == 'normal')
+        self.assert_private()
+        await self.clients[1].close()
+        await self.read(self.clients[0], lambda m: not m['player_view']['players']['1']['connected'])
+        self.clients[1] = await self.open_socket(self.credentials[1])
+        resumed = await self.read(self.clients[1])
+        self.assertEqual(resumed['player_view']['players']['1']['controller'], 'normal')
+
+        await self.fixture({S: PlayerFixture([4], last_draw_type=4)}, gold=33, current=S)
+        self.room.ai.kick()
+        await self.all_states(lambda m: m['player_view']['revision'] == 1)
+        self.assert_private()
+        own = self.views[1]['player_view']['players']['1']
+        self.assertEqual(own['ai_decisions'][0]['hand'], [4])
+        self.assertEqual(own['ai_decisions'][0]['chosen']['type'], 'DISCARD')
+        await self.clients[1].send_json({**command, 'round_id': self.room.table.engine.state.round_id, 'mode': 'human'})
+        await self.all_states(lambda m: m['player_view']['players']['1']['controller'] == 'human')
 
     async def test_orphan_pickup_intent_only_updates_owner_and_survives_reconnect(self):
         await self.setup_room()

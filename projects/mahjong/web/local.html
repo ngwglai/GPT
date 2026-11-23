@@ -7,6 +7,7 @@
   <title>单机练习 · 青雀麻将</title>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/table.css">
+  <link rel="stylesheet" href="/play.css">
 </head>
 <body class="game-mode">
   <header class="topbar">
@@ -14,6 +15,7 @@
       <a class="brand" href="/" aria-label="青雀麻将首页"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="/assets/icons/marks.svg#bird"></use></svg></span><strong>青雀麻将</strong></a>
       <span class="mode-label">四家明牌练习</span>
     </div>
+    <div id="tableHud" class="table-hud hidden" aria-label="本局信息"></div>
     <div class="round-controls">
       <button id="focusTurn" type="button" class="ghost hidden" aria-label="查看当前操作席位">操作席</button>
       <button id="timeoutBtn" type="button" class="ghost hidden">未响应者全部过</button>
@@ -25,6 +27,10 @@
           <label>庄家 <select id="dealerSelect"><option value="0">东</option><option value="1">南</option><option value="2">西</option><option value="3">北</option></select></label>
           <button id="resetMatchBtn" type="button" class="ghost">按设置重置整场</button>
         </div>
+      </details>
+      <details id="controlMenu" class="top-details hidden">
+        <summary class="ghost">托管</summary>
+        <div class="settings-panel" id="controlSettings"></div>
       </details>
       <details class="sound-settings top-details">
         <summary class="ghost"><svg class="icon" aria-hidden="true"><use href="/assets/icons/marks.svg#sound"></use></svg> 声音</summary>

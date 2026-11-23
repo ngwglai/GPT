@@ -1,6 +1,6 @@
-# 本地麻将 v0.5.1
+# 青雀麻将 v0.6.0
 
-青雀麻将提供四家明牌练习和四人局域网联机。v0.5.1 支持主动开启十三幺拾牌、连续牌局与刷新重连，规则由 Python 服务端执行。Web 美术升级提供翡翠绒面牌桌、SVG 牌组和桌面、平板、手机布局。
+青雀麻将提供四家明牌练习和四人局域网联机。v0.6.0 增加三档 AI 托管、报听后的胡牌提示与可见剩余数量，升级翡翠牌桌和完整 SVG 牌组。规则由 Python 服务端执行。
 
 ## 安装与启动
 
@@ -24,6 +24,12 @@ python web_server.py
 房主在联机页输入昵称、创建房间并分享六位房间号。其余玩家输入房间号加入。四人入座且在线后，房主开始游戏，东家掷骰发牌。刷新会用同一浏览器保存的身份恢复座位。
 
 服务器使用 HTTP 和 WebSocket，适用于可信局域网。房间状态保存在内存，重启即清空。进行中的座位绑定浏览器保存的身份，清除网站数据后无法恢复该座位。
+
+## 托管与胡牌提示
+
+- 席位上的「开启托管」使用普通 AI，再点「人工接管」即可恢复手动操作。顶部「托管」可选初级、普通和高级。联机时只能切换自己的席位，刷新或重连会恢复该席位的控制方式。
+- 本地「托管」菜单中的「四家自动对局」会让四个席位使用普通 AI。「暂停托管」把四个席位交还人工。每局结束后可点「下一局」继续。
+- 报听后，手牌旁会用实际牌面列出听口和各自的可见剩余。零张显示「已见完」，受首次上金限制的听口显示「需上金」。可见剩余包含未知位置的牌，实际可摸数量取决于牌墙和对手手牌。
 
 ## 十三幺拾牌
 
@@ -51,11 +57,20 @@ npm install --no-package-lock
 npm run test:ui -- http://127.0.0.1:8765
 ```
 
-前端测试使用 jsdom 和实际 HTTP/WebSocket 连接，覆盖四个客户端的房间同步、私人拾牌意向、重连和公开锁定，另有 Playwright 验收覆盖手机触控、普通操作共存及牌桌布局。命令行引擎可用 `python -m mahjong demo --seed 42 --rounds 3` 试跑。试玩机器人继续从各自的合法操作中选择，开局主动开启意向以保留原有策略。
+前端集成测试使用 jsdom 和真实 HTTP/WebSocket 连接。浏览器验收使用 Chromium，在项目目录运行：
+
+```bash
+python -m pip install playwright==1.62.0
+python -m playwright install chromium
+python -m tests.browser_acceptance --screenshots browser-screenshots
+python -m tools.run_ai_matches --output ai-matches.json
+```
+
+命令行引擎可用 `python -m mahjong demo --seed 42 --rounds 3` 试跑。
 
 ## Web 美术与浏览器验收
 
-[美术升级说明](VISUAL-UPGRADE.md) 收录资产清单、布局与操作变化，以及 Playwright 验收和截图生成方式。
+[v0.6.0 验收报告](VALIDATION-v0.6.0.md) 收录牌面审查、自动对局结果、移动端和桌面截图。[美术升级说明](VISUAL-UPGRADE.md) 保留首轮青雀麻将资产的制作资料。
 
 ## 原版资料
 

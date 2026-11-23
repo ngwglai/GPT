@@ -35,6 +35,7 @@ jobs:
         run: |
           python -m pip install -r requirements.txt
           python -m pip install .
+          python -m pip install playwright==1.62.0
           python -m pip check
           npm install --no-package-lock
       - name: Full Python suite, orphan pickup and gold compatibility
@@ -62,7 +63,7 @@ jobs:
                 Start-Sleep -Milliseconds 250
               }
             }
-            if (-not $health.ok -or $health.version -ne '0.5.1') { throw 'Mahjong health check failed' }
+            if (-not $health.ok -or $health.version -ne '0.6.0') { throw 'Mahjong health check failed' }
             npm run test:ui -- http://127.0.0.1:8765
             if ($LASTEXITCODE -ne 0) { throw 'Frontend integration failed' }
           } finally {
@@ -71,6 +72,13 @@ jobs:
               $server.WaitForExit()
             }
           }
+      - name: Chromium acceptance (Linux)
+        if: runner.os == 'Linux'
+        run: python -m tests.browser_acceptance --chromium /usr/bin/google-chrome
+      - name: Chromium acceptance (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: python -m tests.browser_acceptance --chromium "$env:ProgramFiles\Google\Chrome\Application\chrome.exe"
       - name: Windows batch launchers
         if: runner.os == 'Windows'
         shell: pwsh
@@ -93,10 +101,10 @@ jobs:
                   Start-Sleep -Milliseconds 500
                 }
               }
-              if (-not $health.ok -or $health.version -ne '0.5.1') { throw "$($entry.Key) failed its health check" }
+              if (-not $health.ok -or $health.version -ne '0.6.0') { throw "$($entry.Key) failed its health check" }
               $listeners = Get-NetTCPConnection -State Listen -LocalPort 8765
               if ($entry.Value -notin $listeners.LocalAddress) { throw "$($entry.Key) bound to the wrong address" }
-              Write-Host "$($entry.Key) served v0.5.1 on $($entry.Value)"
+              Write-Host "$($entry.Key) served v0.6.0 on $($entry.Value)"
             } finally {
               if (-not $server.HasExited) {
                 taskkill.exe /PID $server.Id /T /F

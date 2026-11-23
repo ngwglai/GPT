@@ -38,6 +38,7 @@ async function create(page = '/lan.html', saved = null) {
 }
 const visible = el => el && !el.closest('.hidden');
 const toggle = (c, seat) => c.d.querySelector(`[data-orphan-pickup="${seat}"]`);
+const ai = (c, seat) => c.d.querySelector(`[data-ai-toggle="${seat}"]`);
 const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision (\d+)/)?.[1]);
 (async () => {
   const a = await create();
@@ -87,6 +88,12 @@ const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision
     }
   }
   checkHands();
+  ai(seats[1], 1).click();
+  await wait(() => a.d.querySelector('#seat-1 .ai-badge'), 'public managed badge');
+  assert.equal(ai(a, 1), null, 'peer cannot control a managed seat');
+  assert.equal(ai(seats[1], 1).textContent, '人工接管');
+  ai(seats[1], 1).click();
+  await wait(() => !a.d.querySelector('#seat-1 .ai-badge'), 'manual control restored');
   toggle(seats[2], 2).click();
   await wait(() => toggle(seats[2], 2).getAttribute('aria-pressed') === 'true', 'owner opted in');
   assert.equal(rev(seats[2]), 1);
@@ -130,6 +137,11 @@ const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision
   local.d.querySelector('#seedInput').value = '42';
   local.d.querySelector('#resetMatchBtn').click();
   await wait(() => !local.d.querySelector('#center').textContent.includes(`round ${originalRound}`), 'fixed local seed');
+  ai(local, 3).click();
+  await wait(() => ai(local, 3).getAttribute('aria-pressed') === 'true', 'local AI takeover');
+  assert.equal(rev(local), 0);
+  ai(local, 3).click();
+  await wait(() => ai(local, 3).getAttribute('aria-pressed') === 'false', 'local manual takeover');
   local.d.querySelector('[data-action-key="ROLL_DICE:"]').click();
   await wait(() => local.d.querySelectorAll('button.tile[data-tile]').length === 53, 'local all-open hands');
   assert.equal(local.d.querySelectorAll('[data-orphan-pickup][aria-pressed="false"]').length, 4);
@@ -159,5 +171,5 @@ const rev = c => Number(c.d.querySelector('#center').textContent.match(/revision
   assert.equal(local.d.querySelectorAll('.wall-layer.present').length, wallBefore);
   assert.equal(local.d.querySelectorAll('.river-east .river-tiles .tile').length, 0);
   assert.equal(errors.length, 0, errors.join('\n'));
-  console.log('PASS: four DOM clients, create/join/seats, dealer dice, 16 synchronized moves, private hands, wall, XSS escaping, disconnect/reload, local mode and public orphan pickup without a draw. No script errors.');
+  console.log('PASS: four DOM clients, room setup, dealer dice, 16 synchronized moves, private hands, AI takeover, wall, XSS escaping, reconnect, local mode and orphan pickup. No script errors.');
 })().catch(e => { console.error(e); process.exitCode = 1; }).finally(() => clients.forEach(c => c.close()));

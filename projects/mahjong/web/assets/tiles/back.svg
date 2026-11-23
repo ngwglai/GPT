@@ -6,6 +6,6 @@
 <rect x="7" y="7" width="36" height="52" rx="2" fill="none" stroke="#9dc6a5" opacity=".28"/>
 <path d="M25 18 38 33 25 48 12 33zM25 24l8 9-8 9-8-9z" fill="none" stroke="#afd2ab" opacity=".9"/>
 <path d="m25 29 4 4-4 4-4-4z" fill="#c4d6a1"/>
-<path d="M11 16v-5h5m18 0h5v5m0 34v5h-5m-18 0h-5v-5" fill="none" stroke="#afd2ab" opacity=".65"/>
+<path d="M11 16v-5h5m18 0h5v5m0 34v5h-5m-18 0h-5v-5" fill="none" stroke="#afd2ab" stroke-width="1.5" opacity=".75"/>
 
 </svg>

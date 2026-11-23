@@ -25,6 +25,7 @@ from ..rules.gold import get_opposite_tile
 from ..rules.gang import simulate_gang
 from ..rules.response import ResponseResolver
 from ..rules.scoring import HuEffect, ScoreEngine
+from .visibility import wait_hint
 from ..rules.thirteen_orphans import (
     advance_pickup_cycle, check_player_hu, claim_pickup, find_player_waits, orphans_locked, pickup_action,
 )
@@ -648,7 +649,7 @@ class GameEngine:
             pending_claim = {"kind": s.response_kind, "source": int(s.current_discarder), "tile_type": s.current_discard.type_id}
         dice_revealed = s.phase != P.ROLLING_DICE
         wall_view = self._wall_public_view(dice_revealed)
-        return {"round_id": s.round_id, "revision": s.revision, "phase": visible_phase,
+        view = {"round_id": s.round_id, "revision": s.revision, "phase": visible_phase,
                 "dealer": int(s.dealer), "current_player": int(s.current_player), "players": players,
                 "dice": [s.dice1, s.dice2] if dice_revealed else [None, None],
                 "break_wall": int(s.break_wall) if dice_revealed else None,
@@ -666,6 +667,8 @@ class GameEngine:
                 "discards": [{"seat": int(d.seat), "type": d.tile.type_id, "claimed": d.claimed} for d in s.discards],
                 "legal_actions": [{"type": a.type.name, "tile_ids": list(a.tile_ids)} for a in self.legal_actions(viewer)],
                 "result": result}
+        players[int(viewer)]["wait_hint"] = wait_hint(view, int(viewer))
+        return view
 
     def assert_invariants(self):
         """Physical conservation gate after every mutation, including debug states."""
