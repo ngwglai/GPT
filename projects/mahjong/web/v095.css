@@ -14,3 +14,50 @@ body.table-live .cuboid-active .player>.player-head,body.table-live .cuboid-acti
  body.table-live .cuboid-active .scene-toolbar{max-width:23vw!important}
  .cuboid-active .scene-controls{gap:3px!important}
 }
+
+/* v0.10.2: fill the projected wall width with accessible action controls. */
+body.table-live .cuboid-active .player.dock-seat .decision-row {
+  width: var(--wall-action-width, max-content) !important;
+  max-width: none !important;
+  transform: translate(-50%, -50%) scale(var(--edge-scale, 1)) !important;
+  transform-origin: center;
+  flex-direction: column;
+  align-items: stretch;
+}
+body.table-live .cuboid-active .decision-row > .wait-hint {
+  align-self: center;
+  max-width: 100%;
+}
+body.table-live .cuboid-active .decision-row .action-area {
+  display: flex;
+  width: 100%;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 5px;
+}
+body.table-live .cuboid-active .decision-row .action-area > .action-btn,
+body.table-live .cuboid-active .decision-row .action-area > .action-family {
+  flex: 1 1 0;
+  min-width: 0;
+}
+body.table-live .cuboid-active .decision-row .action-area > .action-btn {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 6px 5px;
+  font-size: 16px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+body.table-live .cuboid-active .decision-row .action-area > .action-family > summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  padding: 6px 5px;
+  white-space: normal;
+}
