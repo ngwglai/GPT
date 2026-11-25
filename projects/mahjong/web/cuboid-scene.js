@@ -1426,31 +1426,7 @@
       const wallPoint = F.screen(
         rotate([0, -config.WALL_DISTANCE, config.D * 2], k),
       );
-      const wallTop = F.screen(
-        rotate([0, -config.WALL_DISTANCE, config.D * 2], k),
-      );
-      const wallBottom = F.screen(
-        rotate([0, -config.WALL_DISTANCE, 0], k),
-      );
-      const wallHeight = Math.hypot(
-        wallBottom[0] - wallTop[0],
-        wallBottom[1] - wallTop[1],
-      );
-      const area = shell.closest(".game-content");
-      const viewportScale = viewportFit(
-        F,
-        area?.clientWidth || root.innerWidth || 1440,
-        area?.clientHeight || root.innerHeight || 800,
-      ).scale;
-      const decisionRow = el.querySelector(".decision-row");
-      if (decisionRow) {
-        // Match the wall's vertical size only; preserve the existing action-row width.
-        decisionRow.style.setProperty(
-          "--wall-action-height",
-          `${wallHeight * viewportScale}px`,
-        );
-        place(decisionRow, ...wallPoint);
-      }
+      place(el.querySelector(".decision-row"), ...wallPoint);
       const toolsPoint = F.screen(
         rotate([6.9, -config.WALL_DISTANCE, config.D * 2], k),
       );
