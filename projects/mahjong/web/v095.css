@@ -14,3 +14,17 @@ body.table-live .cuboid-active .player>.player-head,body.table-live .cuboid-acti
  body.table-live .cuboid-active .scene-toolbar{max-width:23vw!important}
  .cuboid-active .scene-controls{gap:3px!important}
 }
+
+/* v0.10.2: match each action target to the rendered wall's vertical silhouette. */
+body.table-live .cuboid-active .decision-row .action-btn {
+  box-sizing: border-box;
+  width: var(--wall-action-width, 53px) !important;
+  min-width: var(--wall-action-width, 53px) !important;
+  height: var(--wall-action-height, 39px) !important;
+  min-height: var(--wall-action-height, 39px) !important;
+  padding: 8px 10px !important;
+  font-size: 16px !important;
+  line-height: 1.15;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

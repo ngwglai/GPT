@@ -1423,14 +1423,100 @@
           });
         }
       }
-      const wallPoint = F.screen(
-        rotate([0, -config.WALL_DISTANCE, config.D * 2], k),
-      );
-      place(el.querySelector(".decision-row"), ...wallPoint);
-      const toolsPoint = F.screen(
-        rotate([6.9, -config.WALL_DISTANCE, config.D * 2], k),
-      );
-      place(el.querySelector(".dock-tools"), ...toolsPoint);
+      const decisionRow = el.querySelector(".decision-row");
+      const dockTools = el.querySelector(".dock-tools");
+      if (el.classList.contains("dock-seat") && decisionRow) {
+        // Use the rendered wall sprites' real silhouette bounds, in the same
+        // unscaled scene coordinates as the projected UI anchors.
+        const wallSprites = shell.querySelectorAll(
+          `.cuboid-sprite[data-wall-seat="${seat}"]`,
+        );
+        let wallTop = Infinity;
+        let wallBottom = -Infinity;
+        for (const sprite of wallSprites) {
+          const top = Number.parseFloat(sprite.style.top);
+          const height = Number.parseFloat(sprite.style.height);
+          if (!Number.isFinite(top) || !Number.isFinite(height)) continue;
+          wallTop = Math.min(wallTop, top);
+          wallBottom = Math.max(wallBottom, top + height);
+        }
+        if (!(wallBottom > wallTop)) {
+          // Fallback for a completely exhausted wall.
+          const profile = [
+            [-config.H / 2, 0],
+            [-config.H / 2, config.D * 2],
+            [config.H / 2, 0],
+            [config.H / 2, config.D * 2],
+          ].map(([dy, z]) =>
+            F.screen(rotate([0, -config.WALL_DISTANCE + dy, z], k)),
+          );
+          wallTop = Math.min(...profile.map((point) => point[1]));
+          wallBottom = Math.max(...profile.map((point) => point[1]));
+        }
+        const wallHeight = wallBottom - wallTop;
+        const wallCenter = F.screen(
+          rotate([0, -config.WALL_DISTANCE, config.D], k),
+        );
+        const wallCenterY = (wallTop + wallBottom) / 2;
+        decisionRow.style.setProperty(
+          "--wall-action-height",
+          `${wallHeight}px`,
+        );
+        decisionRow.style.setProperty(
+          "--wall-action-width",
+          `${(wallHeight * 53) / 39}px`,
+        );
+
+        // Reserve a real gap between the expanded action rail and the utility
+        // controls. Cap the row only as much as necessary to keep both inside
+        // the scene and their pointer targets disjoint.
+        const toolsWidth = dockTools?.offsetWidth || 0;
+        const controlGap = Math.max(18, wallHeight * 0.22);
+        const edgeMargin = 12;
+        const availableRowWidth =
+          toolsWidth > 0
+            ? 2 *
+              (F.width -
+                edgeMargin -
+                controlGap -
+                toolsWidth -
+                wallCenter[0])
+            : F.width * 0.65;
+        const maxRowWidth = Math.max(
+          0,
+          Math.min(F.width * 0.65, availableRowWidth),
+        );
+        decisionRow.style.setProperty(
+          "max-width",
+          `${maxRowWidth}px`,
+          "important",
+        );
+        place(decisionRow, wallCenter[0], wallCenterY);
+
+        const rowWidth = decisionRow.offsetWidth;
+        if (dockTools && toolsWidth > 0 && rowWidth > 0) {
+          const toolsX =
+            wallCenter[0] +
+            rowWidth / 2 +
+            controlGap +
+            toolsWidth / 2;
+          place(dockTools, toolsX, wallCenterY);
+        } else if (dockTools) {
+          const toolsPoint = F.screen(
+            rotate([6.9, -config.WALL_DISTANCE, config.D * 2], k),
+          );
+          place(dockTools, ...toolsPoint);
+        }
+      } else {
+        const wallPoint = F.screen(
+          rotate([0, -config.WALL_DISTANCE, config.D * 2], k),
+        );
+        place(decisionRow, ...wallPoint);
+        const toolsPoint = F.screen(
+          rotate([6.9, -config.WALL_DISTANCE, config.D * 2], k),
+        );
+        place(dockTools, ...toolsPoint);
+      }
     }
   }
   function fit(shell, F) {

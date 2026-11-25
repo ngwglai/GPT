@@ -43,6 +43,56 @@ def pickup_toggle(page, seat):
     return page.locator(f'[data-orphan-pickup="{int(seat)}"]')
 
 
+async def assert_wall_action_layout(page, seat):
+    """The action targets match the wall height and never cover dock controls."""
+    wall = page.locator(f'.cuboid-sprite[data-wall-seat="{int(seat)}"]')
+    wall_boxes = await wall.evaluate_all("""nodes => nodes.map(node => {
+        const rect = node.getBoundingClientRect();
+        return {x: rect.x, y: rect.y, width: rect.width, height: rect.height};
+    })""")
+    assert wall_boxes, f"no rendered wall sprites for seat {seat}"
+    wall_top = min(box["y"] for box in wall_boxes)
+    wall_bottom = max(box["y"] + box["height"] for box in wall_boxes)
+    wall_height = wall_bottom - wall_top
+
+    actions = page.locator(
+        f'#seat-{int(seat)}.dock-seat .decision-row .action-area .action-btn'
+    )
+    tools = page.locator(
+        f'#seat-{int(seat)}.dock-seat .dock-tools :is(button, summary)'
+    )
+    action_boxes = []
+    for index in range(await actions.count()):
+        box = await actions.nth(index).bounding_box()
+        if box:
+            action_boxes.append((index, box))
+            tolerance = max(2, wall_height * 0.03)
+            assert abs(box["height"] - wall_height) <= tolerance, (
+                seat, index, box["height"], wall_height
+            )
+
+    tool_boxes = []
+    for index in range(await tools.count()):
+        if not await tools.nth(index).is_visible():
+            continue
+        box = await tools.nth(index).bounding_box()
+        if box:
+            tool_boxes.append((index, box))
+
+    for action_index, action in action_boxes:
+        for tool_index, tool in tool_boxes:
+            overlap_x = min(
+                action["x"] + action["width"], tool["x"] + tool["width"]
+            ) - max(action["x"], tool["x"])
+            overlap_y = min(
+                action["y"] + action["height"], tool["y"] + tool["height"]
+            ) - max(action["y"], tool["y"])
+            assert overlap_x <= 1 or overlap_y <= 1, (
+                "action target overlaps dock control",
+                seat, action_index, tool_index, action, tool,
+            )
+
+
 def ai_toggle(page, seat):
     return page.locator(f'[data-ai-toggle="{int(seat)}"]')
 
@@ -394,6 +444,17 @@ async def lan_cases(browser, app, url, output, watch):
         await expect(action_button(phone, S, "CHI")).to_be_enabled()
         await expect(action_button(phone, S, "PASS")).to_be_enabled()
         await expect(host.locator("#seat-1 .orphan-ready")).to_have_count(0)
+        # Check wall-height matching and non-overlap on portrait, landscape and desktop.
+        for width, height in ((390, 844), (844, 390), (1366, 768)):
+            await phone.set_viewport_size({"width": width, "height": height})
+            await phone.evaluate(
+                "() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))"
+            )
+            await assert_wall_action_layout(phone, S)
+        await phone.set_viewport_size({"width": 390, "height": 844})
+        await phone.evaluate(
+            "() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))"
+        )
         bounds = await action_button(phone, S, "PICK_ORPHAN").bounding_box()
         assert bounds and bounds["height"] >= 9 and 0 <= bounds["x"] <= bounds["x"] + bounds["width"] <= 390
         await fits(phone)
