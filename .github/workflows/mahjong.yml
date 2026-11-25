@@ -1,188 +1,97 @@
-name: Mahjong
+name: Publish verified Mahjong v0.10.1 binaries
 
 on:
-  workflow_call:
   workflow_dispatch:
+  push:
+    branches: [release/qingque-v0.10.1-publish]
 
 permissions:
-  contents: read
+  actions: read
+  contents: write
 
 jobs:
-  test:
-    name: Mahjong (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
+  publish:
+    if: github.ref == 'refs/heads/release/qingque-v0.10.1-publish'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
-      PYTHONIOENCODING: utf-8
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    defaults:
-      run:
-        working-directory: projects/mahjong
+      GH_TOKEN: ${{ github.token }}
+      REPOSITORY: ngwglai/GPT
+      CI_RUN: '45520641374'
+      INPUT_SHA: a99f76b4dd23c1a7cd6dfe1da3a60cf80de0eef8
+      MERGE_SHA: 56345725dd09f2904cb726c1c1b43a725884042f
+      TAG: mahjong-v0.10.1
+      RELEASE_ID: '457515138'
+      WINDOWS_ZIP_SHA: 20d5b082652f97b3d0a910f159915255beee22a84a36f8024fd209737569e5ef
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: '3.12'
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: '24'
-      - name: Install and check dependencies
+      - name: Verify immutable release inputs
+        shell: bash
         run: |
-          python -m pip install -r requirements.txt
-          python -m pip install .
-          python -m pip install playwright==1.62.0
-          python -m pip check
-          npm install --no-package-lock
-      - name: Full Python suite, orphan pickup and gold compatibility
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = "$REPOSITORY"
+          test "$(gh run view "$CI_RUN" -R "$REPOSITORY" --json headSha,conclusion --jq '.headSha + " " + .conclusion')" = "$INPUT_SHA success"
+          tag_object=$(gh api "repos/$REPOSITORY/git/ref/tags/$TAG" --jq '.object.sha')
+          test "$(gh api "repos/$REPOSITORY/git/tags/$tag_object" --jq '.object.sha')" = "$MERGE_SHA"
+          test "$(gh api "repos/$REPOSITORY/releases/$RELEASE_ID" --jq '.tag_name + " " + (.draft|tostring)')" = "$TAG true"
+      - name: Download and verify the native Windows CI package
+        shell: bash
         run: |
-          python -m unittest discover -v
-          python -m unittest discover -v -k orphan_pickup
-          python -m unittest -v tests.test_gold tests.test_win
-      - name: JavaScript syntax
-        run: |
-          node --check web/app.js
-          node --check web/lan.js
-          node --check web/presentation.js
-          node --check web/components.js
-          node --check web/table-scene.js
-          node --check web/cuboid-scene.js
-          node --check web/perspective.js
-          node --check tests/ui_smoke.cjs
-      - name: Geometry and special layout regressions
-        run: |
-          node tests/v092_scene_logic.cjs
-          node tests/v093_projection.cjs
-          node tests/v094_cuboid.cjs
-          node tests/v095_fit.cjs
-          node tests/v098_perspective.cjs
-          node tests/v101_texture.cjs
-      - name: Read project version
-        shell: pwsh
-        run: |
-          $version = python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])"
-          if ($LASTEXITCODE -ne 0 -or -not $version) { throw 'Mahjong project version could not be read' }
-          "MAHJONG_VERSION=$version" >> $env:GITHUB_ENV
-      - name: Frontend integration
-        shell: pwsh
-        run: |
-          $server = Start-Process python -ArgumentList 'web_server.py', '--no-browser' -PassThru -NoNewWindow
-          try {
-            $health = $null
-            for ($attempt = 0; $attempt -lt 40 -and -not $health; $attempt++) {
-              if ($server.HasExited) { throw "Web server exited with code $($server.ExitCode)" }
-              try {
-                $health = Invoke-RestMethod http://127.0.0.1:8765/api/health -TimeoutSec 2
-              } catch {
-                Start-Sleep -Milliseconds 250
-              }
-            }
-            if (-not $health.ok -or $health.version -ne $env:MAHJONG_VERSION) { throw 'Mahjong health check failed' }
-            npm run test:ui -- http://127.0.0.1:8765
-            if ($LASTEXITCODE -ne 0) { throw 'Frontend integration failed' }
-          } finally {
-            if (-not $server.HasExited) {
-              Stop-Process -Id $server.Id -ErrorAction SilentlyContinue
-              $server.WaitForExit()
-            }
+          set -euo pipefail
+          gh run download "$CI_RUN" -R "$REPOSITORY" --name mahjong-windows-portable --dir portable
+          gh run download "$CI_RUN" -R "$REPOSITORY" --name mahjong-validation-ubuntu-latest --dir linux
+          cd portable
+          printf '%s  %s\n' "$WINDOWS_ZIP_SHA" QingqueMahjong_v0.10.1.zip | sha256sum -c
+          sha256sum -c QingqueMahjong_v0.10.1.sha256
+          unzip -tq QingqueMahjong_v0.10.1.zip
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          import zipfile
+
+          release = Path(".")
+          linux = Path("../linux")
+          prefix = "QingqueMahjong_v0.10.1/validation/v0.10.1/"
+          data = {
+              "workflow": f"https://github.com/{os.environ['REPOSITORY']}/actions/runs/{os.environ['CI_RUN']}",
+              "head_sha": os.environ["INPUT_SHA"],
           }
-      - name: Chromium acceptance (Linux)
-        if: runner.os == 'Linux'
+          for filename, key in (
+              ("ci-performance.json", "linux_performance"),
+              ("ci-soak.json", "linux_frozen"),
+              ("ci-tabs.json", "linux_active_tabs"),
+          ):
+              data[key] = json.loads((linux / filename).read_text(encoding="utf-8"))
+          with zipfile.ZipFile(release / "QingqueMahjong_v0.10.1.zip") as archive:
+              screenshot = archive.read(prefix + "windows-browser/04-local-dealt.png")
+              assert screenshot.startswith(b"\x89PNG\r\n\x1a\n")
+              (release / "QingqueMahjong_v0.10.1_Windows.png").write_bytes(screenshot)
+              data["windows_performance"] = json.loads(archive.read(prefix + "ci-performance.json"))
+          assert not data["linux_performance"]["failures"]
+          assert not data["windows_performance"]["failures"]
+          (release / "QingqueMahjong_v0.10.1_CI.json").write_text(
+              json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+          )
+          PY
+      - name: Upload, verify GitHub asset digests, and publish
+        shell: bash
         run: |
-          python -m tests.browser_acceptance --chromium /usr/bin/google-chrome
-          python -m tests.v101_scene_acceptance --chromium /usr/bin/google-chrome
-          python tools/performance_regression.py --chromium /usr/bin/google-chrome --samples 1 --iterations 24 --output validation/v0.10.1/ci-performance.json
-          python -m tests.soak_acceptance --chromium /usr/bin/google-chrome --rounds 4 --output validation/v0.10.1/ci-soak.json
-          python -m tests.soak_acceptance --chromium /usr/bin/google-chrome --foreground --delay .12 --rounds 2 --output validation/v0.10.1/ci-tabs.json
-      - name: Chromium acceptance (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $chrome = "$env:ProgramFiles\Google\Chrome\Application\chrome.exe"
-          python -m tests.browser_acceptance --chromium $chrome --screenshots validation/v0.10.1/windows-browser
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python -m tests.v101_scene_acceptance --chromium $chrome
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_regression.py --chromium $chrome --samples 1 --iterations 24 --viewports desktop,phone-landscape --output validation/v0.10.1/ci-performance.json
-      - name: Windows batch launchers
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $launchers = [ordered]@{
-            'start_web.bat' = '127.0.0.1'
-            '启动网页版.bat' = '127.0.0.1'
-            'start_lan.bat' = '0.0.0.0'
-            '启动局域网联机.bat' = '0.0.0.0'
-          }
-          foreach ($entry in $launchers.GetEnumerator()) {
-            $server = Start-Process cmd.exe -ArgumentList @('/d', '/c', 'call', $entry.Key) -PassThru -NoNewWindow
-            try {
-              $health = $null
-              for ($attempt = 0; $attempt -lt 120 -and -not $health; $attempt++) {
-                if ($server.HasExited) { throw "$($entry.Key) exited with code $($server.ExitCode)" }
-                try {
-                  $health = Invoke-RestMethod http://127.0.0.1:8765/api/health -TimeoutSec 2
-                } catch {
-                  Start-Sleep -Milliseconds 500
-                }
-              }
-              if (-not $health.ok -or $health.version -ne $env:MAHJONG_VERSION) { throw "$($entry.Key) failed its health check" }
-              $listeners = Get-NetTCPConnection -State Listen -LocalPort 8765
-              if ($entry.Value -notin $listeners.LocalAddress) { throw "$($entry.Key) bound to the wrong address" }
-              Write-Host "$($entry.Key) served v$env:MAHJONG_VERSION on $($entry.Value)"
-            } finally {
-              if (-not $server.HasExited) {
-                taskkill.exe /PID $server.Id /T /F
-                if ($LASTEXITCODE -ne 0) { throw "Failed to stop $($entry.Key)" }
-                $server.WaitForExit()
-              }
-            }
-          }
-      - name: Windows portable build and embedded runtime test
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $archive = Join-Path $env:RUNNER_TEMP 'QingqueMahjong_v0.10.1.zip'
-          python tools/package_release.py --output $archive
-          if ($LASTEXITCODE -ne 0) { throw 'Portable build failed' }
-          $folder = Join-Path $env:RUNNER_TEMP 'mahjong portable 中文'
-          Expand-Archive $archive $folder
-          $project = Join-Path $folder 'QingqueMahjong_v0.10.1'
-          $embedded = Join-Path $project 'runtime/python.exe'
-          Push-Location $project
-          try {
-            & $embedded -m unittest -v tests.test_wall tests.test_gold tests.test_controllers
-            if ($LASTEXITCODE -ne 0) { throw 'Embedded runtime rules failed' }
-            $server = Start-Process cmd.exe -ArgumentList @('/d','/c','call','start_web.bat') -PassThru -NoNewWindow
-            try {
-              $health = $null
-              for ($attempt=0; $attempt -lt 80 -and -not $health; $attempt++) {
-                if ($server.HasExited) { throw 'Portable launcher exited' }
-                try { $health=Invoke-RestMethod http://127.0.0.1:8765/api/health -TimeoutSec 2 }
-                catch { Start-Sleep -Milliseconds 250 }
-              }
-              if ($health.version -ne $env:MAHJONG_VERSION) { throw 'Portable health failed' }
-              $state = (Invoke-RestMethod http://127.0.0.1:8765/api/table).table
-              $body = @{seat=$state.dealer;round_id=$state.round_id;revision=$state.revision;type='ROLL_DICE';tile_ids=@()} | ConvertTo-Json
-              $dealt = Invoke-RestMethod http://127.0.0.1:8765/api/action -Method Post -ContentType 'application/json' -Body $body
-              if ($dealt.table.phase -eq 'ROLLING_DICE') { throw 'Portable deal failed' }
-            } finally { if (-not $server.HasExited) { taskkill.exe /PID $server.Id /T /F } }
-          } finally { Pop-Location }
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: always()
-        with:
-          name: mahjong-validation-${{ matrix.os }}
-          path: |
-            projects/mahjong/validation/v0.10.1/ci-*.json
-            projects/mahjong/validation/v0.10.1/windows-browser/*.png
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: runner.os == 'Windows'
-        with:
-          name: mahjong-windows-portable
-          path: |
-            ${{ runner.temp }}/QingqueMahjong_v0.10.1.zip
-            ${{ runner.temp }}/QingqueMahjong_v0.10.1.sha256
+          set -euo pipefail
+          gh release upload "$TAG" -R "$REPOSITORY" portable/QingqueMahjong_v0.10.1*
+          gh api "repos/$REPOSITORY/releases/$RELEASE_ID/assets" > release-assets.json
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          assets = {a["name"]: a for a in json.loads(Path("release-assets.json").read_text())}
+          for path in Path("portable").glob("QingqueMahjong_v0.10.1*"):
+              asset = assets[path.name]
+              digest = hashlib.sha256(path.read_bytes()).hexdigest()
+              assert asset["state"] == "uploaded", path.name
+              assert asset["size"] == path.stat().st_size, path.name
+              assert asset["digest"] == f"sha256:{digest}", path.name
+          assert len(assets) == 4, list(assets)
+          PY
+          gh release edit "$TAG" -R "$REPOSITORY" --draft=false --latest=false
+          test "$(gh api "repos/$REPOSITORY/releases/$RELEASE_ID" --jq '.draft')" = false
