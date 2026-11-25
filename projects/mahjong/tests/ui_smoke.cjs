@@ -20,6 +20,15 @@ async function create(page = '/lan.html', saved = null) {
   const dom = await JSDOM.fromURL(base + page, {
     runScripts:'dangerously', resources:'usable', pretendToBeVisual:true, virtualConsole:vc,
     beforeParse(window) {
+      // DOM-only transport/rule checks. Raster output is verified by real browsers.
+      const drawing = new Proxy({}, {get: (t,k) => k in t ? t[k] : (()=>{}), set:(t,k,v)=>(t[k]=v,true)});
+      window.HTMLCanvasElement.prototype.getContext = () => drawing;
+      window.Image = class {
+        width=100; height=132;
+        set src(value) { this._src=value; queueMicrotask(()=>this.onload?.()); }
+        get src() { return this._src; }
+        async decode() {}
+      };
       window.fetch = (url, opts) => fetch(new URL(url, base), opts);
       window.WebSocket = class extends WebSocket { constructor(url) { super(url); sockets.push(this); } };
       window.alert = () => dialogs.push('alert');
@@ -83,8 +92,8 @@ const idle = c => !c.d.querySelector('#leaveRoom').disabled;
       assert(!details(c).includes('Seed'));
       assert.equal(c.d.querySelectorAll('.my-seat').length, 1);
       assert(c.d.querySelector(`#seat-${viewer}`).classList.contains('south'), 'own seat must render at bottom');
-      assert.equal(c.d.querySelector('.scene-river-side.river-south')?.dataset.riverSeat, String(viewer), 'own river must stay inside the bottom wall');
-      assert.equal(c.d.querySelectorAll('.wall-layer.present').length, Number(details(c).match(/墙上实牌 (\d+)/)?.[1]));
+      assert(c.d.querySelector('.cuboid-scene'), 'cuboid scene mounted');
+      assert.equal(c.d.querySelectorAll('.cuboid-sprite[data-cuboid-kind="wall"]').length, Number(details(c).match(/墙上实牌 (\d+)/)?.[1]));
       assert.equal(c.d.querySelectorAll('#roster b').length, 0, 'nickname must be escaped');
       assert.equal(c.d.querySelectorAll('[data-orphan-pickup]').length, 1, 'only the owner sees a toggle');
       assert(toggle(c, viewer));
@@ -92,7 +101,8 @@ const idle = c => !c.d.querySelector('#leaveRoom').disabled;
   }
   checkHands();
   ai(seats[1], 1).click();
-  await wait(() => a.d.querySelector('#seat-1 .ai-badge'), 'public managed badge');
+  await wait(() => a.d.querySelector('#seat-1 .ai-badge') &&
+    ai(seats[1], 1)?.textContent === '人工接管', 'public and private managed state');
   assert.equal(ai(a, 1), null, 'peer cannot control a managed seat');
   assert.equal(ai(seats[1], 1).textContent, '人工接管');
   await wait(() => idle(seats[1]), 'AI takeover acknowledgment');
@@ -136,6 +146,7 @@ const idle = c => !c.d.querySelector('#leaveRoom').disabled;
     await wait(() => seats.every(c => rev(c) === revision + 1), 'rendered move synchronized');
     checkHands();
   }
+  await fetch(base+'/api/new-round', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({seed:42,dealer:0})});
   const local = await create('/local.html');
   await wait(() => local.d.querySelector('[data-action-key="ROLL_DICE:"]'), 'local mode');
   const originalRound = details(local).match(/round ([a-f0-9]+)/)[1];
@@ -158,7 +169,7 @@ const idle = c => !c.d.querySelector('#leaveRoom').disabled;
     .find(tile => orphanTypes.has(Math.floor(Number(tile.dataset.tile) / 4)));
   assert(orphan, 'fixed seed provides an orphan to discard');
   const discardedId = orphan.dataset.tile;
-  const wallBefore = local.d.querySelectorAll('.wall-layer.present').length;
+  const wallBefore = local.d.querySelectorAll('.cuboid-sprite[data-cuboid-kind="wall"]').length;
   orphan.click();
   local.d.querySelector('#seat-0 [data-action-key^="DISCARD:"]').click();
   await wait(() => local.d.querySelector('#seat-1 [data-action-key="PICK_ORPHAN:"]'), 'direct pickup action');
@@ -173,8 +184,8 @@ const idle = c => !c.d.querySelector('#leaveRoom').disabled;
   assert.match(local.d.querySelector('#seat-1 .orphan-locked').textContent, /已锁定/);
   assert.equal(dialogs.length, 0, 'pickup play never opens a dialog');
   assert.equal(local.d.querySelector(`#seat-1 .hand [data-tile="${discardedId}"]`), null);
-  assert.equal(local.d.querySelectorAll('.wall-layer.present').length, wallBefore);
-  assert.equal(local.d.querySelectorAll('.scene-river-side.river-east .scene-river').length, 0);
+  assert.equal(local.d.querySelectorAll('.cuboid-sprite[data-cuboid-kind="wall"]').length, wallBefore);
+  assert.equal(local.d.querySelectorAll('.cuboid-sprite[data-cuboid-kind="discard"][data-cuboid-seat="0"]').length, 0);
   assert.equal(errors.length, 0, errors.join('\n'));
   console.log('PASS: four DOM clients, room setup, dealer dice, 16 synchronized moves, private hands, AI takeover, wall, XSS escaping, reconnect, local mode and orphan pickup. No script errors.');
 })().catch(e => { console.error(e); process.exitCode = 1; }).finally(() => clients.forEach(c => c.close()));

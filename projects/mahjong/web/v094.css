@@ -1,0 +1,71 @@
+/* Fixed-camera cuboid table. The legacy layouts are retained for old prototypes,
+   but no legacy board transform or side rail controls the live scene. */
+body.table-live:has(.cuboid-active){display:block;min-height:0;height:100dvh;overflow:hidden;padding:0}
+body.table-live:has(.cuboid-active) .topbar{position:fixed!important;inset:0 0 auto 0;display:flex;min-height:0;height:auto;padding:5px 10px!important;justify-content:flex-end;background:none!important;border:0!important;box-shadow:none!important;pointer-events:none;z-index:40}
+body.table-live:has(.cuboid-active) .topbar .brand{display:none}
+body.table-live:has(.cuboid-active) .topbar #tableHud{display:none!important}
+body.table-live:has(.cuboid-active) .round-controls{margin:0 0 0 auto;pointer-events:auto;flex-wrap:wrap;justify-content:flex-end;gap:4px}
+body.table-live:has(.cuboid-active) .round-controls :is(button,summary){min-height:28px;padding:4px 8px;background:#284c4b66;border:1px solid #fff1d393;box-shadow:none;color:white;text-shadow:0 1px 2px #234240;font-size:12px}
+body.table-live:has(.cuboid-active) .round-controls .settings-panel{background:#fff8e9;color:#294e4c;pointer-events:auto}
+body.table-live:has(.cuboid-active) .game-content{position:absolute!important;inset:44px 0 0!important;display:block!important;width:100%!important;max-width:none!important;height:auto!important;min-height:0!important;padding:0!important;margin:0!important;overflow:hidden!important}
+body.table-live:has(.cuboid-active) #playingHint{display:none!important}
+body.table-live .table-shell.cuboid-active{position:absolute!important;inset:auto!important;left:50%!important;top:50%!important;width:var(--cuboid-width)!important;height:var(--cuboid-height)!important;max-width:none!important;max-height:none!important;min-height:0!important;margin:0!important;padding:0!important;display:block!important;transform:translate(-50%,-50%) scale(var(--cuboid-scale,1))!important;transform-origin:center;aspect-ratio:auto!important;overflow:visible!important;container-type:normal;isolation:isolate;background:none!important}
+body.table-live .cuboid-active .center-board,body.table-live .cuboid-active .table-felt-wrap{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:visible!important;margin:0!important;padding:0!important;transform:none!important;z-index:auto!important;pointer-events:none;background:none!important}
+.cuboid-scene,.cuboid-felt,.cuboid-faces{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;transform-style:flat}
+.cuboid-felt{filter:drop-shadow(0 7px 0 #b48357) drop-shadow(0 12px 17px #163e3d66)}
+.cuboid-face{position:absolute;left:0;top:0;width:100px;height:100px;transform-origin:0 0 0;backface-visibility:visible;background:#d8e1d4;box-shadow:inset 0 0 0 1.4px #56756b;overflow:hidden;pointer-events:none}
+.cuboid-face.top{background:#f5f2df}.cuboid-face.side{background:#becfbc}.cuboid-face.back{background:linear-gradient(130deg,#88cbb5,#489b85);box-shadow:inset 0 0 0 2px #386e61}
+.cuboid-face.front{background:linear-gradient(140deg,#fffdf4,#f9edcf)}.cuboid-face img{display:block;width:100%;height:100%;object-fit:fill;padding:3px;pointer-events:none}
+.cuboid-face.gold{background:#ffe59a;box-shadow:inset 0 0 0 4px #d7a342}.cuboid-face.recent{box-shadow:inset 0 0 0 5px #d96b4f}.cuboid-face.cursor{box-shadow:inset 0 0 0 3px #f6df99}
+.claim-marker{position:absolute;width:15px;height:15px;border-radius:50%;right:3px;top:3px;background:#b66546;box-shadow:0 0 0 2px #fff4d8}
+.cuboid-center-info{position:absolute;display:grid;grid-template:1fr 1.25fr 1fr / 1fr 1.45fr 1fr;align-items:center;justify-items:center;color:#fff8d9;font:600 16px/1.05 system-ui,sans-serif;text-shadow:0 1px 2px #163c3b;pointer-events:none;padding:3px 8px;box-sizing:border-box}
+.center-wind{display:flex;align-items:center;gap:5px;justify-content:center;white-space:nowrap;border:2px solid transparent;border-radius:6px;padding:2px 5px;font-variant-numeric:tabular-nums}.center-wind b{font-size:19px}.center-wind span{font-size:15px}.center-wind.north{grid-area:1/2}.center-wind.south{grid-area:3/2}.center-wind.west{grid-area:2/1}.center-wind.east{grid-area:2/3}.center-wind.active{border-color:#fff3a2;box-shadow:0 0 10px #fff3a2b0}.center-wind .dealer-wind{color:#ffd36d;text-shadow:0 0 7px #ffc85190}.center-round{grid-area:2/2;text-align:center;display:grid;gap:2px;justify-items:center;font-size:14px}.center-round b{font-size:18px}.cuboid-die{font-size:27px;line-height:.8;display:inline-block;margin:0 2px;color:#fff4df}
+.cuboid-gold{position:absolute;top:5px;left:12px;display:flex;align-items:center;gap:7px;color:#fff3c0;font-size:19px;font-weight:800;text-shadow:0 1px 4px #254d46;pointer-events:none}.cuboid-gold img{height:64px;width:48px;border:2px solid #dca749;border-radius:6px;background:#ffe9a2;box-shadow:0 3px 0 #b38c39}.cuboid-overflow{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;z-index:11}
+/* All seat wrappers occupy the same logical canvas, but only their own
+   individually positioned UI controls and hit targets receive pointer events. */
+body.table-live .table-shell.cuboid-active .player,body.table-live .table-shell.cuboid-active .player.dock-seat,body.table-live .table-shell.cuboid-active .player:not(.dock-seat){position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;display:block!important;transform:none!important;background:none!important;border:0!important;box-shadow:none!important;margin:0!important;padding:0!important;pointer-events:none;z-index:4!important;overflow:visible!important}
+body.table-live .table-shell.cuboid-active .player.dock-seat{z-index:5!important}
+body.table-live .cuboid-active .player>.player-head,body.table-live .cuboid-active .player.dock-seat>.player-head{position:absolute!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;width:max-content;max-width:145px!important;min-width:0;display:flex!important;flex-direction:column;align-items:center;gap:4px;padding:5px 6px;border:1px solid #ffefc66e;border-radius:10px;background:#285b59a8!important;box-shadow:0 2px 8px #143b3c55;pointer-events:auto;z-index:8}
+body.table-live .cuboid-active .player-head .player-title{gap:5px}.table-live .cuboid-active .player-head .seat-avatar{width:36px;height:36px}.table-live .cuboid-active .player-head .player-identity strong{color:#fff5d8!important;font-size:14px;max-width:10ch}.table-live .cuboid-active .player-head .player-sub{display:none}.table-live .cuboid-active .player-badges{max-width:140px;justify-content:center}.table-live .cuboid-active .player-badges .badge{font-size:10px}
+body.table-live .cuboid-active .player .hand,body.table-live .cuboid-active .player.dock-seat .hand{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;overflow:visible!important;margin:0!important;padding:0!important;transform:none!important;pointer-events:none;z-index:2}
+body.table-live .cuboid-active .player:not(.dock-seat)>.hand{display:none!important}
+body.table-live .cuboid-active .hand>:not(button[data-tile]){display:none!important}
+body.table-live .cuboid-active .hand button[data-tile]{position:absolute!important;right:auto!important;bottom:auto!important;min-height:0!important;min-width:0!important;max-height:none!important;max-width:none!important;aspect-ratio:auto!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transform:none!important;transition:none!important;pointer-events:auto;opacity:1!important;cursor:pointer}
+body.table-live .cuboid-active .hand button[data-tile]>*{visibility:hidden!important;pointer-events:none}
+body.table-live .cuboid-active .hand button[data-tile]:disabled{pointer-events:none}
+body.table-live .cuboid-active .hand button[data-tile]:is(.selected,:hover,:focus-visible){background:#fff5a95e!important;box-shadow:inset 0 0 0 3px #ffe998!important}
+body.table-live .cuboid-active .player.dock-seat .decision-row,body.table-live .cuboid-active .player.dock-seat .dock-tools{position:absolute!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;width:max-content!important;max-width:65%!important;display:flex!important;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;pointer-events:auto;z-index:12;margin:0!important;padding:0!important}
+body.table-live .cuboid-active .player.dock-seat .decision-row:empty,body.table-live .cuboid-active .player.dock-seat .dock-tools:empty{display:none!important}
+body.table-live .cuboid-active .decision-row .action-area{display:flex;flex-wrap:wrap;justify-content:center;gap:5px}.table-live .cuboid-active .decision-row .action-btn{min-height:39px;min-width:53px;font-size:16px;padding:5px 12px;box-shadow:0 2px 8px #20474090}.table-live .cuboid-active .decision-row .wait-hint{max-width:380px;width:auto;max-height:125px;overflow:auto;background:#fff8e7e8}.table-live .cuboid-active .decision-row .wait-choices{max-width:350px;flex-wrap:wrap}.table-live .cuboid-active .action-choices{z-index:30}
+body.table-live .cuboid-active .dock-tools .seat-tools{display:flex;gap:4px;flex-wrap:wrap}.table-live .cuboid-active .dock-tools :is(button,summary){font-size:12px;min-height:27px;padding:3px 7px}.table-live .cuboid-active .dock-tools .player-inspector-panel{max-height:350px;overflow:auto;z-index:40}
+body.table-live .cuboid-active .scene-toolbar{position:absolute!important;inset:5px 12px auto auto!important;width:auto!important;max-width:55%!important;transform:none!important;display:flex;align-items:flex-end;gap:3px;z-index:20;pointer-events:auto}.cuboid-active .scene-toolbar .scene-status{display:none!important}.cuboid-active .scene-controls{display:flex!important;flex-wrap:wrap;justify-content:flex-end;gap:5px;width:auto!important}.cuboid-active .scene-controls .ghost{background:#27524e99!important;box-shadow:none!important;padding:4px 8px!important;font-size:14px!important;min-height:30px!important}.cuboid-active .table-caption{right:0!important;left:auto!important;max-width:440px}
+body.table-live .cuboid-active .result-box{position:absolute!important;inset:50% auto auto 50%!important;transform:translate(-50%,-50%)!important;width:min(80%,720px)!important;z-index:30!important;pointer-events:auto;background:#fff8e9f5!important;color:#2b5957!important;box-shadow:0 15px 50px #173c3b99}
+body.table-live .cuboid-active .river-inspector{position:absolute!important;inset:4% 10%!important;z-index:35!important;pointer-events:auto;background:#fff8e9fa!important;overflow:auto!important}
+body.table-live .cuboid-active .river-inspector .river{position:static!important;transform:none!important}
+@media(max-width:700px){body.table-live:has(.cuboid-active) .round-controls :is(button,summary){font-size:10px;padding:3px 5px;min-height:25px}body.table-live:has(.cuboid-active) .connection-status{font-size:10px}}
+.cuboid-action-prompt{padding:5px 13px;background:#245953bb;border-radius:9px;color:#fff4d3;font-size:17px;font-weight:700;text-shadow:0 1px 2px #254d46;pointer-events:none}
+.cuboid-home{display:none}.table-live:has(.cuboid-active) .cuboid-home{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;font-size:12px;min-height:28px;border-radius:9px;text-decoration:none;background:#284c4b66!important;box-shadow:none!important}
+body.table-live .cuboid-active .player.dock-seat .dock-tools{max-width:280px!important}
+@media(max-width:700px){.table-live:has(.cuboid-active) .cuboid-home{font-size:10px;min-height:25px;padding:3px 5px}}
+/* v0.9.2's ID-level LAN rule otherwise wins over the centered scene. */
+body.lan-mode.table-live #gameTable.cuboid-active{left:50%!important;right:auto!important;top:50%!important;bottom:auto!important;margin:0!important}
+/* Text is inset to account for the near river's raised top face. */
+.cuboid-center-info{grid-template-rows:1fr 1.8fr 1fr;padding:0 6px}.center-wind{padding:1px 4px}.center-wind b{font-size:17px}.center-wind span{font-size:14px}.center-round{gap:1px;font-size:13px}.center-round b{font-size:16px}.cuboid-die{font-size:22px;line-height:.9}
+.claim-marker{display:grid;place-items:center;width:18px;height:18px;font:800 16px/1 system-ui;color:#fff9e9;font-style:normal}
+
+/* Rounded solid surface is rendered from actual projected 3D vertices. */
+.cuboid-solid{position:absolute;inset:0;pointer-events:none;isolation:isolate}
+.cuboid-rounded-body{position:absolute;pointer-events:none;overflow:visible}
+.cuboid-face{border-radius:0;box-shadow:none;overflow:visible}
+.cuboid-face.back{box-shadow:none}
+.cuboid-face img{padding:0}
+.cuboid-face.gold{box-shadow:inset 0 0 0 2px #d7a342}
+.cuboid-face.recent{box-shadow:inset 0 0 0 4px #d96b4f}
+.cuboid-face.cursor{box-shadow:inset 0 0 0 3px #f6df99}
+
+/* v0.10.0: one raster sprite per tile, stable across updates. */
+.cuboid-sprite{position:absolute;display:block;max-width:none;max-height:none;pointer-events:none;user-select:none;object-fit:fill}
+
+/* Keep the existing sound controls inside narrow portrait viewports. */
+.table-live .sound-panel{position:fixed!important;top:45px!important;right:8px!important;left:auto!important;width:340px;min-width:0;max-width:calc(100vw - 16px);box-sizing:border-box}
+.cuboid-felt-image{position:absolute;left:-80px;top:-80px;max-width:none;pointer-events:none;overflow:visible}

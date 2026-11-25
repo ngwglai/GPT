@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#10261f">
+  <meta name="theme-color" content="#e9fbef">
   <title>美术图鉴 · 青雀麻将</title>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/table.css">
   <link rel="stylesheet" href="/lan.css">
   <link rel="stylesheet" href="/gallery.css">
   <link rel="stylesheet" href="/scene.css">
+  <link rel="stylesheet" href="/modern-ui.css">
 </head>
 <body class="gallery-page">
   <header class="topbar">
@@ -23,9 +24,21 @@
       <h1>美术图鉴</h1>
       <p>预览场景素材、完整牌面和实战组件。</p>
       <nav class="gallery-nav" aria-label="图鉴目录">
-        <a href="#scenes">场景</a><a href="#tiles">麻将牌</a><a href="#components">桌面组件</a><a href="#phone">手机预览</a>
+        <a href="#spring">春樱v0.9</a><a href="#scenes">旧版场景</a><a href="#tiles">麻将牌</a><a href="#components">桌面组件</a><a href="#phone">手机预览</a>
       </nav>
     </div>
+    <section class="gallery-section" id="spring" aria-labelledby="spring-title">
+      <h2 id="spring-title">v0.9 · 春樱牌桌美术</h2>
+      <p>房间与角色头像为独立图像素材；麻将牌、牌河、风位和操作控件由DOM、SVG与CSS实时生成。</p>
+      <figure class="v09-gallery-art"><img src="/assets/ui-v09/sakura-room.webp" alt="春樱日本茶室背景" loading="lazy"><figcaption>日式春樱房间 · 可独立用于游戏背景</figcaption></figure>
+      <div class="v09-gallery-avatars">
+        <img src="/assets/ui-v09/seat-0.webp" alt="东家角色头像" loading="lazy">
+        <img src="/assets/ui-v09/seat-1.webp" alt="南家角色头像" loading="lazy">
+        <img src="/assets/ui-v09/seat-2.webp" alt="西家角色头像" loading="lazy">
+        <img src="/assets/ui-v09/seat-3.webp" alt="北家角色头像" loading="lazy">
+      </div>
+      <p><a class="primary" href="/prototype-v091.html">打开静态对局原型</a></p>
+    </section>
     <section class="gallery-section" id="scenes" aria-labelledby="scenes-title">
       <h2 id="scenes-title">场景与材质</h2>
       <div class="scene-grid">

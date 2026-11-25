@@ -1,0 +1,967 @@
+{
+  "accelerated_server_delay_s": 0.01,
+  "physical_device": false,
+  "rounds": [
+    {
+      "seed": 42,
+      "revision": 90,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 0,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "revision": 90,
+          "diagnostics": {
+            "hits": 0,
+            "misses": 272,
+            "created": 258,
+            "reused": 14,
+            "removed": 122,
+            "lastMs": 444.60000000009313,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 272,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6265112,
+            "bodyEntries": 184,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4678852
+          },
+          "heap_bytes": 3846088,
+          "nodes": 1020
+        },
+        {
+          "revision": 90,
+          "diagnostics": {
+            "hits": 0,
+            "misses": 272,
+            "created": 258,
+            "reused": 14,
+            "removed": 122,
+            "lastMs": 369.10000000009313,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 272,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6265112,
+            "bodyEntries": 184,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4678852
+          },
+          "heap_bytes": 3848940,
+          "nodes": 1020
+        },
+        {
+          "revision": 90,
+          "diagnostics": {
+            "hits": 0,
+            "misses": 272,
+            "created": 258,
+            "reused": 14,
+            "removed": 122,
+            "lastMs": 355.5999999998603,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 272,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6265112,
+            "bodyEntries": 184,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4678852
+          },
+          "heap_bytes": 3853776,
+          "nodes": 1020
+        },
+        {
+          "revision": 90,
+          "diagnostics": {
+            "hits": 0,
+            "misses": 272,
+            "created": 258,
+            "reused": 14,
+            "removed": 122,
+            "lastMs": 423.60000000009313,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 272,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6265112,
+            "bodyEntries": 184,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4678852
+          },
+          "heap_bytes": 3848916,
+          "nodes": 1020
+        }
+      ]
+    },
+    {
+      "seed": 43,
+      "revision": 93,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 1,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "revision": 93,
+          "diagnostics": {
+            "hits": 0,
+            "misses": 544,
+            "created": 502,
+            "reused": 42,
+            "removed": 366,
+            "lastMs": 376.10000000009313,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 544,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6274268,
+            "bodyEntries": 184,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4633668
+          },
+          "heap_bytes": 3914616,
+          "nodes": 990
+        },
+        {
+          "revision": 93,
+          "diagnostics": {
+            "hits": 0,
+            "misses": 544,
+            "created": 502,
+            "reused": 42,
+            "removed": 366,
+            "lastMs": 501,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 544,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6274268,
+            "bodyEntries": 184,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4633668
+          },
+          "heap_bytes": 3911336,
+          "nodes": 990
+        },
+        {
+          "revision": 93,
+          "diagnostics": {
+            "hits": 0,
+            "misses": 544,
+            "created": 502,
+            "reused": 42,
+            "removed": 366,
+            "lastMs": 456,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 544,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6274268,
+            "bodyEntries": 184,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4633668
+          },
+          "heap_bytes": 3914176,
+          "nodes": 990
+        },
+        {
+          "revision": 93,
+          "diagnostics": {
+            "hits": 0,
+            "misses": 544,
+            "created": 502,
+            "reused": 42,
+            "removed": 366,
+            "lastMs": 1050.5999999998603,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 544,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6274268,
+            "bodyEntries": 184,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4633668
+          },
+          "heap_bytes": 3913904,
+          "nodes": 990
+        }
+      ]
+    },
+    {
+      "seed": 44,
+      "revision": 87,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 2,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "revision": 87,
+          "diagnostics": {
+            "hits": 12,
+            "misses": 804,
+            "created": 746,
+            "reused": 70,
+            "removed": 610,
+            "lastMs": 442.29999999981374,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 804,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6282552,
+            "bodyEntries": 188,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4708692
+          },
+          "heap_bytes": 3979748,
+          "nodes": 1013
+        },
+        {
+          "revision": 87,
+          "diagnostics": {
+            "hits": 12,
+            "misses": 804,
+            "created": 746,
+            "reused": 70,
+            "removed": 610,
+            "lastMs": 368.0999999998603,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 804,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6282552,
+            "bodyEntries": 188,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4708692
+          },
+          "heap_bytes": 3979572,
+          "nodes": 1013
+        },
+        {
+          "revision": 87,
+          "diagnostics": {
+            "hits": 12,
+            "misses": 804,
+            "created": 746,
+            "reused": 70,
+            "removed": 610,
+            "lastMs": 427.19999999995343,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 804,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6282552,
+            "bodyEntries": 188,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4708692
+          },
+          "heap_bytes": 3982188,
+          "nodes": 1013
+        },
+        {
+          "revision": 87,
+          "diagnostics": {
+            "hits": 12,
+            "misses": 804,
+            "created": 746,
+            "reused": 70,
+            "removed": 610,
+            "lastMs": 434.30000000004657,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 804,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6282552,
+            "bodyEntries": 188,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4708692
+          },
+          "heap_bytes": 3979804,
+          "nodes": 1013
+        }
+      ]
+    },
+    {
+      "seed": 45,
+      "revision": 85,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 3,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "revision": 85,
+          "diagnostics": {
+            "hits": 25,
+            "misses": 1063,
+            "created": 990,
+            "reused": 98,
+            "removed": 854,
+            "lastMs": 356.60000000009313,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1063,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6274528,
+            "bodyEntries": 186,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4795808
+          },
+          "heap_bytes": 4038216,
+          "nodes": 990
+        },
+        {
+          "revision": 85,
+          "diagnostics": {
+            "hits": 25,
+            "misses": 1063,
+            "created": 990,
+            "reused": 98,
+            "removed": 854,
+            "lastMs": 293,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1063,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6274528,
+            "bodyEntries": 186,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4795808
+          },
+          "heap_bytes": 4033536,
+          "nodes": 990
+        },
+        {
+          "revision": 85,
+          "diagnostics": {
+            "hits": 25,
+            "misses": 1063,
+            "created": 990,
+            "reused": 98,
+            "removed": 854,
+            "lastMs": 375.0999999998603,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1063,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6274528,
+            "bodyEntries": 186,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4795808
+          },
+          "heap_bytes": 4036488,
+          "nodes": 990
+        },
+        {
+          "revision": 85,
+          "diagnostics": {
+            "hits": 25,
+            "misses": 1063,
+            "created": 990,
+            "reused": 98,
+            "removed": 854,
+            "lastMs": 364.69999999995343,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1063,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6274528,
+            "bodyEntries": 186,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4795808
+          },
+          "heap_bytes": 4036840,
+          "nodes": 990
+        }
+      ]
+    },
+    {
+      "seed": 46,
+      "revision": 89,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 0,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "revision": 89,
+          "diagnostics": {
+            "hits": 25,
+            "misses": 1335,
+            "created": 1234,
+            "reused": 126,
+            "removed": 1098,
+            "lastMs": 366.9000000001397,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1335,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6277624,
+            "bodyEntries": 190,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4374216
+          },
+          "heap_bytes": 4047616,
+          "nodes": 994
+        },
+        {
+          "revision": 89,
+          "diagnostics": {
+            "hits": 25,
+            "misses": 1335,
+            "created": 1234,
+            "reused": 126,
+            "removed": 1098,
+            "lastMs": 356.9000000001397,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1335,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6277624,
+            "bodyEntries": 190,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4374216
+          },
+          "heap_bytes": 4045576,
+          "nodes": 994
+        },
+        {
+          "revision": 89,
+          "diagnostics": {
+            "hits": 25,
+            "misses": 1335,
+            "created": 1234,
+            "reused": 126,
+            "removed": 1098,
+            "lastMs": 316,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1335,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6277624,
+            "bodyEntries": 190,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4374216
+          },
+          "heap_bytes": 4043880,
+          "nodes": 994
+        },
+        {
+          "revision": 89,
+          "diagnostics": {
+            "hits": 25,
+            "misses": 1335,
+            "created": 1234,
+            "reused": 126,
+            "removed": 1098,
+            "lastMs": 490.79999999981374,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1335,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6277624,
+            "bodyEntries": 190,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4374216
+          },
+          "heap_bytes": 4045688,
+          "nodes": 994
+        }
+      ]
+    },
+    {
+      "seed": 47,
+      "revision": 88,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 1,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "revision": 88,
+          "diagnostics": {
+            "hits": 25,
+            "misses": 1607,
+            "created": 1478,
+            "reused": 154,
+            "removed": 1342,
+            "lastMs": 694.6999999999534,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1607,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6278136,
+            "bodyEntries": 186,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4741984
+          },
+          "heap_bytes": 4062532,
+          "nodes": 1002
+        },
+        {
+          "revision": 88,
+          "diagnostics": {
+            "hits": 25,
+            "misses": 1607,
+            "created": 1478,
+            "reused": 154,
+            "removed": 1342,
+            "lastMs": 488.5,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1607,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6278136,
+            "bodyEntries": 186,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4741984
+          },
+          "heap_bytes": 4062392,
+          "nodes": 1002
+        },
+        {
+          "revision": 88,
+          "diagnostics": {
+            "hits": 25,
+            "misses": 1607,
+            "created": 1478,
+            "reused": 154,
+            "removed": 1342,
+            "lastMs": 845.1000000000931,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1607,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6278136,
+            "bodyEntries": 186,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4741984
+          },
+          "heap_bytes": 4062492,
+          "nodes": 1002
+        },
+        {
+          "revision": 88,
+          "diagnostics": {
+            "hits": 25,
+            "misses": 1607,
+            "created": 1478,
+            "reused": 154,
+            "removed": 1342,
+            "lastMs": 667.9000000001397,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1607,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6278136,
+            "bodyEntries": 186,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4741984
+          },
+          "heap_bytes": 4062376,
+          "nodes": 1002
+        }
+      ]
+    },
+    {
+      "seed": 48,
+      "revision": 89,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 2,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "revision": 89,
+          "diagnostics": {
+            "hits": 37,
+            "misses": 1867,
+            "created": 1722,
+            "reused": 182,
+            "removed": 1586,
+            "lastMs": 726.8999999999069,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1867,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6270548,
+            "bodyEntries": 186,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4598656
+          },
+          "heap_bytes": 4087764,
+          "nodes": 1002
+        },
+        {
+          "revision": 89,
+          "diagnostics": {
+            "hits": 37,
+            "misses": 1867,
+            "created": 1722,
+            "reused": 182,
+            "removed": 1586,
+            "lastMs": 973.8000000000466,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1867,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6270548,
+            "bodyEntries": 186,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4598656
+          },
+          "heap_bytes": 4086660,
+          "nodes": 1002
+        },
+        {
+          "revision": 89,
+          "diagnostics": {
+            "hits": 37,
+            "misses": 1867,
+            "created": 1722,
+            "reused": 182,
+            "removed": 1586,
+            "lastMs": 2329.5,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1867,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6270548,
+            "bodyEntries": 186,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4598656
+          },
+          "heap_bytes": 4094504,
+          "nodes": 1002
+        },
+        {
+          "revision": 89,
+          "diagnostics": {
+            "hits": 37,
+            "misses": 1867,
+            "created": 1722,
+            "reused": 182,
+            "removed": 1586,
+            "lastMs": 948.6999999999534,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 1867,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6270548,
+            "bodyEntries": 186,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4598656
+          },
+          "heap_bytes": 4086304,
+          "nodes": 1002
+        }
+      ]
+    },
+    {
+      "seed": 49,
+      "revision": 91,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 3,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "revision": 91,
+          "diagnostics": {
+            "hits": 37,
+            "misses": 2139,
+            "created": 1966,
+            "reused": 210,
+            "removed": 1830,
+            "lastMs": 1708.8000000000466,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 2139,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6260252,
+            "bodyEntries": 189,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4553308
+          },
+          "heap_bytes": 4099100,
+          "nodes": 994
+        },
+        {
+          "revision": 91,
+          "diagnostics": {
+            "hits": 37,
+            "misses": 2139,
+            "created": 1966,
+            "reused": 210,
+            "removed": 1830,
+            "lastMs": 1408.3999999999069,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 2139,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6260252,
+            "bodyEntries": 189,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4553308
+          },
+          "heap_bytes": 4096476,
+          "nodes": 994
+        },
+        {
+          "revision": 91,
+          "diagnostics": {
+            "hits": 37,
+            "misses": 2139,
+            "created": 1966,
+            "reused": 210,
+            "removed": 1830,
+            "lastMs": 1772,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 2139,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6260252,
+            "bodyEntries": 189,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4553308
+          },
+          "heap_bytes": 4096624,
+          "nodes": 994
+        },
+        {
+          "revision": 91,
+          "diagnostics": {
+            "hits": 37,
+            "misses": 2139,
+            "created": 1966,
+            "reused": 210,
+            "removed": 1830,
+            "lastMs": 3051.899999999907,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 2139,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6260252,
+            "bodyEntries": 189,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4553308
+          },
+          "heap_bytes": 4094380,
+          "nodes": 994
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

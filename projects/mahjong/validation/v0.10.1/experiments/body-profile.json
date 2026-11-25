@@ -1,0 +1,122 @@
+{
+  "boot_ms": 1367.61130900004,
+  "roll_ui_ms": 579.835049000053,
+  "updates_ms": [
+    229.20000000006985,
+    97.5,
+    109.5,
+    96,
+    96.40000000002328,
+    94.90000000002328,
+    103.19999999995343,
+    92.59999999997672,
+    100.59999999997672,
+    99.79999999993015,
+    121.30000000004657,
+    106.90000000002328
+  ],
+  "top_cpu_ms": [
+    [
+      "(program) ",
+      1053.47
+    ],
+    [
+      "sprite cuboid-scene.js",
+      993.87
+    ],
+    [
+      "(idle) ",
+      375.11
+    ],
+    [
+      "triangle cuboid-scene.js",
+      187.39
+    ],
+    [
+      "renderSprites cuboid-scene.js",
+      123.5
+    ],
+    [
+      "fit cuboid-scene.js",
+      113.5
+    ],
+    [
+      " cuboid-scene.js",
+      65.22
+    ],
+    [
+      "(garbage collector) ",
+      54.55
+    ],
+    [
+      "query ",
+      47.08
+    ],
+    [
+      "fill cuboid-scene.js",
+      42.29
+    ],
+    [
+      "renderPlayer app.js",
+      41.85
+    ],
+    [
+      "tileFaces cuboid-scene.js",
+      29.13
+    ],
+    [
+      "rotate cuboid-scene.js",
+      25.18
+    ],
+    [
+      "positionUI cuboid-scene.js",
+      24.29
+    ],
+    [
+      "hull cuboid-scene.js",
+      21.9
+    ],
+    [
+      " ",
+      18.81
+    ],
+    [
+      "cachePut cuboid-scene.js",
+      17.8
+    ],
+    [
+      "surfaceColor cuboid-scene.js",
+      14.71
+    ],
+    [
+      "fetch ",
+      12.55
+    ],
+    [
+      "MahjongScene.mount cuboid-scene.js",
+      9.27
+    ]
+  ],
+  "diagnostics": {
+    "hits": 1827,
+    "misses": 527,
+    "created": 232,
+    "reused": 2122,
+    "removed": 53,
+    "lastMs": 106.40000000002328,
+    "tiles": 179,
+    "cacheBytes": 12559776,
+    "rasterized": 527,
+    "evicted": 500,
+    "cacheEntries": 197,
+    "bodyBytes": 7211388,
+    "bodyEntries": 126
+  },
+  "long_tasks_ms": [
+    86,
+    206,
+    276
+  ],
+  "errors": [],
+  "note": "Exploratory profiling; instrumentation and conditions vary. Use formal serial benchmark JSON for acceptance comparisons."
+}

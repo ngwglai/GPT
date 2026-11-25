@@ -22,7 +22,7 @@ class RoundTests(unittest.TestCase):
                 # With (1, 2), the break is the opposite wall at column 15.
                 break_side = (int(dealer) + 2) % 4
                 physical_ids = [side * 34 + 2 * column + layer
-                                for side in (0, 1, 2, 3)
+                                for side in (0, 3, 2, 1)
                                 for column in range(16, -1, -1)
                                 for layer in (0, 1)]
                 start = physical_ids.index(break_side * 34 + 30)

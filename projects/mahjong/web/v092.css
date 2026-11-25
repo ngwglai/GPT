@@ -1,0 +1,293 @@
+/* 青雀麻将 v0.9.2 — historical alignment/layout layer, retained under the v0.9.3 homography override. */
+
+/* Center the game stage in the real viewport, rather than the asymmetric flex remainder. */
+body.table-live .game-content{
+  display:grid!important;grid-template-columns:minmax(0,1fr);place-items:center;
+  width:100%;min-width:0;height:100%;min-height:0;padding:0;overflow:visible;
+}
+.table-live .table-shell{
+  --rail-size:clamp(156px,14vw,216px);
+  --side:min(94vw,calc(100dvh - 96px),calc(100vw - var(--rail-size) - var(--rail-size) - 36px),980px);
+  position:relative;display:block;flex:0 0 auto;justify-self:center;align-self:center;
+  width:var(--side);height:var(--side);aspect-ratio:1;max-width:none;max-height:none;
+  min-width:0;min-height:0;margin:0 auto!important;padding:0;left:auto!important;right:auto!important;
+  transform:none!important;container-type:inline-size;overflow:visible;border:0;
+  background:transparent;box-shadow:none;
+}
+.lan-mode.table-live .game-content{justify-items:center;align-items:center}
+.lan-mode.table-live #gameTable{justify-self:center;align-self:center;margin-inline:auto!important;left:auto!important;right:auto!important}
+.table-live .center-board{position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;display:block;overflow:visible}
+.table-live .table-felt-wrap,.table-live .wall-stage.v09-stage{position:absolute;inset:0;overflow:visible}
+
+/* Historical v0.9.2 board-surface styling; v0.9.3 applies one shared planar homography. */
+.v09-board{
+  --river-w:clamp(10px,2.78cqw,26px);--wall-w:clamp(8px,2.02cqw,19px);
+  --back-w:clamp(8px,1.78cqw,17px);--exposed-w:clamp(9px,1.96cqw,18px);
+  position:absolute;inset:0;width:100%;height:100%;aspect-ratio:1;box-sizing:border-box;
+  isolation:isolate;overflow:visible;border:0;border-radius:0;background:transparent;box-shadow:none;
+}
+.v09-board::before,.v09-board::after{content:none!important;display:none!important}
+.v092-board-surface{position:absolute;inset:0;z-index:0;pointer-events:none;filter:drop-shadow(0 9px 0 #805a43) drop-shadow(0 17px 19px #193c3c72)}
+.v092-board-surface::before,.v092-board-surface::after{
+  content:"";position:absolute;display:block;
+  transform:none;transform-origin:50% 56%;
+}
+.v092-board-surface::before{
+  inset:0;clip-path:polygon(4.2% 0,95.8% 0,100% 100%,0 100%);
+  background:linear-gradient(180deg,#f6dfb6 0%,#c69a6b 3.2%,#93684c 100%);
+}
+.v092-board-surface::after{
+  inset:1.15%;clip-path:polygon(4.1% 0,95.9% 0,99.6% 100%,.4% 100%);border:1px solid #f8e7bf;
+  background:
+    radial-gradient(circle at 22% 26%,#f7d7cf26 0 2px,transparent 3px),
+    radial-gradient(circle at 79% 70%,#f7e5bb30 0 2px,transparent 3px),
+    radial-gradient(ellipse at 48% 45%,#9ce0d4 0%,#61b9ae 57%,#2e8882 100%);
+  box-shadow:inset 0 0 0 5px #e7c99b,inset 0 0 0 8px #287d78,inset 0 0 70px #1a626055;
+}
+.v09-felt-guide{z-index:1;inset:27% 25%;border-radius:18%;opacity:.45;transform:none}
+.v09-felt-crest{z-index:1;left:12%;top:68%;font-size:clamp(22px,4.6cqw,54px);opacity:.34}
+.v09-wall,.v09-enemy-hand,.v09-river,.v09-exposed,.v09-center-widget{z-index:3}
+
+/* Four walls follow the shallow trapezoid's near/far edges. */
+.v09-wall{gap:1px;justify-content:center;align-items:center}
+.v09-wall-north{left:23%;top:5.5%;width:54%;height:4%;transform:scaleX(.96)}
+.v09-wall-south{left:16.5%;bottom:7.2%;width:67%;height:4%;transform:rotate(180deg) scaleX(1.02)}
+.v09-wall-west{left:5.8%;top:20%;width:4%;height:59%;flex-direction:column;transform:skewY(-2deg)}
+.v09-wall-east{right:5.8%;top:20%;width:4%;height:59%;flex-direction:column-reverse;transform:skewY(2deg)}
+.v09-wall-west .v09-wall-stack,.v09-wall-east .v09-wall-stack{width:calc(var(--wall-w)*.94);height:var(--wall-w)}
+
+/* East/West concealed backs reserve their rotated visual footprint. */
+.v09-enemy-hand{position:absolute;display:flex;justify-content:center;gap:1px;z-index:3;pointer-events:none}
+.v09-enemy-hand .v09-card{width:var(--back-w);height:calc(var(--back-w)*1.37);border-bottom-width:3px}
+.v09-enemy-north{left:27%;top:12.5%;width:46%}
+.v09-enemy-west{left:16%;top:24%;height:52%;flex-direction:column;align-items:center;--hand-angle:-90deg}
+.v09-enemy-east{right:16%;top:24%;height:52%;flex-direction:column;align-items:center;--hand-angle:90deg}
+.v092-hand-cell{position:relative;display:block;flex:none;width:var(--back-w);height:calc(var(--back-w)*1.37)}
+.v09-enemy-west .v092-hand-cell,.v09-enemy-east .v092-hand-cell{width:var(--back-w);height:calc(var(--back-w)*1.37)}
+.v09-enemy-west .v092-hand-cell>.v09-card,.v09-enemy-east .v092-hand-cell>.v09-card{
+  position:absolute;left:50%;top:50%;width:calc(var(--back-w)*1.37);height:var(--back-w);
+  transform:translate(-50%,-50%) rotate(var(--hand-angle));
+}
+
+/* Rivers share one logical grid. E/W grids flow down a column; each face is
+   rotated inside a fixed visual cell, so spacing/alignment does not rotate away. */
+.v09-river,.v09-river.crowded,.v09-river.dense{
+  position:absolute;inset:auto;display:grid;grid-template-columns:repeat(7,var(--river-w));
+  grid-auto-flow:row;grid-auto-rows:calc(var(--river-w)*1.36);gap:1px 2px;
+  width:max-content;height:max-content;max-width:none;min-width:0;margin:0;padding:0;
+  overflow:visible;align-content:center;justify-content:center;transform-origin:center center;
+}
+.v09-river .v09-card{width:var(--river-w);height:calc(var(--river-w)*1.36);border-bottom-width:2px;border-radius:3px}
+.v09-river.crowded{--river-w:clamp(9px,2.52cqw,23px)}
+.v09-river.dense{--river-w:clamp(8px,2.28cqw,20px)}
+.v09-river-north,.v09-river-north.crowded,.v09-river-north.dense{
+  left:50%;right:auto;top:29.5%;bottom:auto;width:max-content;height:max-content;
+  transform:translate(-50%,-50%) rotate(180deg);
+}
+.v09-river-south,.v09-river-south.crowded,.v09-river-south.dense{
+  left:50%;right:auto;top:68%;bottom:auto;width:max-content;height:max-content;
+  transform:translate(-50%,-50%);
+}
+.v09-river-north.crowded,.v09-river-south.crowded{grid-template-columns:repeat(8,var(--river-w))}
+.v09-river-north.dense,.v09-river-south.dense{grid-template-columns:repeat(10,var(--river-w))}
+.v09-river-west,.v09-river-west.crowded,.v09-river-west.dense,
+.v09-river-east,.v09-river-east.crowded,.v09-river-east.dense{
+  top:50%;right:auto;bottom:auto;width:max-content;height:max-content;
+  grid-template-columns:none;grid-template-rows:repeat(7,var(--river-w));
+  grid-auto-flow:column;grid-auto-columns:calc(var(--river-w)*1.36);grid-auto-rows:var(--river-w);
+  gap:2px 1px;transform:translate(-50%,-50%);
+  --river-w:clamp(8px,2.25cqw,18px);
+}
+.v09-river-west,.v09-river-west.crowded,.v09-river-west.dense{left:30%;--river-angle:-90deg;direction:ltr}
+.v09-river-east,.v09-river-east.crowded,.v09-river-east.dense{left:70%;--river-angle:90deg;direction:rtl}
+.v09-river-west.crowded,.v09-river-east.crowded{grid-template-rows:repeat(8,var(--river-w))}
+.v09-river-west.dense,.v09-river-east.dense{grid-template-rows:repeat(10,var(--river-w))}
+.v092-river-cell{position:relative;display:block;flex:none;width:calc(var(--river-w)*1.36);height:var(--river-w);direction:ltr}
+.v092-river-cell>.v09-card{
+  position:absolute;left:50%;top:50%;width:var(--river-w);height:calc(var(--river-w)*1.36);
+  transform:translate(-50%,-50%) rotate(var(--river-angle));
+}
+
+/* Meld cells keep their transformed footprint. East/West melds stack along
+   the side rail; claimed tiles use the source direction, and bu-gang uses a
+   separate translate property so the claimed rotation is never overwritten. */
+.v09-exposed{
+  position:absolute;display:flex;flex-wrap:nowrap;align-items:center;align-content:flex-start;
+  gap:3px;overflow:visible;scrollbar-width:thin;pointer-events:none;padding:2px;z-index:5;
+  height:auto;max-height:none;
+}
+.v09-exposed-set,.v092-meld-set{
+  display:flex;flex:none;align-items:center;gap:1px;padding:2px;
+  background:#164a4a24;border:1px solid #e6d4a54d;border-radius:5px;overflow:visible;
+}
+.v09-exposed-east .v092-meld-set,.v09-exposed-west .v092-meld-set{flex-direction:column}
+.v092-meld-cell{position:relative;display:block;flex:none;width:var(--cell-w);height:var(--cell-h);overflow:visible}
+.v092-meld-cell>.v09-card{
+  position:absolute;left:50%;top:50%;width:var(--exposed-w);height:calc(var(--exposed-w)*1.32);
+  transform:translate(-50%,-50%) rotate(var(--seat-angle));transform-origin:center;border-bottom-width:2px;
+}
+.v09-exposed-south{
+  --seat-angle:0deg;--cell-w:var(--exposed-w);--cell-h:calc(var(--exposed-w)*1.32);
+  --claim-cell-w:calc(var(--exposed-w)*1.32);--claim-cell-h:var(--exposed-w);--claim-turn:90deg;
+  left:19%;bottom:13%;width:62%;height:4.5%;max-height:4.5%;flex-direction:row;justify-content:center;
+}
+.v09-exposed-north{
+  --seat-angle:180deg;--cell-w:var(--exposed-w);--cell-h:calc(var(--exposed-w)*1.32);
+  --claim-cell-w:calc(var(--exposed-w)*1.32);--claim-cell-h:var(--exposed-w);--claim-turn:90deg;
+  left:19%;top:16%;width:62%;height:4.2%;max-height:4.2%;flex-direction:row;justify-content:center;
+}
+.v09-exposed-west{
+  --seat-angle:-90deg;--cell-w:calc(var(--exposed-w)*1.32);--cell-h:var(--exposed-w);
+  --claim-cell-w:var(--exposed-w);--claim-cell-h:calc(var(--exposed-w)*1.32);--claim-turn:90deg;
+  left:10.5%;right:auto;top:22%;bottom:auto;width:4.5%;height:56%;max-height:56%;flex-direction:column;justify-content:center;
+}
+.v09-exposed-east{
+  --seat-angle:90deg;--cell-w:calc(var(--exposed-w)*1.32);--cell-h:var(--exposed-w);
+  --claim-cell-w:var(--exposed-w);--claim-cell-h:calc(var(--exposed-w)*1.32);--claim-turn:90deg;
+  right:10.5%;left:auto;top:22%;bottom:auto;width:4.5%;height:56%;max-height:56%;flex-direction:column;justify-content:center;
+}
+.v09-exposed-south,.v09-exposed-north,.v09-exposed-east,.v09-exposed-west{transform:none!important}
+.v092-meld-cell.is-claimed{width:var(--claim-cell-w);height:var(--claim-cell-h)}
+.v092-meld-cell.is-claimed>.v09-card{transform:translate(-50%,-50%) rotate(calc(var(--seat-angle) + var(--claim-turn)))}
+.v092-meld-cell.is-claimed.source-left>.v09-card{--claim-turn:-90deg}
+.v092-meld-cell.is-claimed.source-across>.v09-card{--claim-turn:90deg}
+.v092-meld-cell.is-claimed.source-right>.v09-card{--claim-turn:90deg}
+.v09-exposed-south .v092-meld-cell.is-stacked,.v09-exposed-north .v092-meld-cell.is-stacked{margin-inline-start:calc(var(--exposed-w)*-.48);z-index:2}
+.v09-exposed-east .v092-meld-cell.is-stacked,.v09-exposed-west .v092-meld-cell.is-stacked{margin-block-start:calc(var(--exposed-w)*-.48);z-index:2}
+.v092-meld-cell.is-stacked>.v09-card{translate:0 -3px}
+.v092-meld-cell.is-claimed>.v09-card.scene-stacked{
+  transform:translate(-50%,-50%) rotate(calc(var(--seat-angle) + var(--claim-turn)));translate:0 -3px;
+}
+
+/* Central compass remains square to the viewer above the perspective felt. */
+.v09-center-widget{left:50%;top:49.5%;width:clamp(92px,19.5cqw,178px);aspect-ratio:1.13;z-index:7;border-width:clamp(2px,.48cqw,5px);border-radius:clamp(10px,2cqw,20px)}
+.v09-center-widget::before{inset:clamp(4px,1cqw,9px)}
+.v09-center-content{gap:clamp(1px,.35cqw,3px);transform:translateY(-7%)}
+.v09-center-content>b{font-size:clamp(13px,2.8cqw,24px)}
+.v09-center-content>.v09-center-eyebrow{font-size:clamp(6px,.9cqw,9px)}
+.v09-center-content>span:not(.v09-center-eyebrow){font-size:clamp(9px,1.4cqw,12px)}
+.v09-center-content strong{font-size:clamp(10px,1.7cqw,16px)}
+.v09-center-widget>span[class^="v09-compass"]{width:clamp(17px,3cqw,25px);height:clamp(17px,3cqw,25px);font-size:clamp(11px,1.8cqw,15px)}
+.v091-gold-corner{right:clamp(4px,.9cqw,9px);bottom:clamp(3px,.5cqw,5px);z-index:8}
+.v091-gold-corner .v09-card{--river-w:clamp(13px,2.4cqw,21px);border-bottom-width:2px}
+.v09-gold-reveal{display:none!important}
+
+/* The existing hand stays interactive and sits on the near edge of the table. */
+.table-live .table-shell .player.dock-seat{
+  position:absolute;inset:0;z-index:11;grid-area:auto;display:block;width:100%;height:100%;
+  max-width:none;min-width:0;min-height:0;max-height:none;padding:0;overflow:visible;
+  border:0;border-radius:0;background:transparent;box-shadow:none;pointer-events:none;
+}
+.table-live .dock-seat .hand{
+  position:absolute;left:7%;bottom:1.7%;display:flex;justify-content:center;align-items:end;
+  width:86%;min-width:0;min-height:0;padding:0;margin:0;gap:var(--hand-gap,2px);
+  flex-wrap:nowrap;overflow:visible;pointer-events:auto;
+}
+.table-live .dock-seat .hand .tile:not(.small){
+  --tile-width:min(64px,calc((100% - (var(--hand-slots) - 1)*var(--hand-gap) - var(--draw-gap))/var(--hand-slots)));
+  flex:0 0 var(--tile-width);width:var(--tile-width);height:auto;aspect-ratio:1/1.32;
+  min-height:0;border-bottom-width:clamp(2px,.65cqw,5px);
+}
+.table-live .dock-seat .hand .tile.selected{transform:translateY(-8px)}
+.table-live .dock-seat>.player-head{
+  position:absolute;left:calc(-1 * var(--rail-size));bottom:3.5%;
+  max-width:calc(var(--rail-size) - 8px);pointer-events:auto;box-shadow:0 5px 18px #183d4470;
+}
+.table-live .dock-seat .dock-tools{
+  position:absolute;left:calc(100% + 8px);right:auto;bottom:2.5%;display:flex;flex-wrap:wrap;
+  width:var(--rail-size);max-width:none;justify-content:flex-start;pointer-events:auto;
+}
+.table-live .dock-seat .decision-row{
+  position:absolute;left:calc(100% + 8px);right:auto;top:34%;display:flex;
+  justify-content:flex-start;align-items:flex-start;width:var(--rail-size);max-width:none;
+  flex-wrap:wrap;pointer-events:auto;
+}
+.table-live .dock-seat .decision-row .action-area{justify-content:flex-start;flex-wrap:wrap;gap:5px}
+.table-live .dock-seat .decision-row .wait-hint{width:100%;margin-bottom:6px}
+.table-live .dock-seat .decision-row .wait-choices{max-width:100%;flex-wrap:wrap}
+.table-live .table-shell .player:not(.dock-seat){width:var(--rail-size);z-index:12}
+.table-live .table-shell .player.north:not(.dock-seat){top:0;left:50%;transform:translate(-50%,-25%)}
+.table-live .table-shell .player.west:not(.dock-seat){left:calc(-1 * var(--rail-size));top:33%;transform:none}
+.table-live .table-shell .player.east:not(.dock-seat){right:calc(-1 * var(--rail-size));top:17%;transform:none}
+.table-live .scene-toolbar{
+  position:absolute;top:1%;left:calc(100% + 8px);right:auto;display:flex;flex-direction:column;
+  align-items:stretch;gap:6px;width:var(--rail-size);max-width:none;transform:none;z-index:14;
+}
+.table-live .scene-status{max-width:100%;white-space:normal;line-height:1.3;overflow-wrap:anywhere}
+.table-live .scene-controls{flex-wrap:wrap}
+.table-live .scene-controls .ghost{white-space:nowrap}
+.table-live .river-inspector{inset:5% 6% 7%}
+
+/* Portrait: square board centered above a compact control rail. */
+@media (orientation:portrait){
+  .table-live .table-shell{--rail-size:clamp(112px,28vw,168px);--side:min(96vw,calc(100dvh - 252px),920px);margin-inline:auto!important}
+  .table-live .table-shell .player.north:not(.dock-seat),.table-live .table-shell .player.west:not(.dock-seat),.table-live .table-shell .player.east:not(.dock-seat){top:-40px;left:auto;right:auto;transform:none;width:30.5%;max-width:none}
+  .table-live .table-shell .player.west:not(.dock-seat){left:1%}
+  .table-live .table-shell .player.north:not(.dock-seat){left:34.75%}
+  .table-live .table-shell .player.east:not(.dock-seat){right:1%}
+  .table-live .scene-toolbar{top:calc(100% + 9px);left:50%;right:auto;transform:translateX(-50%);flex-direction:row;align-items:center;justify-content:center;width:100%;max-width:100%;gap:5px}
+  .table-live .scene-status{max-width:40%;font-size:10px}
+  .table-live .scene-controls{gap:4px;flex-wrap:nowrap}
+  .table-live .scene-controls .ghost{padding:4px 6px;min-height:31px;font-size:10px}
+  .table-live .dock-seat>.player-head{left:1%;top:calc(100% + 47px);bottom:auto;max-width:35%}
+  .table-live .dock-seat .dock-tools{left:auto;right:0;top:calc(100% + 47px);bottom:auto;width:63%;justify-content:flex-end}
+  .table-live .dock-seat .decision-row{top:calc(100% + 105px);left:0;right:0;width:100%;justify-content:center;align-items:center}
+  .table-live .dock-seat .decision-row .action-area{justify-content:center}
+  .table-live .dock-seat .decision-row .wait-hint{width:auto;max-width:94vw}
+  .table-live .dock-seat .decision-row .wait-choices{max-width:70vw;flex-wrap:nowrap}
+}
+@media (max-width:690px) and (orientation:portrait){
+  body.table-live .game-content{padding-top:44px}
+  .table-live .table-shell{--side:min(96vw,calc(100dvh - 242px))}
+  .v09-board{--river-w:clamp(9px,2.82cqw,14px);--wall-w:clamp(8px,2.04cqw,10px);--back-w:clamp(7px,1.82cqw,9px);--exposed-w:clamp(8px,2.18cqw,12px)}
+  .table-live .v09-center-widget{width:clamp(90px,24.5cqw,110px)}
+  .v091-gold-corner{bottom:3px;right:3px;padding:0 1px}
+  .v091-gold-corner .v09-card{--river-w:13px}
+  .table-live .table-shell .player:not(.dock-seat){border-radius:7px}
+  .table-live .table-shell .player:is(.north,.west,.east):not(.dock-seat){top:-39px}
+  .table-live .scene-toolbar{top:calc(100% + 7px);gap:3px}
+  .table-live .scene-status{max-width:43%;padding:3px 5px;font-size:9px}
+  .table-live .scene-controls .ghost{min-height:27px;padding:3px 5px;font-size:9px}
+  .table-live .dock-seat>.player-head{top:calc(100% + 45px);max-width:35%}
+  .table-live .dock-seat .dock-tools{top:calc(100% + 45px);width:64%}
+  .table-live .dock-seat .decision-row{top:calc(100% + 98px)}
+  .table-live .dock-seat .hand{left:4%;width:92%;bottom:1.4%;--hand-gap:1px;--draw-gap:3px}
+  .table-live .dock-seat .hand .tile:not(.small){min-height:0;aspect-ratio:1/1.33;border-radius:3px}
+  .table-live .dock-seat .action-btn{min-height:38px;min-width:43px;padding:4px 7px;font-size:12px}
+  .table-live .dock-seat .action-btn.hu{min-width:47px;font-size:17px}
+}
+
+/* Landscape phones reserve equal side gutters and center the board in the viewport. */
+@media (orientation:landscape) and (max-height:550px){
+  .table-live .table-shell{--rail-size:clamp(106px,14vw,132px);--side:min(calc(100dvh - 48px),calc(100vw - var(--rail-size) - var(--rail-size) - 24px),920px);margin-inline:auto!important}
+  .v09-board{--river-w:clamp(9px,2.92cqw,13px);--wall-w:clamp(8px,2.05cqw,10px);--back-w:clamp(7px,1.82cqw,9px);--exposed-w:clamp(8px,2.16cqw,12px)}
+  .table-live .table-shell .player.west:not(.dock-seat){left:calc(-1 * var(--rail-size));top:25%}
+  .table-live .table-shell .player.east:not(.dock-seat){right:calc(-1 * var(--rail-size));top:18%}
+  .table-live .dock-seat>.player-head{left:calc(-1 * var(--rail-size));bottom:6%;max-width:calc(var(--rail-size) - 6px)}
+  .table-live .dock-seat .dock-tools,.table-live .dock-seat .decision-row,.table-live .scene-toolbar{left:calc(100% + 6px);right:auto;width:var(--rail-size);max-width:var(--rail-size)}
+  .table-live .dock-seat .dock-tools{bottom:0}
+  .table-live .dock-seat .decision-row{top:40%}
+  .table-live .scene-toolbar{top:1%;gap:4px}
+  .table-live .scene-status{font-size:9px;line-height:1.1;padding:3px 5px}
+  .table-live .scene-controls{gap:3px}
+  .table-live .scene-controls .ghost{min-height:24px;padding:2px 4px;font-size:9px}
+  .table-live .table-shell .player.north:not(.dock-seat){top:0;transform:translate(-50%,-20%);width:118px}
+  .table-live .dock-seat .hand{left:4.5%;width:91%;bottom:1%;--hand-gap:1px;--draw-gap:3px}
+  .table-live .dock-seat .hand .tile:not(.small){min-height:0;aspect-ratio:1/1.33}
+  .table-live .dock-seat .action-btn{min-height:31px;min-width:37px;padding:2px 5px;font-size:11px}
+  .table-live .dock-seat .action-btn.hu{min-width:44px;font-size:16px}
+  .table-live .dock-seat .decision-row .wait-hint{max-height:63px;overflow:auto}
+  .table-live .dock-seat .decision-row .wait-choices{flex-wrap:nowrap;max-width:120px}
+  .table-live .v09-center-widget{width:clamp(72px,22cqw,92px)}
+}
+@media (orientation:landscape) and (min-height:551px){
+  .table-live .scene-toolbar{width:var(--rail-size);max-width:none;align-items:stretch}
+  .table-live .scene-controls{width:100%;display:flex;flex-wrap:wrap;justify-content:flex-start}
+  .table-live .scene-controls .ghost{min-width:0;white-space:nowrap;padding-inline:8px}
+  .table-live .scene-status{max-width:100%;width:100%}
+}
+@media (prefers-reduced-motion:reduce){.table-live .dock-seat .hand .tile,.table-live .action-btn{transition:none!important}}
+
+/* The alternate complete-table view flattens the felt, not the tiles or their alignment. */
+.table-live .overhead-view .v092-board-surface::before,.table-live .overhead-view .v092-board-surface::after{transform:none}
+.table-live .overhead-view .v092-board-surface::before,.table-live .overhead-view .v092-board-surface::after{clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}

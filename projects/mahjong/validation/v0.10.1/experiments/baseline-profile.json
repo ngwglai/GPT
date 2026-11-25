@@ -1,0 +1,120 @@
+{
+  "boot_ms": 1267.6500060000535,
+  "roll_ui_ms": 485.56835700003376,
+  "updates_ms": [
+    305.60000000009313,
+    232.39999999990687,
+    190.80000000004657,
+    185.70000000006985,
+    166.79999999993015,
+    190.5,
+    179.80000000004657,
+    202,
+    182.5,
+    230.5,
+    218.59999999997672,
+    221.29999999993015
+  ],
+  "top_cpu_ms": [
+    [
+      "sprite cuboid-scene.js",
+      1493.68
+    ],
+    [
+      "(program) ",
+      933.03
+    ],
+    [
+      "(idle) ",
+      351.07
+    ],
+    [
+      "triangle cuboid-scene.js",
+      242.01
+    ],
+    [
+      "fit cuboid-scene.js",
+      200.94
+    ],
+    [
+      "fill cuboid-scene.js",
+      193.68
+    ],
+    [
+      " cuboid-scene.js",
+      180.3
+    ],
+    [
+      "renderSprites cuboid-scene.js",
+      108.69
+    ],
+    [
+      "tileFaces cuboid-scene.js",
+      82.6
+    ],
+    [
+      "hull cuboid-scene.js",
+      81.03
+    ],
+    [
+      "(garbage collector) ",
+      55.41
+    ],
+    [
+      "rotate cuboid-scene.js",
+      52.19
+    ],
+    [
+      "surfaceColor cuboid-scene.js",
+      33.42
+    ],
+    [
+      "positionUI cuboid-scene.js",
+      31.4
+    ],
+    [
+      "texture cuboid-scene.js",
+      28.65
+    ],
+    [
+      "project cuboid-scene.js",
+      26.09
+    ],
+    [
+      "cross cuboid-scene.js",
+      20.38
+    ],
+    [
+      " ",
+      17.27
+    ],
+    [
+      "world cuboid-scene.js",
+      16.39
+    ],
+    [
+      "mean cuboid-scene.js",
+      15.2
+    ]
+  ],
+  "diagnostics": {
+    "hits": 1861,
+    "misses": 493,
+    "created": 232,
+    "reused": 2122,
+    "removed": 53,
+    "lastMs": 220.20000000006985,
+    "tiles": 179,
+    "cacheBytes": 21383200,
+    "cacheEntries": 384
+  },
+  "long_tasks_ms": [
+    55,
+    167,
+    51,
+    56,
+    285
+  ],
+  "errors": [],
+  "note": "Exploratory profiling; instrumentation and conditions vary. Use formal serial benchmark JSON for acceptance comparisons."
+}

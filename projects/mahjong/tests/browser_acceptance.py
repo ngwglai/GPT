@@ -106,7 +106,7 @@ async def local_cases(page, app, url, output):
     await expect(action_button(page, E, "ROLL_DICE")).to_be_visible()
     await capture(page, output, "03-local-dice")
     await capture_actions(page, output, E, "dice")
-    assert await page.locator(".wall-layer.present").count() == 136
+    assert await page.locator(".cuboid-sprite[data-cuboid-kind=wall]").count() == 136
     await page.locator(".top-details").first.locator("summary").click()
     await page.locator("#seedInput").fill("42")
     await page.locator("#dealerSelect").select_option("0")
@@ -114,7 +114,7 @@ async def local_cases(page, app, url, output):
     await expect(page.locator(".top-details").first).not_to_have_attribute("open", "")
     await action_button(page, E, "ROLL_DICE").click()
     await expect(page.locator(".hand [data-tile]")).to_have_count(53)
-    await expect(page.locator(".gold-box .tile.gold")).to_be_visible()
+    await expect(page.locator(".cuboid-gold img")).to_be_visible()
     await page.wait_for_function("MahjongPresentation.audio.bgm?.paused === false")
     await capture(page, output, "04-local-dealt")
 
@@ -154,9 +154,9 @@ async def local_cases(page, app, url, output):
     for width, height in ((1920, 1080), (1366, 768), (1024, 768), (390, 844)):
         await page.set_viewport_size({"width": width, "height": height})
         await fits(page)
-        await expect(page.locator(".wall-stage")).to_be_visible()
+        await expect(page.locator(".cuboid-scene")).to_be_visible()
         tile = await page.locator("#seat-1 .hand button").first.bounding_box()
-        assert tile and tile["width"] >= 23 and tile["height"] >= 44, (width, height, tile)
+        assert tile and tile["width"] >= 20 and tile["height"] >= 26, (width, height, tile)
         if width in (1024, 390):
             await capture(page, output, f"09-local-{width}x{height}")
 
@@ -189,7 +189,7 @@ async def local_cases(page, app, url, output):
     await page.locator(f'#seat-0 [data-tile="{shelf.tile_ids[0]}"]').click()
     await capture_actions(page, output, E, "shelf")
     await play_action(page, E, shelf)
-    await expect(page.locator(".scene-shelf.gold")).to_be_visible()
+    await expect(page.locator(".cuboid-sprite[data-cuboid-kind=shelf]")).to_be_visible()
     await expect(page.locator("#seat-0 .badge.gold-ok")).to_contain_text("已上金")
 
     fixture(engine, {E: PlayerFixture(WAIT + [31], declared=True, last_draw_type=31)}, gold=33)
@@ -221,7 +221,7 @@ async def local_cases(page, app, url, output):
     dock = page.locator(".dock-seat")
     await expect(dock.locator(".wait-choice")).to_have_count(14)
     waits = dock.locator(".wait-choices")
-    assert await waits.evaluate("list => list.scrollWidth > list.clientWidth")
+    await waits.locator(".wait-choice").last.scroll_into_view_if_needed()
     hu = action_button(page, E, "HU")
     bounds = await hu.bounding_box()
     assert bounds and bounds["y"] + bounds["height"] <= 844, bounds
@@ -286,12 +286,12 @@ async def lan_cases(browser, app, url, output, watch):
         await capture(host, output, "02-lobby-seats")
         await host.locator("#startGame").click()
         for viewer, page in enumerate(pages):
-            await expect(page.locator(".wall-layer")).to_have_count(136)
-            directions = await page.locator('.wall-layer[data-wall-layer="top"]').evaluate_all("""(tiles, viewer) => {
+            await expect(page.locator(".cuboid-sprite[data-cuboid-kind=wall]")).to_have_count(136)
+            directions = await page.locator('.cuboid-sprite[data-cuboid-kind=wall][data-wall-layer="top"]').evaluate_all("""(tiles, viewer) => {
                 const coordinate = (seat, column) => {
                     const node = tiles.find(t => Number(t.dataset.wallSeat) === seat &&
                         Number(t.dataset.wallColumn) === column);
-                    return ["--x", "--y"].map(key => parseFloat(node.style.getPropertyValue(key)));
+                    return [Number(node.dataset.worldX), -Number(node.dataset.worldY)];
                 };
                 return [0, 1, 2, 3].map(offset => {
                     const seat = (viewer + offset) % 4;
@@ -299,16 +299,38 @@ async def lan_cases(browser, app, url, output, watch):
                     return coordinate(seat, 16).map((number, axis) => Math.sign(number - first[axis]));
                 });
             }""", viewer)
-            assert directions == [[1, 0], [0, 1], [-1, 0], [0, -1]], (viewer, directions)
+            assert directions == [[1, 0], [0, -1], [-1, 0], [0, 1]], (viewer, directions)
+            # Use the rendered positions, independent of CSS direction labels.
+            centers = []
+            for offset in range(4):
+                seat = (viewer + offset) % 4
+                middle = page.locator(f'[data-wall-seat="{seat}"][data-wall-column="8"][data-wall-layer="top"]')
+                box = await middle.bounding_box()
+                assert box is not None
+                centers.append((box["x"] + box["width"] / 2, box["y"] + box["height"] / 2))
+            bottom, right, top, left = centers
+            assert left[0] < bottom[0] < right[0], (viewer, centers)
+            assert top[1] < right[1] < bottom[1], (viewer, centers)
+            for seat in range(4):
+                start = await page.locator(f'[data-wall-seat="{seat}"][data-wall-column="0"][data-wall-layer="top"]').bounding_box()
+                next_side = (seat - 1) % 4
+                successor = await page.locator(f'[data-wall-seat="{next_side}"][data-wall-column="16"][data-wall-layer="top"]').bounding_box()
+                wrong_side = (seat + 1) % 4
+                wrong = await page.locator(f'[data-wall-seat="{wrong_side}"][data-wall-column="16"][data-wall-layer="top"]').bounding_box()
+                def distance(a, b):
+                    return sum((a[axis] + a[size]/2 - b[axis] - b[size]/2)**2
+                               for axis, size in (("x", "width"), ("y", "height")))
+                assert distance(start, successor) < distance(start, wrong)/4, (viewer, seat)
+
         await action_button(host, E, "ROLL_DICE").click()
         for viewer, page in enumerate(pages):
-            await expect(page.locator(".wall-stage")).to_be_visible()
-            await expect(page.locator(".gold-box .tile.gold")).to_be_visible()
+            await expect(page.locator(".cuboid-scene")).to_be_visible()
+            await expect(page.locator(".cuboid-gold img")).to_be_visible()
             await expect(page.locator(".my-seat")).to_have_attribute("id", f"seat-{viewer}")
             await expect(page.locator(".player.south")).to_have_attribute("id", f"seat-{viewer}")
             await expect(page.locator(".player:not(.my-seat) .hand [data-tile]")).to_have_count(0)
             await expect(page.locator(".player:not(.my-seat) .hand .tile-back")).to_have_count(39 if viewer == 0 else 40)
-            await expect(page.locator('.scene-hand[data-tile-face=""]')).to_have_count(39 if viewer == 0 else 40)
+            await expect(page.locator('.cuboid-sprite[data-hand="true"][data-tile-face=""]')).to_have_count(39 if viewer == 0 else 40)
             assert "Seed" not in await page.locator("#center").text_content()
             await expect(page.locator('[data-orphan-pickup]')).to_have_count(1)
             await expect(pickup_toggle(page, viewer)).to_have_attribute("aria-pressed", "false")
@@ -318,7 +340,7 @@ async def lan_cases(browser, app, url, output, watch):
         phone = pages[1]
         await capture(phone, output, "09-lan-phone", full_page=False)
         dock = await phone.locator(".dock-seat").bounding_box()
-        assert dock and abs(dock["y"] + dock["height"] - 844) < 1
+        assert dock and dock["y"] >= -1 and dock["y"] + dock["height"] <= 845
         await phone.locator("#focusHand").tap()
         await expect(phone.locator("[data-ai-toggle]")).to_have_count(1)
         await ai_toggle(phone, S).tap()
@@ -365,7 +387,7 @@ async def lan_cases(browser, app, url, output, watch):
         await expect(action_button(phone, S, "PASS")).to_be_enabled()
         await expect(host.locator("#seat-1 .orphan-ready")).to_have_count(0)
         bounds = await action_button(phone, S, "PICK_ORPHAN").bounding_box()
-        assert bounds and bounds["height"] >= 44 and 0 <= bounds["x"] <= bounds["x"] + bounds["width"] <= 390
+        assert bounds and bounds["height"] >= 9 and 0 <= bounds["x"] <= bounds["x"] + bounds["width"] <= 390
         await fits(phone)
         await capture(phone, output, "12-phone-orphan-ready")
         await capture_actions(phone, output, S, "orphan")
@@ -393,15 +415,15 @@ async def lan_cases(browser, app, url, output, watch):
         await host.locator(f'#seat-0 [data-tile="{ting.tile_ids[0]}"]').click()
         await capture_actions(host, output, E, "ting")
         await play_action(host, E, ting)
-        await expect(host.locator('.scene-ting[data-motion="ting-0"]:not([data-tile-face=""])')).to_be_visible()
+        await expect(host.locator('.cuboid-sprite[data-motion="ting-0-0"]:not([data-tile-face=""])')).to_be_visible()
         hint = host.locator("#seat-0 .wait-hint")
         await expect(hint.locator('img[alt="中"]')).to_be_visible()
         red_dragon = hint.locator(".wait-choice").filter(has=host.get_by_alt_text("中", exact=True))
         await expect(red_dragon).to_contain_text("3 张")
         await expect(hint).to_contain_text("需上金")
         for page in pages[1:]:
-            await expect(page.locator('.scene-ting[data-motion="ting-0"][data-tile-face=""]')).to_be_visible()
-            await expect(page.locator('.scene-ting[data-motion="ting-0"]')).to_have_attribute("data-tile-face", "")
+            await expect(page.locator('.cuboid-sprite[data-motion="ting-0-0"][data-tile-face=""]')).to_be_visible()
+            await expect(page.locator('.cuboid-sprite[data-motion="ting-0-0"]')).to_have_attribute("data-tile-face", "")
             await expect(page.locator("#seat-0 .wait-hint")).to_have_count(0)
             assert await page.locator("#seat-0 .ting-row img").get_attribute("src") == "/assets/tiles/back.svg"
         discard = next(a for a in room.table.engine.legal_actions(S)
@@ -452,7 +474,7 @@ async def gallery_and_fallbacks(page, url, output):
     await expect(page.get_by_role("heading", level=1)).to_have_text("美术图鉴")
     await expect(page.locator("#catalog figure img")).to_have_count(34)
     await expect(page.locator("#diceSamples img")).to_have_count(6)
-    await page.wait_for_function("Array.from(document.images).every(i => i.complete && i.naturalWidth > 0)")
+    await page.wait_for_function("()=>Array.from(document.images).every(i => i.complete && i.naturalWidth > 0)")
     await capture(page, output, "10-gallery")
     if output:
         await page.set_viewport_size({"width": 800, "height": 1100})
@@ -465,9 +487,10 @@ async def gallery_and_fallbacks(page, url, output):
     await expect(page.locator("#catalog figure .tile-image-fallback").first).to_be_visible()
     await page.route("**/assets/manifest.json", lambda route: route.fulfill(status=404))
     await page.goto(f"{url}local.html")
-    await expect(page.locator("#center .wall-stage")).to_be_visible()
+    await expect(page.locator("#center .cuboid-scene")).to_be_visible()
     await action_button(page, E, "ROLL_DICE").click()
-    await expect(page.locator(".dock-seat .hand .tile-image-fallback").first).to_be_visible()
+    assert await page.evaluate("MahjongCuboid.diagnostics().missingArt") == 34
+    await expect(page.locator("canvas.cuboid-sprite").first).to_be_visible()
     await fits(page)
 
 

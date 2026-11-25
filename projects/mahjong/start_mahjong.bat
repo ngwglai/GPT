@@ -5,6 +5,8 @@ pushd "%~dp0" || goto directory_failed
 
 set "MAHJONG_HOST=%~1"
 if not defined MAHJONG_HOST set "MAHJONG_HOST=127.0.0.1"
+if exist "runtime\python.exe" goto portable_runtime
+
 set "VENV_PYTHON=.venv\Scripts\python.exe"
 set "PYTHON_PROBE=import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)"
 if not exist "%VENV_PYTHON%" goto find_python
@@ -49,6 +51,14 @@ if errorlevel 1 goto dependencies_failed
 if errorlevel 1 goto dependencies_failed
 
 "%VENV_PYTHON%" "web_server.py" --host "%MAHJONG_HOST%"
+if errorlevel 1 goto server_failed
+popd
+exit /b 0
+
+:portable_runtime
+"runtime\python.exe" -c "import aiohttp, mahjong"
+if errorlevel 1 goto dependencies_failed
+"runtime\python.exe" "web_server.py" --host "%MAHJONG_HOST%"
 if errorlevel 1 goto server_failed
 popd
 exit /b 0

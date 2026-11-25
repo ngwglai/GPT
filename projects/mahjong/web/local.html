@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#10261f">
-  <title>单机练习 · 青雀麻将</title>
+  <meta name="theme-color" content="#f1e8d2">
+  <title>单机练习 · 青雀麻将 v0.10.1</title>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/table.css">
-  <link rel="stylesheet" href="/play.css">
-  <link rel="stylesheet" href="/scene.css">
+  <link rel="stylesheet" href="/v09.css"><link rel="stylesheet" href="/v091.css"><link rel="stylesheet" href="/v092.css"><link rel="stylesheet" href="/v093.css">
+  <link rel="stylesheet" href="/v094.css"><link rel="stylesheet" href="/v095.css">
 </head>
 <body class="game-mode">
   <header class="topbar">
@@ -18,6 +18,7 @@
     </div>
     <div id="tableHud" class="table-hud hidden" aria-label="本局信息"></div>
     <div class="round-controls">
+      <a href="/" class="ghost cuboid-home" aria-label="返回首页">首页</a>
       <button id="focusTurn" type="button" class="ghost hidden" aria-label="查看当前操作席位">操作席</button>
       <button id="timeoutBtn" type="button" class="ghost hidden">未响应者全部过</button>
       <details class="top-details">
@@ -59,8 +60,8 @@
   </main>
   <script src="/presentation.js"></script>
   <script src="/components.js"></script>
-  <script src="/table-mesh.js"></script>
-  <script src="/table-scene.js"></script>
+  <script src="/perspective.js"></script><script src="/table-scene.js"></script>
+  <script src="/cuboid-scene.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>

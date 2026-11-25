@@ -1,0 +1,7 @@
+......................................Executing <Task pending name='Task-1838' coro=<LanTests.test_orphan_pickup_stays_public_through_reconnect_and_win() running at /tmp/mj98/QingqueMahjong_v0.9.7/tests/test_lan_server.py:430> wait_for=<_GatheringFuture pending cb=[Task.task_wakeup()] created at /usr/lib/python3.13/asyncio/tasks.py:765> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.100 seconds
+..........................................................................................................................................................
+----------------------------------------------------------------------
+Ran 192 tests in 30.743s
+
+OK
+LAN complete round: 89 authenticated actions, DRAW, next round dealt.

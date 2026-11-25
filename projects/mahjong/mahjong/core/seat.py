@@ -25,4 +25,5 @@ def opposite_seat(seat: Seat) -> Seat:
 
 
 def turn_order(start: Seat, include_start: bool = True) -> tuple[Seat, ...]:
+    """Player order counterclockwise, independent of physical wall traversal."""
     return tuple(advance_seat(start, i) for i in range(0 if include_start else 1, 4))

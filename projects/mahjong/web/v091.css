@@ -1,0 +1,86 @@
+/* v0.9.1 square-table rendering: all rivers use the same logical grid. */
+body.table-live .game-content{display:flex;align-items:center;justify-content:center;padding:0;overflow:visible;width:100%}
+.table-live .table-shell{--side:min(94vw,calc(100dvh - 92px),calc(100vw - 396px),920px);position:relative;display:block;flex:0 0 auto;width:var(--side);height:var(--side);max-width:100%;max-height:100%;min-width:0;min-height:0;aspect-ratio:1;margin:0 auto;padding:0;container-type:inline-size;overflow:visible;border:0;background:transparent;box-shadow:none}
+.table-live .center-board{position:absolute;inset:0;width:100%;height:100%;min-width:0;min-height:0;display:block;overflow:visible}
+.table-live .table-felt-wrap,.table-live .wall-stage.v09-stage{position:absolute;inset:0;overflow:visible}
+.v09-board,.table-live .overhead-view .v09-board{--river-w:clamp(10px,2.94cqw,27px);--wall-w:clamp(8px,2.15cqw,20px);--back-w:clamp(8px,1.90cqw,18px);--exposed-w:clamp(9px,2.15cqw,19px);position:absolute;inset:0;width:100%;height:100%;aspect-ratio:1;box-sizing:border-box;border:clamp(5px,1.2cqw,12px) solid #b88b64;border-radius:clamp(15px,4cqw,36px);background:radial-gradient(circle at 48% 42%,#96dcd0 0%,#61b8af 56%,#318b85 100%);box-shadow:0 2px 0 #ffe5b2,0 9px 0 #845f49,0 15px 30px #233f3f70,inset 0 0 0 4px #f6dfb2,inset 0 0 0 7px #1f807a,inset 0 0 60px #215f6266}
+.v09-board::before{inset:clamp(7px,2cqw,15px);border-radius:clamp(10px,2.3cqw,25px)}.v09-board::after{inset:clamp(12px,3cqw,24px);border-radius:clamp(9px,2cqw,20px)}
+.v09-felt-guide{inset:27% 26%;border-radius:18%;opacity:.48}.v09-felt-crest{left:12%;top:67%;font-size:clamp(22px,5cqw,59px);opacity:.45}
+.v09-wall{gap:1px;justify-content:center;align-items:center}.v09-wall-north{left:21%;top:5%;width:58%;height:4%;transform:none}.v09-wall-south{left:21%;bottom:16.7%;width:58%;height:4%;transform:rotate(180deg)}.v09-wall-west{left:5%;top:20%;width:4%;height:57%;flex-direction:column}.v09-wall-east{right:5%;top:20%;width:4%;height:57%;flex-direction:column-reverse}
+.v09-enemy-north{left:27%;top:12%;width:46%}.v09-enemy-west{left:13%;top:26%;height:49%}.v09-enemy-east{right:13%;top:26%;height:49%}
+/* A symmetric 7-column / variable-row tile matrix. Rotating the matrix never overlaps the central compass. */
+.v09-river,.v09-river.crowded,.v09-river-west.crowded,.v09-river-east.crowded{position:absolute;inset:auto;display:grid;grid-template-columns:repeat(7,var(--river-w));grid-auto-flow:row;grid-auto-rows:calc(var(--river-w)*1.36);gap:1px 2px;width:max-content;height:max-content;max-width:none;min-width:0;margin:0;padding:0;overflow:visible;align-content:center;justify-content:center;transform-origin:center center}
+.v09-river .v09-card{width:var(--river-w);height:calc(var(--river-w)*1.36);border-bottom-width:2px;border-radius:3px}
+.v09-river-north,.v09-river-north.crowded{left:50%;top:29.4%;transform:translate(-50%,-50%) rotate(180deg)}.v09-river-south,.v09-river-south.crowded{left:50%;top:68%;transform:translate(-50%,-50%)}.v09-river-west,.v09-river-west.crowded{left:28.8%;top:49.5%;transform:translate(-50%,-50%) rotate(90deg)}.v09-river-east,.v09-river-east.crowded{left:71.2%;top:49.5%;transform:translate(-50%,-50%) rotate(-90deg)}
+.v09-river.crowded{--river-w:clamp(9px,2.67cqw,24px)}.v09-river.dense{--river-w:clamp(8px,2.42cqw,21px)}
+/* Four small exposed-meld pockets sit in the corner quadrants. */
+.v09-exposed{display:flex;flex-wrap:wrap;align-content:flex-start;align-items:flex-start;gap:2px;overflow:auto;scrollbar-width:thin;width:28%;max-width:28%;height:12%;max-height:12%;padding:1px;transform:none}.v09-exposed-set{display:inline-flex;flex-wrap:nowrap;gap:0;padding:1px;max-width:100%}.v09-exposed .v09-card{width:var(--exposed-w);height:calc(var(--exposed-w)*1.32);flex:none;border-bottom-width:2px}
+.v09-exposed-north{left:11%;top:20.5%}.v09-exposed-east{right:10%;top:20.5%}.v09-exposed-west{left:10%;bottom:20.2%}.v09-exposed-south{right:10%;bottom:20.2%}
+/* Gold tile is inside the compass, not a freestanding table overlay. */
+.v09-center-widget{left:50%;top:49.5%;width:clamp(91px,19.4cqw,175px);aspect-ratio:1.13;z-index:7;border-width:clamp(2px,.48cqw,5px);border-radius:clamp(10px,2cqw,20px)}.v09-center-widget::before{inset:clamp(4px,1cqw,9px)}
+.v09-center-content{gap:clamp(1px,.35cqw,3px);transform:translateY(-7%)}.v09-center-content>b{font-size:clamp(13px,2.8cqw,24px)}.v09-center-content>.v09-center-eyebrow{font-size:clamp(6px,.9cqw,9px)}.v09-center-content>span:not(.v09-center-eyebrow){font-size:clamp(9px,1.4cqw,12px)}.v09-center-content strong{font-size:clamp(10px,1.7cqw,16px)}
+.v09-center-widget>span[class^="v09-compass"]{width:clamp(17px,3cqw,25px);height:clamp(17px,3cqw,25px);font-size:clamp(11px,1.8cqw,15px)}
+.v091-gold-corner{position:absolute;right:clamp(4px,.9cqw,9px);bottom:clamp(3px,.5cqw,5px);z-index:8;display:flex;align-items:center;gap:2px;padding:1px 2px;color:#ffe9ba;font-size:clamp(8px,1.1cqw,10px);line-height:1;background:#162f38a5;border:1px solid #d9ad77;border-radius:5px}.v091-gold-corner .v09-card{--river-w:clamp(13px,2.4cqw,21px);border-bottom-width:2px}.v09-gold-reveal{display:none!important}
+/* Interactive hand is within the square tabletop. The original DOM/buttons remain live. */
+.table-live .table-shell .player.dock-seat{position:absolute;inset:0;z-index:11;grid-area:auto;grid-row:auto;grid-column:auto;display:block;width:100%;height:100%;max-width:none;min-width:0;min-height:0;max-height:none;padding:0;overflow:visible;border:0;border-radius:0;background:transparent;box-shadow:none;pointer-events:none}
+.table-live .dock-seat .hand{position:absolute;left:6.7%;bottom:1.5%;display:flex;justify-content:center;align-items:end;width:86.6%;min-width:0;min-height:0;padding:0;margin:0;gap:var(--hand-gap,2px);flex-wrap:nowrap;overflow:visible;pointer-events:auto}
+.table-live .dock-seat .hand .tile:not(.small){--tile-width:min(64px,calc((100% - (var(--hand-slots) - 1)*var(--hand-gap) - var(--draw-gap)) / var(--hand-slots)));flex:0 0 var(--tile-width);width:var(--tile-width);height:auto;aspect-ratio:1/1.32;min-height:0;border-bottom-width:clamp(2px,.65cqw,5px)}.table-live .dock-seat .hand .tile.selected{transform:translateY(-8px)}
+.table-live .dock-seat>.player-head{position:absolute;left:calc(-1 * clamp(150px,14vw,208px));bottom:3.5%;max-width:clamp(136px,13vw,194px);pointer-events:auto;box-shadow:0 5px 18px #183d4470}
+.table-live .dock-seat .dock-tools{position:absolute;left:calc(100% + 12px);bottom:2.5%;display:flex;flex-wrap:wrap;width:clamp(120px,14vw,220px);max-width:none;justify-content:flex-start;pointer-events:auto}
+.table-live .dock-seat .decision-row{position:absolute;left:calc(100% + 12px);top:34%;display:flex;justify-content:flex-start;align-items:flex-start;width:clamp(132px,16vw,216px);max-width:none;flex-wrap:wrap;pointer-events:auto}
+.table-live .dock-seat .decision-row .action-area{justify-content:flex-start;flex-wrap:wrap;gap:5px}.table-live .dock-seat .decision-row .wait-hint{width:100%;margin-bottom:6px}.table-live .dock-seat .decision-row .wait-choices{max-width:100%;flex-wrap:wrap}
+.table-live .table-shell .player:not(.dock-seat){width:clamp(126px,13vw,196px);z-index:12}.table-live .table-shell .player.north:not(.dock-seat){top:0;left:50%;transform:translate(-50%,-25%)}.table-live .table-shell .player.west:not(.dock-seat){left:calc(-1 * clamp(150px,14vw,208px));top:33%;transform:none}.table-live .table-shell .player.east:not(.dock-seat){right:calc(-1 * clamp(150px,14vw,208px));top:17%;transform:none}
+.table-live .scene-toolbar{position:absolute;top:1%;left:calc(100% + 12px);display:flex;flex-direction:column;align-items:flex-start;gap:7px;max-width:clamp(132px,16vw,220px);transform:none;z-index:14}.table-live .scene-status{max-width:100%;white-space:normal;line-height:1.35;overflow-wrap:anywhere}.table-live .scene-controls{flex-wrap:wrap}.table-live .scene-controls .ghost{white-space:normal}.table-live .river-inspector{inset:5% 6% 7%}
+/* Portrait devices use the space beneath the square for controls, never for a separate hand. */
+@media (orientation:portrait){
+ body.table-live .game-content{align-items:flex-start;justify-content:center;padding-top:clamp(38px,5vh,57px)}
+ .table-live .table-shell{--side:min(94vw,calc(100dvh - 250px),920px);max-height:none}
+ .table-live .table-shell .player.north:not(.dock-seat),.table-live .table-shell .player.west:not(.dock-seat),.table-live .table-shell .player.east:not(.dock-seat){top:-42px;left:auto;right:auto;transform:none;width:30.5%;max-width:none}
+ .table-live .table-shell .player.west:not(.dock-seat){left:1%}.table-live .table-shell .player.north:not(.dock-seat){left:34.75%}.table-live .table-shell .player.east:not(.dock-seat){right:1%}
+ .table-live .scene-toolbar{top:calc(100% + 10px);left:50%;transform:translateX(-50%);flex-direction:row;align-items:center;justify-content:center;width:100%;max-width:100%;gap:6px}
+ .table-live .scene-status{max-width:40%;font-size:10px}.table-live .scene-controls{gap:4px;flex-wrap:nowrap}.table-live .scene-controls .ghost{padding:4px 6px;min-height:31px;font-size:10px}
+ .table-live .dock-seat>.player-head{left:1%;top:calc(100% + 52px);bottom:auto;max-width:32%}
+ .table-live .dock-seat .dock-tools{left:auto;right:0;top:calc(100% + 51px);bottom:auto;width:66%;justify-content:flex-end}
+ .table-live .dock-seat .decision-row{top:calc(100% + 110px);left:0;right:0;width:100%;justify-content:center;align-items:center}
+ .table-live .dock-seat .decision-row .action-area{justify-content:center}.table-live .dock-seat .decision-row .wait-hint{width:auto;max-width:94vw}.table-live .dock-seat .decision-row .wait-choices{max-width:70vw;flex-wrap:nowrap}
+}
+@media (max-width:690px) and (orientation:portrait){
+ body.table-live .game-content{padding-top:45px}.table-live .table-shell{--side:min(96vw,calc(100dvh - 242px))}
+ .v09-board{--river-w:clamp(9px,2.90cqw,14px);--wall-w:clamp(8px,2.10cqw,10px);--back-w:clamp(7px,1.85cqw,9px);--exposed-w:clamp(8px,2.25cqw,12px)}
+ .v09-river-north,.v09-river-north.crowded{top:30%}.v09-river-south,.v09-river-south.crowded{top:68.7%}.v09-center-widget{width:clamp(90px,24.5cqw,110px)}.v09-center-content{transform:translateY(-10%)}
+ .v091-gold-corner{bottom:3px;right:3px;padding:0 1px}.v091-gold-corner .v09-card{--river-w:13px}
+ .table-live .table-shell .player:not(.dock-seat){border-radius:7px}.table-live .table-shell .player:is(.north,.west,.east):not(.dock-seat){top:-39px}
+ .table-live .scene-toolbar{top:calc(100% + 7px);gap:3px}.table-live .scene-status{max-width:43%;padding:3px 5px;font-size:9px}.table-live .scene-controls .ghost{min-height:27px;padding:3px 5px;font-size:9px}
+ .table-live .dock-seat>.player-head{top:calc(100% + 45px);max-width:35%}.table-live .dock-seat .dock-tools{top:calc(100% + 45px);width:64%}.table-live .dock-seat .decision-row{top:calc(100% + 98px)}
+ .table-live .dock-seat .hand{left:4%;width:92%;bottom:1.4%;--hand-gap:1px;--draw-gap:3px}.table-live .dock-seat .hand .tile:not(.small){min-height:0;aspect-ratio:1/1.33;border-radius:3px}
+ .table-live .dock-seat .action-btn{min-height:38px;min-width:43px;padding:4px 7px;font-size:12px}.table-live .dock-seat .action-btn.hu{min-width:47px;font-size:17px}
+ .table-live .river-inspector{inset:3%;padding:6px;grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* On landscape phones the spare width becomes two comfortable side rails. */
+@media (orientation:landscape) and (max-height:550px){
+ .table-live .table-shell{--side:min(calc(100dvh - 54px),calc(100vw - 280px));max-height:none}
+ .v09-board{--river-w:clamp(9px,3.0cqw,13px);--wall-w:clamp(8px,2.12cqw,10px);--back-w:clamp(7px,1.85cqw,9px);--exposed-w:clamp(8px,2.2cqw,12px)}
+ .v09-river-north,.v09-river-north.crowded{top:30%}.v09-river-south,.v09-river-south.crowded{top:68.5%}.v09-center-widget{width:clamp(83px,24cqw,102px)}.v09-center-content{transform:translateY(-9%)}.v091-gold-corner .v09-card{--river-w:12px}
+ .table-live .dock-seat .hand{left:4.5%;width:91%;bottom:1%;--hand-gap:1px;--draw-gap:3px}.table-live .dock-seat .hand .tile:not(.small){min-height:0;aspect-ratio:1/1.33}
+ .table-live .table-shell .player.west:not(.dock-seat){left:-145px;top:25%}.table-live .table-shell .player.east:not(.dock-seat){right:-145px;top:18%}.table-live .dock-seat>.player-head{left:-145px;bottom:6%;max-width:135px}
+ .table-live .dock-seat .dock-tools{left:calc(100% + 7px);bottom:0;width:139px}.table-live .dock-seat .decision-row{left:calc(100% + 7px);top:40%;width:139px}
+ .table-live .scene-toolbar{left:calc(100% + 7px);top:1%;width:139px;max-width:139px;gap:4px}.table-live .scene-status{font-size:9px;line-height:1.1;padding:3px 5px}.table-live .scene-controls{gap:3px}.table-live .scene-controls .ghost{min-height:24px;padding:2px 4px;font-size:9px}
+ .table-live .table-shell .player.north:not(.dock-seat){top:0;transform:translate(-50%,-20%);width:118px}
+ .table-live .dock-seat .action-btn{min-height:31px;min-width:37px;padding:2px 5px;font-size:11px}.table-live .dock-seat .action-btn.hu{min-width:44px;font-size:16px}
+ .table-live .dock-seat .decision-row .wait-hint{max-height:63px;overflow:auto}.table-live .dock-seat .decision-row .wait-choices{flex-wrap:nowrap;max-width:120px}
+}
+@media (prefers-reduced-motion:reduce){.table-live .dock-seat .hand .tile,.table-live .action-btn{transition:none!important}}
+/* Right sidebar needs a concrete width; without it buttons collapse to vertical glyphs. */
+@media (orientation:landscape) and (min-height:551px){
+ .table-live .scene-toolbar{width:clamp(144px,16vw,218px);max-width:none;align-items:stretch}
+ .table-live .scene-controls{width:100%;display:flex;flex-wrap:wrap;justify-content:flex-start}
+ .table-live .scene-controls .ghost{min-width:0;white-space:nowrap;padding-inline:8px}
+ .table-live .scene-status{max-width:100%;width:100%;white-space:normal}
+}
+/* In a very long round, add columns rather than allowing tall discard stacks
+   to grow towards the compass. This preserves face size and seat symmetry. */
+.v09-river.crowded{grid-template-columns:repeat(8,var(--river-w))}
+.v09-river.dense{grid-template-columns:repeat(10,var(--river-w))}
+/* Exceptional 35+ discards on one side: widen the outer river gutters. */
+.v09-river-west.dense{left:26%}
+.v09-river-east.dense{left:74%}

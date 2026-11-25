@@ -1,0 +1,38 @@
+{
+  "felt-oblique-1.png": {
+    "width": 1600,
+    "height": 1065,
+    "scale": 1,
+    "bytes": 6816000
+  },
+  "felt-oblique-1.5.png": {
+    "width": 2400,
+    "height": 1597,
+    "scale": 1.5,
+    "bytes": 15331200
+  },
+  "felt-oblique-2.png": {
+    "width": 3200,
+    "height": 2129,
+    "scale": 2,
+    "bytes": 27251200
+  },
+  "felt-overhead-1.png": {
+    "width": 1360,
+    "height": 1360,
+    "scale": 1,
+    "bytes": 7398400
+  },
+  "felt-overhead-1.5.png": {
+    "width": 2040,
+    "height": 2040,
+    "scale": 1.5,
+    "bytes": 16646400
+  },
+  "felt-overhead-2.png": {
+    "width": 2720,
+    "height": 2720,
+    "scale": 2,
+    "bytes": 29593600
+  }
+}

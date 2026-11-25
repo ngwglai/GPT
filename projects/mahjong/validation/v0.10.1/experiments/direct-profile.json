@@ -1,0 +1,126 @@
+{
+  "boot_ms": 1964.0335699999696,
+  "roll_ui_ms": 801.738058000069,
+  "updates_ms": [
+    255.70000000006985,
+    102.5,
+    67.5,
+    84.10000000009313,
+    77.59999999997672,
+    92.19999999995343,
+    93.09999999997672,
+    57.09999999997672,
+    59,
+    54,
+    56,
+    61.29999999993015
+  ],
+  "top_cpu_ms": [
+    [
+      "(program) ",
+      1503.83
+    ],
+    [
+      "(idle) ",
+      737.05
+    ],
+    [
+      "renderSprites cuboid-scene.js",
+      649.68
+    ],
+    [
+      "sprite cuboid-scene.js",
+      306.29
+    ],
+    [
+      "fit cuboid-scene.js",
+      113.08
+    ],
+    [
+      " cuboid-scene.js",
+      77.58
+    ],
+    [
+      "(garbage collector) ",
+      74.53
+    ],
+    [
+      "newRaster cuboid-scene.js",
+      68.85
+    ],
+    [
+      "triangle cuboid-scene.js",
+      66.59
+    ],
+    [
+      "rotate cuboid-scene.js",
+      57.54
+    ],
+    [
+      "fill cuboid-scene.js",
+      44.81
+    ],
+    [
+      "img.onload cuboid-scene.js",
+      41.48
+    ],
+    [
+      "positionUI cuboid-scene.js",
+      32.62
+    ],
+    [
+      "tileFaces cuboid-scene.js",
+      31.08
+    ],
+    [
+      "cachePut cuboid-scene.js",
+      27.09
+    ],
+    [
+      "renderPlayer app.js",
+      18.36
+    ],
+    [
+      "MahjongScene.mount cuboid-scene.js",
+      16.99
+    ],
+    [
+      "hull cuboid-scene.js",
+      14.83
+    ],
+    [
+      "project cuboid-scene.js",
+      13.61
+    ],
+    [
+      "surfaceColor cuboid-scene.js",
+      11.93
+    ]
+  ],
+  "diagnostics": {
+    "hits": 1827,
+    "misses": 527,
+    "created": 232,
+    "reused": 2122,
+    "removed": 53,
+    "lastMs": 60.699999999953434,
+    "tiles": 179,
+    "cacheBytes": 12573576,
+    "rasterized": 527,
+    "evicted": 460,
+    "cacheEntries": 237,
+    "bodyBytes": 7211388,
+    "bodyEntries": 126
+  },
+  "long_tasks_ms": [
+    78,
+    102,
+    344,
+    65,
+    119,
+    99,
+    275
+  ],
+  "errors": [],
+  "note": "Exploratory profiling; instrumentation and conditions vary. Use formal serial benchmark JSON for acceptance comparisons."
+}

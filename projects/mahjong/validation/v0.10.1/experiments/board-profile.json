@@ -1,0 +1,126 @@
+{
+  "boot_ms": 2022.7039510000395,
+  "roll_ui_ms": 552.8002140000581,
+  "updates_ms": [
+    205.69999999995343,
+    73.69999999995343,
+    75.69999999995343,
+    92.70000000006985,
+    65.30000000004657,
+    97.19999999995343,
+    94.29999999993015,
+    66,
+    88.90000000002328,
+    76.30000000004657,
+    79.09999999997672,
+    77
+  ],
+  "top_cpu_ms": [
+    [
+      "(program) ",
+      1173.45
+    ],
+    [
+      "(idle) ",
+      915.09
+    ],
+    [
+      "renderSprites cuboid-scene.js",
+      493.69
+    ],
+    [
+      "sprite cuboid-scene.js",
+      364.36
+    ],
+    [
+      "triangle cuboid-scene.js",
+      106.97
+    ],
+    [
+      "fit cuboid-scene.js",
+      99.31
+    ],
+    [
+      " cuboid-scene.js",
+      78.16
+    ],
+    [
+      "fill cuboid-scene.js",
+      72.78
+    ],
+    [
+      "(garbage collector) ",
+      66.17
+    ],
+    [
+      "newRaster cuboid-scene.js",
+      60.94
+    ],
+    [
+      "img.onload cuboid-scene.js",
+      45.02
+    ],
+    [
+      " ",
+      39.75
+    ],
+    [
+      "positionUI cuboid-scene.js",
+      34.64
+    ],
+    [
+      "rotate cuboid-scene.js",
+      24.19
+    ],
+    [
+      "tileFaces cuboid-scene.js",
+      21.87
+    ],
+    [
+      "hull cuboid-scene.js",
+      21.46
+    ],
+    [
+      "cachePut cuboid-scene.js",
+      16.98
+    ],
+    [
+      "renderPlayer app.js",
+      15.58
+    ],
+    [
+      "createElement ",
+      10.97
+    ],
+    [
+      "surfaceColor cuboid-scene.js",
+      10.79
+    ]
+  ],
+  "diagnostics": {
+    "hits": 1827,
+    "misses": 527,
+    "created": 232,
+    "reused": 2122,
+    "removed": 53,
+    "lastMs": 76.5,
+    "tiles": 179,
+    "cacheBytes": 12559776,
+    "rasterized": 527,
+    "evicted": 500,
+    "cacheEntries": 197,
+    "bodyBytes": 7211388,
+    "bodyEntries": 126
+  },
+  "long_tasks_ms": [
+    80,
+    52,
+    92,
+    101,
+    238,
+    67,
+    220
+  ],
+  "errors": [],
+  "note": "Exploratory profiling; instrumentation and conditions vary. Use formal serial benchmark JSON for acceptance comparisons."
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "oneshots_disabled": false,
+    "media": {
+      "created": 2,
+      "plays": 2,
+      "animations": 0
+    },
+    "roll_visible_ms": 584.7453840005983,
+    "layout_count_delta": 6,
+    "layout_seconds_delta": 0.02104,
+    "before_memory": {
+      "available": true,
+      "pss_bytes": 366572544,
+      "rss_bytes_sum": 573652992,
+      "processes_read": 7,
+      "processes_unreadable": 0
+    },
+    "after_roll_memory": {
+      "available": true,
+      "pss_bytes": 421623808,
+      "rss_bytes_sum": 655433728,
+      "processes_read": 7,
+      "processes_unreadable": 0
+    },
+    "idle_memory": {
+      "available": true,
+      "pss_bytes": 436586496,
+      "rss_bytes_sum": 707846144,
+      "processes_read": 8,
+      "processes_unreadable": 0
+    }
+  },
+  {
+    "oneshots_disabled": true,
+    "media": {
+      "created": 1,
+      "plays": 1,
+      "animations": 0
+    },
+    "roll_visible_ms": 463.60359500067716,
+    "layout_count_delta": 8,
+    "layout_seconds_delta": 0.021412,
+    "before_memory": {
+      "available": true,
+      "pss_bytes": 373753856,
+      "rss_bytes_sum": 591376384,
+      "processes_read": 7,
+      "processes_unreadable": 0
+    },
+    "after_roll_memory": {
+      "available": true,
+      "pss_bytes": 434889728,
+      "rss_bytes_sum": 666521600,
+      "processes_read": 8,
+      "processes_unreadable": 0
+    },
+    "idle_memory": {
+      "available": true,
+      "pss_bytes": 439526400,
+      "rss_bytes_sum": 709287936,
+      "processes_read": 8,
+      "processes_unreadable": 0
+    }
+  }
+]

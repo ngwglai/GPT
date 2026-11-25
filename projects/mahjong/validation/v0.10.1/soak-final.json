@@ -1,0 +1,1288 @@
+{
+  "server_delay_s": 0.01,
+  "physical_device": false,
+  "foreground": false,
+  "rounds": [
+    {
+      "seed": 42,
+      "revision": 91,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 0,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "visible_revisions": [
+            91
+          ],
+          "revision": 91,
+          "diagnostics": {
+            "hits": 148,
+            "misses": 124,
+            "created": 259,
+            "reused": 13,
+            "removed": 123,
+            "lastMs": 492.69999999995343,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 124,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 3600024,
+            "bodyEntries": 118,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4432592
+          },
+          "heap_bytes": 3774292,
+          "nodes": 998
+        },
+        {
+          "visible_revisions": [
+            91
+          ],
+          "revision": 91,
+          "diagnostics": {
+            "hits": 148,
+            "misses": 124,
+            "created": 259,
+            "reused": 13,
+            "removed": 123,
+            "lastMs": 403.69999999995343,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 124,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 3600024,
+            "bodyEntries": 118,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4432592
+          },
+          "heap_bytes": 3778868,
+          "nodes": 998
+        },
+        {
+          "visible_revisions": [
+            91
+          ],
+          "revision": 91,
+          "diagnostics": {
+            "hits": 148,
+            "misses": 124,
+            "created": 259,
+            "reused": 13,
+            "removed": 123,
+            "lastMs": 499.0999999999767,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 124,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 3600024,
+            "bodyEntries": 118,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4432592
+          },
+          "heap_bytes": 3773900,
+          "nodes": 998
+        },
+        {
+          "visible_revisions": [
+            91
+          ],
+          "revision": 91,
+          "diagnostics": {
+            "hits": 148,
+            "misses": 124,
+            "created": 259,
+            "reused": 13,
+            "removed": 123,
+            "lastMs": 554.0999999999767,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 124,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 3600024,
+            "bodyEntries": 118,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4432592
+          },
+          "heap_bytes": 3772596,
+          "nodes": 998
+        }
+      ]
+    },
+    {
+      "seed": 43,
+      "revision": 85,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 1,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "visible_revisions": [
+            85
+          ],
+          "revision": 85,
+          "diagnostics": {
+            "hits": 297,
+            "misses": 247,
+            "created": 504,
+            "reused": 40,
+            "removed": 368,
+            "lastMs": 300.29999999998836,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 247,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 5102016,
+            "bodyEntries": 167,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4794760
+          },
+          "heap_bytes": 3994672,
+          "nodes": 980
+        },
+        {
+          "visible_revisions": [
+            85
+          ],
+          "revision": 85,
+          "diagnostics": {
+            "hits": 297,
+            "misses": 247,
+            "created": 504,
+            "reused": 40,
+            "removed": 368,
+            "lastMs": 223.09999999997672,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 247,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 5102016,
+            "bodyEntries": 167,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4794760
+          },
+          "heap_bytes": 3994820,
+          "nodes": 980
+        },
+        {
+          "visible_revisions": [
+            85
+          ],
+          "revision": 85,
+          "diagnostics": {
+            "hits": 297,
+            "misses": 247,
+            "created": 504,
+            "reused": 40,
+            "removed": 368,
+            "lastMs": 259.4000000000233,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 247,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 5102016,
+            "bodyEntries": 167,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4794760
+          },
+          "heap_bytes": 3995336,
+          "nodes": 980
+        },
+        {
+          "visible_revisions": [
+            85
+          ],
+          "revision": 85,
+          "diagnostics": {
+            "hits": 297,
+            "misses": 247,
+            "created": 504,
+            "reused": 40,
+            "removed": 368,
+            "lastMs": 240.09999999997672,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 247,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 5102016,
+            "bodyEntries": 167,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4794760
+          },
+          "heap_bytes": 3995300,
+          "nodes": 980
+        }
+      ]
+    },
+    {
+      "seed": 44,
+      "revision": 89,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 2,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "visible_revisions": [
+            89
+          ],
+          "revision": 89,
+          "diagnostics": {
+            "hits": 446,
+            "misses": 370,
+            "created": 748,
+            "reused": 68,
+            "removed": 612,
+            "lastMs": 131.5,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 370,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 5720436,
+            "bodyEntries": 187,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4663612
+          },
+          "heap_bytes": 4080484,
+          "nodes": 984
+        },
+        {
+          "visible_revisions": [
+            89
+          ],
+          "revision": 89,
+          "diagnostics": {
+            "hits": 446,
+            "misses": 370,
+            "created": 748,
+            "reused": 68,
+            "removed": 612,
+            "lastMs": 138.20000000001164,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 370,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 5720436,
+            "bodyEntries": 187,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4663612
+          },
+          "heap_bytes": 4084876,
+          "nodes": 984
+        },
+        {
+          "visible_revisions": [
+            89
+          ],
+          "revision": 89,
+          "diagnostics": {
+            "hits": 446,
+            "misses": 370,
+            "created": 748,
+            "reused": 68,
+            "removed": 612,
+            "lastMs": 111.20000000001164,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 370,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 5720436,
+            "bodyEntries": 187,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4663612
+          },
+          "heap_bytes": 4081016,
+          "nodes": 984
+        },
+        {
+          "visible_revisions": [
+            89
+          ],
+          "revision": 89,
+          "diagnostics": {
+            "hits": 446,
+            "misses": 370,
+            "created": 748,
+            "reused": 68,
+            "removed": 612,
+            "lastMs": 182.89999999996508,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 370,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 5720436,
+            "bodyEntries": 187,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4663612
+          },
+          "heap_bytes": 4081020,
+          "nodes": 984
+        }
+      ]
+    },
+    {
+      "seed": 45,
+      "revision": 85,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 3,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "visible_revisions": [
+            85
+          ],
+          "revision": 85,
+          "diagnostics": {
+            "hits": 595,
+            "misses": 493,
+            "created": 992,
+            "reused": 96,
+            "removed": 856,
+            "lastMs": 125.79999999998836,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 493,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6069024,
+            "bodyEntries": 201,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4804772
+          },
+          "heap_bytes": 4179252,
+          "nodes": 965
+        },
+        {
+          "visible_revisions": [
+            85
+          ],
+          "revision": 85,
+          "diagnostics": {
+            "hits": 595,
+            "misses": 493,
+            "created": 992,
+            "reused": 96,
+            "removed": 856,
+            "lastMs": 136.59999999997672,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 493,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6069024,
+            "bodyEntries": 201,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4804772
+          },
+          "heap_bytes": 4179564,
+          "nodes": 965
+        },
+        {
+          "visible_revisions": [
+            85
+          ],
+          "revision": 85,
+          "diagnostics": {
+            "hits": 595,
+            "misses": 493,
+            "created": 992,
+            "reused": 96,
+            "removed": 856,
+            "lastMs": 107.60000000003492,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 493,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6069024,
+            "bodyEntries": 201,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4804772
+          },
+          "heap_bytes": 4180184,
+          "nodes": 965
+        },
+        {
+          "visible_revisions": [
+            85
+          ],
+          "revision": 85,
+          "diagnostics": {
+            "hits": 595,
+            "misses": 493,
+            "created": 992,
+            "reused": 96,
+            "removed": 856,
+            "lastMs": 248,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 493,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6069024,
+            "bodyEntries": 201,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4804772
+          },
+          "heap_bytes": 4180712,
+          "nodes": 965
+        }
+      ]
+    },
+    {
+      "seed": 46,
+      "revision": 96,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 0,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "visible_revisions": [
+            96
+          ],
+          "revision": 96,
+          "diagnostics": {
+            "hits": 744,
+            "misses": 616,
+            "created": 1236,
+            "reused": 124,
+            "removed": 1100,
+            "lastMs": 182.29999999998836,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 616,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6273928,
+            "bodyEntries": 205,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4653300
+          },
+          "heap_bytes": 4167592,
+          "nodes": 978
+        },
+        {
+          "visible_revisions": [
+            96
+          ],
+          "revision": 96,
+          "diagnostics": {
+            "hits": 744,
+            "misses": 616,
+            "created": 1236,
+            "reused": 124,
+            "removed": 1100,
+            "lastMs": 143.29999999998836,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 616,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6273928,
+            "bodyEntries": 205,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4653300
+          },
+          "heap_bytes": 4167808,
+          "nodes": 978
+        },
+        {
+          "visible_revisions": [
+            96
+          ],
+          "revision": 96,
+          "diagnostics": {
+            "hits": 744,
+            "misses": 616,
+            "created": 1236,
+            "reused": 124,
+            "removed": 1100,
+            "lastMs": 207.20000000001164,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 616,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6273928,
+            "bodyEntries": 205,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4653300
+          },
+          "heap_bytes": 4168220,
+          "nodes": 978
+        },
+        {
+          "visible_revisions": [
+            96
+          ],
+          "revision": 96,
+          "diagnostics": {
+            "hits": 744,
+            "misses": 616,
+            "created": 1236,
+            "reused": 124,
+            "removed": 1100,
+            "lastMs": 262.19999999995343,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 616,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6273928,
+            "bodyEntries": 205,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4653300
+          },
+          "heap_bytes": 4168108,
+          "nodes": 978
+        }
+      ]
+    },
+    {
+      "seed": 47,
+      "revision": 88,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 1,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "visible_revisions": [
+            88
+          ],
+          "revision": 88,
+          "diagnostics": {
+            "hits": 893,
+            "misses": 739,
+            "created": 1480,
+            "reused": 152,
+            "removed": 1344,
+            "lastMs": 186.79999999998836,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 739,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6258200,
+            "bodyEntries": 206,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4530376
+          },
+          "heap_bytes": 4224848,
+          "nodes": 996
+        },
+        {
+          "visible_revisions": [
+            88
+          ],
+          "revision": 88,
+          "diagnostics": {
+            "hits": 893,
+            "misses": 739,
+            "created": 1480,
+            "reused": 152,
+            "removed": 1344,
+            "lastMs": 191.5,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 739,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6258200,
+            "bodyEntries": 206,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4530376
+          },
+          "heap_bytes": 4224304,
+          "nodes": 996
+        },
+        {
+          "visible_revisions": [
+            88
+          ],
+          "revision": 88,
+          "diagnostics": {
+            "hits": 893,
+            "misses": 739,
+            "created": 1480,
+            "reused": 152,
+            "removed": 1344,
+            "lastMs": 189.79999999998836,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 739,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6258200,
+            "bodyEntries": 206,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4530376
+          },
+          "heap_bytes": 4224720,
+          "nodes": 996
+        },
+        {
+          "visible_revisions": [
+            88
+          ],
+          "revision": 88,
+          "diagnostics": {
+            "hits": 893,
+            "misses": 739,
+            "created": 1480,
+            "reused": 152,
+            "removed": 1344,
+            "lastMs": 251.39999999996508,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 739,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6258200,
+            "bodyEntries": 206,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4530376
+          },
+          "heap_bytes": 4224972,
+          "nodes": 996
+        }
+      ]
+    },
+    {
+      "seed": 48,
+      "revision": 93,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 2,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "visible_revisions": [
+            93
+          ],
+          "revision": 93,
+          "diagnostics": {
+            "hits": 1041,
+            "misses": 863,
+            "created": 1725,
+            "reused": 179,
+            "removed": 1589,
+            "lastMs": 178.29999999998836,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 863,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6287392,
+            "bodyEntries": 208,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4609336
+          },
+          "heap_bytes": 4211920,
+          "nodes": 972
+        },
+        {
+          "visible_revisions": [
+            93
+          ],
+          "revision": 93,
+          "diagnostics": {
+            "hits": 1041,
+            "misses": 863,
+            "created": 1725,
+            "reused": 179,
+            "removed": 1589,
+            "lastMs": 165.70000000001164,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 863,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6287392,
+            "bodyEntries": 208,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4609336
+          },
+          "heap_bytes": 4218376,
+          "nodes": 972
+        },
+        {
+          "visible_revisions": [
+            93
+          ],
+          "revision": 93,
+          "diagnostics": {
+            "hits": 1041,
+            "misses": 863,
+            "created": 1725,
+            "reused": 179,
+            "removed": 1589,
+            "lastMs": 232.09999999997672,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 863,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6287392,
+            "bodyEntries": 208,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4609336
+          },
+          "heap_bytes": 4212452,
+          "nodes": 972
+        },
+        {
+          "visible_revisions": [
+            93
+          ],
+          "revision": 93,
+          "diagnostics": {
+            "hits": 1041,
+            "misses": 863,
+            "created": 1725,
+            "reused": 179,
+            "removed": 1589,
+            "lastMs": 252.59999999997672,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 863,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6287392,
+            "bodyEntries": 208,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4609336
+          },
+          "heap_bytes": 4212592,
+          "nodes": 972
+        }
+      ]
+    },
+    {
+      "seed": 49,
+      "revision": 88,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 3,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "visible_revisions": [
+            88
+          ],
+          "revision": 88,
+          "diagnostics": {
+            "hits": 1190,
+            "misses": 986,
+            "created": 1970,
+            "reused": 206,
+            "removed": 1834,
+            "lastMs": 113.60000000003492,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 986,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6282488,
+            "bodyEntries": 206,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4529212
+          },
+          "heap_bytes": 4238432,
+          "nodes": 974
+        },
+        {
+          "visible_revisions": [
+            88
+          ],
+          "revision": 88,
+          "diagnostics": {
+            "hits": 1190,
+            "misses": 986,
+            "created": 1970,
+            "reused": 206,
+            "removed": 1834,
+            "lastMs": 132.29999999998836,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 986,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6282488,
+            "bodyEntries": 206,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4529212
+          },
+          "heap_bytes": 4238572,
+          "nodes": 974
+        },
+        {
+          "visible_revisions": [
+            88
+          ],
+          "revision": 88,
+          "diagnostics": {
+            "hits": 1190,
+            "misses": 986,
+            "created": 1970,
+            "reused": 206,
+            "removed": 1834,
+            "lastMs": 107.5,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 986,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6282488,
+            "bodyEntries": 206,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4529212
+          },
+          "heap_bytes": 4238148,
+          "nodes": 974
+        },
+        {
+          "visible_revisions": [
+            88
+          ],
+          "revision": 88,
+          "diagnostics": {
+            "hits": 1190,
+            "misses": 986,
+            "created": 1970,
+            "reused": 206,
+            "removed": 1834,
+            "lastMs": 140.5,
+            "tiles": 136,
+            "cacheBytes": 7856172,
+            "rasterized": 986,
+            "evicted": 0,
+            "cacheEntries": 136,
+            "bodyBytes": 6282488,
+            "bodyEntries": 206,
+            "renderer": "per-tile-canvas",
+            "restoreCount": 0,
+            "backgroundBytes": 15331200,
+            "atlasScale": 2,
+            "missingArt": 0,
+            "artWidth": 100,
+            "artBytes": 1795200,
+            "rasterScale": 1.5,
+            "staticLimit": 8388608,
+            "bodyLimit": 6291456,
+            "liveBytes": 4529212
+          },
+          "heap_bytes": 4238512,
+          "nodes": 974
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

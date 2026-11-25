@@ -6,7 +6,9 @@ from .tile import Tile
 
 
 COLUMNS_PER_WALL = 17
-CLOCKWISE_WALLS = (Seat.EAST, Seat.SOUTH, Seat.WEST, Seat.NORTH)
+# With the next player on the right, the clockwise wall neighbor is the
+# previous player. Physical storage indexes still use the Seat enum.
+CLOCKWISE_WALLS = (Seat.EAST, Seat.NORTH, Seat.WEST, Seat.SOUTH)
 STACK_COUNT = len(CLOCKWISE_WALLS) * COLUMNS_PER_WALL
 TILE_COUNT = STACK_COUNT * 2
 
@@ -45,6 +47,7 @@ class WallExhausted(Exception):
 def determine_break_wall(dealer: Seat, dice_sum: int) -> Seat:
     if type(dice_sum) is not int or not 2 <= dice_sum <= 12:
         raise ValueError("dice_sum must be 2..12")
+    # Count dice from the dealer in player order, with the local 5/9 rule.
     return opposite_seat(dealer) if dice_sum in (5, 9) else advance_seat(dealer, dice_sum - 1)
 
 
