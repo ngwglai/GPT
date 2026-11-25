@@ -1532,9 +1532,12 @@
       stage.innerHTML =
         '<div class="cuboid-felt-holder"></div><div class="cuboid-faces"></div><div class="cuboid-info-holder"></div>';
     const feltHolder = stage.querySelector(".cuboid-felt-holder");
-    const feltKey = overhead + "/" + rasterScale;
+    // Felt has smooth gradients and no tile detail. Limit its decoded pixels
+    // independently of the full raster resolution used for the tiles.
+    const feltScale = Math.min(rasterScale, 1.5);
+    const feltKey = overhead + "/" + feltScale;
     if (feltHolder.__view !== feltKey) {
-      feltHolder.innerHTML = `<img class="cuboid-felt-image" src="/assets/table/felt-${overhead ? "overhead" : "oblique"}-${rasterScale}.png" alt="" style="width:${Math.ceil((F.width + 160) * rasterScale) / rasterScale}px;height:${Math.ceil((F.height + 160) * rasterScale) / rasterScale}px">`;
+      feltHolder.innerHTML = `<img class="cuboid-felt-image" src="/assets/table/felt-${overhead ? "overhead" : "oblique"}-${feltScale}.png" alt="" style="width:${Math.ceil((F.width + 160) * feltScale) / feltScale}px;height:${Math.ceil((F.height + 160) * feltScale) / feltScale}px">`;
       feltHolder.__view = feltKey;
       const image = feltHolder.firstElementChild;
       image.onerror = () => {
@@ -1576,6 +1579,8 @@
       if (root.ResizeObserver) {
         shell.__cuboidObserver = new ResizeObserver(resize);
         shell.__cuboidObserver.observe(shell.closest(".game-content"));
+        const topbar = document.querySelector(".topbar");
+        if (topbar) shell.__cuboidObserver.observe(topbar);
       }
     }
   };

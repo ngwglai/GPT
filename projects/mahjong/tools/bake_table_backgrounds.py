@@ -1,4 +1,4 @@
-"""Bake the two vector felt/shadow sources at 1x, 1.5x and 2x without runtime filters.
+"""Bake the two vector felt/shadow sources at 1x and 1.5x without runtime filters.
 First run node tools/build_table_backgrounds.cjs. Requires development Playwright only.
 """
 import json
@@ -18,7 +18,7 @@ with sync_playwright() as p:
         source=(ASSETS/f'felt-{view}.svg').read_text()
         svg=ElementTree.fromstring(source)
         w,h=float(svg.attrib['width']),float(svg.attrib['height'])
-        for scale in (1,1.5,2):
+        for scale in (1,1.5):
             width,height=math.ceil(w*scale),math.ceil(h*scale)
             page.set_viewport_size({'width':width,'height':height})
             page.set_content(f'<style>body{{margin:0;background:transparent}}svg{{display:block;width:{w*scale}px;height:{h*scale}px}}</style>'+source)

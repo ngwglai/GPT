@@ -180,4 +180,4 @@ python -m tools.run_ai_matches --output ai-matches.json
 
 ### 美术资源重建
 
-`node tools/build_table_backgrounds.cjs` 从同一投影生成桌布矢量源；`CHROMIUM_PATH=/path/to/chromium python tools/bake_table_backgrounds.py` 预绘制保留原渐变、桌边和阴影的 1× / 1.5× / 2× PNG。运行时不再计算整桌实时滤镜。`tools/bake_tile_sprites.py` 生成 1×常用牌与 2×牌墙资源；高 DPI 仅选择所需一组。牌面 SVG 的完整性由 `tests/protected_art.json` 记录，修改美术时应明确审查并更新该清单。
+`node tools/build_table_backgrounds.cjs` 从同一投影生成桌布矢量源；`CHROMIUM_PATH=/path/to/chromium python tools/bake_table_backgrounds.py` 预绘制保留原渐变、桌边和阴影的 1× / 1.5× PNG。运行时不再计算整桌实时滤镜。`tools/bake_tile_sprites.py` 生成 1×常用牌与 2×牌墙资源；高 DPI 仅选择所需一组。牌面 SVG 的完整性由 `tests/protected_art.json` 记录，修改美术时应明确审查并更新该清单。

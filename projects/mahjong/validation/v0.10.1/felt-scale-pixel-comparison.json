@@ -1,0 +1,13 @@
+{
+  "note": "Whole-screen captures of one actual legal table at 2360x1640; only the static felt source resolution was changed. Timing-dependent presentation is included.",
+  "comparisons": {
+    "felt-1.5x": {
+      "mean_abs_rgb_channel": 0.13483481466170594,
+      "fraction_of_pixels_with_any_channel_delta_gt_16": 0.002173160396858206
+    },
+    "felt-1x": {
+      "mean_abs_rgb_channel": 0.23613011575031004,
+      "fraction_of_pixels_with_any_channel_delta_gt_16": 0.005820070276973956
+    }
+  }
+}

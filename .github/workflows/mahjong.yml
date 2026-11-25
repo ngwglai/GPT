@@ -97,6 +97,7 @@ jobs:
           python -m tests.v101_scene_acceptance --chromium /usr/bin/google-chrome
           python tools/performance_regression.py --chromium /usr/bin/google-chrome --samples 1 --iterations 24 --output validation/v0.10.1/ci-performance.json
           python -m tests.soak_acceptance --chromium /usr/bin/google-chrome --rounds 4 --output validation/v0.10.1/ci-soak.json
+          python -m tests.soak_acceptance --chromium /usr/bin/google-chrome --foreground --delay .12 --rounds 2 --output validation/v0.10.1/ci-tabs.json
       - name: Chromium acceptance (Windows)
         if: runner.os == 'Windows'
         shell: pwsh

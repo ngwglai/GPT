@@ -639,8 +639,9 @@ function render() {
   [0,1,2,3].forEach(renderPlayer);
   renderCenter();
   renderTableHud();
-  MahjongScene.mount(document.querySelector(".table-shell"));
+  const shell = document.querySelector(".table-shell");
   if (window.LanGame) {
+    MahjongScene.mount(shell);
     window.LanGame.decorate();
     return;
   }
@@ -656,6 +657,8 @@ function render() {
     document.getElementById("dealerSelect").value = String(table.dealer);
   }
   if (!document.getElementById("seedInput").value) document.getElementById("seedInput").value = table.test_mode.seed;
+  // The response button can wrap the header; measure only after updating it.
+  MahjongScene.mount(shell);
 }
 
 async function boot() {

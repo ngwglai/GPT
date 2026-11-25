@@ -152,7 +152,7 @@ def run(args, url):
                     assert diag['cacheBytes'] <= diag['staticLimit']
                     assert diag['bodyBytes'] <= diag['bodyLimit']
                     assert diag['liveBytes'] < 16*1024*1024
-                    assert diag.get('backgroundBytes',0) <= 32*1024*1024
+                    assert diag.get('backgroundBytes',0) <= 17*1024*1024
                     assert diag.get('artBytes',0) <= 8*1024*1024
                 assert counts['tiles'] < 260 and counts['nodes'] < 3500
                 page.locator('[data-view-toggle]').click()
