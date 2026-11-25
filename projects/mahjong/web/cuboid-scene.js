@@ -1423,10 +1423,52 @@
           });
         }
       }
-      const wallPoint = F.screen(
-        rotate([0, -config.WALL_DISTANCE, config.D * 2], k),
+      // Match the action rail to the projected outer edges of this 17-stack wall.
+      const wallHalfSpan = 8 * config.WALL_PITCH + config.W / 2;
+      const wallStart = F.screen(
+        rotate(
+          [
+            config.WALL_OFFSET - wallHalfSpan,
+            -config.WALL_DISTANCE,
+            config.D * 2,
+          ],
+          k,
+        ),
       );
-      place(el.querySelector(".decision-row"), ...wallPoint);
+      const wallEnd = F.screen(
+        rotate(
+          [
+            config.WALL_OFFSET + wallHalfSpan,
+            -config.WALL_DISTANCE,
+            config.D * 2,
+          ],
+          k,
+        ),
+      );
+      const wallWidth = Math.hypot(
+        wallEnd[0] - wallStart[0],
+        wallEnd[1] - wallStart[1],
+      );
+      const wallCenter = [
+        (wallStart[0] + wallEnd[0]) / 2,
+        (wallStart[1] + wallEnd[1]) / 2,
+      ];
+      const area = shell.closest(".game-content");
+      const viewportScale = viewportFit(
+        F,
+        area?.clientWidth || root.innerWidth || 1440,
+        area?.clientHeight || root.innerHeight || 800,
+      ).scale;
+      const decisionRow = el.querySelector(".decision-row");
+      if (decisionRow) {
+        // The rail counter-scales with the fitted board, so its buttons keep
+        // a useful physical touch size while its width matches the visible wall.
+        decisionRow.style.setProperty(
+          "--wall-action-width",
+          `${wallWidth * viewportScale}px`,
+        );
+        place(decisionRow, ...wallCenter);
+      }
       const toolsPoint = F.screen(
         rotate([6.9, -config.WALL_DISTANCE, config.D * 2], k),
       );
