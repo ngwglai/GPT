@@ -1,0 +1,5 @@
+青雀麻将 v0.9.6 · 混合透视牌桌（试用版）
+完整解压后双击「启动网页版.bat」或「启动局域网联机.bat」。
+首次启动可能需要联网安装依赖。请使用 Python 3.11 或更新版本。
+调参入口：web/cuboid-scene.js 顶部 config（ANGLE=60，HAND_ANGLE=30）。
+详细说明：V0.9.6-DESIGN-AND-TESTS.md。

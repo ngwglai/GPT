@@ -1,0 +1,26 @@
+{
+  "felt-oblique-1.png": {
+    "width": 1600,
+    "height": 1065,
+    "scale": 1,
+    "bytes": 6816000
+  },
+  "felt-oblique-1.5.png": {
+    "width": 2400,
+    "height": 1597,
+    "scale": 1.5,
+    "bytes": 15331200
+  },
+  "felt-overhead-1.png": {
+    "width": 1360,
+    "height": 1360,
+    "scale": 1,
+    "bytes": 7398400
+  },
+  "felt-overhead-1.5.png": {
+    "width": 2040,
+    "height": 2040,
+    "scale": 1.5,
+    "bytes": 16646400
+  }
+}

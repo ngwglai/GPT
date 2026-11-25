@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "engine": "chromium",
+  "cpu_rate": 1,
+  "scenario": "legal",
+  "physical_device": false,
+  "platform": "Linux",
+  "samples": [
+    {
+      "viewport": "phone-landscape",
+      "sample": 0,
+      "boot_ms": 2569.2470399999365,
+      "roll_ms": 625.9316519999629,
+      "gameplay_render_ms": [
+        229.1000000005588,
+        153.8999999994412
+      ],
+      "request_ms": [
+        57.43045199960761,
+        57.54272000012861,
+        124.26221499936219,
+        52.92018299951451,
+        16.757057999711833,
+        24.7919470002671,
+        30.710355000337586,
+        45.55630499999097,
+        31.295243999920785,
+        26.274711000951356,
+        28.197728001032374,
+        30.520233000061125
+      ],
+      "update_ms": [
+        51.700000000186265,
+        89,
+        129.90000000037253,
+        42.5,
+        65.3999999994412,
+        44.59999999962747,
+        52.09999999962747,
+        46.60000000055879,
+        48.10000000055879,
+        49.5,
+        39.5,
+        72.19999999925494
+      ],
+      "paint_ms": [
+        220.0542240007053,
+        354.9650759996439,
+        637.5285049998638,
+        139.8211359992274,
+        211.45726000031573,
+        150.90221399987058,
+        183.51147599969408,
+        172.45935699975234,
+        143.54591300070751,
+        183.72117299986712,
+        161.17971899984695,
+        206.76924799954577
+      ],
+      "update_median_ms": 50.60000000009313,
+      "update_p95_ms": 89,
+      "paint_p95_ms": 354.9650759996439,
+      "diagnostics": {
+        "hits": 1689,
+        "misses": 351,
+        "created": 619,
+        "reused": 1421,
+        "removed": 483,
+        "lastMs": 59.90000000037253,
+        "tiles": 136,
+        "cacheBytes": 7856172,
+        "rasterized": 351,
+        "evicted": 0,
+        "cacheEntries": 136,
+        "bodyBytes": 2507204,
+        "bodyEntries": 83,
+        "renderer": "per-tile-canvas",
+        "restoreCount": 0,
+        "backgroundBytes": 15331200,
+        "atlasScale": 2,
+        "missingArt": 0,
+        "artWidth": 100,
+        "artBytes": 1795200,
+        "rasterScale": 1.5,
+        "staticLimit": 8388608,
+        "bodyLimit": 6291456,
+        "liveBytes": 4569500
+      },
+      "counts": {
+        "nodes": 906,
+        "tiles": 136,
+        "canvases": 136
+      },
+      "longtasks_ms": [
+        72,
+        115,
+        348,
+        251,
+        108,
+        59,
+        88,
+        229,
+        154,
+        63,
+        335,
+        135
+      ],
+      "errors": [],
+      "browser_memory": {
+        "available": true,
+        "pss_bytes": 484213760,
+        "rss_bytes_sum": 746442752,
+        "processes_read": 8,
+        "processes_unreadable": 0
+      },
+      "metrics": {
+        "Nodes": 3635,
+        "LayoutDuration": 0.266922,
+        "TaskDuration": 5.839542,
+        "JSHeapUsedSize": 4479004
+      }
+    }
+  ],
+  "failures": [
+    {
+      "viewport": "phone-landscape",
+      "paint_p95_ms": 354.9650759996439,
+      "limit_ms": 350
+    }
+  ],
+  "browser_version": "154.0.8037.57"
+}

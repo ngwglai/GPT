@@ -1,0 +1,24 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>青雀麻将 v0.9.2 · 2.5D牌桌原型</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/table.css"><link rel="stylesheet" href="/v09.css"><link rel="stylesheet" href="/v091.css"><link rel="stylesheet" href="/v092.css"></head>
+<body class="game-mode table-live"><header class="topbar"><div class="brand"><span class="brand-mark">❀</span><strong>青雀麻将</strong><span class="mode-label">春樱对局 · V0.9.1</span></div><div class="table-hud"><span>第 <b>1</b> 局</span><span>庄 <b>东</b></span><span>余 <b>62</b> 张</span></div><div class="round-controls"><button class="ghost">托管</button><button class="ghost">声音</button><button class="ghost">设置</button></div></header>
+<main class="game-content"><section class="table-shell"><section class="center-board" id="center"></section><div class="scene-toolbar"><div class="scene-status">南家出牌 · 金牌：五万</div><div class="scene-controls"><button class="ghost">完整桌面</button><button class="ghost">查看牌河</button><button class="ghost">详情</button></div></div>
+<article class="player north" id="seat-3"></article><article class="player east" id="seat-0"></article><article class="player west" id="seat-2"></article><article class="player south dock-seat" id="seat-1"></article></section></main>
+<script>window.MahjongPresentation={assets:{resolve:(k,v)=>k==='tiles'?`/assets/tiles/${v}.svg`:null}};</script>
+<script src="/components.js"></script><script src="/table-scene.js"></script>
+<script>
+const ids=(xs)=>xs.map((t,i)=>({id:t*4+i%4,type:t}));
+const players=[0,1,2,3].map((seat)=>({seat,nickname:['青雀·樱','青雀·月','青雀·枫','青雀·雪'][seat],concealed_tiles:ids([0,1,2,3,4,12,13,14,15,17,18,27,28]),shelf_count:0,shelf_tiles:[],melds:[],picked_orphans:[],ting_tile:null,controller:'human'}));
+players[1].concealed_tiles=ids([0,1,2,3,4,4,12,13,14,17,18,27,28,29]);
+players[1].last_drawn_tile=players[1].concealed_tiles.at(-1).id;
+players[0].melds=[{type:'PENG',count:3,tiles:[19,19,19],source:1}];
+players[2].shelf_tiles=[5];players[2].shelf_count=1;
+const walls=Object.fromEntries([0,1,2,3].map(s=>[s,Array.from({length:17},(_,c)=>({column:c,top:{present:true,normal_cursor:c===16},bottom:{present:true}}))]));
+const discards=[];[3,2,1,0].forEach(s=>{const list=[27,6,18,31,8,4,26,13,29,15,1,24];list.slice(0,s===1?8:11).forEach(type=>discards.push({seat:s,type,claimed:false}));});
+const mock={phase:'TURN_ACTION',match:{round_no:1,scoring:{totals:{0:'25000',1:'25000',2:'25000',3:'25000'}}},dealer:1,current_player:1,normal_tiles_remaining:62,gold_tile_type:4,gold_indicator:{type:3},wall_view:{sides:walls,break_position:{side:1,column:10}},dice:[2,4],discards,players};
+const layout={north:3,west:2,east:0,south:1};
+document.querySelector('#center').innerHTML=`<div class="table-felt-wrap">${MahjongScene.markup(mock,layout)}</div>`;
+for (const seat of [0,1,2,3]){
+ const p=players[seat];const el=document.querySelector(`#seat-${seat}`);
+ el.innerHTML=`<div class="player-head"><div class="player-title"><div class="seat-avatar">${['❀','♥','✦','❋'][seat]}<b>${seatNames[seat]}</b></div><div class="player-identity"><strong>${p.nickname}</strong><div class="player-sub"><b class="seat-points">25,000</b></div></div></div><div class="player-badges"><span class="badge">${seat===1?'你':'AI'}</span></div></div>`;
+ if(seat===1){el.innerHTML+=`<div class="decision-row"><div class="action-area"><button class="action-btn">吃</button><button class="action-btn">碰</button><button class="action-btn gang">杠</button><button class="action-btn ting">报听</button><button class="action-btn shelf">上金</button><button class="action-btn hu">胡</button></div></div><div class="dock-tools"><button class="ghost">十三幺拾牌</button><button class="ghost">托管</button><button class="ghost">牌况</button></div><div class="hand" style="--hand-slots:14">${p.concealed_tiles.map((t,i)=>`<button class="tile ${i===13?'selected drawn':''}">${MahjongTile.body(t.type)}</button>`).join('')}</div>`;}
+}
+</script></body></html>

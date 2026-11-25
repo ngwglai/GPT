@@ -1,0 +1,128 @@
+{
+  "boot_ms": 1546.9192130001375,
+  "roll_ui_ms": 763.759385999947,
+  "updates_ms": [
+    217.89999999990687,
+    27.199999999953434,
+    42,
+    34.300000000046566,
+    30.699999999953434,
+    55.39999999990687,
+    33.699999999953434,
+    40.10000000009313,
+    51.39999999990687,
+    49.10000000009313,
+    75.19999999995343,
+    42.10000000009313
+  ],
+  "top_cpu_ms": [
+    [
+      "(program) ",
+      1327.28
+    ],
+    [
+      "(idle) ",
+      544.65
+    ],
+    [
+      " cuboid-scene.js",
+      177.15
+    ],
+    [
+      "sprite cuboid-scene.js",
+      171.13
+    ],
+    [
+      "fit cuboid-scene.js",
+      137.61
+    ],
+    [
+      "triangle cuboid-scene.js",
+      131.66
+    ],
+    [
+      "renderSprites cuboid-scene.js",
+      100.97
+    ],
+    [
+      "(garbage collector) ",
+      60.86
+    ],
+    [
+      "newRaster cuboid-scene.js",
+      58.66
+    ],
+    [
+      "fill cuboid-scene.js",
+      54.03
+    ],
+    [
+      "esc components.js",
+      40.34
+    ],
+    [
+      "positionUI cuboid-scene.js",
+      39.54
+    ],
+    [
+      "tileFaces cuboid-scene.js",
+      37.8
+    ],
+    [
+      "rotate cuboid-scene.js",
+      37.14
+    ],
+    [
+      "img.onload cuboid-scene.js",
+      35.65
+    ],
+    [
+      "hull cuboid-scene.js",
+      29.01
+    ],
+    [
+      " ",
+      21.19
+    ],
+    [
+      "project cuboid-scene.js",
+      19.04
+    ],
+    [
+      "MahjongScene.mount cuboid-scene.js",
+      16.81
+    ],
+    [
+      "surfaceColor cuboid-scene.js",
+      15.71
+    ]
+  ],
+  "diagnostics": {
+    "hits": 1861,
+    "misses": 493,
+    "created": 232,
+    "reused": 2122,
+    "removed": 53,
+    "lastMs": 41,
+    "tiles": 179,
+    "cacheBytes": 3312476,
+    "rasterized": 493,
+    "evicted": 0,
+    "cacheEntries": 170,
+    "bodyBytes": 1311700,
+    "bodyEntries": 100,
+    "rasterScale": 1,
+    "staticLimit": 4194304,
+    "bodyLimit": 6291456,
+    "liveBytes": 2950860
+  },
+  "long_tasks_ms": [
+    63,
+    111,
+    189,
+    64,
+    282
+  ],
+  "errors": [],
+  "note": "Exploratory profiling; instrumentation and conditions vary. Use formal serial benchmark JSON for acceptance comparisons."
+}

@@ -1,0 +1,127 @@
+{
+  "boot_ms": 3276.1958789999426,
+  "roll_ui_ms": 1426.8483350000452,
+  "updates_ms": [
+    272.80000000004657,
+    25,
+    21.70000000006985,
+    120.80000000004657,
+    98.19999999995343,
+    93.30000000004657,
+    62.59999999997672,
+    88.5,
+    41.40000000002328,
+    80.80000000004657,
+    99.30000000004657,
+    66.59999999997672
+  ],
+  "top_cpu_ms": [
+    [
+      "(program) ",
+      2137.08
+    ],
+    [
+      "(idle) ",
+      1487.58
+    ],
+    [
+      "renderSprites cuboid-scene.js",
+      362.75
+    ],
+    [
+      "sprite cuboid-scene.js",
+      281.66
+    ],
+    [
+      "fit cuboid-scene.js",
+      275.65
+    ],
+    [
+      "(garbage collector) ",
+      220.76
+    ],
+    [
+      "triangle cuboid-scene.js",
+      219.21
+    ],
+    [
+      " cuboid-scene.js",
+      202.39
+    ],
+    [
+      "fill cuboid-scene.js",
+      171.79
+    ],
+    [
+      "positionUI cuboid-scene.js",
+      65.37
+    ],
+    [
+      "img.onload cuboid-scene.js",
+      57.98
+    ],
+    [
+      "rotate cuboid-scene.js",
+      55.0
+    ],
+    [
+      "newRaster cuboid-scene.js",
+      53.36
+    ],
+    [
+      "tileFaces cuboid-scene.js",
+      52.29
+    ],
+    [
+      "MahjongScene.mount cuboid-scene.js",
+      51.55
+    ],
+    [
+      "project cuboid-scene.js",
+      38.04
+    ],
+    [
+      "addEventListener ",
+      30.02
+    ],
+    [
+      " ",
+      29.98
+    ],
+    [
+      "hull cuboid-scene.js",
+      27.29
+    ],
+    [
+      "renderPlayer app.js",
+      24.12
+    ]
+  ],
+  "diagnostics": {
+    "hits": 1853,
+    "misses": 501,
+    "created": 232,
+    "reused": 2122,
+    "removed": 53,
+    "lastMs": 64.19999999995343,
+    "tiles": 179,
+    "cacheBytes": 12547292,
+    "rasterized": 501,
+    "evicted": 8,
+    "cacheEntries": 162,
+    "bodyBytes": 5814736,
+    "bodyEntries": 108
+  },
+  "long_tasks_ms": [
+    57,
+    98,
+    171,
+    756,
+    60,
+    122,
+    294,
+    465
+  ],
+  "errors": [],
+  "note": "Exploratory profiling; instrumentation and conditions vary. Use formal serial benchmark JSON for acceptance comparisons."
+}

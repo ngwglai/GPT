@@ -1,9 +1,15 @@
 {
   "name": "local-mahjong-ui-tests",
-  "version": "0.8.0",
+  "version": "0.10.1",
   "private": true,
-  "description": "Optional development-only DOM integration tests; not required to play",
-  "scripts": {"test:ui": "node tests/ui_smoke.cjs"},
-  "devDependencies": {"jsdom": "30.0.1"},
-  "engines": {"node": ">=22.19.0"}
+  "description": "Optional development-only DOM integration tests for v0.10.1",
+  "scripts": {
+    "test:ui": "node tests/ui_smoke.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "30.0.1"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  }
 }

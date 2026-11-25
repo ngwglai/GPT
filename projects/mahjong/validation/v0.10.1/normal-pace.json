@@ -1,0 +1,135 @@
+{
+  "server_delay_s": 0.24,
+  "physical_device": false,
+  "rounds": [
+    {
+      "seed": 42,
+      "revision": 90,
+      "result": {
+        "type": "DRAW",
+        "winner": null,
+        "source": null,
+        "method": null,
+        "winning_tile": null,
+        "next_dealer": 0,
+        "patterns": [],
+        "effects": [],
+        "settlement": {
+          "status": "PENDING_CONFIGURATION",
+          "mode": "NORMAL",
+          "transfers": {},
+          "missing": [
+            "draw_settlement_policy"
+          ]
+        }
+      },
+      "windows": [
+        {
+          "revision": 90,
+          "diagnostics": {
+            "hits": 0,
+            "misses": 272,
+            "created": 258,
+            "reused": 14,
+            "removed": 122,
+            "lastMs": 498.5,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 272,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6287004,
+            "bodyEntries": 185,
+            "missingArt": 0,
+            "artBytes": 7180800,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4678852
+          },
+          "heap_bytes": 3973392,
+          "nodes": 1020
+        },
+        {
+          "revision": 90,
+          "diagnostics": {
+            "hits": 0,
+            "misses": 272,
+            "created": 258,
+            "reused": 14,
+            "removed": 122,
+            "lastMs": 607.8999999999069,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 272,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6287004,
+            "bodyEntries": 185,
+            "missingArt": 0,
+            "artBytes": 7180800,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4678852
+          },
+          "heap_bytes": 3978908,
+          "nodes": 1020
+        },
+        {
+          "revision": 90,
+          "diagnostics": {
+            "hits": 0,
+            "misses": 272,
+            "created": 258,
+            "reused": 14,
+            "removed": 122,
+            "lastMs": 492.39999999990687,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 272,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6287004,
+            "bodyEntries": 185,
+            "missingArt": 0,
+            "artBytes": 7180800,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4678852
+          },
+          "heap_bytes": 3969448,
+          "nodes": 1020
+        },
+        {
+          "revision": 90,
+          "diagnostics": {
+            "hits": 0,
+            "misses": 272,
+            "created": 258,
+            "reused": 14,
+            "removed": 122,
+            "lastMs": 504.59999999962747,
+            "tiles": 136,
+            "cacheBytes": 3312476,
+            "rasterized": 272,
+            "evicted": 0,
+            "cacheEntries": 170,
+            "bodyBytes": 6287004,
+            "bodyEntries": 185,
+            "missingArt": 0,
+            "artBytes": 7180800,
+            "rasterScale": 1.5,
+            "staticLimit": 4194304,
+            "bodyLimit": 6291456,
+            "liveBytes": 4678852
+          },
+          "heap_bytes": 3976124,
+          "nodes": 1020
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

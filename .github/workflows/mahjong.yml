@@ -50,8 +50,17 @@ jobs:
           node --check web/presentation.js
           node --check web/components.js
           node --check web/table-scene.js
-          node --check web/table-mesh.js
+          node --check web/cuboid-scene.js
+          node --check web/perspective.js
           node --check tests/ui_smoke.cjs
+      - name: Geometry and special layout regressions
+        run: |
+          node tests/v092_scene_logic.cjs
+          node tests/v093_projection.cjs
+          node tests/v094_cuboid.cjs
+          node tests/v095_fit.cjs
+          node tests/v098_perspective.cjs
+          node tests/v101_texture.cjs
       - name: Read project version
         shell: pwsh
         run: |
@@ -85,18 +94,20 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           python -m tests.browser_acceptance --chromium /usr/bin/google-chrome
-          python -m tests.wall_browser_acceptance --chromium /usr/bin/google-chrome
-          python -m tests.match_browser_acceptance --chromium /usr/bin/google-chrome
+          python -m tests.v101_scene_acceptance --chromium /usr/bin/google-chrome
+          python tools/performance_regression.py --chromium /usr/bin/google-chrome --samples 1 --iterations 24 --output validation/v0.10.1/ci-performance.json
+          python -m tests.soak_acceptance --chromium /usr/bin/google-chrome --rounds 4 --output validation/v0.10.1/ci-soak.json
+          python -m tests.soak_acceptance --chromium /usr/bin/google-chrome --foreground --delay .12 --rounds 2 --output validation/v0.10.1/ci-tabs.json
       - name: Chromium acceptance (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $chrome = "$env:ProgramFiles\Google\Chrome\Application\chrome.exe"
-          python -m tests.browser_acceptance --chromium $chrome
+          python -m tests.browser_acceptance --chromium $chrome --screenshots validation/v0.10.1/windows-browser
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python -m tests.wall_browser_acceptance --chromium $chrome
+          python -m tests.v101_scene_acceptance --chromium $chrome
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python -m tests.match_browser_acceptance --chromium $chrome
+          python tools/performance_regression.py --chromium $chrome --samples 1 --iterations 24 --viewports desktop,phone-landscape --output validation/v0.10.1/ci-performance.json
       - name: Windows batch launchers
         if: runner.os == 'Windows'
         shell: pwsh
@@ -131,3 +142,47 @@ jobs:
               }
             }
           }
+      - name: Windows portable build and embedded runtime test
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP 'QingqueMahjong_v0.10.1.zip'
+          python tools/package_release.py --output $archive
+          if ($LASTEXITCODE -ne 0) { throw 'Portable build failed' }
+          $folder = Join-Path $env:RUNNER_TEMP 'mahjong portable 中文'
+          Expand-Archive $archive $folder
+          $project = Join-Path $folder 'QingqueMahjong_v0.10.1'
+          $embedded = Join-Path $project 'runtime/python.exe'
+          Push-Location $project
+          try {
+            & $embedded -m unittest -v tests.test_wall tests.test_gold tests.test_controllers
+            if ($LASTEXITCODE -ne 0) { throw 'Embedded runtime rules failed' }
+            $server = Start-Process cmd.exe -ArgumentList @('/d','/c','call','start_web.bat') -PassThru -NoNewWindow
+            try {
+              $health = $null
+              for ($attempt=0; $attempt -lt 80 -and -not $health; $attempt++) {
+                if ($server.HasExited) { throw 'Portable launcher exited' }
+                try { $health=Invoke-RestMethod http://127.0.0.1:8765/api/health -TimeoutSec 2 }
+                catch { Start-Sleep -Milliseconds 250 }
+              }
+              if ($health.version -ne $env:MAHJONG_VERSION) { throw 'Portable health failed' }
+              $state = (Invoke-RestMethod http://127.0.0.1:8765/api/table).table
+              $body = @{seat=$state.dealer;round_id=$state.round_id;revision=$state.revision;type='ROLL_DICE';tile_ids=@()} | ConvertTo-Json
+              $dealt = Invoke-RestMethod http://127.0.0.1:8765/api/action -Method Post -ContentType 'application/json' -Body $body
+              if ($dealt.table.phase -eq 'ROLLING_DICE') { throw 'Portable deal failed' }
+            } finally { if (-not $server.HasExited) { taskkill.exe /PID $server.Id /T /F } }
+          } finally { Pop-Location }
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: mahjong-validation-${{ matrix.os }}
+          path: |
+            projects/mahjong/validation/v0.10.1/ci-*.json
+            projects/mahjong/validation/v0.10.1/windows-browser/*.png
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: runner.os == 'Windows'
+        with:
+          name: mahjong-windows-portable
+          path: |
+            ${{ runner.temp }}/QingqueMahjong_v0.10.1.zip
+            ${{ runner.temp }}/QingqueMahjong_v0.10.1.sha256

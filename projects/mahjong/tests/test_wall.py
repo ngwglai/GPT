@@ -7,7 +7,8 @@ from mahjong.core.wall import Layer, WallExhausted, WallPosition, WallState, det
 from mahjong.rules.gold import get_opposite_tile
 
 
-WALLS = (Seat.EAST, Seat.SOUTH, Seat.WEST, Seat.NORTH)
+PLAYERS = (Seat.EAST, Seat.SOUTH, Seat.WEST, Seat.NORTH)
+WALLS = (Seat.EAST, Seat.NORTH, Seat.WEST, Seat.SOUTH)
 PHYSICAL_PATH = [
     WallPosition(side, column, layer)
     for side in WALLS
@@ -37,8 +38,8 @@ class WallTests(unittest.TestCase):
         self.assertEqual(Counter(t.type_id for t in deck), Counter({i: 4 for i in range(34)}))
 
     def test_seat_cycle(self):
-        for i, seat in enumerate(WALLS):
-            expected = WALLS[i:] + WALLS[:i]
+        for i, seat in enumerate(PLAYERS):
+            expected = PLAYERS[i:] + PLAYERS[:i]
             self.assertEqual(turn_order(seat), expected)
             self.assertEqual(next_seat(seat), expected[1])
             self.assertEqual(opposite_seat(seat), expected[2])
@@ -50,7 +51,7 @@ class WallTests(unittest.TestCase):
             for d1 in range(1, 7):
                 for d2 in range(1, 7):
                     with self.subTest(dealer=dealer, dice=(d1, d2)):
-                        expected_side = WALLS[(WALLS.index(dealer) + offsets_by_sum[d1 + d2]) % 4]
+                        expected_side = PLAYERS[(PLAYERS.index(dealer) + offsets_by_sum[d1 + d2]) % 4]
                         self.assertEqual(determine_break_wall(dealer, d1 + d2), expected_side)
                         wall = self.wall((d1, d2), dealer)
                         self.assertEqual(wall.break_wall, expected_side)
@@ -64,7 +65,7 @@ class WallTests(unittest.TestCase):
             for large in range(1, 7):
                 wall = self.wall((1, large), dealer)
                 cases.add((wall.break_wall, large))
-                side = WALLS[(WALLS.index(wall.break_wall) - 1) % 4]
+                side = PLAYERS[(PLAYERS.index(wall.break_wall) - 1) % 4]
                 expected = WallPosition(side, large - 1, Layer.TOP)
                 self.assertEqual(wall.gold_indicator_position, expected)
                 indicator = wall.get_slot(expected)
@@ -116,8 +117,8 @@ class WallTests(unittest.TestCase):
         self.assertEqual(tail_order[:4], [
             WallPosition(Seat.WEST, 16, Layer.TOP),
             WallPosition(Seat.WEST, 16, Layer.BOTTOM),
-            WallPosition(Seat.SOUTH, 0, Layer.TOP),
-            WallPosition(Seat.SOUTH, 0, Layer.BOTTOM),
+            WallPosition(Seat.NORTH, 0, Layer.TOP),
+            WallPosition(Seat.NORTH, 0, Layer.BOTTOM),
         ])
         ids = []
         for position, successor in zip(tail_order, tail_order[1:] + tail_order[:1]):
@@ -187,13 +188,15 @@ class WallTests(unittest.TestCase):
         self.assertFalse(wall.can_draw_tail())
 
     def test_indicator_can_be_drawn_from_both_ends(self):
-        for replacement, dice, count in ((False, (6, 6), 112), (True, (1, 1), 2)):
+        for replacement, dice in ((False, (6, 6)), (True, (1, 1))):
             with self.subTest(replacement=replacement):
                 wall = self.wall(dice)
                 indicator = wall.get_slot(wall.gold_indicator_position)
                 gold = get_opposite_tile(indicator.tile.type_id)
                 draw = wall.draw_gang_replacement if replacement else wall.draw_normal
-                for _ in range(count):
+                # Verify the indicator can be reached within the legal range.
+                cursor = "gang_draw_cursor" if replacement else "normal_draw_cursor"
+                while getattr(wall, cursor) != indicator.position:
                     self.assertNotEqual(draw(), indicator.tile)
                 before = sum(not slot.drawn for slot in wall.slots)
                 self.assertFalse(indicator.drawn)

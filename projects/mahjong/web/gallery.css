@@ -50,3 +50,9 @@
 @media (max-width: 740px) {
   .scene-grid, .gallery-samples { grid-template-columns: minmax(0, 1fr); }
 }
+
+.v09-gallery-art{margin:14px 0;max-width:900px;border:2px solid #dfc192;border-radius:17px;overflow:hidden;background:#e5dfcc}
+.v09-gallery-art img{display:block;width:100%;height:auto;max-height:410px;object-fit:cover}
+.v09-gallery-art figcaption{padding:7px 13px;background:#3c6666;color:#fff4da}
+.v09-gallery-avatars{display:flex;flex-wrap:wrap;gap:14px;margin:16px 0}
+.v09-gallery-avatars img{height:90px;width:90px;border:3px solid #ebc78b;border-radius:18px;object-fit:cover}

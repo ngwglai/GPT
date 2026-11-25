@@ -1,0 +1,123 @@
+{
+  "boot_ms": 1404.0030319999914,
+  "roll_ui_ms": 508.48073399993154,
+  "updates_ms": [
+    290,
+    240.5,
+    179,
+    144,
+    139.20000000006985,
+    143.29999999993015,
+    172.90000000002328,
+    215.59999999997672,
+    191.90000000002328,
+    192.90000000002328,
+    193.29999999993015,
+    197.40000000002328
+  ],
+  "top_cpu_ms": [
+    [
+      "sprite cuboid-scene.js",
+      1317.93
+    ],
+    [
+      "(program) ",
+      1094.31
+    ],
+    [
+      "(idle) ",
+      365.13
+    ],
+    [
+      "triangle cuboid-scene.js",
+      244.22
+    ],
+    [
+      "fill cuboid-scene.js",
+      186.62
+    ],
+    [
+      " cuboid-scene.js",
+      186.6
+    ],
+    [
+      "renderSprites cuboid-scene.js",
+      129.86
+    ],
+    [
+      "hull cuboid-scene.js",
+      115.98
+    ],
+    [
+      "fit cuboid-scene.js",
+      106.49
+    ],
+    [
+      "(garbage collector) ",
+      74.25
+    ],
+    [
+      "cachePut cuboid-scene.js",
+      64.8
+    ],
+    [
+      "tileFaces cuboid-scene.js",
+      64.29
+    ],
+    [
+      "rotate cuboid-scene.js",
+      55.29
+    ],
+    [
+      "surfaceColor cuboid-scene.js",
+      36.64
+    ],
+    [
+      "positionUI cuboid-scene.js",
+      29.36
+    ],
+    [
+      "project cuboid-scene.js",
+      21.65
+    ],
+    [
+      "world cuboid-scene.js",
+      21.27
+    ],
+    [
+      "cross cuboid-scene.js",
+      17.64
+    ],
+    [
+      "MahjongScene.mount cuboid-scene.js",
+      15.87
+    ],
+    [
+      "path cuboid-scene.js",
+      15.29
+    ]
+  ],
+  "diagnostics": {
+    "hits": 1830,
+    "misses": 524,
+    "created": 232,
+    "reused": 2122,
+    "removed": 53,
+    "lastMs": 197,
+    "tiles": 179,
+    "cacheBytes": 12559932,
+    "rasterized": 524,
+    "evicted": 495,
+    "cacheEntries": 199
+  },
+  "long_tasks_ms": [
+    52,
+    56,
+    227,
+    69,
+    64,
+    228
+  ],
+  "errors": [],
+  "note": "Exploratory profiling; instrumentation and conditions vary. Use formal serial benchmark JSON for acceptance comparisons."
+}

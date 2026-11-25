@@ -1,0 +1,129 @@
+{
+  "boot_ms": 2067.834578999964,
+  "roll_ui_ms": 709.5140569999785,
+  "updates_ms": [
+    254.19999999995343,
+    131.40000000002328,
+    140.90000000002328,
+    150.20000000006985,
+    122.40000000002328,
+    143.40000000002328,
+    151.5,
+    155.59999999997672,
+    226.59999999997672,
+    189.5,
+    252.60000000009313,
+    182.29999999993015
+  ],
+  "top_cpu_ms": [
+    [
+      "sprite cuboid-scene.js",
+      1561.13
+    ],
+    [
+      "(program) ",
+      1479.27
+    ],
+    [
+      "(idle) ",
+      632.7
+    ],
+    [
+      "triangle cuboid-scene.js",
+      316.75
+    ],
+    [
+      "renderSprites cuboid-scene.js",
+      250.79
+    ],
+    [
+      "fit cuboid-scene.js",
+      137.69
+    ],
+    [
+      " cuboid-scene.js",
+      111.68
+    ],
+    [
+      "(garbage collector) ",
+      64.44
+    ],
+    [
+      "fill cuboid-scene.js",
+      60.06
+    ],
+    [
+      "positionUI cuboid-scene.js",
+      37.75
+    ],
+    [
+      "fetch ",
+      33.65
+    ],
+    [
+      "hull cuboid-scene.js",
+      30.61
+    ],
+    [
+      "tileFaces cuboid-scene.js",
+      30.51
+    ],
+    [
+      "rotate cuboid-scene.js",
+      24.03
+    ],
+    [
+      "cachePut cuboid-scene.js",
+      23.07
+    ],
+    [
+      "MahjongScene.mount cuboid-scene.js",
+      21.55
+    ],
+    [
+      " ",
+      18.75
+    ],
+    [
+      "surfaceColor cuboid-scene.js",
+      17.21
+    ],
+    [
+      "project cuboid-scene.js",
+      12.56
+    ],
+    [
+      "renderPlayer app.js",
+      11.49
+    ]
+  ],
+  "diagnostics": {
+    "hits": 1827,
+    "misses": 527,
+    "created": 232,
+    "reused": 2122,
+    "removed": 53,
+    "lastMs": 181.80000000004657,
+    "tiles": 179,
+    "cacheBytes": 12559776,
+    "rasterized": 527,
+    "evicted": 500,
+    "cacheEntries": 197,
+    "bodyBytes": 7211388,
+    "bodyEntries": 126
+  },
+  "long_tasks_ms": [
+    59,
+    62,
+    94,
+    107,
+    134,
+    386,
+    76,
+    105,
+    57,
+    268
+  ],
+  "errors": [],
+  "note": "Exploratory profiling; instrumentation and conditions vary. Use formal serial benchmark JSON for acceptance comparisons."
+}

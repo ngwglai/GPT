@@ -15,7 +15,7 @@ def orphans_locked(player: PlayerState) -> bool:
 
 
 def advance_pickup_cycle(state: GameState, seat: Seat) -> None:
-    """Count clockwise laps from the dealer, including turns skipped by claims."""
+    """Count counterclockwise player laps from the dealer, including turns skipped by claims."""
     source_offset = (state.current_player - state.dealer) % len(Seat)
     target_offset = (seat - state.dealer) % len(Seat)
     if target_offset < source_offset:

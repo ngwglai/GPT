@@ -12,6 +12,15 @@ let table = null;
 let selected = { seat: null, tileId: null };
 let busy = false;
 let tablePoll;
+let localRefreshRequested = false;
+const localTabChannel = !document.body.classList.contains("lan-mode") &&
+  typeof BroadcastChannel === "function" ? new BroadcastChannel("qingque-local-table") : null;
+if (localTabChannel) localTabChannel.onmessage = () => {
+  localRefreshRequested = true;
+  if (!document.hidden && table) scheduleTablePoll();
+};
+let hiddenRenderPending=false;
+let acceptedSnapshot = "";
 let mutationEpoch = 0;
 let riversExpanded = false;
 let dockSeat = null;
@@ -34,9 +43,9 @@ function visualSeatMap() {
   const seat = viewerSeat ?? dockSeat ?? 0;
   return {
     south: seat,
-    west: (seat + 1) % 4,
+    east: (seat + 1) % 4,
     north: (seat + 2) % 4,
-    east: (seat + 3) % 4,
+    west: (seat + 3) % 4,
   };
 }
 function applySeatLayout() {
@@ -67,6 +76,7 @@ async function api(path, options = {}) {
   const res = await fetch(path, { headers: {"Content-Type": "application/json"}, ...options });
   const data = await res.json().catch(() => ({ok:false,error:`HTTP ${res.status}`}));
   if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  if (options.method === "POST") localTabChannel?.postMessage(null);
   return data.table;
 }
 function setBusy(v) {
@@ -90,6 +100,9 @@ function newPresentationEvents(nextTable, initial) {
   return fresh;
 }
 function acceptTable(nextTable, { initial = false } = {}) {
+  const serialized = JSON.stringify(nextTable);
+  if (serialized === acceptedSnapshot) { scheduleTablePoll(); return; }
+  acceptedSnapshot = serialized;
   const last = table;
   const sameRound = last?.round_id === nextTable.round_id;
   if (!sameRound) {
@@ -98,12 +111,14 @@ function acceptTable(nextTable, { initial = false } = {}) {
   }
   if (!sameRound || last.revision !== nextTable.revision) MahjongScene.cancelFlights();
   const events = newPresentationEvents(nextTable, initial);
-  const before = sameRound ? MahjongScene.snapshot(events) : null;
+  const before = sameRound && events.length && !document.hidden ? MahjongScene.snapshot(events) : null;
   table = nextTable;
   if (selected.tileId != null && !legalForSeat(selected.seat).some(action => action.tile_ids.includes(selected.tileId))) {
     selected = {seat:null,tileId:null};
   }
   document.body.classList.add("table-live");
+  if(document.hidden){hiddenRenderPending=true;scheduleTablePoll();return;}
+  hiddenRenderPending=false;
   render();
   MahjongScene.animate(events, before, last, table);
   for (const event of events) {
@@ -120,20 +135,26 @@ function acceptTable(nextTable, { initial = false } = {}) {
 }
 function scheduleTablePoll() {
   clearTimeout(tablePoll);
-  if (window.LanGame || table?.phase === "ROUND_END" ||
-      !Object.values(table?.players || {}).some(p => p.controller && p.controller !== "human")) return;
+  if (window.LanGame || document.hidden) return;
+  const aiRunning = table?.phase !== "ROUND_END" &&
+    Object.values(table?.players || {}).some(p => p.controller && p.controller !== "human");
+  if (!localRefreshRequested && !aiRunning) return;
   tablePoll = setTimeout(async () => {
+    if (document.hidden) return;
     if (busy) return scheduleTablePoll();
+    const requested = localRefreshRequested;
+    localRefreshRequested = false;
     const epoch = mutationEpoch;
     try {
       const next = await api("/api/table");
       if (epoch === mutationEpoch) acceptTable(next);
       else scheduleTablePoll();
     } catch (error) {
+      localRefreshRequested ||= requested;
       showNotice(error.message);
       scheduleTablePoll();
     }
-  }, 300);
+  }, localRefreshRequested ? 50 : 300);
 }
 async function changeController(seat, mode) {
   if (window.LanGame) return window.LanGame.setController(mode);
@@ -154,7 +175,7 @@ function renderTableHud() {
   const hud = document.getElementById("tableHud");
   const menu = document.getElementById("controlMenu");
   const settings = document.getElementById("controlSettings");
-  hud.classList.remove("hidden");
+  hud.classList.add("hidden");
   menu.classList.remove("hidden");
   const stats = `<span>第 <b>${table.match?.round_no ?? 1}</b> 局</span><span>庄 <b>${seatNames[table.dealer]}</b></span><span>余 <b>${table.normal_tiles_remaining ?? "—"}</b> 张</span>`;
   if (hud.renderedMarkup !== stats) {
@@ -382,7 +403,6 @@ function renderPlayer(seat) {
   const aiStatus = p.ai_thinking ? "AI 思考中" : table.phase === "WAITING_FOR_RESPONSES" ? "AI 等待响应" : "AI 托管";
   const status = [
     managed ? badge(aiStatus, "ai-badge") : window.LanGame ? "" : badge("人工", "human-badge"),
-    table.dealer === seat ? badge("庄", "dealer") : "",
     viewerSeat === seat ? badge("你", "self") : "",
     p.declared_ting ? badge("已听", "ting") : "",
     picked.length ? badge("十三幺·已锁定", "orphan-locked") :
@@ -402,6 +422,7 @@ function renderPlayer(seat) {
   ].join("");
   const hand = renderHand(seat,p) || `<span class="action-hint">${rolling ? "尚未发牌" : "暂无手牌"}</span>`;
   const actions = renderActions(seat);
+  const prompt = legalForSeat(seat).length && !actions ? "请选择手牌" : "";
   const tools = orphanPickupControl(seat, p) + quickControl;
   const openDetails = [...el.querySelectorAll("details[open]")].map(details => details.className);
   const avatar = `${icon("bird")}<b>${seatNames[seat]}</b>`;
@@ -422,9 +443,9 @@ function renderPlayer(seat) {
     </div>
     <div class="decision-row">
       ${renderWaitHint(p)}
-      ${actions ? `<div class="action-area" aria-label="${seatNames[seat]}家操作">${actions}</div>` : ""}
+      ${actions ? `<div class="action-area" aria-label="${seatNames[seat]}家操作">${actions}</div>` : prompt ? `<span class="cuboid-action-prompt">${prompt}</span>` : ""}
     </div>
-    <div class="hand" style="--hand-slots:${Math.max(14, p.concealed_count)}" aria-label="${seatNames[seat]}家手牌">${hand}</div>`;
+    <div class="hand" data-hand-seat="${seat}" style="--hand-slots:${Math.max(14, p.concealed_count)}" aria-label="${seatNames[seat]}家手牌">${hand}</div>`;
 
   if (markup === el.renderedMarkup) return;
   const waitsScrollLeft = el.querySelector(".wait-choices")?.scrollLeft || 0;
@@ -541,7 +562,12 @@ function renderCenter() {
     ${table.result ? renderResult(table.result) : ""}
     ${riversExpanded ? `<section class="river-inspector" aria-label="四家牌河" tabindex="0">${Object.entries(layout).map(([side, seat]) => renderRiver(seat, side)).join("")}</section>` : ""}`;
   if (el.renderedMarkup === markup) return;
+  // Return the projected live hand to its owning seat before replacing the board.
+  MahjongScene.restoreHand(el.closest(".table-shell"));
+  const persistentScene=el.querySelector(".cuboid-scene");
+  if(persistentScene)persistentScene.remove();
   el.innerHTML = markup;
+  if(persistentScene)el.querySelector(".cuboid-scene")?.replaceWith(persistentScene);
   el.renderedMarkup = markup;
 }
 function bindTableEvents() {
@@ -613,8 +639,9 @@ function render() {
   [0,1,2,3].forEach(renderPlayer);
   renderCenter();
   renderTableHud();
-  MahjongScene.mount(document.querySelector(".table-shell"));
+  const shell = document.querySelector(".table-shell");
   if (window.LanGame) {
+    MahjongScene.mount(shell);
     window.LanGame.decorate();
     return;
   }
@@ -630,10 +657,13 @@ function render() {
     document.getElementById("dealerSelect").value = String(table.dealer);
   }
   if (!document.getElementById("seedInput").value) document.getElementById("seedInput").value = table.test_mode.seed;
+  // The response button can wrap the header; measure only after updating it.
+  MahjongScene.mount(shell);
 }
 
 async function boot() {
   if (window.MahjongPresentation?.init) await window.MahjongPresentation.init();
+  await window.MahjongCuboid?.preload();
   document.getElementById("newRoundBtn").addEventListener("click", roundButtonAction);
   document.getElementById("resetMatchBtn").addEventListener("click", resetMatch);
   document.getElementById("timeoutBtn").addEventListener("click", timeoutResponses);
@@ -647,6 +677,19 @@ async function boot() {
   });
   await loadTable(true);
 }
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){clearTimeout(tablePoll);return;}
+  if(hiddenRenderPending){hiddenRenderPending=false;render();}
+  // Server AI is independent of browser timers. Fetch the latest state when a local tab returns.
+  if(!window.LanGame&&table){
+    if(busy){localRefreshRequested=true;scheduleTablePoll();}
+    else{
+      clearTimeout(tablePoll);
+      localRefreshRequested=false;
+      loadTable(true);
+    }
+  }
+});
 bindTableEvents();
 document.getElementById("controlSettings").addEventListener("change", event => {
   const seat = event.target.dataset.controlSeat;

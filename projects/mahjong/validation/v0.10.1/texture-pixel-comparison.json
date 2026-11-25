@@ -1,0 +1,11 @@
+{
+  "viewport": [
+    1440,
+    900
+  ],
+  "state": "seed42 dealer0 after real dice deal",
+  "mean_absolute_channel_0_255": 0.0033369341563786008,
+  "rms_channel_0_255": 0.2955652396375225,
+  "changed_pixel_fraction": 0.00047530864197530866,
+  "over_16_pixel_fraction": 6.558641975308642e-05
+}

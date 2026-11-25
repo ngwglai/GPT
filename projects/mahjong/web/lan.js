@@ -200,6 +200,7 @@
   window.addEventListener('pageshow', event => { if (event.persisted) connect(); });
   (async () => {
     await window.MahjongPresentation?.init();
+    await window.MahjongCuboid?.preload();
     if (saved?.room_code && saved?.session_token) connect();
     else save(null);
   })();
