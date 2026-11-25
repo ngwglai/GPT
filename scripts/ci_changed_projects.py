@@ -29,6 +29,11 @@ PROJECT_PATHS = {
     "mahjong": "projects/mahjong",
 }
 
+PROJECT_CONFIG_FILES = {
+    # This root-level attribute rule only protects Mahjong tile SVG bytes.
+    ".gitattributes": "mahjong",
+}
+
 WORKFLOW_PROJECTS = {
     ".github/workflows/entropylab.yml": "entropylab",
     ".github/workflows/compressionlab.yml": "compressionlab",
@@ -106,6 +111,10 @@ def classify_changed_paths(paths: Iterable[str]) -> dict[str, bool]:
             # its own path-filtered workflow; the root CI checks the other two.
             selected["entropylab"] = True
             selected["rogue_survivor"] = True
+            continue
+
+        if path in PROJECT_CONFIG_FILES:
+            selected[PROJECT_CONFIG_FILES[path]] = True
             continue
 
         if path in WORKFLOW_PROJECTS:
