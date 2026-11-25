@@ -1,0 +1,2 @@
+# Preserve reviewed tile artwork bytes exactly across Windows and Unix checkouts.
+projects/mahjong/web/assets/tiles/*.svg -text

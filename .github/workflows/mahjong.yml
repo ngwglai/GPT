@@ -14,6 +14,8 @@ jobs:
     timeout-minutes: 15
     env:
       PYTHONIOENCODING: utf-8
+      # Source files and SVGs are UTF-8; don't inherit the Windows legacy code page.
+      PYTHONUTF8: "1"
     strategy:
       fail-fast: false
       matrix:
@@ -39,10 +41,14 @@ jobs:
           python -m pip check
           npm install --no-package-lock
       - name: Full Python suite, orphan pickup and gold compatibility
+        shell: pwsh
         run: |
           python -m unittest discover -v
+          if ($LASTEXITCODE -ne 0) { throw "Full Python suite failed with exit code $LASTEXITCODE" }
           python -m unittest discover -v -k orphan_pickup
+          if ($LASTEXITCODE -ne 0) { throw "Orphan pickup suite failed with exit code $LASTEXITCODE" }
           python -m unittest -v tests.test_gold tests.test_win
+          if ($LASTEXITCODE -ne 0) { throw "Gold compatibility suite failed with exit code $LASTEXITCODE" }
       - name: JavaScript syntax
         run: |
           node --check web/app.js
@@ -112,6 +118,44 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
+          function Stop-MahjongTestServer {
+            param([System.Diagnostics.Process]$Launcher)
+
+            # A .bat process can exit before its Python child. Stop the process
+            # that owns the listening socket first, then the cmd.exe wrapper.
+            $listenerIds = @(
+              Get-NetTCPConnection -State Listen -LocalPort 8765 -ErrorAction SilentlyContinue |
+                Select-Object -ExpandProperty OwningProcess -Unique
+            )
+            foreach ($listenerId in $listenerIds) {
+              if ($listenerId -and $listenerId -ne $PID) {
+                Stop-Process -Id $listenerId -Force -ErrorAction SilentlyContinue
+              }
+            }
+
+            try {
+              $Launcher.Refresh()
+              if (-not $Launcher.HasExited) {
+                Stop-Process -Id $Launcher.Id -Force -ErrorAction SilentlyContinue
+              }
+            } catch {
+              # The launcher may already have exited during child shutdown.
+            }
+
+            $deadline = [DateTime]::UtcNow.AddSeconds(5)
+            do {
+              Start-Sleep -Milliseconds 100
+              $remaining = @(
+                Get-NetTCPConnection -State Listen -LocalPort 8765 -ErrorAction SilentlyContinue
+              )
+            } while ($remaining.Count -gt 0 -and [DateTime]::UtcNow -lt $deadline)
+
+            if ($remaining.Count -gt 0) {
+              $remainingIds = ($remaining | Select-Object -ExpandProperty OwningProcess -Unique) -join ', '
+              throw "Port 8765 remained occupied after launcher cleanup (PID: $remainingIds)"
+            }
+          }
+
           $launchers = [ordered]@{
             'start_web.bat' = '127.0.0.1'
             '启动网页版.bat' = '127.0.0.1'
@@ -135,11 +179,7 @@ jobs:
               if ($entry.Value -notin $listeners.LocalAddress) { throw "$($entry.Key) bound to the wrong address" }
               Write-Host "$($entry.Key) served v$env:MAHJONG_VERSION on $($entry.Value)"
             } finally {
-              if (-not $server.HasExited) {
-                taskkill.exe /PID $server.Id /T /F
-                if ($LASTEXITCODE -ne 0) { throw "Failed to stop $($entry.Key)" }
-                $server.WaitForExit()
-              }
+              Stop-MahjongTestServer -Launcher $server
             }
           }
       - name: Windows portable build and embedded runtime test
@@ -170,7 +210,38 @@ jobs:
               $body = @{seat=$state.dealer;round_id=$state.round_id;revision=$state.revision;type='ROLL_DICE';tile_ids=@()} | ConvertTo-Json
               $dealt = Invoke-RestMethod http://127.0.0.1:8765/api/action -Method Post -ContentType 'application/json' -Body $body
               if ($dealt.table.phase -eq 'ROLLING_DICE') { throw 'Portable deal failed' }
-            } finally { if (-not $server.HasExited) { taskkill.exe /PID $server.Id /T /F } }
+            } finally {
+              # The portable launcher has the same cmd.exe -> Python process
+              # shape; clean up the socket owner even if cmd.exe exited first.
+              $listenerIds = @(
+                Get-NetTCPConnection -State Listen -LocalPort 8765 -ErrorAction SilentlyContinue |
+                  Select-Object -ExpandProperty OwningProcess -Unique
+              )
+              foreach ($listenerId in $listenerIds) {
+                if ($listenerId -and $listenerId -ne $PID) {
+                  Stop-Process -Id $listenerId -Force -ErrorAction SilentlyContinue
+                }
+              }
+              try {
+                $server.Refresh()
+                if (-not $server.HasExited) {
+                  Stop-Process -Id $server.Id -Force -ErrorAction SilentlyContinue
+                }
+              } catch {
+                # The portable launcher may already have exited.
+              }
+              $deadline = [DateTime]::UtcNow.AddSeconds(5)
+              do {
+                Start-Sleep -Milliseconds 100
+                $remaining = @(
+                  Get-NetTCPConnection -State Listen -LocalPort 8765 -ErrorAction SilentlyContinue
+                )
+              } while ($remaining.Count -gt 0 -and [DateTime]::UtcNow -lt $deadline)
+              if ($remaining.Count -gt 0) {
+                $remainingIds = ($remaining | Select-Object -ExpandProperty OwningProcess -Unique) -join ', '
+                throw "Portable launcher left port 8765 occupied (PID: $remainingIds)"
+              }
+            }
           } finally { Pop-Location }
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
