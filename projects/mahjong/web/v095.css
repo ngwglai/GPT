@@ -14,21 +14,3 @@ body.table-live .cuboid-active .player>.player-head,body.table-live .cuboid-acti
  body.table-live .cuboid-active .scene-toolbar{max-width:23vw!important}
  .cuboid-active .scene-controls{gap:3px!important}
 }
-
-/* Match the action buttons' vertical size to the projected wall; keep width unchanged. */
-body.table-live .cuboid-active .player.dock-seat .decision-row {
-  height: var(--wall-action-height, auto) !important;
-  max-height: none !important;
-  transform: translate(-50%, -50%) scale(var(--edge-scale, 1)) !important;
-  transform-origin: center;
-  align-items: stretch;
-}
-body.table-live .cuboid-active .decision-row .action-area {
-  height: 100%;
-  align-items: stretch;
-}
-body.table-live .cuboid-active .decision-row .action-area > .action-btn {
-  height: 100%;
-  min-height: 0;
-  box-sizing: border-box;
-}
