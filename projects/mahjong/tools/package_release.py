@@ -1,6 +1,6 @@
 """Build a clean Windows x64 portable ZIP plus source/tests, excluding local environments.
 Downloads the pinned official CPython embeddable distribution and binary wheels.
-Run: python tools/package_release.py --output /path/QingqueMahjong_v0.10.1.zip
+Run: python tools/package_release.py --output /path/QingqueMahjong_v1.0.0.zip
 """
 import argparse
 import hashlib
@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -22,7 +23,9 @@ EXCLUDED = {'.venv', '__pycache__', 'node_modules', '.git', '.pytest_cache', 'bu
 def build(output):
     with tempfile.TemporaryDirectory(prefix='qingque-') as temp:
         stage = Path(temp)
-        project = stage/'QingqueMahjong_v0.10.1'
+        with (ROOT/'pyproject.toml').open('rb') as metadata:
+            version = tomllib.load(metadata)['project']['version']
+        project = stage/f'QingqueMahjong_v{version}'
         shutil.copytree(ROOT, project, ignore=lambda d, names: [n for n in names if n in EXCLUDED
                         or n.endswith(('.pyc', '.pyo', '.egg-info'))])
         archive = stage/'python.zip'

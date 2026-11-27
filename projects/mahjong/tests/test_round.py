@@ -148,11 +148,11 @@ class RoundTests(unittest.TestCase):
         view=service.handle_intent("0",payload)
         self.assertEqual(view["revision"],1)
 
-    def test_failed_score_hook_rolls_back_entire_action(self):
+    def test_failed_settlement_rolls_back_entire_action(self):
         e=engine()
         from .test_scoring import sample_config
         e.scoring=ScoreEngine(sample_config())
-        e.scoring.additive_hooks.append(lambda *args: 1/0)
+        e.scoring.settle = lambda *args, **kwargs: 1/0
         build_fixture(e,{E:PlayerFixture(WAIT+[31],declared=True,last_draw_type=31)},gold=33)
         before=e.player_view(E)
         events=len(e.state.event_log)

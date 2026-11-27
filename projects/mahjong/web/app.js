@@ -215,9 +215,10 @@ async function resetMatch() {
   if (busy) return;
   const seed = document.getElementById("seedInput").value.trim();
   const dealer = Number(document.getElementById("dealerSelect").value);
+  const base_score = Number(document.getElementById("baseScoreSelect").value);
   try {
     setBusy(true); selected = {seat:null,tileId:null};
-    const next = await api("/api/new-round", {method:"POST", body:JSON.stringify({seed, dealer})});
+    const next = await api("/api/new-round", {method:"POST", body:JSON.stringify({seed, dealer, base_score})});
     document.getElementById("seedInput").value = next.test_mode.seed;
     acceptTable(next); showNotice("");
     document.getElementById("resetMatchBtn").closest("details").open = false;
@@ -343,14 +344,26 @@ function renderActions(seat) {
     if (!families.has(action.type)) families.set(action.type, []);
     families.get(action.type).push(action);
   }
+  // The action name is the visual headline; keep the full combination and
+  // first-pickup warning visible as supporting text, not a tooltip-only label.
+  const actionText = (type, detail = "") => {
+    const name = type === "DECLARE_TING" ? "报听" : actionNames[type] || type;
+    const secondary = [type === "DECLARE_TING" ? "并打出" : "", detail].filter(Boolean).join(" ");
+    const firstPickup = secondary.match(/^(.*?)(（锁定十三幺）)$/);
+    const detailMarkup = firstPickup
+      ? `<span class="action-detail pickup-detail"><span>${esc(firstPickup[1])}</span><span>${esc(firstPickup[2])}</span></span>`
+      : secondary ? `<span class="action-detail">${esc(secondary)}</span>` : "";
+    return `<span class="action-word" data-length="${Math.min(3, [...name].length)}">${esc(name)}</span>${detailMarkup}`;
+  };
   const button = (action, concise) => {
     const kind = actionStyles[action.type] || "";
     const label = actionLabel(seat, action);
-    const text = concise && !["CHI", "PICK_ORPHAN"].includes(action.type) ? actionNames[action.type] : label;
-    return `<button class="action-btn ${kind}" type="button" data-action-seat="${seat}" data-action-key="${esc(actionKey(action))}" title="${esc(label)}">${esc(text)}</button>`;
+    const base = action.type === "ROLL_DICE" ? "掷骰子" : actionNames[action.type] || action.type;
+    const detail = concise && !["CHI", "PICK_ORPHAN"].includes(action.type) ? "" : label.slice(base.length).replace(/^\s*·?\s*/, "");
+    return `<button class="action-btn ${kind}" type="button" data-action-seat="${seat}" data-action-key="${esc(actionKey(action))}" title="${esc(label)}" aria-label="${esc(label)}">${actionText(action.type, detail)}</button>`;
   };
   return [...families].map(([type, choices]) => choices.length === 1 ? button(choices[0], true) :
-    `<details class="action-family"><summary class="action-btn ${actionStyles[type] || ""}">${actionNames[type]}</summary><div class="action-choices">${choices.map(choice => button(choice, false)).join("")}</div></details>`).join("");
+    `<details class="action-family"><summary class="action-btn ${actionStyles[type] || ""}">${actionText(type)}</summary><div class="action-choices">${choices.map(choice => button(choice, false)).join("")}</div></details>`).join("");
 }
 function playerZone(label, rowClass, content) {
   if (!content) return "";
@@ -495,6 +508,13 @@ function previousRoundText(record) {
   const dealerNote = r.winner === record.dealer ? "庄家连庄" : `庄家顺延到${seatNames[r.next_dealer]}家`;
   return `${prefix}：${seatNames[r.winner]}家${method}，${dealerNote}`;
 }
+function renderScoreDetails(result) {
+  const items = result?.settlement?.items;
+  if (!items) return "";
+  const rows = items.payments.map(p => `<tr><th scope="row">${seatNames[p.payer]}→${seatNames[p.receiver]}</th><td>${p.base}</td><td>${p.gold}</td><td>${p.open_gang + p.concealed_gang}</td><td>${p.discard}</td><td>${p.total}</td></tr>`).join("");
+  const exempt = items.other_hu.map(seat => seatNames[seat] + "家").join("、");
+  return `<div class="score-detail"><p>本局支付明细 · 基础分 ${items.base_score}</p>${exempt ? `<p>${esc(exempt)}同响免付胡牌分，杠分照常。</p>` : ""}${rows ? `<table><thead><tr><th>支付</th><th>基础</th><th>上金</th><th>杠</th><th>点炮</th><th>合计</th></tr></thead><tbody>${rows}</tbody></table>` : "<p>本局无分数支付。</p>"}</div>`;
+}
 function renderResult(result) {
   const won = result.type !== "DRAW";
   const method = winMethods[result.method] || result.method;
@@ -543,7 +563,8 @@ function renderCenter() {
         <details class="table-details"${debugOpen ? " open" : ""}><summary class="ghost">详情</summary>
           <div class="table-caption">
             ${goldText ? `<p>${esc(goldText)}</p>` : ""}
-            <div class="table-footer"><div class="match-meta"><span>累计分</span>${score}${scoringNote}</div></div>
+            <div class="table-footer"><div class="match-meta"><span>累计分 · 基础 ${scoring?.base_score ?? 1}</span>${score}${scoringNote}</div></div>
+            ${renderScoreDetails(table.result)}
             ${previous ? `<div class="previous-round">${esc(previous)}</div>` : ""}
             <div>庄家 ${seatNames[table.dealer]} · 墙上实牌 ${table.wall_view?.tiles_present ?? "—"} · 本局杠数 ${table.gang_count}${breakText ? ` · ${esc(breakText)}` : ""} · round ${esc(table.round_id.slice(0,8))} · revision ${table.revision}${table.test_mode ? ` · Seed ${esc(table.test_mode.seed)}` : ""}</div>
           </div>
@@ -655,6 +676,7 @@ function render() {
   document.getElementById("focusTurn").classList.toggle("hidden", ended);
   if (document.activeElement !== document.getElementById("dealerSelect") && !document.querySelector(".top-details")?.open) {
     document.getElementById("dealerSelect").value = String(table.dealer);
+    document.getElementById("baseScoreSelect").value = String(table.match?.scoring?.base_score ?? 1);
   }
   if (!document.getElementById("seedInput").value) document.getElementById("seedInput").value = table.test_mode.seed;
   // The response button can wrap the header; measure only after updating it.

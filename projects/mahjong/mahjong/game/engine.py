@@ -408,11 +408,13 @@ class GameEngine:
         s = self.state
         source, tile = s.current_discarder, s.current_discard
         selected = self.resolver.resolve(source, s.pending_responses)
+        other_hu = tuple(seat for seat, action in s.pending_responses.items()
+                         if action.type == A.HU and selected is not None and seat != selected.seat)
         rob = s.response_kind == "ROB_BU_GANG"
         s.response_options = {}
         s.pending_responses = {}
         if selected and selected.type == A.HU:
-            self._end_hu(selected.seat, source, (HuEffect.QIANG_GANG_HU,) if rob else ())
+            self._end_hu(selected.seat, source, (HuEffect.QIANG_GANG_HU,) if rob else (), other_hu=other_hu)
         elif rob:
             action = s.pending_gang
             s.pending_gang = None
@@ -477,7 +479,7 @@ class GameEngine:
             self.state = backup
             raise
 
-    def _end_hu(self, winner: Seat, source: Seat | None, effects: tuple[HuEffect, ...]):
+    def _end_hu(self, winner: Seat, source: Seat | None, effects: tuple[HuEffect, ...], *, other_hu: tuple[Seat, ...] = ()):
         s = self.state
         tile = s.current_discard if source is not None else s.players[winner].last_drawn_tile
         p = s.players[winner]
@@ -493,7 +495,7 @@ class GameEngine:
         hu = check_player_hu(self.solver, p, p.concealed_tiles, s.gold_tile_type)
         if not hu:
             raise IllegalAction("winning state failed validation")
-        settlement = self.scoring.settle(s, winner, source, effects)
+        settlement = self.scoring.settle(s, winner, source, effects, other_hu=other_hu)
         method = "SELF_DRAW" if source is None else ("ROB_GANG" if HuEffect.QIANG_GANG_HU in effects else "DISCARD")
         s.result = RoundResult("HU", winner, source, method,
                                tile, hu.patterns, effects, determine_next_dealer(s.dealer, winner, "HU"), settlement)
@@ -512,7 +514,8 @@ class GameEngine:
         s.pending_responses.clear()
         s.response_options.clear()
         self._emit(E.ROUND_DRAW, reason=reason)
-        self._emit(E.ROUND_SETTLED, status=settlement.status, mode=settlement.mode.name, missing=list(settlement.missing))
+        self._emit(E.ROUND_SETTLED, status=settlement.status, mode=settlement.mode.name,
+                   transfers={int(k): str(v) for k, v in settlement.transfers.items()}, missing=list(settlement.missing))
 
     def _wall_public_view(self, reveal_break: bool) -> dict:
         """Public geometry only: never expose the types/IDs of undrawn wall tiles."""
@@ -638,7 +641,7 @@ class GameEngine:
                       "next_dealer": int(r.next_dealer), "patterns": list(r.patterns), "effects": [e.name for e in r.effects],
                       "settlement": {"status": r.settlement.status, "mode": r.settlement.mode.name,
                                      "transfers": {int(k): str(v) for k, v in r.settlement.transfers.items()},
-                                     "missing": list(r.settlement.missing)}}
+                                     "missing": list(r.settlement.missing), "items": deepcopy(r.settlement.items)}}
         visible_phase = s.phase.name
         pending_claim = None
         if s.phase == P.WAITING_FOR_RESPONSES:

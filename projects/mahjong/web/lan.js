@@ -57,6 +57,7 @@
     hide('waitingControls', room.started); hide('playingHint', !room.started);
     hide('nextRound', !controls.can_next_round);
     $('roomTitle').textContent = room.code;
+    $('roomScoreMode').textContent = `基础分：${room.base_score ?? 1} 分`;
     $('yourSeat').textContent = you.seat == null ? '请选择空位' : `你是${seatNames[you.seat]}家`;
     $('roster').innerHTML = [0,1,2,3].map(seat => {
       const member = room.members.find(p => p.seat === seat);
@@ -145,7 +146,7 @@
     joinBusy = true;
     $('createRoom').disabled = $('joinRoom').disabled = true;
     try {
-      const payload = create ? {nickname:name} : {nickname:name, room_code:$('roomCode').value.trim().toUpperCase()};
+      const payload = create ? {nickname:name, base_score:Number($('roomBaseScore').value)} : {nickname:name, room_code:$('roomCode').value.trim().toUpperCase()};
       const res = await fetch(create ? '/api/rooms' : '/api/rooms/join', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error || '加入失败');

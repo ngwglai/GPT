@@ -1347,7 +1347,7 @@
     const wind = (side) => {
       const seat = layout[side],
         score = table.match?.scoring?.totals?.[String(seat)] ?? "—";
-      return `<div class="center-wind ${side}${seat === active && table.phase !== "ROUND_END" ? " active" : ""}" title="${safe(seatNames[seat])}家${seat === table.dealer ? "（庄家）" : ""}"><b class="${seat === table.dealer ? "dealer-wind" : ""}">${seatNames[seat]}</b><span>${safe(score)}</span></div>`;
+      return `<div class="center-wind ${side}${seat === active && table.phase !== "ROUND_END" ? " active" : ""}" title="${safe(seatNames[seat])}家${seat === table.dealer ? "（庄家）" : ""}"><b class="${seat === table.dealer ? "dealer-wind" : ""}">${seatNames[seat]}</b><span style="--score-chars:${Math.max(1, String(score).length)}">${safe(score)}</span></div>`;
     };
     const dice = (table.dice || [])
       .filter((v) => v != null)
@@ -1491,7 +1491,9 @@
           `${maxRowWidth}px`,
           "important",
         );
-        place(decisionRow, wallCenter[0], wallCenterY);
+        // Extra rows and wait hints expand upward, never down over the hand.
+        const rowHeight = decisionRow.offsetHeight;
+        place(decisionRow, wallCenter[0], Math.min(wallCenterY, wallBottom - rowHeight / 2));
 
         const rowWidth = decisionRow.offsetWidth;
         if (dockTools && toolsWidth > 0 && rowWidth > 0) {
@@ -1557,6 +1559,20 @@
         ) {
           // The nearby corner inside the two walls is free in ordinary play.
           [ax, ay] = F.screen([6.5, 6.8, 0.3]);
+        }
+      }
+      // A long nickname or several badges must not cover the near hand.
+      if (head.dataset.visualSide === "south") {
+        const handTiles = shell.querySelectorAll(".dock-seat .hand button[data-tile]");
+        const near = [...handTiles].map((tile) => tile.getBoundingClientRect());
+        if (near.length) {
+          const left = Math.min(...near.map((r) => r.left)),
+            right = Math.max(...near.map((r) => r.right)),
+            top = Math.min(...near.map((r) => r.top));
+          if (V.x + (ax + hw) * s > left && V.x + (ax - hw) * s < right &&
+              V.y + (ay + hh) * s > top - 3) {
+            ay = (top - V.y - 3) / s - hh;
+          }
         }
       }
       const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -1647,6 +1663,8 @@
       info.innerHTML = markup;
       info.__markup = markup;
     }
+    // Logical tile width; the scene transform scales text and tiles together.
+    shell.style.setProperty("--ui-tile", `${F.handUnit * config.W}px`);
     positionUI(shell, table, layout, model, F);
     fit(shell, F);
     stats.lastMs = performance.now() - started;

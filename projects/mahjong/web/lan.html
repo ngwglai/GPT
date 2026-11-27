@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f1e8d2">
-  <title>局域网联机 · 青雀麻将 v0.10.1</title>
+  <title>局域网联机 · 青雀麻将 v1.0.0</title>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/table.css">
   <link rel="stylesheet" href="/v09.css"><link rel="stylesheet" href="/v091.css"><link rel="stylesheet" href="/v092.css"><link rel="stylesheet" href="/v093.css">
@@ -50,6 +50,8 @@
         <label for="nickname">你的昵称</label>
         <input id="nickname" maxlength="20" autocomplete="nickname" placeholder="输入昵称">
         <div class="join-actions">
+          <label for="roomBaseScore">创建房间基础分</label>
+          <select id="roomBaseScore"><option value="1">1 分</option><option value="5">5 分</option></select>
           <button id="createRoom" type="button" class="primary">创建房间 <svg class="icon" aria-hidden="true"><use href="/assets/icons/marks.svg#plus"></use></svg></button>
           <div class="join-divider"><span>已有房间号</span></div>
           <div class="join-code">
@@ -63,7 +65,7 @@
     </section>
     <section id="roomPanel" class="lobby-card room-card hidden">
       <div class="room-heading">
-        <div><span class="eyebrow"><i></i> 房间号</span><h1 id="roomTitle"></h1></div>
+        <div><span class="eyebrow"><i></i> 房间号</span><h1 id="roomTitle"></h1><p id="roomScoreMode" class="subtle"></p></div>
         <span id="yourSeat" class="badge self"></span>
       </div>
       <div id="roster" class="roster" aria-label="玩家席位"></div>

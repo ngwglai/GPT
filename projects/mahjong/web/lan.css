@@ -87,3 +87,29 @@
   .seat-choice { min-height: 112px; gap: 8px; padding: 8px; }
   .room-controls { align-items: stretch; flex-direction: column; }
 }
+
+/* Readable foregrounds for the spring-sakura lobby only.
+   Light room cards and dark header/input surfaces need opposite ink colors. */
+body.lan-mode:not(.table-live) .lobby-card :is(.subtle, .lobby-form > p, .join-divider) { color: #365653; }
+body.lan-mode:not(.table-live) .lobby-card .eyebrow,
+body.lan-mode:not(.table-live) .lobby-card .badge.dealer { color: #80551e; }
+body.lan-mode:not(.table-live) #roomTitle { color: #254e50; }
+body.lan-mode:not(.table-live) .lobby-card :is(.badge.self, .badge.online) { color: #216343; }
+body.lan-mode:not(.table-live) .lobby-card .badge.offline { color: #a12d40; }
+body.lan-mode:not(.table-live) .lobby-card .badge.vacant-label { color: #52645f; }
+/* Vacant disabled cards already fade as a whole; compensate with darker ink. */
+body.lan-mode:not(.table-live) .lobby-card .seat-choice.vacant:disabled :is(strong, .badge.vacant-label) { color: #182a26; }
+body.lan-mode:not(.table-live) .lobby-card input:not([type="checkbox"]):not([type="range"]) { color: #fff5e2; }
+body.lan-mode:not(.table-live) .lobby-card input::placeholder { color: #bdd3c8; }
+body.lan-mode:not(.table-live) :is(.topbar, .lobby-card) .ghost:not(:disabled) { color: #fff5e2; }
+body.lan-mode:not(.table-live) .topbar { color: #fff5e2; }
+body.lan-mode:not(.table-live) .topbar :is(.mode-label, .connection-status, .settings-panel label, .settings-panel small) { color: #d2e5da; }
+body.lan-mode:not(.table-live) .topbar .connection-status[data-connection="online"] { color: #b3eaca; }
+body.lan-mode:not(.table-live) .topbar .connection-status[data-connection="offline"],
+body.lan-mode:not(.table-live) .topbar .quiet-danger:not(:disabled) { color: #ffc2b3; }
+body.lan-mode:not(.table-live) .topbar .connection-status[data-connection="waiting"] { color: #f4d59a; }
+
+/* Room scoring is selected at creation and is fixed for the match. */
+body.lan-mode:not(.table-live) #roomBaseScore { width:100%; color:#f7f4e8; background:#29483f; border:1px solid #688578; border-radius:8px; padding:8px; font:inherit; }
+body.lan-mode:not(.table-live) #roomScoreMode { color:#365653; font-weight:700; }
+body.lan-mode:not(.table-live) label[for="roomBaseScore"] { margin:0; color:#365653; }
