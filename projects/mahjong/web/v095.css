@@ -15,7 +15,7 @@ body.table-live .cuboid-active .player>.player-head,body.table-live .cuboid-acti
  .cuboid-active .scene-controls{gap:3px!important}
 }
 
-/* v0.10.2: match each action target to the rendered wall's vertical silhouette. */
+/* v1.0.0: match each action target to the rendered wall's vertical silhouette. */
 body.table-live .cuboid-active .decision-row .action-btn {
   box-sizing: border-box;
   width: var(--wall-action-width, 53px) !important;
@@ -28,3 +28,91 @@ body.table-live .cuboid-active .decision-row .action-btn {
   white-space: normal;
   overflow-wrap: anywhere;
 }
+
+/* v1.0.0 typography: scale against the projected south-hand tile, not the
+   viewport. Existing backgrounds, button silhouettes and table geometry stay. */
+body.table-live .cuboid-active .decision-row .action-btn {
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  gap:2px;padding:3px 5px!important;line-height:1;
+}
+.cuboid-active .action-word {
+  display:block;flex:none;white-space:nowrap;line-height:1.05;
+  font-family:KaiTi,"Kaiti SC",STKaiti,"Noto Serif CJK SC",var(--title-font);
+  font-weight:900;letter-spacing:0;
+  font-size:min(calc(var(--ui-tile,88px)*.94),calc(var(--wall-action-height,39px)*.79));
+}
+.cuboid-active .action-word[data-length="2"] {
+  font-size:min(calc(var(--ui-tile,88px)*.77),calc((var(--wall-action-width,53px) - 12px)*.46),calc(var(--wall-action-height,39px)*.79));
+}
+.cuboid-active .action-word[data-length="3"] {
+  font-size:min(calc(var(--ui-tile,88px)*.58),calc((var(--wall-action-width,53px) - 12px)*.31),calc(var(--wall-action-height,39px)*.79));
+}
+.cuboid-active .action-btn.hu .action-word {
+  font-size:min(calc(var(--ui-tile,88px)*1.12),calc(var(--wall-action-height,39px)*.89));
+}
+.cuboid-active .action-btn:has(.action-detail) .action-word {
+  font-size:min(calc(var(--ui-tile,88px)*.58),calc((var(--wall-action-width,53px) - 12px)*.45),calc(var(--wall-action-height,39px)*.47));
+}
+.cuboid-active .action-btn:has(.action-detail) .action-word[data-length="3"] {
+  font-size:min(calc(var(--ui-tile,88px)*.52),calc((var(--wall-action-width,53px) - 12px)*.30),calc(var(--wall-action-height,39px)*.47));
+}
+.cuboid-active .action-detail {
+  display:block;max-width:100%;min-width:0;white-space:normal;overflow-wrap:anywhere;
+  font-size:min(calc(var(--ui-tile,88px)*.23),calc(var(--wall-action-height,39px)*.20));
+  font-weight:700;line-height:1.12;text-align:center;
+}
+/* The side cells are narrow: stack the wind and score instead of letting
+   larger numerals push the centre round/remaining-count out of its cell. */
+.cuboid-active .cuboid-center-info {
+  grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,1fr);
+  grid-template-rows:minmax(0,1fr) minmax(0,1.8fr) minmax(0,1fr);
+}
+.cuboid-active .center-wind {gap:3px;padding:0 2px;max-width:100%;min-width:0;line-height:1.05}
+.cuboid-active .center-wind:is(.west,.east){flex-direction:column;gap:1px}
+.cuboid-active .center-wind b{font-size:calc(var(--ui-tile,88px)*.34);line-height:1.04}
+.cuboid-active .center-wind span{font-size:calc(var(--ui-tile,88px)*.28);font-weight:750;line-height:1.04}
+.cuboid-active .center-round{font-size:calc(var(--ui-tile,88px)*.29);line-height:1.04;gap:1px;white-space:nowrap}
+.cuboid-active .center-round b{font-size:calc(var(--ui-tile,88px)*.32);line-height:1.04}
+.cuboid-active .cuboid-die{font-size:calc(var(--ui-tile,88px)*.28)}
+.cuboid-active .cuboid-gold{font-size:calc(var(--ui-tile,88px)*.26)}
+body.table-live .cuboid-active .player-head .player-identity strong{font-size:calc(var(--ui-tile,88px)*.23)!important;max-width:8ch;line-height:1.1}
+body.table-live .cuboid-active .player-head .player-badges{max-width:140px;gap:2px}
+body.table-live .cuboid-active .player-head .player-badges .badge{font-size:calc(var(--ui-tile,88px)*.17)!important;line-height:1.25;padding:1px 3px}
+body.table-live .cuboid-active .seat-avatar b{font-size:calc(var(--ui-tile,88px)*.19);line-height:1.05}
+body.table-live .cuboid-active .dock-tools :is(button,summary){font-size:calc(var(--ui-tile,88px)*.27);line-height:1.15;min-height:34px;padding:3px 5px;white-space:nowrap}
+body.table-live .cuboid-active .dock-tools .seat-tools{justify-content:center;max-width:100%;gap:4px}
+body.table-live .cuboid-active .dock-tools .orphan-toggle{font-size:calc(var(--ui-tile,88px)*.20)}
+body.table-live .cuboid-active .decision-row .cuboid-action-prompt{font-size:calc(var(--ui-tile,88px)*.35)}
+body.table-live .cuboid-active .wait-caption{font-size:calc(var(--ui-tile,88px)*.24);min-width:0;flex:0 1 auto}
+body.table-live .cuboid-active .wait-caption span{font-size:calc(var(--ui-tile,88px)*.19);overflow-wrap:anywhere}
+body.table-live .cuboid-active .wait-choice{font-size:calc(var(--ui-tile,88px)*.19)}
+body.table-live .cuboid-active .wait-choice small{font-size:calc(var(--ui-tile,88px)*.17)}
+body.table-live .cuboid-active .wait-choices{min-width:0;flex:1 1 auto;flex-wrap:nowrap!important;max-width:100%!important}
+body.table-live:has(.cuboid-active) .round-controls :is(button,summary),body.table-live:has(.cuboid-active) .cuboid-home{font-size:14px!important;line-height:1.15}
+body.table-live:has(.cuboid-active) .connection-status{font-size:13px!important}
+body.table-live .cuboid-active .scene-controls .ghost{font-size:14px!important;line-height:1.15}
+@media(max-height:480px) and (orientation:landscape){
+ body.table-live:has(.cuboid-active) .round-controls :is(button,summary),body.table-live:has(.cuboid-active) .cuboid-home,body.table-live .cuboid-active .scene-controls .ghost{font-size:12px!important}
+ body.table-live:has(.cuboid-active) .connection-status{font-size:11px!important}
+}
+
+/* Long signed scores must fit even in the narrow east/west cells. */
+.cuboid-active .center-wind span{font-size:min(calc(var(--ui-tile,88px)*.28),calc(var(--ui-tile,88px)*1.20 / var(--score-chars,1)))}
+.cuboid-active .center-wind:is(.north,.south) span{font-size:min(calc(var(--ui-tile,88px)*.28),calc(var(--ui-tile,88px)*1.70 / var(--score-chars,1)))}
+.cuboid-active .pickup-detail{display:grid;gap:0;line-height:1.05;font-size:min(calc(var(--ui-tile,88px)*.21),calc((var(--wall-action-width,53px) - 12px)*.135),calc(var(--wall-action-height,39px)*.19))}
+.cuboid-active .pickup-detail>span{white-space:nowrap}
+/* Keep the enlarged wait preview compact; a long list scrolls horizontally,
+   and a long pattern list scrolls within the panel rather than covering scores. */
+body.table-live .cuboid-active .decision-row .wait-hint{
+  width:max-content!important;max-width:min(100%,520px)!important;
+  max-height:90px!important;align-items:flex-start;overflow:auto;
+  box-sizing:border-box;flex:0 1 auto;
+}
+body.table-live .cuboid-active .wait-caption{flex:0 0 auto;max-width:42%;white-space:nowrap}
+body.table-live .cuboid-active .wait-caption .wait-patterns{white-space:normal;overflow-wrap:anywhere}
+body.table-live .cuboid-active .wait-choices{align-self:center}
+
+/* Round payment detail stays in the existing scrollable detail panel. */
+.score-detail { margin:8px 0; max-width:100%; overflow-x:auto; }
+.score-detail table { border-collapse:collapse; width:100%; font-size:inherit; font-variant-numeric:tabular-nums; }
+.score-detail th,.score-detail td { text-align:right; padding:3px 4px; white-space:nowrap; border-bottom:1px solid #789a8c55; }

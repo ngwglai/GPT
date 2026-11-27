@@ -107,5 +107,5 @@ if __name__ == '__main__':
     parser.add_argument('--foreground', action='store_true', help='Keep all four clients executing/rendering throughout each round')
     parser.add_argument('--delay', type=float, default=.01, help='Use .24 for normal production pacing')
     parser.add_argument('--rounds', type=int, default=8)
-    parser.add_argument('--output', type=Path, default=Path('validation/v0.10.1/soak.json'))
+    parser.add_argument('--output', type=Path, default=Path('validation/v1.0.0/soak.json'))
     asyncio.run(main(parser.parse_args()))

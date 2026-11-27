@@ -16,7 +16,7 @@ import socket
 import time
 
 from aiohttp import web, WSMsgType
-from mahjong import Seat, IllegalAction, __version__
+from mahjong import Seat, IllegalAction, ScoreConfig, __version__
 from mahjong.game.autoplay import AutoRunner
 from web_server import LocalTable, WEB_ROOT
 
@@ -63,8 +63,9 @@ class Member:
 
 
 class Room:
-    def __init__(self, code):
+    def __init__(self, code, base_score=1):
         self.code = code
+        self.base_score = ScoreConfig(base_score).base_ping_hu
         self.members: dict[str, Member] = {}
         self.host_id = None
         self.table: LocalTable | None = None
@@ -122,7 +123,7 @@ class Room:
             }
         return {'type': 'state', 'room_version': self.version,
                 'room': {'code': self.code, 'started': self.table is not None,
-                         'host_id': self.host_id, 'members': roster},
+                         'host_id': self.host_id, 'members': roster, 'base_score': self.base_score},
                 'you': {'member_id': member.member_id, 'seat': member.seat},
                 'controls': {
                     'can_start': self.table is None and member.member_id == self.host_id and
@@ -151,7 +152,7 @@ class Room:
             fields(data, ('type',))
             if not self.view(member)['controls']['can_start']:
                 raise ClientError('需要四位玩家在线并入座，由房主开始。')
-            self.table = LocalTable()
+            self.table = LocalTable(base_score=self.base_score)
             self.ai = AutoRunner(self.table, self.lock, self.publish_ai)
         elif kind == 'action':
             fields(data, ('type', 'intent'))
@@ -243,8 +244,10 @@ async def boundary(request, handler):
 
 async def create_room(request):
     data = await request.json()
-    fields(data, ('nickname',))
+    if not isinstance(data, dict) or 'nickname' not in data or set(data) - {'nickname', 'base_score'}:
+        raise ClientError('请求字段不正确，请刷新后重试。')
     name = nickname(data['nickname'])
+    base_score = ScoreConfig(data.get('base_score', 1)).base_ping_hu
     rooms = request.app[ROOMS]
     if len(rooms) >= 128:
         raise ClientError('临时房间已满，请稍后再试。')
@@ -252,7 +255,7 @@ async def create_room(request):
     code = ''.join(secrets.choice(alphabet) for _ in range(6))
     while code in rooms:
         code = ''.join(secrets.choice(alphabet) for _ in range(6))
-    room = rooms[code] = Room(code)
+    room = rooms[code] = Room(code, base_score)
     member = room.join(name)
     return web.json_response({'ok': True, 'room_code': code, 'session_token': member.token})
 
@@ -366,12 +369,13 @@ async def local_api(request):
         else:
             data = await request.json()
             if request.path == '/api/new-round':
-                if not isinstance(data, dict) or set(data) - {'seed', 'dealer'}:
+                if not isinstance(data, dict) or set(data) - {'seed', 'dealer', 'base_score'}:
                     raise ClientError('unexpected fields')
                 dealer = data.get('dealer', 0)
                 if type(dealer) is not int or dealer not in range(4):
                     raise ClientError('dealer must be 0..3')
-                result = table.new_round(seed=seed_value(data.get('seed')), dealer=Seat(dealer))
+                base_score = ScoreConfig(data['base_score']).base_ping_hu if 'base_score' in data else None
+                result = table.new_round(seed=seed_value(data.get('seed')), dealer=Seat(dealer), base_score=base_score)
             elif request.path == '/api/next-round':
                 if not isinstance(data, dict) or set(data) - {'seed'}:
                     raise ClientError('unexpected fields')

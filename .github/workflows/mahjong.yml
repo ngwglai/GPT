@@ -101,19 +101,22 @@ jobs:
         run: |
           python -m tests.browser_acceptance --chromium /usr/bin/google-chrome
           python -m tests.v101_scene_acceptance --chromium /usr/bin/google-chrome
-          python tools/performance_regression.py --chromium /usr/bin/google-chrome --samples 1 --iterations 24 --output validation/v0.10.1/ci-performance.json
-          python -m tests.soak_acceptance --chromium /usr/bin/google-chrome --rounds 4 --output validation/v0.10.1/ci-soak.json
-          python -m tests.soak_acceptance --chromium /usr/bin/google-chrome --foreground --delay .12 --rounds 2 --output validation/v0.10.1/ci-tabs.json
+          python -m tests.scoring_browser_acceptance --chromium /usr/bin/google-chrome
+          python tools/performance_regression.py --chromium /usr/bin/google-chrome --samples 1 --iterations 24 --output validation/v1.0.0/ci-performance.json
+          python -m tests.soak_acceptance --chromium /usr/bin/google-chrome --rounds 4 --output validation/v1.0.0/ci-soak.json
+          python -m tests.soak_acceptance --chromium /usr/bin/google-chrome --foreground --delay .12 --rounds 2 --output validation/v1.0.0/ci-tabs.json
       - name: Chromium acceptance (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $chrome = "$env:ProgramFiles\Google\Chrome\Application\chrome.exe"
-          python -m tests.browser_acceptance --chromium $chrome --screenshots validation/v0.10.1/windows-browser
+          python -m tests.browser_acceptance --chromium $chrome --screenshots validation/v1.0.0/windows-browser
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -m tests.v101_scene_acceptance --chromium $chrome
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/performance_regression.py --chromium $chrome --samples 1 --iterations 24 --viewports desktop,phone-landscape --output validation/v0.10.1/ci-performance.json
+          python -m tests.scoring_browser_acceptance --chromium $chrome
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/performance_regression.py --chromium $chrome --samples 1 --iterations 24 --viewports desktop,phone-landscape --output validation/v1.0.0/ci-performance.json
       - name: Windows batch launchers
         if: runner.os == 'Windows'
         shell: pwsh
@@ -186,12 +189,12 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $archive = Join-Path $env:RUNNER_TEMP 'QingqueMahjong_v0.10.1.zip'
+          $archive = Join-Path $env:RUNNER_TEMP "QingqueMahjong_v${env:MAHJONG_VERSION}.zip"
           python tools/package_release.py --output $archive
           if ($LASTEXITCODE -ne 0) { throw 'Portable build failed' }
           $folder = Join-Path $env:RUNNER_TEMP 'mahjong portable 中文'
           Expand-Archive $archive $folder
-          $project = Join-Path $folder 'QingqueMahjong_v0.10.1'
+          $project = Join-Path $folder "QingqueMahjong_v$env:MAHJONG_VERSION"
           $embedded = Join-Path $project 'runtime/python.exe'
           Push-Location $project
           try {
@@ -248,12 +251,12 @@ jobs:
         with:
           name: mahjong-validation-${{ matrix.os }}
           path: |
-            projects/mahjong/validation/v0.10.1/ci-*.json
-            projects/mahjong/validation/v0.10.1/windows-browser/*.png
+            projects/mahjong/validation/v1.0.0/ci-*.json
+            projects/mahjong/validation/v1.0.0/windows-browser/*.png
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: runner.os == 'Windows'
         with:
           name: mahjong-windows-portable
           path: |
-            ${{ runner.temp }}/QingqueMahjong_v0.10.1.zip
-            ${{ runner.temp }}/QingqueMahjong_v0.10.1.sha256
+            ${{ runner.temp }}/QingqueMahjong_v${{ env.MAHJONG_VERSION }}.zip
+            ${{ runner.temp }}/QingqueMahjong_v${{ env.MAHJONG_VERSION }}.sha256

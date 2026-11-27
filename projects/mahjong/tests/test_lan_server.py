@@ -56,8 +56,8 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         await ws.send_json({'type': 'authenticate', 'session_token': credential['session_token']})
         return ws
 
-    async def setup_room(self, start=True):
-        first = await self.post('/api/rooms', {'nickname': '玩家东'})
+    async def setup_room(self, start=True, base_score=1):
+        first = await self.post('/api/rooms', {'nickname': '玩家东', 'base_score': base_score})
         self.code = first['room_code']
         self.room = self.app[ROOMS][self.code]
         self.credentials = [first]
@@ -151,6 +151,35 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         await self.reject(0, {'type': 'choose_seat', 'seat': 1})
         await self.post('/api/rooms/join', {'room_code': self.code, 'nickname': '新人'}, 400)
         self.assert_private()
+
+    async def test_five_point_room_score_and_next_round(self):
+        await self.setup_room(start=False, base_score=5)
+        self.assertTrue(all(v['room']['base_score'] == 5 for v in self.views.values()))
+        await self.clients[0].send_json({'type':'start'})
+        await self.all_states(lambda m: m['player_view'] is not None)
+        self.assertTrue(all(v['player_view']['match']['scoring']['base_score'] == 5 for v in self.views.values()))
+        from tests.test_gold import WAIT
+        await self.fixture({S:PlayerFixture(WAIT, declared=True), W:PlayerFixture([3,4,5,12,13,14,21,22,23,28,28,28,31], declared=True)}, gold=33, discard=(E,31))
+        await self.act(2,'HU')
+        await self.act(1,'HU')
+        expected = {'0':'-15','1':'20','2':'0','3':'-5'}
+        for v in self.views.values():
+            self.assertEqual(v['player_view']['match']['scoring']['totals'], expected)
+            self.assertEqual(v['player_view']['result']['settlement']['items']['other_hu'], [2])
+        self.assert_private()
+        old = self.views[0]['player_view']
+        await self.clients[0].send_json({'type':'next_round','round_id':old['round_id'],'revision':old['revision']})
+        await self.all_states(lambda m: m['player_view']['round_id'] != old['round_id'])
+        for v in self.views.values():
+            self.assertEqual(v['player_view']['match']['scoring']['totals'], expected)
+            self.assertEqual(v['player_view']['match']['scoring']['base_score'], 5)
+
+    async def test_invalid_base_scores_at_http_boundary(self):
+        for base in (0, 2, True, '5', None):
+            await self.post('/api/rooms', {'nickname':'玩家','base_score':base}, 400)
+            await self.post('/api/new-round', {'base_score':base}, 400)
+        result = await self.post('/api/new-round', {'base_score':5})
+        self.assertEqual(result['table']['match']['scoring']['base_score'], 5)
 
     async def test_invalid_session_and_missing_room(self):
         c = await self.post('/api/rooms', {'nickname': '房主'})

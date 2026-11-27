@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import Enum, auto
-from typing import Callable
 
 from ..core.seat import Seat
+from ..core.player import MeldType
 
 
 class HuEffect(Enum):
@@ -14,90 +14,73 @@ class HuEffect(Enum):
 
 class SettlementMode(Enum):
     NORMAL = auto()
-    MINIMUM_PING_HU = auto()
 
 
-@dataclass
+@dataclass(frozen=True)
 class ScoreConfig:
-    # None means unconfirmed, NOT zero and NOT a silently chosen house rule.
-    base_ping_hu: Decimal | None = None
-    shelf_bonus: Decimal | None = None
-    dealer_multiplier: Decimal | None = None
-    discard_multiplier: Decimal | None = None
-    self_draw_multiplier: Decimal | None = None
-    dealer_scope: str | None = None  # WINNER_ONLY or EITHER_PARTY
-    self_draw_payment: str | None = None  # EACH_OPPONENT
-    effect_bonus: dict[HuEffect, Decimal] = field(default_factory=dict)
+    """The only selectable scoring rule is the match's base (1 or 5)."""
+    base_ping_hu: int = 1
 
     def __post_init__(self):
-        for name in ("base_ping_hu", "shelf_bonus", "dealer_multiplier", "discard_multiplier", "self_draw_multiplier"):
-            value = getattr(self, name)
-            if value is not None:
-                value = Decimal(str(value))
-                if not value.is_finite() or value < 0:
-                    raise ValueError("score amounts must be finite and nonnegative")
-                setattr(self, name, value)
-        self.effect_bonus = {k: Decimal(str(v)) for k, v in self.effect_bonus.items()}
-        if any(not v.is_finite() or v < 0 for v in self.effect_bonus.values()):
-            raise ValueError("effect bonus must be finite and nonnegative")
-        if self.dealer_scope not in {None, "WINNER_ONLY", "EITHER_PARTY"}:
-            raise ValueError("invalid dealer scope")
-        if self.self_draw_payment not in {None, "EACH_OPPONENT"}:
-            raise ValueError("unsupported self-draw payment; install a custom ScoreEngine")
+        if type(self.base_ping_hu) is not int or self.base_ping_hu not in (1, 5):
+            raise ValueError("基础分必须为1或5")
 
 
 @dataclass
 class Settlement:
     mode: SettlementMode
-    status: str  # CALCULATED or PENDING_CONFIGURATION
+    status: str
     transfers: dict[Seat, Decimal] = field(default_factory=dict)
     missing: tuple[str, ...] = ()
     items: dict = field(default_factory=dict)
 
 
 class ScoreEngine:
-    """Reference policy: winner's shelf bonus, additives then multipliers.
+    """Settle all directed payments at round end, independently of hand shape.
 
-    An unconfigured table still completes the round, with a pending quote.
-    Override settle for independent shelf payments, gang fees or other rules.
+    Only the first-priority accepted HU receives base/shelf/discard payments.
+    Other players who actually submitted HU are exempt from base/shelf payments
+    to that winner, but all completed gangs are paid by all three opponents.
     """
 
     def __init__(self, config: ScoreConfig | None = None):
         self.config = config or ScoreConfig()
-        self.additive_hooks: list[Callable] = []
-        self.multiplier_hooks: list[Callable] = []
 
-    def settle(self, state, winner: Seat | None, source: Seat | None, effects: tuple[HuEffect, ...]) -> Settlement:
-        minimum = source is not None and state.players[source].is_declared_ting and HuEffect.QIANG_GANG_HU not in effects
-        mode = SettlementMode.MINIMUM_PING_HU if minimum else SettlementMode.NORMAL
-        if winner is None:
-            # Draw-time shelf/gang payments have not been specified either.
-            return Settlement(mode, "PENDING_CONFIGURATION", missing=("draw_settlement_policy",))
-        c = self.config
-        required = ["base_ping_hu"]
-        if not minimum:
-            required += ["shelf_bonus", "dealer_multiplier", "dealer_scope"]
-            required += ["discard_multiplier"] if source is not None else ["self_draw_multiplier", "self_draw_payment"]
-        missing = tuple(name for name in required if getattr(c, name) is None)
-        if missing:
-            return Settlement(mode, "PENDING_CONFIGURATION", missing=missing)
-        payers = [source] if source is not None else [seat for seat in Seat if seat != winner]
+    def settle(self, state, winner: Seat | None, source: Seat | None,
+               effects: tuple[HuEffect, ...], *, other_hu: tuple[Seat, ...] = ()) -> Settlement:
+        base = self.config.base_ping_hu
+        exempt = set(other_hu)
+        if (winner is None and (source is not None or exempt)) or (
+            winner is not None and (source == winner or winner in exempt or source in exempt
+                                    or (source is None and exempt))
+        ) or not exempt.issubset(set(Seat)):
+            raise ValueError("invalid settlement participants")
         transfers = {seat: Decimal(0) for seat in Seat}
-        subtotal = c.base_ping_hu
-        if not minimum:
-            subtotal += c.shelf_bonus * state.players[winner].shelf_count
-            subtotal += sum((c.effect_bonus.get(e, Decimal(0)) for e in effects), Decimal(0))
-            subtotal += sum((Decimal(str(h(state, winner, source, effects))) for h in self.additive_hooks), Decimal(0))
-        for payer in payers:
-            amount = subtotal
-            if not minimum:
-                amount *= c.discard_multiplier if source is not None else c.self_draw_multiplier
-                if winner == state.dealer or (c.dealer_scope == "EITHER_PARTY" and payer == state.dealer):
-                    amount *= c.dealer_multiplier
-                for hook in self.multiplier_hooks:
-                    amount *= Decimal(str(hook(state, winner, payer, effects)))
-            if not amount.is_finite() or amount < 0:
-                raise ValueError("invalid score hook result")
-            transfers[payer] -= amount
-            transfers[winner] += amount
-        return Settlement(mode, "CALCULATED", transfers, items={"subtotal": str(subtotal), "override": minimum})
+        payments = []
+        matrix = [[0 for _ in Seat] for _ in Seat]
+        for receiver in Seat:
+            player = state.players[receiver]
+            open_gangs = sum(m.type in (MeldType.MING_GANG, MeldType.BU_GANG) for m in player.melds)
+            concealed_gangs = sum(m.type == MeldType.AN_GANG for m in player.melds)
+            for payer in Seat:
+                if payer == receiver:
+                    continue
+                hu_payment = receiver == winner and payer not in exempt
+                basic = base * (2 if source is None else 1) * (
+                    2 if state.dealer in (payer, receiver) else 1) if hu_payment else 0
+                gold = 5 * player.shelf_count if hu_payment else 0
+                discard = 5 if hu_payment and payer == source else 0
+                gang_open, gang_concealed = open_gangs, 2 * concealed_gangs
+                amount = basic + gold + gang_open + gang_concealed + discard
+                matrix[int(payer)][int(receiver)] = amount
+                if amount:
+                    transfers[payer] -= amount
+                    transfers[receiver] += amount
+                    payments.append(dict(payer=int(payer), receiver=int(receiver), base=basic,
+                                         gold=gold, open_gang=gang_open, concealed_gang=gang_concealed,
+                                         discard=discard, total=amount))
+        assert sum(transfers.values()) == 0
+        return Settlement(SettlementMode.NORMAL, "CALCULATED", transfers, items={
+            "base_score": base, "other_hu": sorted(map(int, exempt)),
+            "matrix": matrix, "payments": payments,
+        })

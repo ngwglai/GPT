@@ -1,6 +1,6 @@
 """Repeatable real-HTTP UI benchmark. Never represents physical-device testing.
 
-python tools/performance_regression.py --output validation/v0.10.1/chromium.json
+python tools/performance_regression.py --output validation/v1.0.0/chromium.json
 python tools/performance_regression.py --base-url http://127.0.0.1:8766 --baseline --output baseline.json
 Use identical options, host and browser for both versions; run them sequentially.
 """
@@ -212,7 +212,7 @@ def main():
     parser.add_argument('--max-paint-ms', type=float, default=350, help='Two-rAF wall time proxy, not physical display latency')
     parser.add_argument('--baseline', action='store_true')
     parser.add_argument('--screenshots', action='store_true')
-    parser.add_argument('--output', type=Path, default=ROOT/'validation/v0.10.1/performance.json')
+    parser.add_argument('--output', type=Path, default=ROOT/'validation/v1.0.0/performance.json')
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     server = None

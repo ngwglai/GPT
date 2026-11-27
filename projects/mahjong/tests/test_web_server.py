@@ -31,7 +31,7 @@ class WebServerBoundaryTests(unittest.TestCase):
             "round_id": snap["round_id"], "revision": snap["revision"],
             "type": "HU", "tile_ids": [],
         })
-        expected = {"0": "6", "1": "-2", "2": "-2", "3": "-2"}
+        expected = {"0": "12", "1": "-4", "2": "-4", "3": "-4"}
         self.assertEqual(result["match"]["scoring"]["totals"], expected)
         self.assertEqual(table.scoring_view()["totals"], expected)
         self.assertEqual(table.next_round(seed=43)["match"]["scoring"]["totals"], expected)
@@ -198,8 +198,15 @@ class WebServerBoundaryTests(unittest.TestCase):
         self.assertEqual(set(snap["match"]["scoring"]["totals"]), {"0", "1", "2", "3"})
         config = LocalTable(seed=42).engine.scoring.config
         self.assertEqual(str(config.base_ping_hu), "1")
-        self.assertEqual(str(config.shelf_bonus), "1")
-        self.assertEqual(str(config.dealer_multiplier), "2")
+        self.assertEqual(snap["match"]["scoring"]["base_score"], 1)
+
+    def test_base_mode_persists_and_reset_clears_totals(self):
+        table = LocalTable(seed=42, base_score=5)
+        self.assertEqual(table.scoring_view()["base_score"], 5)
+        table.engine._end_draw("TEST")
+        self.assertEqual(table.next_round(seed=43)["match"]["scoring"]["base_score"], 5)
+        self.assertEqual(table.new_round(seed=44, base_score=1)["match"]["scoring"]["base_score"], 1)
+        with self.assertRaises(ValueError): table.new_round(base_score=3)
 
 
 if __name__ == "__main__":

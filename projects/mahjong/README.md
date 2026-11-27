@@ -1,14 +1,18 @@
-# 青雀麻将 v0.10.1
+# 青雀麻将 v1.0.0
 
-以用户提供的 v0.10.0 完整包为开发基准，整合仓库 v0.8.0 及其全部麻将历史分支。按状态变化重绘、复用投影底图和存活牌 Canvas，取消运行时 PNG 编解码循环，按显示尺寸选择栅格分辨率。45°桌面、30°手牌、1.4:1 近远宽比、12条圆棱与8个圆角、六筒分组间距均保留；仅重新绘制八条牌面。
+青雀麻将支持四家明牌练习、AI 托管和局域网四人联机。v1.0.0 是正式版本，项目进入维护阶段，后续处理缺陷和兼容性问题。版本变更见 [Web 变更记录](WEB_CHANGELOG.txt)。
 
-[调查、实测对比及限制](PERFORMANCE-v0.10.1.md) · [自动化性能工具](tools/performance_regression.py) · [八局四窗口冻结恢复测试](tests/soak_acceptance.py)
+## 正式计分
 
-**Windows 便携包**：从 Release 下载 ZIP 并完整解压，双击 `启动网页版.bat`；联机双击 `启动局域网联机.bat`。Release 包内置 Python 与依赖，首次启动可离线。源码 checkout 没有 `runtime/` 时，原有脚本仍自动创建 `.venv` 并安装依赖，需要已安装 Python 3.11+ 及软件源访问。运行时保持服务器窗口开启。Windows x64 打包命令：`python tools/package_release.py --output /path/QingqueMahjong_v0.10.1.zip`；构建时需联网，包中记录运行库及 wheel 校验值。
+单机可在「牌局」菜单中重置整场时选 1 分或 5 分作为基础分。联机由房主在创建房间时选择，整场固定。对局结束后可在「详情」查看各家支付明细，下一局承接累计分。完整计分和同响顺位见 [计分规则](SCORING-RULES.md)。
 
-手机横竖屏、平板、Chromium/Firefox/WebKit 的测试采用云端浏览器和视口模拟。真实 iOS/Android 设备的稳定性尚未验证，详见实测报告；不声称手机进程重载已被完全解决。
+Windows x64 便携包内置 Python 与依赖。完整解压后双击 `启动网页版.bat`，联机时双击 `启动局域网联机.bat`。首次启动可离线。源码版启动方式见下文；自行构建便携包时执行 `python tools/package_release.py --output /path/QingqueMahjong_v1.0.0.zip`，构建需要联网。
+
+浏览器验收使用视口模拟。真实 iOS 与 Android 设备仍待验证。既有渲染性能测量及限制见 [v0.10.1 历史报告](PERFORMANCE-v0.10.1.md)。
 
 ## 历史渲染记录
+
+v0.10.1 采用按状态变化重绘、复用投影底图和存活牌 Canvas、按显示尺寸选择栅格分辨率的实现，并更新八条牌面。桌面采用 45° 视角，南家手牌采用独立 30° 投影。
 
 v0.10.0 首次采用逐牌位图精灵，详见 [当时的设计与测试说明](V0.10.0-DESIGN-AND-TESTS.md)。以下版本段落用于历史对照，当前渲染入口为 `web/cuboid-scene.js`。
 
@@ -139,10 +143,11 @@ python -m pip install playwright==1.62.0
 python -m playwright install chromium firefox webkit
 python -m tests.browser_acceptance --chromium /path/to/chromium
 python -m tests.v101_scene_acceptance --chromium /path/to/chromium
+python -m tests.scoring_browser_acceptance --chromium /path/to/chromium
 python -m tests.soak_acceptance --chromium /path/to/chromium --rounds 8
-python tools/performance_regression.py --chromium /path/to/chromium --screenshots --output validation/v0.10.1/current.json
-python tools/performance_regression.py --engine firefox --samples 1 --output validation/v0.10.1/firefox.json
-python tools/performance_regression.py --engine webkit --samples 1 --output validation/v0.10.1/webkit.json
+python tools/performance_regression.py --chromium /path/to/chromium --screenshots --output validation/v1.0.0/current.json
+python tools/performance_regression.py --engine firefox --samples 1 --output validation/v1.0.0/firefox.json
+python tools/performance_regression.py --engine webkit --samples 1 --output validation/v1.0.0/webkit.json
 node tests/v094_cuboid.cjs
 node tests/v095_fit.cjs
 node tests/v098_perspective.cjs
@@ -152,7 +157,7 @@ python -m tools.run_ai_matches --output ai-matches.json
 
 性能工具不指定 `--base-url` 时会自行启动并清理独立服务。对原 v0.10.0 服务使用相同命令加 `--base-url http://127.0.0.1:8766 --baseline`，两版依次运行，避免其他浏览器负载；默认三次样本、四种视口、36次真实合法HTTP动作；`--scenario stress` 另测固定视角、可超过136张牌的合成栅格压力，不能当成真实对局；每个样本启动独立浏览器，每次等待牌图解码并取得两个 rAF 回调。`--cpu-rate 4` 仅为 Chromium CPU 节流，不等同于真实低端设备。`--max-update-ms` 为更新 p95 门禁，默认180ms；双 rAF 墙钟代理的 p95 门禁为350ms（包含自动化与软件渲染开销，不等于物理显示延迟）。同时检查缓存上限、存活像素、节点数量、未变化状态不重建及脚本/崩溃错误。完整时延和失败记录写入 JSON。冻结恢复测试加速服务端节奏，但不替换规则或 AI 决策；加 `--foreground --delay .24` 可测持续执行的四窗口及正常生产节奏。
 
-`scene_acceptance`、`wall_browser_acceptance`、`layout_browser_acceptance`、`match_browser_acceptance` 保留 v0.8 的历史视觉断言，不能作为当前版本验收。当前 CI 使用已迁移的完整 `browser_acceptance`、新场景身份/暗牌检查、性能工具和多局冻结恢复测试。预烘焙资源可用 `CHROMIUM_PATH=/path/to/chromium python tools/bake_tile_sprites.py` 重建。
+`scene_acceptance`、`wall_browser_acceptance`、`layout_browser_acceptance`、`match_browser_acceptance` 保留 v0.8 的历史视觉断言，不能作为当前版本验收。当前 CI 使用已迁移的完整 `browser_acceptance`、新场景身份与暗牌检查、计分浏览器验收、性能工具和多局冻结恢复测试。预烘焙资源可用 `CHROMIUM_PATH=/path/to/chromium python tools/bake_tile_sprites.py` 重建。
 
 命令行引擎可用 `python -m mahjong demo --seed 42 --rounds 3` 试跑。
 

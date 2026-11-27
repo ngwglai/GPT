@@ -26,6 +26,8 @@ class ResponseTests(unittest.TestCase):
         self.assertEqual(e.state.phase,GamePhase.WAITING_FOR_RESPONSES)
         play(e,choose(e,S,ActionType.HU))
         self.assertEqual(e.state.result.winner,S)
+        self.assertEqual(e.state.result.settlement.items["other_hu"], [int(W)])
+        self.assertEqual(e.state.result.settlement.transfers, {E:-7,S:8,W:0,N:-1})
         self.assertEqual(len(e.state.players[W].concealed_tiles),13)
         e.assert_invariants()
 
@@ -34,6 +36,7 @@ class ResponseTests(unittest.TestCase):
         play(e,choose(e,W,ActionType.HU))
         play(e,choose(e,S,ActionType.PASS))
         self.assertEqual(e.state.result.winner,W)
+        self.assertEqual(e.state.result.settlement.transfers[S], -1)
 
     def test_timeout_does_not_discard_submitted_hu(self):
         e=self.fixture_two_winners()

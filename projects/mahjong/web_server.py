@@ -22,22 +22,8 @@ WEB_ROOT = ROOT / "web"
 PLAYER_IDS = {seat: f"local-seat-{int(seat)}" for seat in Seat}
 
 
-def default_score_engine() -> ScoreEngine:
-    """Default reference scoring used by the interactive web/LAN frontends.
-
-    These values are the example defaults documented by the project.  More
-    specific local rules can still replace this ScoreEngine later without
-    changing GameEngine or the clients.
-    """
-    return ScoreEngine(ScoreConfig(
-        base_ping_hu=1,
-        shelf_bonus=1,
-        dealer_multiplier=2,
-        discard_multiplier=1,
-        self_draw_multiplier=1,
-        dealer_scope="EITHER_PARTY",
-        self_draw_payment="EACH_OPPONENT",
-    ))
+def default_score_engine(base_score: int = 1) -> ScoreEngine:
+    return ScoreEngine(ScoreConfig(base_ping_hu=base_score))
 
 
 @dataclass(frozen=True)
@@ -54,11 +40,11 @@ class LocalTable:
 
     The engine still owns each individual round.  This lightweight wrapper only
     carries the few values that must survive between rounds: round number,
-    dealer continuity, previous result, per-round seed history, and a future
-    scoring-total slot.
+    dealer continuity, previous result, per-round seed history, and the
+    cumulative scoring ledger.
     """
 
-    def __init__(self, seed: int | None = None, dealer: Seat = Seat.EAST):
+    def __init__(self, seed: int | None = None, dealer: Seat = Seat.EAST, base_score: int = 1):
         self._lock = threading.RLock()
         self.engine: GameEngine | None = None
         self.service: TableService | None = None
@@ -73,7 +59,7 @@ class LocalTable:
         self.control_generation = {seat: 0 for seat in Seat}
         self.control = {}
         self.decisions = {}
-        self.new_round(seed=seed, dealer=dealer)
+        self.new_round(seed=seed, dealer=dealer, base_score=base_score)
 
     def _choose_seed(self, seed: int | None = None) -> int:
         if seed is not None:
@@ -83,11 +69,13 @@ class LocalTable:
             chosen = secrets.randbits(64)
         return chosen
 
-    def new_round(self, *, seed: int | None = None, dealer: Seat = Seat.EAST) -> dict:
+    def new_round(self, *, seed: int | None = None, dealer: Seat = Seat.EAST, base_score: int | None = None) -> dict:
         """Start a fresh local match.  This is the explicit debug reset path."""
         with self._lock:
             chosen_seed = self._choose_seed(seed)
-            engine = GameEngine(RuleConfig(), score_engine=default_score_engine())
+            if base_score is None:
+                base_score = self.engine.scoring.config.base_ping_hu if self.engine else 1
+            engine = GameEngine(RuleConfig(), score_engine=default_score_engine(base_score))
             engine.start_round(PLAYER_IDS, dealer=dealer, seed=chosen_seed, manual_dice_roll=True)
             self.engine = engine
             self.service = TableService(engine)
@@ -148,10 +136,10 @@ class LocalTable:
             settlement = state.result.settlement if state and state.result else None
             transfers = settlement.transfers if settlement and settlement.status == "CALCULATED" else {}
             pending = self.score_pending or (settlement is not None and settlement.status != "CALCULATED")
-            configured = all(getattr(self.engine.scoring.config, name) is not None
-                             for name in ("base_ping_hu", "shelf_bonus", "dealer_multiplier"))
+            configured = self.engine.scoring.config.base_ping_hu in (1, 5)
             return {
                 "status": "PENDING_CONFIGURATION" if pending or not configured else "READY",
+                "base_score": self.engine.scoring.config.base_ping_hu,
                 "totals": {str(int(seat)): str(value + transfers.get(seat, 0))
                            for seat, value in self.total_scores.items()},
             }
@@ -258,7 +246,7 @@ class LocalTable:
                     "history": list(self.history),
                     "scoring": {
                         **self.scoring_view(),
-                        "note": "已启用示例默认计分；流局附加结算等未定义地方规则仍会标记为待配置。",
+                        "note": "基础分与上金、杠牌、点炮分按本局结束时统一结算。",
                     },
                 },
                 "test_mode": {"all_hands_open": True, "seed": str(self.seed)},
