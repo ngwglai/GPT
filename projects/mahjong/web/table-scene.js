@@ -62,13 +62,17 @@ const MahjongScene = (() => {
     const p=table.players[seat];
     const count=Array.isArray(p.concealed_tiles)?p.concealed_tiles.length:(p.concealed_count||0);
     if (!count) return '';
+    const revealed = table.phase === 'ROUND_END' && Array.isArray(p.concealed_tiles)
+      ? [...p.concealed_tiles].sort((a,b) => a.type-b.type || a.id-b.id) : null;
     const cards = Array.from({length:count}, (_,i) => {
-      const tile = face(null, {back:true, cls:'scene-hand', motion:`opponent-${seat}-${i}`});
+      const type = revealed?.[i]?.type ?? null;
+      const tile = face(type, {back:type==null, gold:type===table.gold_tile_type, cls:'scene-hand',
+        motion:revealed ? `hand-${seat}-${revealed[i].id}` : `opponent-${seat}-${i}`});
       // East/West cells reserve the rotated tile's *visual* dimensions. This
       // prevents a 90-degree transform from making adjacent backs overlap.
       return side === 'east' || side === 'west' ? `<span class="v092-hand-cell">${tile}</span>` : tile;
     }).join('');
-    return `<div class="v09-enemy-hand v09-enemy-${side}" aria-label="${winds[seat]}家暗牌，共${count}张">${cards}</div>`;
+    return `<div class="v09-enemy-hand v09-enemy-${side}" aria-label="${winds[seat]}家${revealed ? '亮牌' : '暗牌'}，共${count}张">${cards}</div>`;
   }
   function river(table,seat,side) {
     const tiles=(table.discards||[]).map((discard,index)=>({...discard,index})).filter(d=>d.seat===seat && !d.claimed);

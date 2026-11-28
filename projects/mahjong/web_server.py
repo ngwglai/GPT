@@ -176,7 +176,10 @@ class LocalTable:
     def ting_ticket(self) -> TingDiscardTicket | None:
         with self._lock:
             state = self.engine.state
-            if state.phase.name != "TURN_ACTION":
+            if state.phase.name != "TURN_ACTION" or state.result is not None:
+                return None
+            # Fail closed if a response window is still populated.
+            if state.response_options or state.pending_responses or state.current_discard is not None:
                 return None
             seat = state.current_player
             player = state.players[seat]
@@ -193,7 +196,7 @@ class LocalTable:
 
     def apply_ting(self, ticket: TingDiscardTicket) -> bool:
         with self._lock:
-            if ticket != self.ting_ticket():
+            if ticket is None or ticket != self.ting_ticket():
                 return False
             self.service.handle_intent(PLAYER_IDS[ticket.seat], {
                 "round_id": ticket.round_id, "revision": ticket.revision,

@@ -1278,6 +1278,7 @@
       node.dataset.motion = t.key;
       node.dataset.cuboidSeat = t.seat;
       node.dataset.hand = String(!!t.hand);
+      node.dataset.standing = String(!!t.stand);
       const world = rotate([t.x, t.y, t.z || 0], t.k);
       node.dataset.worldX = world[0];
       node.dataset.worldY = world[1];
@@ -1607,8 +1608,9 @@
       });
     const layout = visualSeatMap(),
       model = layoutTiles(table, layout);
-    // The inspection view lays known hand tiles face-up; hidden hands remain hidden.
-    if (overhead) {
+    // At settlement, lay all four revealed hands flat in BOTH camera modes.
+    // This also changes the sprite cache key and exposes the actual top face.
+    if (overhead || table.phase === "ROUND_END") {
       for (const t of model.tiles) if (t.hand) t.stand = false;
       for (const hand of Object.values(model.hands))
         for (const t of hand) t.stand = false;

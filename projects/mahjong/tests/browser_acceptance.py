@@ -521,6 +521,10 @@ async def lan_cases(browser, app, url, output, watch):
         await action_button(pages[1], S, "CHI").tap()
         for page in pages:
             await expect(page.locator(".result-box.win")).to_contain_text("北家荣胡")
+            await expect(page.locator('.cuboid-sprite[data-hand="true"][data-standing="true"]')).to_have_count(0)
+            await expect(page.locator('.cuboid-sprite[data-hand="true"][data-tile-face=""]')).to_have_count(0)
+            for seat in (1, 2, 3):
+                await expect(page.locator(f'.cuboid-sprite[data-hand="true"][data-cuboid-seat="{seat}"][data-standing="false"]').first).to_be_visible()
         await capture(host, output, "08-lan-win")
         for page in pages:
             await page.locator("#nextRound").click()

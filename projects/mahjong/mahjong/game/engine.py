@@ -144,6 +144,10 @@ class GameEngine:
 
     def _draw_for(self, seat: Seat):
         s = self.state
+        if s.phase == P.ROUND_END:
+            raise IllegalAction("cannot draw after settlement")
+        if s.response_options or s.pending_responses:
+            raise IllegalAction("cannot draw before the response window is resolved")
         advance_pickup_cycle(s, seat)
         s.current_player = seat
         s.current_discard = s.current_discarder = None
@@ -406,6 +410,12 @@ class GameEngine:
 
     def _resolve_responses(self):
         s = self.state
+        # Never advance on an incomplete response window, even if a caller
+        # mistakenly attempts to resolve it during automatic discard.
+        if s.phase != P.WAITING_FOR_RESPONSES:
+            raise IllegalAction("no active response window")
+        if set(s.pending_responses) != set(s.response_options):
+            raise IllegalAction("response window still has unanswered seats")
         source, tile = s.current_discarder, s.current_discard
         selected = self.resolver.resolve(source, s.pending_responses)
         other_hu = tuple(seat for seat, action in s.pending_responses.items()

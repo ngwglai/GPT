@@ -541,6 +541,38 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         self.assert_private()
         print(f'LAN complete round: {steps} authenticated actions, DRAW, next round dealt.')
 
+    async def test_auto_ting_discard_waits_for_hu_over_four_sockets(self):
+        from tests.test_gold import WAIT
+        await self.setup_room()
+        await self.fixture({
+            E: PlayerFixture(WAIT + [32], declared=True, last_draw_type=32),
+            S: PlayerFixture([3,4,5,12,13,14,21,22,23,28,28,28,32], declared=True),
+            W: PlayerFixture([6,7,8,15,16,17,24,25,26,29,29,29,32], declared=True),
+        }, gold=33)
+        self.room.ai.kick()
+        await self.all_states(lambda m: m['player_view']['phase'] == 'WAITING_FOR_RESPONSES')
+        view = self.views[0]['player_view']
+        revision = view['revision']
+        remaining = view['normal_tiles_remaining']
+        for seat in (1, 2):
+            self.assertIn('HU', [a['type'] for a in self.views[seat]['player_view']['legal_actions']])
+        await asyncio.sleep(1)
+        self.assertEqual(self.room.table.engine.state.revision, revision)
+        self.assertEqual(self.room.table.view_for(E)['normal_tiles_remaining'], remaining)
+        await self.act(1, 'PASS')
+        self.assertEqual(self.views[0]['player_view']['phase'], 'WAITING_FOR_RESPONSES')
+        await self.act(2, 'HU')
+        for message in self.views.values():
+            final = message['player_view']
+            self.assertEqual(final['phase'], 'ROUND_END')
+            self.assertEqual(final['result']['source'], 0)
+            self.assertEqual(final['result']['winner'], 2)
+            self.assertTrue(all('concealed_tiles' in p for p in final['players'].values()))
+        revision = self.room.table.engine.state.revision
+        await asyncio.sleep(0.6)
+        self.assertEqual(self.room.table.engine.state.revision, revision)
+        self.assert_private()
+
     async def test_dealer_win_keeps_dealer_on_next_round(self):
         from tests.test_gold import WAIT
         await self.setup_room()
