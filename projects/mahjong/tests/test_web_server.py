@@ -214,3 +214,27 @@ class WebServerBoundaryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DefaultRobGangTests(unittest.TestCase):
+    def test_local_table_rob_gang_and_next_round(self):
+        from mahjong.core.player import MeldType
+        from .helpers import E, S, W, build_fixture, PlayerFixture, choose
+        from mahjong import ActionType
+        from web_server import PLAYER_IDS
+        table = LocalTable(seed=42)
+        self.assertTrue(table.engine.rules.allow_rob_bu_gang)
+        build_fixture(table.engine, {E:PlayerFixture([0,1,2,3,4,5,6,7,8,9,9],melds=[(MeldType.PENG,[0]*3,W)],last_draw_type=0,declared=True),
+            S:PlayerFixture([10,11,12,13,14,15,18,19,20,27,27,27,33],declared=True,shelves=1)}, gold=33)
+        for seat, player in table.engine.state.players.items():
+            player.player_id = PLAYER_IDS[seat]
+        for seat, kind in ((E,ActionType.BU_GANG),(S,ActionType.HU)):
+            action = choose(table.engine,seat,kind)
+            state = table.engine.state
+            table.act(seat=seat,payload={"round_id":state.round_id,"revision":state.revision,"type":kind.name,"tile_ids":list(action.tile_ids)})
+        result = table.engine.state.result
+        self.assertEqual(result.method,"ROB_GANG")
+        payment = next(p for p in result.settlement.items["payments"] if p["payer"] == E and p["receiver"] == S)
+        self.assertEqual(payment["discard"],0)
+        table.next_round(seed=43)
+        self.assertTrue(table.engine.rules.allow_rob_bu_gang)

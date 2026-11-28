@@ -24,7 +24,7 @@ class GamePhase(Enum):
 @dataclass(frozen=True)
 class RuleConfig:
     quad_as_two_pairs: bool = True
-    allow_rob_bu_gang: bool = False
+    allow_rob_bu_gang: bool = True
     hide_an_gang: bool = True
     enable_hai_di_tag: bool = False
 

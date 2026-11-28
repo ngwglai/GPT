@@ -69,7 +69,8 @@ class ScoreEngine:
                 basic = base * (2 if source is None else 1) * (
                     2 if state.dealer in (payer, receiver) else 1) if hu_payment else 0
                 gold = 5 * player.shelf_count if hu_payment else 0
-                discard = 5 if hu_payment and payer == source else 0
+                discard = 5 if (hu_payment and payer == source
+                                and not state.players[payer].is_declared_ting) else 0
                 gang_open, gang_concealed = open_gangs, 2 * concealed_gangs
                 amount = basic + gold + gang_open + gang_concealed + discard
                 matrix[int(payer)][int(receiver)] = amount

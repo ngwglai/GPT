@@ -11,7 +11,7 @@ from aiohttp import ClientConnectionError, ClientSession, web
 
 from lan_server import create_app, ROOMS, LOCAL, NETWORK
 from network_admin import GameListener, create_admin_app
-from mahjong import Seat, RuleConfig
+from mahjong import Seat
 from mahjong.core.player import MeldType
 from mahjong.game.debug import build_fixture, PlayerFixture
 from mahjong.solver.thirteen_orphans import ORPHANS
@@ -495,7 +495,7 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_rob_bu_gang_window_and_reconnect_preserves_response(self):
         await self.setup_room()
-        self.room.table.engine.rules = RuleConfig(allow_rob_bu_gang=True)
+        self.assertTrue(self.room.table.engine.rules.allow_rob_bu_gang)
         await self.fixture({E:PlayerFixture([0,1,2,3,4,5,6,7,8,9,9], melds=[(MeldType.PENG,[0]*3,W)], last_draw_type=0),
                             S:PlayerFixture([10,11,12,13,14,15,18,19,20,27,27,27,33], declared=True, shelves=1)}, gold=33)
         await self.act(0, 'BU_GANG')
@@ -506,6 +506,10 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('HU', [a['type'] for a in self.views[1]['player_view']['legal_actions']])
         await self.act(1, 'HU')
         self.assertEqual(self.views[0]['player_view']['result']['method'], 'ROB_GANG')
+        payment = next(p for p in self.room.table.engine.state.result.settlement.items["payments"] if p["payer"] == E and p["receiver"] == S)
+        self.assertEqual(payment["discard"], 5)
+        await self.ready_all(self.views[0]["player_view"])
+        self.assertTrue(self.room.table.engine.rules.allow_rob_bu_gang)
         self.assert_private()
 
     async def test_ting_tile_and_waits_are_private(self):
@@ -710,6 +714,8 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(final['result']['source'], 0)
             self.assertEqual(final['result']['winner'], 2)
             self.assertTrue(all('concealed_tiles' in p for p in final['players'].values()))
+        payment = next(p for p in self.room.table.engine.state.result.settlement.items["payments"] if p["payer"] == E and p["receiver"] == W)
+        self.assertEqual(payment["discard"], 0)
         revision = self.room.table.engine.state.revision
         await asyncio.sleep(0.6)
         self.assertEqual(self.room.table.engine.state.revision, revision)

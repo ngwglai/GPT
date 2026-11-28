@@ -71,19 +71,25 @@ class ScoringTests(unittest.TestCase):
         self.assertEqual(q.items['matrix'][N][S],1)
         self.assertEqual(q.items['other_hu'],[2,3])
 
-    def test_special_effects_and_declared_ting_do_not_modify_score(self):
+    def test_special_effects_do_not_modify_score_and_ting_exempts_only_discard(self):
         s=self.fixture()
         s.players[E].is_declared_ting=True
         self.assertEqual(self.quote(s,S,E).transfers, self.quote(s,S,E,effects=tuple(HuEffect)).transfers)
         self.assertEqual(self.quote(s,S,E).mode, SettlementMode.NORMAL)
+        for effects in ((), (HuEffect.QIANG_GANG_HU,)):
+            for declared in (False, True):
+                s.players[E].is_declared_ting = declared
+                q = self.quote(s,S,E,effects=effects)
+                payment = next(p for p in q.items["payments"] if p["payer"] == E and p["receiver"] == S)
+                self.assertEqual((payment["base"], payment["gold"], payment["discard"]), (2,10,0 if declared else 5))
 
     def test_invalid_config_rejected(self):
         for amount in (-1,0,2,True,1.0,'5',None,'NaN','Infinity'):
             with self.assertRaises(ValueError): ScoreConfig(amount)
 
-    def test_reported_source_still_pays_full_score_in_engine(self):
+    def test_reported_source_pays_no_discard_penalty_in_engine(self):
         e=engine()
         build_fixture(e,{S:PlayerFixture(WAIT,declared=True),E:PlayerFixture(declared=True)},gold=33,discard=(E,31))
         play(e,choose(e,S,ActionType.HU))
         self.assertEqual(e.state.result.winner,S)
-        self.assertEqual(e.state.result.settlement.transfers,{E:-7,S:9,W:-1,N:-1})
+        self.assertEqual(e.state.result.settlement.transfers,{E:-2,S:4,W:-1,N:-1})

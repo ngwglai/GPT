@@ -88,7 +88,7 @@ class GangTests(unittest.TestCase):
         e.assert_invariants()
 
     def test_rob_bu_gang_does_not_commit_or_draw(self):
-        e=engine(allow_rob_bu_gang=True)
+        e=engine()
         f=PlayerFixture([0,1,2,3,4,5,6,7,8,9,9],melds=[(MeldType.PENG,[0]*3,W)],last_draw_type=0)
         other=PlayerFixture([10,11,12,13,14,15,18,19,20,27,27,27,33],declared=True,shelves=1)
         build_fixture(e,{E:f,S:other},gold=33)
@@ -105,7 +105,7 @@ class GangTests(unittest.TestCase):
         e.assert_invariants()
 
     def test_rob_window_pass_commits_gang(self):
-        e=engine(allow_rob_bu_gang=True)
+        e=engine()
         f=PlayerFixture([0,1,2,3,4,5,6,7,8,9,9],melds=[(MeldType.PENG,[0]*3,W)],last_draw_type=0)
         other=PlayerFixture([10,11,12,13,14,15,18,19,20,27,27,27,33],declared=True,shelves=1)
         build_fixture(e,{E:f,S:other},gold=33)
@@ -113,3 +113,19 @@ class GangTests(unittest.TestCase):
         play(e,choose(e,S,ActionType.PASS))
         self.assertEqual(e.state.total_gang_count,1)
         self.assertEqual(e.state.players[E].melds[0].type,MeldType.BU_GANG)
+
+    def test_rob_bu_gang_penalty_depends_on_source_ting(self):
+        for declared in (False, True):
+            with self.subTest(declared=declared):
+                e=engine()
+                f=PlayerFixture([0,1,2,3,4,5,6,7,8,9,9],melds=[(MeldType.PENG,[0]*3,W)],last_draw_type=0,declared=declared)
+                other=PlayerFixture([10,11,12,13,14,15,18,19,20,27,27,27,33],declared=True,shelves=1)
+                build_fixture(e,{E:f,S:other},gold=33)
+                tail=e.state.wall.tail
+                play(e,choose(e,E,ActionType.BU_GANG))
+                play(e,choose(e,S,ActionType.HU))
+                self.assertEqual(e.state.result.method,"ROB_GANG")
+                payment=next(p for p in e.state.result.settlement.items["payments"] if p["payer"]==E and p["receiver"]==S)
+                self.assertEqual((payment["base"],payment["gold"],payment["discard"]),(2,5,0 if declared else 5))
+                self.assertEqual(e.state.total_gang_count,0)
+                self.assertEqual(e.state.wall.tail,tail)
