@@ -49,6 +49,7 @@ async def run(chromium):
             await room_page.locator('#nickname').fill('测试玩家')
             await room_page.locator('#roomBaseScore').select_option('5')
             await room_page.locator('#createRoom').click()
+            await expect(room_page.locator('#roomDisplayName')).to_have_text('麻将房间')
             await expect(room_page.locator('#roomScoreMode')).to_have_text('基础分：5 分')
             assert await room_page.evaluate('document.documentElement.scrollWidth <= innerWidth')
             assert all(room.base_score == 5 for room in app[ROOMS].values())

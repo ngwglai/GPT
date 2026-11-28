@@ -70,7 +70,8 @@
     const allManaged = count === 4;
     $('nextRound').textContent = allManaged ? '开始下一局 (4/4)' : mineReady ? `取消准备 (${count}/4)` : `准备下一局 (${count}/4)`;
     $('roomTitle').textContent = room.code;
-    $('roomScoreMode').textContent = `${room.name || '麻将房间'} · 基础分：${room.base_score ?? 1} 分`;
+    $('roomDisplayName').textContent = room.name || '麻将房间';
+    $('roomScoreMode').textContent = `基础分：${room.base_score ?? 1} 分`;
     $('yourSeat').textContent = you.seat == null ? '请选择空位' : `你是${seatNames[you.seat]}家`;
     $('roster').innerHTML = [0,1,2,3].map(seat => {
       const member = room.members.find(p => p.seat === seat);
