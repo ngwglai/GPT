@@ -45,6 +45,7 @@ async def run(args):
                 await page.wait_for_function("()=>table.phase!=='ROLLING_DICE'")
                 response = await page.request.get(url+'api/table')
                 dealt = (await response.json())['table']
+                assert not dealt['gold_indicator']['drawn']
                 await wall_snapshot(page, dealt)
                 assert len(await page.locator('[data-cuboid-kind="wall"]').all()) == 83
                 before = await page.evaluate('MahjongCuboid.diagnostics().rasterized')
