@@ -65,7 +65,7 @@ class WallTests(unittest.TestCase):
             for large in range(1, 7):
                 wall = self.wall((1, large), dealer)
                 cases.add((wall.break_wall, large))
-                side = PLAYERS[(PLAYERS.index(wall.break_wall) - 1) % 4]
+                side = PLAYERS[(PLAYERS.index(wall.break_wall) + 1) % 4]
                 expected = WallPosition(side, large - 1, Layer.TOP)
                 self.assertEqual(wall.gold_indicator_position, expected)
                 indicator = wall.get_slot(expected)
@@ -76,6 +76,17 @@ class WallTests(unittest.TestCase):
                 self.assertEqual(wall.remaining_normal_count(0), 122)
                 self.assertEqual(sum(not slot.drawn for slot in wall.slots), 136)
         self.assertEqual(len(cases), 24)
+
+    def test_indicator_survives_initial_deal(self):
+        for dealer in WALLS:
+            for d1 in range(1, 7):
+                for d2 in range(1, 7):
+                    with self.subTest(dealer=dealer, dice=(d1, d2)):
+                        wall = self.wall((d1, d2), dealer)
+                        indicator = wall.get_slot(wall.gold_indicator_position)
+                        for _ in range(53):
+                            self.assertNotEqual(wall.draw_normal(), indicator.tile)
+                        self.assertFalse(indicator.drawn)
 
     def test_bad_wall(self):
         with self.assertRaises(ValueError):
