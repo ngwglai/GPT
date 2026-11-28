@@ -1,0 +1,30 @@
+name: Publish Mahjong v1.2.1
+on:
+  push:
+    branches: [release/mahjong-v1.2.1]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: a81e29fe795b3877af29c30bb48c091080f05c39
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Package
+        working-directory: projects/mahjong
+        shell: pwsh
+        run: |
+          python tools/package_release.py --output "$env:RUNNER_TEMP/QingqueMahjong_v1.2.1.zip"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git archive --format=zip --output="$env:RUNNER_TEMP/QingqueMahjong_v1.2.1-source.zip" HEAD:projects/mahjong
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Publish
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create mahjong-v1.2.1 "$env:RUNNER_TEMP/QingqueMahjong_v1.2.1.zip" "$env:RUNNER_TEMP/QingqueMahjong_v1.2.1.sha256" "$env:RUNNER_TEMP/QingqueMahjong_v1.2.1-source.zip" --target a81e29fe795b3877af29c30bb48c091080f05c39 --title "青雀麻将 v1.2.1" --notes "默认开启抢补杠；报听者出牌点炮或补杠被抢胡免除额外5分，其他计分不变。完整 CI 验证状态请见 Actions。" --prerelease
