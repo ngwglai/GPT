@@ -1,0 +1,30 @@
+name: Publish Mahjong v1.2.0
+on:
+  push:
+    branches: [release/mahjong-v1.2.0]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 3895563080f9ec76d9b882722318153055c0d4db
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Package
+        working-directory: projects/mahjong
+        shell: pwsh
+        run: |
+          python tools/package_release.py --output "$env:RUNNER_TEMP/QingqueMahjong_v1.2.0.zip"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git archive --format=zip --output="$env:RUNNER_TEMP/QingqueMahjong_v1.2.0-source.zip" HEAD:projects/mahjong
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Publish
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create mahjong-v1.2.0 "$env:RUNNER_TEMP/QingqueMahjong_v1.2.0.zip" "$env:RUNNER_TEMP/QingqueMahjong_v1.2.0.sha256" "$env:RUNNER_TEMP/QingqueMahjong_v1.2.0-source.zip" --target 3895563080f9ec76d9b882722318153055c0d4db --title "青雀麻将 v1.2.0" --notes "大厅、动态座位、服务器管理后台及网络恢复。包含文字修正版。完整 CI 验证状态请见 Actions。" --prerelease
