@@ -5,6 +5,8 @@
   try { saved = JSON.parse(localStorage.getItem(key) || 'null'); } catch (_) { /* new session */ }
   let socket = null, state = null, retryTimer, retry = 0, stopped = false;
   let authenticated = false, pending = null, commandId = 0, joinBusy = false;
+  let lastSeen = 0, pendingAt = 0;
+  const STALE_MS = 20000;
   const $ = id => document.getElementById(id);
   const hide = (id, value) => $(id).classList.toggle('hidden', value);
   const status = (text, kind = "") => {
@@ -25,7 +27,9 @@
     }
     if (pending !== null) return;
     pending = ++commandId;
-    socket.send(JSON.stringify({...data, command_id:pending}));
+    pendingAt = Date.now();
+    try { socket.send(JSON.stringify({...data, command_id:pending})); }
+    catch (_) { disconnect(socket); }
     decorate();
   }
   function decorate() {
@@ -73,8 +77,38 @@
     $('waitingHint').textContent = `${room.members.length}/4 人已加入。${unseated ? `尚未入座：${unseated}。` : ''}${controls.can_start ? '四人已在线入座，可以开始。' : '等待四人在线入座，由房主开始。'}`;
     decorate();
   }
+  function disconnect(ws) {
+    if (!ws || socket !== ws) return;
+    socket = null; authenticated = false; pending = null;
+    try { ws.close(); } catch (_) { /* already disconnected */ }
+    decorate();
+    if (stopped || !saved) return;
+    status('连接中断，正在自动重连…', 'offline');
+    showNotice('网络连接中断；座位和牌局保留，恢复连接后继续。');
+    clearTimeout(retryTimer);
+    retryTimer = setTimeout(connect, Math.min(8000, 700 * (2 ** Math.min(retry++, 4))));
+  }
+  function checkConnection() {
+    if (stopped || !saved) return;
+    if (!socket) {
+      // Keep the backoff timer; online/visibility also checks live connections.
+      if (!retryTimer) connect();
+      return;
+    }
+    const now = Date.now();
+    if (socket.readyState >= WebSocket.CLOSING || now - lastSeen >= STALE_MS ||
+        (pending !== null && now - pendingAt >= STALE_MS)) {
+      disconnect(socket);
+      return;
+    }
+    if (ready()) {
+      try { socket.send(JSON.stringify({type:'ping'})); }
+      catch (_) { disconnect(socket); }
+    }
+  }
   function connect() {
-    if (!saved || stopped || (socket && socket.readyState !== WebSocket.CLOSED)) return;
+    clearTimeout(retryTimer); retryTimer = null;
+    if (!saved || stopped || (socket && socket.readyState < WebSocket.CLOSING)) return;
     clearTimeout(retryTimer);
     authenticated = false;
     pending = null;
@@ -83,13 +117,18 @@
     status(state ? '正在恢复连接…' : '正在连接房间…', 'waiting');
     const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws/${encodeURIComponent(session.room_code)}`);
     socket = ws;
+    lastSeen = Date.now();
     ws.onopen = () => {
-      if (socket === ws) ws.send(JSON.stringify({type:'authenticate', session_token:session.session_token}));
+      if (socket !== ws) return;
+      try { ws.send(JSON.stringify({type:'authenticate', session_token:session.session_token})); }
+      catch (_) { disconnect(ws); }
     };
     ws.onmessage = event => {
       if (socket !== ws) return;
       let message;
       try { message = JSON.parse(event.data); } catch (_) { showNotice('收到了无法识别的消息。'); return; }
+      lastSeen = Date.now();
+      if (message.type === 'pong') return;
       if (message.type === 'command_ack') {
         if (message.command_id === pending) { pending = null; decorate(); }
         return;
@@ -131,17 +170,8 @@
         acceptTable({...view, legal_actions:{[String(state.you.seat)]:view.legal_actions}}, {initial:firstState});
       }
     };
-    ws.onclose = () => {
-      if (socket !== ws) return;
-      authenticated = false; pending = null; decorate();
-      if (stopped || !saved) return;
-      status('连接中断，正在自动重连…', 'offline');
-      showNotice('网络连接中断；座位和牌局保留，恢复连接后继续。');
-      retryTimer = setTimeout(connect, Math.min(8000, 700 * (2 ** retry++)));
-    };
-    ws.onerror = () => {
-      if (socket === ws) status('暂时无法连接服务器', 'offline');
-    };
+    ws.onclose = () => disconnect(ws);
+    ws.onerror = () => disconnect(ws);
   }
   async function join(create) {
     if (joinBusy) return;
@@ -150,9 +180,11 @@
     if (saved && !confirm('你还有一个可恢复的房间身份。继续会用新身份加入，原座位可能无法恢复，确定继续吗？')) return;
     joinBusy = true;
     $('createRoom').disabled = $('joinRoom').disabled = true;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
     try {
       const payload = create ? {nickname:name, base_score:Number($('roomBaseScore').value)} : {nickname:name, room_code:$('roomCode').value.trim().toUpperCase()};
-      const res = await fetch(create ? '/api/rooms' : '/api/rooms/join', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+      const res = await fetch(create ? '/api/rooms' : '/api/rooms/join', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload), signal:controller.signal});
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error || '加入失败');
       clearTimeout(retryTimer);
@@ -162,8 +194,8 @@
       state = null; pending = null; stopped = false;
       save({room_code:data.room_code, session_token:data.session_token});
       showNotice(''); connect();
-    } catch (e) { showNotice(e.message); }
-    finally { joinBusy = false; $('createRoom').disabled = $('joinRoom').disabled = false; }
+    } catch (e) { showNotice(e.name === 'AbortError' ? '请求超时，请检查连接后再试。' : e.message); }
+    finally { clearTimeout(timeout); joinBusy = false; $('createRoom').disabled = $('joinRoom').disabled = false; }
   }
   window.LanGame = {
     decorate,
@@ -204,11 +236,13 @@
   $('roomCode').addEventListener('keydown', event => {
     if (event.key === 'Enter' && !event.isComposing) join(false);
   });
-  window.addEventListener('online', connect);
+  window.addEventListener('online', checkConnection);
+  window.addEventListener('offline', () => disconnect(socket));
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) connect();
+    if (!document.hidden) checkConnection();
   });
-  window.addEventListener('pageshow', event => { if (event.persisted) connect(); });
+  window.addEventListener('pageshow', event => { if (event.persisted) checkConnection(); });
+  setInterval(checkConnection, 5000);
   (async () => {
     await window.MahjongPresentation?.init();
     await window.MahjongCuboid?.preload();

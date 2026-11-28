@@ -11,21 +11,64 @@ from dataclasses import dataclass, field
 import ipaddress
 import json
 import logging
+import os
 import secrets
 import socket
 import time
 
-from aiohttp import web, WSMsgType
+# Windows native TransmitFile/Proactor may fail after a peer resets.
+# Set before importing aiohttp, including when another caller imported it first.
+if os.name == 'nt':
+    os.environ['AIOHTTP_NOSENDFILE'] = '1'
+
+from aiohttp import web, WSMsgType, web_fileresponse
+
+if os.name == 'nt':
+    web_fileresponse.NOSENDFILE = True
 from mahjong import Seat, IllegalAction, ScoreConfig, __version__
 from mahjong.game.autoplay import AutoRunner
 from web_server import LocalTable, WEB_ROOT
 
 LOG = logging.getLogger(__name__)
 ROOM_TTL = 24 * 60 * 60
+FILE_TIMEOUT = 30
+SEND_TIMEOUT = 3
+CLOSE_TIMEOUT = 3
 ROOMS = web.AppKey('rooms', dict)
 LOCAL = web.AppKey('local', LocalTable)
 LOCAL_LOCK = web.AppKey('local_lock', asyncio.Lock)
 LOCAL_AI = web.AppKey('local_ai', AutoRunner)
+
+
+def peer_io_error(exc):
+    return isinstance(exc, (ConnectionError, TimeoutError)) or (
+        isinstance(exc, OSError) and getattr(exc, 'winerror', None)
+        in {64, 121, 995, 10053, 10054, 10060}
+    )
+
+
+class NetworkFileResponse(web.FileResponse):
+    """Keep range/HEAD handling, but bound file preparation and transfer."""
+    async def prepare(self, request):
+        transport = request.transport
+        try:
+            return await asyncio.wait_for(super().prepare(request), FILE_TIMEOUT)
+        except OSError as exc:
+            if not peer_io_error(exc):
+                raise
+            LOG.info("Static transfer interrupted: peer=%s path=%s error=%s",
+                     request.remote, request.path, type(exc).__name__)
+            if transport is not None:
+                transport.abort()
+            # aiohttp finish_response treats ConnectionError as peer disconnect.
+            raise ConnectionResetError("Static transfer interrupted") from exc
+
+
+async def close_socket(ws, *, drain=True, **kwargs):
+    try:
+        await asyncio.wait_for(ws.close(drain=drain, **kwargs), CLOSE_TIMEOUT)
+    except (OSError, RuntimeError):
+        LOG.debug("WebSocket close interrupted", exc_info=True)
 
 
 class ClientError(ValueError):
@@ -231,11 +274,13 @@ class Room:
     @staticmethod
     async def send(ws, payload):
         try:
-            await asyncio.wait_for(ws.send_json(payload), timeout=3)
-        except (TimeoutError, ConnectionError, RuntimeError):
-            # Don't await close while holding the room lock; receiver's finally
-            # will remove this socket and broadcast the offline roster.
-            asyncio.create_task(ws.close())
+            await asyncio.wait_for(ws.send_json(payload), timeout=SEND_TIMEOUT)
+            return True
+        except (OSError, RuntimeError) as exc:
+            LOG.info("WebSocket send interrupted (%s)", type(exc).__name__)
+            # Never await a closing handshake while holding the room lock.
+            asyncio.create_task(close_socket(ws, drain=False))
+            return False
 
 
 def room_for(request, code):
@@ -319,6 +364,12 @@ async def websocket(request):
                 continue
             try:
                 data = json.loads(msg.data)
+                # Probe the connection without mutating state or replaying commands.
+                if data == {'type': 'ping'}:
+                    room.authenticate(member.token)
+                    if not await room.send(ws, {'type': 'pong'}):
+                        break
+                    continue
                 command_id = data.pop('command_id', None) if isinstance(data, dict) else None
                 if command_id is not None and (type(command_id) is not int or command_id < 1):
                     raise ClientError('操作编号无效。')
@@ -341,7 +392,7 @@ async def websocket(request):
                         room.touch()
                         for peer in peers:
                             await room.send(peer, {'type': 'left', 'resumable': room.table is not None})
-                            asyncio.create_task(peer.close())
+                            asyncio.create_task(close_socket(peer))
                         await room.broadcast()
                         break
                     shared = room.command(member, data)
@@ -358,16 +409,23 @@ async def websocket(request):
     except InvalidSession as exc:
         await Room.send(ws, {'type': 'error', 'error': str(exc), 'invalid_session': True})
     except (ValueError, TypeError, TimeoutError) as exc:
-        LOG.info("WebSocket authentication interrupted (%s)", type(exc).__name__)
+        LOG.info("WebSocket interrupted (%s)", type(exc).__name__)
+    except OSError as exc:
+        if not peer_io_error(exc):
+            raise
+        LOG.info("WebSocket peer disconnected: room=%s peer=%s error=%s",
+                 room.code if room else '-', request.remote, type(exc).__name__)
     finally:
-        if member is not None:
-            async with room.lock:
-                member.sockets.discard(ws)
-                if not member.connected:
-                    room.ready_seats.discard(member.seat)
-                room.touch()
-                await room.broadcast()
-        await ws.close()
+        try:
+            if member is not None:
+                async with room.lock:
+                    member.sockets.discard(ws)
+                    if not member.connected:
+                        room.ready_seats.discard(member.seat)
+                    room.touch()
+                    await room.broadcast()
+        finally:
+            await close_socket(ws)
     return ws
 
 
@@ -452,7 +510,7 @@ async def static_file(request):
         raise web.HTTPNotFound()
     if target.suffix not in {'.html', '.js', '.css', '.json', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.gif', '.mp3', '.ogg', '.wav'}:
         raise web.HTTPNotFound()
-    return web.FileResponse(target)
+    return NetworkFileResponse(target)
 
 
 async def cleanup(app):
@@ -475,7 +533,7 @@ async def cleanup(app):
 async def shutdown(app):
     await asyncio.gather(app[LOCAL_AI].close(), *(room.ai.close() for room in app[ROOMS].values() if room.ai))
     peers = [ws for room in app[ROOMS].values() for p in room.members.values() for ws in p.sockets]
-    await asyncio.gather(*(ws.close(code=1001, message=b'Server shutdown') for ws in peers))
+    await asyncio.gather(*(close_socket(ws, code=1001, message=b'Server shutdown') for ws in peers))
 
 
 async def health(request):
@@ -518,4 +576,4 @@ def run(args):
     print('按 Ctrl+C 停止；重启服务器会清除临时房间。', flush=True)
     if not args.no_browser:
         threading.Timer(0.6, lambda: webbrowser.open(url)).start()
-    web.run_app(create_app(args.seed, Seat(args.dealer)), host=args.host, port=args.port, access_log=None)
+    web.run_app(create_app(args.seed, Seat(args.dealer)), host=args.host, port=args.port, access_log=None, keepalive_timeout=30)

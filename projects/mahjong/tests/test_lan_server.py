@@ -6,7 +6,8 @@ all player actions in these tests travel over authenticated WebSockets.
 import asyncio
 import json
 import unittest
-from aiohttp import ClientSession, web
+from unittest.mock import patch
+from aiohttp import ClientConnectionError, ClientSession, web
 
 from lan_server import create_app, ROOMS, LOCAL
 from mahjong import Seat, RuleConfig
@@ -232,6 +233,41 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNot(self.room.table, self.app[LOCAL])
         await self.reject(0, {'type': 'timeout-responses'})
         await self.reject(0, {'type': 'start', 'seed': 42})
+
+    async def test_static_failure_does_not_poison_new_requests(self):
+        failure = OSError("simulated Windows file transfer timeout")
+        failure.winerror = 121
+        with patch.object(web.FileResponse, 'prepare', side_effect=failure):
+            async with asyncio.timeout(5):
+                with self.assertRaises(ClientConnectionError):
+                    async with self.http.get(self.url + '/') as response:
+                        await response.read()
+        async with self.http.get(self.url + '/api/health') as response:
+            self.assertTrue((await response.json())['ok'])
+        async with self.http.get(self.url + '/') as response:
+            self.assertEqual(response.status, 200)
+            self.assertIn('<html', (await response.text()).lower())
+
+    async def test_probe_and_abrupt_disconnect_resume(self):
+        await self.setup_room()
+        old = self.views[2]
+        await self.clients[2].send_json({'type': 'ping'})
+        self.assertEqual(await self.read(self.clients[2], lambda m: m.get('type') == 'pong'),
+                         {'type': 'pong'})
+        # Abrupt TCP abort, without a WebSocket closing handshake.
+        self.clients[2]._response.connection.transport.abort()
+        await self.read(self.clients[0], lambda m: m.get('type') == 'state'
+                        and not m['room']['members'][2]['connected'])
+        self.clients[2] = await self.open_socket(self.credentials[2])
+        recovered = await self.read(self.clients[2])
+        self.assertEqual(recovered['you'], old['you'])
+        self.assertEqual(recovered['player_view']['round_id'], old['player_view']['round_id'])
+        self.assertEqual(recovered['player_view']['revision'], old['player_view']['revision'])
+        self.assertEqual(recovered['player_view']['players']['2']['concealed_tiles'],
+                         old['player_view']['players']['2']['concealed_tiles'])
+        async with self.http.get(self.url + '/') as response:
+            self.assertEqual(response.status, 200)
+            await response.read()
 
     async def test_disconnect_refresh_and_multiple_tabs(self):
         await self.setup_room()
