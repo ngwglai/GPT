@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "local-mahjong-engine"
-version = "1.0.0"
+version = "1.1.0"
 description = "Deterministic four-player Mahjong engine, LAN play and projected rounded-tile table"
 requires-python = ">=3.11"
 dependencies = ["aiohttp>=3.13.5,<4"]

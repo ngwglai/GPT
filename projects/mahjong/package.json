@@ -1,8 +1,8 @@
 {
   "name": "local-mahjong-ui-tests",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
-  "description": "Optional development-only DOM integration tests for v1.0.0",
+  "description": "Optional development-only DOM integration tests for v1.1.0",
   "scripts": {
     "test:ui": "node tests/audio_regression.cjs && node tests/ui_smoke.cjs"
   },
