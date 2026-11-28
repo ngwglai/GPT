@@ -139,9 +139,12 @@ class WebServerBoundaryTests(unittest.TestCase):
         self.assertEqual(out["current_player"], int(Seat.SOUTH))
 
     def test_dealt_gold_exposes_shelve_and_shelve_skips_response(self):
-        table = LocalTable(seed=3)
+        # With the corrected indicator wall, seed 6 deals gold to East.
+        table = LocalTable(seed=6)
         snap = self.roll_dice(table)
-        shelf = next(a for a in snap["legal_actions"]["0"] if a["type"] == "SHELVE_GOLD")
+        shelves = [a for a in snap["legal_actions"]["0"] if a["type"] == "SHELVE_GOLD"]
+        self.assertTrue(shelves, "fixture must deal at least one gold tile to East")
+        shelf = shelves[0]
         out = table.act(seat=Seat.EAST, payload={
             "round_id": snap["round_id"], "revision": snap["revision"],
             "type": shelf["type"], "tile_ids": shelf["tile_ids"],
