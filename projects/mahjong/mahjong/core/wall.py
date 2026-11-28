@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import IntEnum
 
-from .seat import Seat, advance_seat, opposite_seat, previous_seat
+from .seat import Seat, advance_seat, opposite_seat
 from .tile import Tile
 
 
@@ -85,7 +85,7 @@ class WallState:
         self._normal_slots = tuple(slot for stack in self._stacks for slot in stack)
         self.set_cursors(0, TILE_COUNT - 1)
 
-        self.gold_indicator_position = WallPosition(previous_seat(self.break_wall), max(dice) - 1, Layer.TOP)
+        self.gold_indicator_position = WallPosition(advance_seat(self.break_wall), max(dice) - 1, Layer.TOP)
         indicator = self.get_slot(self.gold_indicator_position)
         indicator.revealed = indicator.is_gold_indicator = True
 
