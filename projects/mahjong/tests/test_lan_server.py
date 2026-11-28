@@ -541,6 +541,61 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         self.assert_private()
         print(f'LAN complete round: {steps} authenticated actions, DRAW, next round dealt.')
 
+    async def test_manual_discard_to_human_ting_ron_with_auto_enabled(self):
+        await self.check_manual_ron_response(True, S, "HU")
+
+    async def test_manual_discard_to_human_ting_ron_with_auto_disabled(self):
+        await self.check_manual_ron_response(False, S, "HU")
+
+    async def test_manual_discard_to_nonadjacent_ting_ron_with_auto_enabled(self):
+        await self.check_manual_ron_response(True, W, "HU")
+
+    async def test_manual_discard_to_human_ting_ron_explicit_pass(self):
+        await self.check_manual_ron_response(True, S, "PASS")
+
+    async def check_manual_ron_response(self, enabled, winner, response):
+        from tests.test_gold import WAIT
+        await self.setup_room()
+        # Every seat stays human. Only the potential winner is declared ting.
+        await self.fixture({E: PlayerFixture([31], last_draw_type=31),
+                            winner: PlayerFixture(WAIT, declared=True)}, gold=33)
+        seat = int(winner)
+        for i in range(4):
+            self.assertEqual(self.views[i]['player_view']['players'][str(i)]['controller'], 'human')
+        self.assertFalse(self.views[0]['player_view']['players']['0']['declared_ting'])
+        await self.clients[seat].send_json({'type': 'auto_ting', 'round_id': 'debug', 'enabled': enabled})
+        self.views[seat] = await self.read(self.clients[seat], lambda m:
+            m.get('type') == 'state' and m['player_view']['players'][str(seat)]['auto_ting'] == enabled)
+        await self.act(0, 'DISCARD')
+        view = self.views[seat]['player_view']
+        revision = view['revision']
+        wall = view['wall_view']
+        self.assertEqual(view['phase'], 'WAITING_FOR_RESPONSES')
+        self.assertTrue(view['players'][str(seat)]['declared_ting'])
+        self.assertEqual({a['type'] for a in view['legal_actions']}, {'HU', 'PASS'})
+        self.assertIsNone(self.room.table.ting_ticket())
+        self.assertIsNone(self.room.table.ai_ticket())
+        for _ in range(4):
+            self.room.ai.kick()
+            await asyncio.sleep(0.6)
+            self.assertEqual(self.room.table.engine.state.revision, revision)
+            current = self.room.table.view_for(winner)
+            self.assertEqual(current['phase'], 'WAITING_FOR_RESPONSES')
+            self.assertEqual(current['wall_view'], wall)
+            self.assertEqual(len(current['discards']), 1)
+            self.assertEqual({a['type'] for a in current['legal_actions']}, {'HU', 'PASS'})
+        print(f'RON probe: auto={enabled} seat={seat} phase=WAITING_FOR_RESPONSES revision={revision}; preserved for 2.4 seconds')
+        await self.act(seat, response)
+        final = self.views[0]['player_view']
+        if response == 'HU':
+            self.assertEqual(final['phase'], 'ROUND_END')
+            self.assertEqual(final['result']['winner'], seat)
+            self.assertEqual(final['result']['source'], 0)
+        else:
+            self.assertEqual(final['phase'], 'TURN_ACTION')
+            self.assertEqual(final['current_player'], 1)
+        print(f'RON probe: explicit {response} accepted, phase={final["phase"]}')
+
     async def test_auto_ting_discard_waits_for_hu_over_four_sockets(self):
         from tests.test_gold import WAIT
         await self.setup_room()
