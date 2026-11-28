@@ -329,6 +329,7 @@ def main():
     parser = argparse.ArgumentParser(description=f"麻将 v{__version__}：单机测试与局域网四人联机")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--admin-port", type=int, default=None, help="仅本机管理端口，默认游戏端口+1；0 禁用")
     parser.add_argument("--seed", type=int, default=None, help="固定开局随机种子，便于复现")
     parser.add_argument("--dealer", type=int, choices=range(4), default=0, metavar="0-3")
     parser.add_argument("--no-browser", action="store_true", help="不自动打开浏览器")

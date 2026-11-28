@@ -9,7 +9,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function wait(fn, label) {
   const start = Date.now();
   while (!fn()) {
-    if (Date.now() - start > 10000) throw new Error(`Timed out: ${label}; ${errors.join('; ')}`);
+    if (Date.now() - start > 10000) throw new Error(`Timed out: ${label}; ${errors.join('; ')}; notices: ${clients.map(c=>c.d.querySelector('#notice')?.textContent).filter(Boolean).join(' | ')}`);
     await pause(20);
   }
 }
@@ -29,6 +29,9 @@ async function create(page = '/lan.html', saved = null) {
         get src() { return this._src; }
         async decode() {}
       };
+      // The mocked fetch belongs to Node, so its signals must also belong to Node.
+      window.AbortController = globalThis.AbortController;
+      window.AbortSignal = globalThis.AbortSignal;
       window.fetch = (url, opts) => fetch(new URL(url, base), opts);
       window.WebSocket = class extends WebSocket { constructor(url) { super(url); sockets.push(this); } };
       window.alert = () => dialogs.push('alert');

@@ -9,7 +9,8 @@ import unittest
 from unittest.mock import patch
 from aiohttp import ClientConnectionError, ClientSession, web
 
-from lan_server import create_app, ROOMS, LOCAL
+from lan_server import create_app, ROOMS, LOCAL, NETWORK
+from network_admin import GameListener, create_admin_app
 from mahjong import Seat, RuleConfig
 from mahjong.core.player import MeldType
 from mahjong.game.debug import build_fixture, PlayerFixture
@@ -268,6 +269,111 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         async with self.http.get(self.url + '/') as response:
             self.assertEqual(response.status, 200)
             await response.read()
+
+    async def test_public_lobby_and_password_room(self):
+        public = await self.post('/api/rooms', {'nickname':'host', 'name':'公开桌'})
+        private = await self.post('/api/rooms', {'nickname':'host', 'name':'私密桌', 'password':'secret'})
+        async with self.http.get(self.url + '/api/rooms') as res:
+            data = await res.json()
+        self.assertEqual([r['code'] for r in data['rooms']], [public['room_code']])
+        self.assertNotIn('secret', json.dumps(data))
+        await self.post('/api/rooms/join', {'room_code':private['room_code'], 'nickname':'guest'}, 400)
+        await self.post('/api/rooms/join', {'room_code':private['room_code'], 'nickname':'guest', 'password':'secret'})
+
+    async def test_release_and_replace_preserves_private_seat(self):
+        await self.setup_room()
+        await self.act(0, 'ROLL_DICE')
+        old = self.views[2]['player_view']
+        target = self.views[2]['you']['member_id']
+        await self.reject(1, {'type':'remove_member','member_id':target})
+        await self.clients[0].send_json({'type':'remove_member','member_id':target})
+        left = await self.read(self.clients[2], lambda m:m.get('type')=='left')
+        self.assertFalse(left['resumable'])
+        await self.read(self.clients[0], lambda m:m.get('type')=='state' and len(m['room']['members'])==3)
+        bad = await self.open_socket(self.credentials[2])
+        self.assertTrue((await self.read(bad, lambda m:m.get('type')=='error'))['invalid_session'])
+        replacement = await self.post('/api/rooms/join', {'room_code':self.code, 'nickname':'替补'})
+        self.clients[2] = await self.open_socket(replacement)
+        initial = await self.read(self.clients[2])
+        self.assertIsNone(initial['player_view'])
+        await self.clients[2].send_json({'type':'choose_seat','seat':2})
+        recovered = await self.read(self.clients[2], lambda m:m.get('type')=='state' and m['you']['seat']==2)
+        view = recovered['player_view']
+        self.assertEqual(view['round_id'], old['round_id'])
+        self.assertEqual(view['revision'], old['revision'])
+        self.assertEqual(view['players']['2']['concealed_tiles'], old['players']['2']['concealed_tiles'])
+        self.assertNotIn('concealed_tiles', view['players']['0'])
+
+    async def test_ai_fill_and_pause_without_players(self):
+        c = await self.post('/api/rooms', {'nickname':'host'})
+        ws = await self.open_socket(c)
+        await self.read(ws)
+        await ws.send_json({'type':'choose_seat','seat':1})
+        await self.read(ws, lambda m:m.get('type')=='state' and m['you']['seat']==1)
+        await ws.send_json({'type':'start_ai'})
+        state = await self.read(ws, lambda m:m.get('type')=='state' and m['player_view'] is not None)
+        room = self.app[ROOMS][c['room_code']]
+        self.assertEqual(state['room']['ai'], 3)
+        await ws.send_json({'type':'pause','enabled':True})
+        await self.read(ws, lambda m:m.get('type')=='state' and m['room']['paused'])
+        revision = room.table.engine.state.revision
+        await asyncio.sleep(.5)
+        self.assertEqual(room.table.engine.state.revision, revision)
+        await ws.close()
+        async with asyncio.timeout(5):
+            while any(p.connected for p in room.members.values()):
+                await asyncio.sleep(.01)
+        self.assertFalse(room.can_run())
+
+    async def test_http_reset_preserves_identity_and_round(self):
+        await self.setup_room()
+        before = self.views[2]
+        await self.post('/api/connections/reset', {'room_code':self.code,'session_token':'bad'}, 400)
+        result = await self.post('/api/connections/reset', {'room_code':self.code,'session_token':self.credentials[2]['session_token']})
+        self.assertGreaterEqual(result['closed'],1)
+        self.clients[2] = await self.open_socket(self.credentials[2])
+        current = await self.read(self.clients[2])
+        self.assertEqual(current['you'],before['you'])
+        self.assertEqual(current['player_view']['round_id'],before['player_view']['round_id'])
+
+    async def test_admin_isolated_and_listener_restart_keeps_round(self):
+        await self.setup_room()
+        before = self.views[0]['player_view']['round_id']
+        registry = self.app[NETWORK]
+        port = self.site._server.sockets[0].getsockname()[1]
+        listener = GameListener(self.runner,registry,'127.0.0.1',port,self.site)
+        async def no_room_action(*args):
+            self.fail('unexpected room action')
+        admin = create_admin_app(registry,lambda:[],no_room_action,listener.restart)
+        admin_runner = web.AppRunner(admin)
+        await admin_runner.setup()
+        try:
+            site = web.TCPSite(admin_runner,'127.0.0.1',0)
+            await site.start()
+            url = 'http://127.0.0.1:'+str(site._server.sockets[0].getsockname()[1])
+            async with self.http.get(self.url+'/api/status') as response:
+                self.assertEqual(response.status,404)
+            async with self.http.get(url+'/api/status',headers={'Host':'evil.example'}) as response:
+                self.assertEqual(response.status,403)
+            async with self.http.get(url+'/api/status') as response:
+                status = await response.json()
+            self.assertGreaterEqual(sum(c['kind']=='ws' for c in status['connections']),4)
+            self.assertNotIn(self.credentials[0]['session_token'],json.dumps(status))
+            async with self.http.post(url+'/api/manage',json={'action':'restart'}) as response:
+                self.assertEqual(response.status,403)
+            headers={'X-Admin-Token':status['token']}
+            async with self.http.post(url+'/api/manage',json={'action':'restart'},headers={**headers,'Origin':'http://evil.example'}) as response:
+                self.assertEqual(response.status,403)
+            async with self.http.post(url+'/api/manage',json={'action':'restart'},headers=headers) as response:
+                self.assertEqual(response.status,200,await response.text())
+                self.assertGreaterEqual((await response.json())['closed'],4)
+            self.clients[0] = await self.open_socket(self.credentials[0])
+            current = await self.read(self.clients[0])
+            self.assertEqual(current['player_view']['round_id'],before)
+            async with self.http.get(self.url+'/') as response:
+                self.assertEqual(response.status,200)
+        finally:
+            await admin_runner.cleanup()
 
     async def test_disconnect_refresh_and_multiple_tabs(self):
         await self.setup_room()

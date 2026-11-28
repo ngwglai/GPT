@@ -113,3 +113,14 @@ body.lan-mode:not(.table-live) .topbar .connection-status[data-connection="waiti
 body.lan-mode:not(.table-live) #roomBaseScore { width:100%; color:#f7f4e8; background:#29483f; border:1px solid #688578; border-radius:8px; padding:8px; font:inherit; }
 body.lan-mode:not(.table-live) #roomScoreMode { color:#365653; font-weight:700; }
 body.lan-mode:not(.table-live) label[for="roomBaseScore"] { margin:0; color:#365653; }
+
+/* Public lobby and compact room management. */
+.public-rooms { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 16px; }
+.room-list-heading, .public-room-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.room-list-heading h2 { margin:0; font-size:18px; }
+.public-room-row { padding:8px 0; border-bottom:1px solid var(--line); color:#365653; font-size:13px; }
+.public-room-row span { min-width:0; overflow-wrap:anywhere; }
+.public-room-row button { flex-shrink:0; }
+.room-management-panel { min-width: min(280px, 85vw); max-height:70vh; overflow:auto; }
+.room-management-panel button, #hostManagement button { width:100%; margin:3px 0; text-align:left; white-space:normal; }
+#roomName, #roomPassword { width:100%; }

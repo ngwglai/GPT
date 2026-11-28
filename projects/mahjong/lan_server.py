@@ -25,6 +25,7 @@ from aiohttp import web, WSMsgType, web_fileresponse
 
 if os.name == 'nt':
     web_fileresponse.NOSENDFILE = True
+from network_admin import ConnectionRegistry, GameListener, create_admin_app
 from mahjong import Seat, IllegalAction, ScoreConfig, __version__
 from mahjong.game.autoplay import AutoRunner
 from web_server import LocalTable, WEB_ROOT
@@ -38,6 +39,7 @@ ROOMS = web.AppKey('rooms', dict)
 LOCAL = web.AppKey('local', LocalTable)
 LOCAL_LOCK = web.AppKey('local_lock', asyncio.Lock)
 LOCAL_AI = web.AppKey('local_ai', AutoRunner)
+NETWORK = web.AppKey('network', ConnectionRegistry)
 
 
 def peer_io_error(exc):
@@ -51,6 +53,8 @@ class NetworkFileResponse(web.FileResponse):
     """Keep range/HEAD handling, but bound file preparation and transfer."""
     async def prepare(self, request):
         transport = request.transport
+        registry = request.app[NETWORK]
+        registry.update(transport, kind='file', path=request.path)
         try:
             return await asyncio.wait_for(super().prepare(request), FILE_TIMEOUT)
         except OSError as exc:
@@ -58,10 +62,13 @@ class NetworkFileResponse(web.FileResponse):
                 raise
             LOG.info("Static transfer interrupted: peer=%s path=%s error=%s",
                      request.remote, request.path, type(exc).__name__)
+            registry.error(transport, exc)
             if transport is not None:
                 transport.abort()
             # aiohttp finish_response treats ConnectionError as peer disconnect.
             raise ConnectionResetError("Static transfer interrupted") from exc
+        finally:
+            registry.update(transport, kind="http")
 
 
 async def close_socket(ws, *, drain=True, **kwargs):
@@ -106,8 +113,11 @@ class Member:
 
 
 class Room:
-    def __init__(self, code, base_score=1):
+    def __init__(self, code, base_score=1, name=None, password=''):
         self.code = code
+        self.name = name or '麻将房间'
+        self.password = password
+        self.paused = False
         self.base_score = ScoreConfig(base_score).base_ping_hu
         self.members: dict[str, Member] = {}
         self.host_id = None
@@ -123,8 +133,6 @@ class Room:
         self.touched = time.monotonic()
 
     def join(self, name):
-        if self.table:
-            raise ClientError('牌局已经开始，只能使用原身份重连。')
         if len(self.members) >= 4:
             raise ClientError('房间已满。')
         member = Member(nickname(name))
@@ -133,6 +141,59 @@ class Room:
             self.host_id = member.member_id
         self.touch()
         return member
+
+    def can_run(self):
+        return not self.paused and any(p.connected and p.seat is not None for p in self.members.values())
+
+    def summary(self):
+        return {'code': self.code, 'name': self.name, 'base_score': self.base_score,
+                'started': self.table is not None, 'paused': self.paused or not self.can_run(),
+                'private': bool(self.password), 'players': len(self.members),
+                'online': sum(p.connected for p in self.members.values()),
+                'vacant': 4 - sum(p.seat is not None for p in self.members.values()),
+                'vacant_controls': {int(s): self.table.control[s] for s in Seat if not any(p.seat == int(s) for p in self.members.values())} if self.table else {},
+                'ai': sum(mode != 'human' for mode in self.table.control.values()) if self.table else 0}
+
+    def transfer_host(self, member):
+        if self.host_id == member.member_id:
+            others = [p for p in self.members.values() if p is not member]
+            successor = next((p for p in others if p.connected), others[0] if others else None)
+            self.host_id = successor.member_id if successor else None
+
+    async def reset_member(self, member, registry):
+        peers = tuple(member.sockets)
+        member.sockets.clear()
+        self.ready_seats.discard(member.seat)
+        count = registry.abort_sockets(peers)
+        for peer in peers:
+            asyncio.create_task(close_socket(peer, drain=False))
+        self.touch()
+        await self.broadcast()
+        return count
+
+    async def release(self, member, *, use_ai=False):
+        # Remove authorization BEFORE any await, so a stale socket cannot act.
+        if self.members.get(member.token) is not member:
+            return
+        peers = tuple(member.sockets)
+        member.sockets.clear()
+        del self.members[member.token]
+        self.transfer_host(member)
+        if member.seat is not None:
+            self.ready_seats.discard(member.seat)
+            if self.table:
+                seat = Seat(member.seat)
+                self.table.set_control(seat=seat, round_id=self.table.engine.state.round_id,
+                                       mode='easy' if use_ai else 'human')
+                # Invalidate any ticket already computed for the former occupant.
+                self.table.control_generation[seat] += 1
+        self.touch()
+        await asyncio.gather(*(self.send(peer, {'type': 'left', 'resumable': False}) for peer in peers))
+        for peer in peers:
+            asyncio.create_task(close_socket(peer))
+        await self.broadcast()
+        if self.ai:
+            self.ai.kick()
 
     def authenticate(self, token):
         if not isinstance(token, str) or token not in self.members:
@@ -146,11 +207,11 @@ class Room:
     def ready_status(self):
         if not self.table or self.table.engine.state.phase.name != "ROUND_END":
             return set()
-        return {p.seat for p in self.members.values() if p.seat is not None and (
-            self.table.control[Seat(p.seat)] != "human" or (p.connected and p.seat in self.ready_seats))}
+        return {int(seat) for seat in Seat if self.table.control[seat] != 'human'} | {
+            p.seat for p in self.members.values() if p.seat is not None and p.connected and p.seat in self.ready_seats}
 
     def advance_if_ready(self):
-        if len(self.ready_status()) == 4 and self.ready_seats:
+        if self.can_run() and len(self.ready_status()) == 4 and self.ready_seats:
             self.table.next_round()
             self.ready_seats.clear()
 
@@ -165,9 +226,10 @@ class Room:
             table = self.table.view_for(Seat(member.seat))
             by_seat = {p.seat: p for p in self.members.values()}
             for seat, player in table['players'].items():
-                p = by_seat[seat]
+                p = by_seat.get(seat)
                 player.pop('player_id', None)
-                player.update(nickname=p.name, connected=p.connected, ready=seat in ready_seats)
+                player.update(nickname=p.name if p else ('AI' if self.table.control[Seat(seat)] != 'human' else '空缺'),
+                              connected=p.connected if p else False, ready=seat in ready_seats)
             # Match metadata is public; omit all seeds, including historical seeds.
             def record(r):
                 return {k: r[k] for k in ('round_no', 'dealer', 'result')} if r else None
@@ -178,8 +240,7 @@ class Room:
                 'scoring': self.table.scoring_view(),
             }
         return {'type': 'state', 'room_version': self.version,
-                'room': {'code': self.code, 'started': self.table is not None,
-                         'host_id': self.host_id, 'members': roster, 'base_score': self.base_score},
+                'room': {**self.summary(), 'host_id': self.host_id, 'members': roster},
                 'you': {'member_id': member.member_id, 'seat': member.seat},
                 'controls': {
                     'can_start': self.table is None and member.member_id == self.host_id and
@@ -187,7 +248,10 @@ class Room:
                     'can_next_round': bool(self.table and member.seat is not None and
                                            self.table.engine.state.phase.name == 'ROUND_END'),
                     'ready_seats': sorted(ready_seats),
-                    'can_choose_seat': self.table is None,
+                    'can_choose_seat': self.table is None or member.seat is None,
+                    'can_start_ai': self.table is None and member.member_id == self.host_id and
+                                    bool(self.members) and all(p.seat is not None and p.connected for p in self.members.values()),
+                    'can_manage': member.member_id == self.host_id,
                 }, 'player_view': table}
 
     def command(self, member, data) -> bool:
@@ -197,22 +261,46 @@ class Room:
         kind = data.get('type')
         if kind == 'choose_seat':
             fields(data, ('type', 'seat'))
-            if self.table:
-                raise ClientError('开始后不能换座。')
+            if self.table and member.seat is not None:
+                raise ClientError('进行中不能换到另一席；请先释放原座位。')
             seat = data['seat']
             if type(seat) is not int or seat not in range(4):
                 raise ClientError('座位必须为东、南、西、北之一。')
             if any(p is not member and p.seat == seat for p in self.members.values()):
                 raise ClientError('这个座位已有玩家。')
             member.seat = seat
-        elif kind == 'start':
+            if self.table:
+                self.table.set_control(seat=Seat(seat), round_id=self.table.engine.state.round_id, mode='human')
+                self.table.control_generation[Seat(seat)] += 1
+                self.ready_seats.discard(seat)
+        elif kind in ('start', 'start_ai'):
             fields(data, ('type',))
-            if not self.view(member)['controls']['can_start']:
-                raise ClientError('需要四位玩家在线并入座，由房主开始。')
+            control = 'can_start' if kind == 'start' else 'can_start_ai'
+            if not self.view(member)['controls'][control]:
+                raise ClientError('需要玩家在线并入座，由房主开始。')
             self.table = LocalTable(base_score=self.base_score)
-            self.ai = AutoRunner(self.table, self.lock, self.publish_ai)
+            occupied = {p.seat for p in self.members.values()}
+            for seat in Seat:
+                if int(seat) not in occupied:
+                    self.table.set_control(seat=seat, round_id=self.table.engine.state.round_id, mode='easy')
+            self.ai = AutoRunner(self.table, self.lock, self.publish_ai, can_run=self.can_run)
+        elif kind == 'pause':
+            fields(data, ('type', 'enabled'))
+            if member.member_id != self.host_id or type(data['enabled']) is not bool:
+                raise ClientError('仅房主可以暂停或恢复房间。')
+            self.paused = data['enabled']
+        elif kind == 'vacant_control':
+            fields(data, ('type', 'seat', 'mode'))
+            seat = data['seat']
+            if (member.member_id != self.host_id or not self.table or type(seat) is not int
+                    or seat not in range(4) or any(p.seat == seat for p in self.members.values())):
+                raise ClientError('仅房主可以管理空缺座位。')
+            self.table.set_control(seat=Seat(seat), round_id=self.table.engine.state.round_id, mode=data['mode'])
+            self.advance_if_ready()
         elif kind == 'action':
             fields(data, ('type', 'intent'))
+            if self.paused:
+                raise ClientError('房间已暂停。')
             if not self.table or member.seat is None:
                 raise ClientError('牌局尚未开始。')
             self.table.human_act(seat=Seat(member.seat), payload=data['intent'])
@@ -301,6 +389,11 @@ def check_origin(request):
 @web.middleware
 async def boundary(request, handler):
     check_origin(request)
+    registry = request.app[NETWORK]
+    transport = request.transport
+    registry.update(transport, kind='http', path=request.path)
+    if registry.blocked(transport):
+        raise web.HTTPForbidden(text='此地址暂时被管理员限制')
     try:
         response = await handler(request)
     except (ClientError, IllegalAction, ValueError, TypeError, KeyError) as exc:
@@ -313,9 +406,25 @@ async def boundary(request, handler):
     return response
 
 
+async def list_rooms(request):
+    rooms = [room.summary() for room in request.app[ROOMS].values() if not room.password]
+    return web.json_response({'ok': True, 'rooms': rooms,
+                              'online': sum(room['online'] for room in rooms)})
+
+
+async def reset_player(request):
+    data = await request.json()
+    fields(data, ('room_code', 'session_token'))
+    room = room_for(request, data['room_code'])
+    async with room.lock:
+        member = room.authenticate(data['session_token'])
+        count = await room.reset_member(member, request.app[NETWORK])
+    return web.json_response({'ok': True, 'closed': count})
+
+
 async def create_room(request):
     data = await request.json()
-    if not isinstance(data, dict) or 'nickname' not in data or set(data) - {'nickname', 'base_score'}:
+    if not isinstance(data, dict) or 'nickname' not in data or set(data) - {'nickname', 'base_score', 'name', 'password'}:
         raise ClientError('请求字段不正确，请刷新后重试。')
     name = nickname(data['nickname'])
     base_score = ScoreConfig(data.get('base_score', 1)).base_ping_hu
@@ -326,16 +435,26 @@ async def create_room(request):
     code = ''.join(secrets.choice(alphabet) for _ in range(6))
     while code in rooms:
         code = ''.join(secrets.choice(alphabet) for _ in range(6))
-    room = rooms[code] = Room(code, base_score)
+    title = data.get('name') or '麻将房间'
+    password = data.get('password', '')
+    if not isinstance(title, str) or not 1 <= len(title.strip()) <= 40 or not isinstance(password, str) or len(password) > 64:
+        raise ClientError('房间名或密码格式不正确。')
+    room = rooms[code] = Room(code, base_score, title.strip(), password)
     member = room.join(name)
     return web.json_response({'ok': True, 'room_code': code, 'session_token': member.token})
 
 
 async def join_room(request):
     data = await request.json()
-    fields(data, ('nickname', 'room_code'))
+    if not isinstance(data, dict) or not {'nickname', 'room_code'} <= set(data) or set(data) - {'nickname', 'room_code', 'password'}:
+        raise ClientError('请求字段不正确。')
     room = room_for(request, data['room_code'])
     async with room.lock:
+        if request.app[ROOMS].get(room.code) is not room:
+            raise InvalidSession('房间已关闭。')
+        password = data.get('password', '')
+        if not isinstance(password, str) or (room.password and password != room.password):
+            raise ClientError('房间密码错误。')
         member = room.join(data['nickname'])
         await room.broadcast()
     return web.json_response({'ok': True, 'room_code': room.code, 'session_token': member.token})
@@ -343,6 +462,8 @@ async def join_room(request):
 
 async def websocket(request):
     room = None
+    registry = request.app[NETWORK]
+    transport = request.transport
     ws = web.WebSocketResponse(heartbeat=10, max_msg_size=8192)
     await ws.prepare(request)
     member = None
@@ -355,18 +476,27 @@ async def websocket(request):
         async with room.lock:
             member = room.authenticate(data['session_token'])
             member.sockets.add(ws)
+            host = next((p for p in room.members.values() if p.member_id == room.host_id), None)
+            if host is None or not host.connected:
+                room.host_id = member.member_id
+            registry.update(transport, kind='ws', room=room.code, member=member.member_id, ws=ws)
             room.touch()
             await room.broadcast()
+            if room.ai:
+                room.ai.kick()
         async for msg in ws:
             if msg.type != WSMsgType.TEXT:
                 if msg.type in (WSMsgType.ERROR, WSMsgType.CLOSE):
                     break
                 continue
             try:
+                registry.update(transport)
                 data = json.loads(msg.data)
                 # Probe the connection without mutating state or replaying commands.
                 if data == {'type': 'ping'}:
                     room.authenticate(member.token)
+                    if ws not in member.sockets:
+                        break
                     if not await room.send(ws, {'type': 'pong'}):
                         break
                     continue
@@ -376,6 +506,34 @@ async def websocket(request):
                 async with room.lock:
                     # Recheck token: another tab may have explicitly left.
                     room.authenticate(member.token)
+                    if ws not in member.sockets or transport is None or transport.is_closing():
+                        break
+                    if isinstance(data, dict) and data.get('type') == 'delete_room':
+                        fields(data, ('type',))
+                        if member.member_id != room.host_id:
+                            raise ClientError('仅房主可以删除房间。')
+                        room.paused = True
+                        request.app[ROOMS].pop(room.code, None)
+                        for target in list(room.members.values()):
+                            await room.release(target)
+                        if room.ai:
+                            asyncio.create_task(room.ai.close())
+                        break
+                    if isinstance(data, dict) and data.get('type') == 'release':
+                        fields(data, ('type',))
+                        await room.release(member)
+                        break
+                    if isinstance(data, dict) and data.get('type') == 'remove_member':
+                        fields(data, ('type', 'member_id'))
+                        if member.member_id != room.host_id:
+                            raise ClientError('只有房主可以移除玩家。')
+                        target = next((p for p in room.members.values() if p.member_id == data['member_id']), None)
+                        if target is None or target is member:
+                            raise ClientError('玩家不存在或不能移除自己。')
+                        await room.release(target)
+                        if command_id is not None:
+                            await room.send(ws, {'type': 'command_ack', 'command_id': command_id})
+                        continue
                     if isinstance(data, dict) and data.get('type') == 'leave':
                         fields(data, ('type',))
                         peers = tuple(member.sockets)
@@ -383,12 +541,9 @@ async def websocket(request):
                         room.ready_seats.discard(member.seat)
                         if not room.table:
                             del room.members[member.token]
-                        if room.host_id == member.member_id:
-                            others = [p for p in room.members.values() if p is not member]
-                            if others:
-                                room.host_id = next((p.member_id for p in others if p.connected), others[0].member_id)
-                            elif not room.table:
-                                room.host_id = None
+                        room.transfer_host(member)
+                        if room.host_id is None and room.table:
+                            room.host_id = member.member_id
                         room.touch()
                         for peer in peers:
                             await room.send(peer, {'type': 'left', 'resumable': room.table is not None})
@@ -402,6 +557,9 @@ async def websocket(request):
                     if room.ai:
                         room.ai.kick()
             except (ClientError, IllegalAction, ValueError, TypeError, KeyError) as exc:
+                if isinstance(exc, InvalidSession):
+                    await room.send(ws, {'type': 'error', 'error': str(exc), 'invalid_session': True})
+                    break
                 await room.send(ws, {'type': 'error', 'error': str(exc)})
                 async with room.lock:
                     if member.token in room.members:
@@ -413,6 +571,7 @@ async def websocket(request):
     except OSError as exc:
         if not peer_io_error(exc):
             raise
+        registry.error(transport, exc)
         LOG.info("WebSocket peer disconnected: room=%s peer=%s error=%s",
                  room.code if room else '-', request.remote, type(exc).__name__)
     finally:
@@ -420,11 +579,15 @@ async def websocket(request):
             if member is not None:
                 async with room.lock:
                     member.sockets.discard(ws)
-                    if not member.connected:
-                        room.ready_seats.discard(member.seat)
-                    room.touch()
-                    await room.broadcast()
+                    if room.members.get(member.token) is member:
+                        if not member.connected:
+                            room.ready_seats.discard(member.seat)
+                            if member.member_id == room.host_id and any(p.connected for p in room.members.values() if p is not member):
+                                room.transfer_host(member)
+                        room.touch()
+                        await room.broadcast()
         finally:
+            registry.update(transport, kind='http', room=None, member=None, ws=None)
             await close_socket(ws)
     return ws
 
@@ -518,11 +681,17 @@ async def cleanup(app):
         while True:
             await asyncio.sleep(60)
             now = time.monotonic()
+            app[NETWORK].prune()
             for code, room in list(app[ROOMS].items()):
-                if now - room.touched > ROOM_TTL and not any(p.connected for p in room.members.values()):
-                    if room.ai:
-                        await room.ai.close()
-                    del app[ROOMS][code]
+                async with room.lock:
+                    expired = now - room.touched > ROOM_TTL and not any(p.connected for p in room.members.values())
+                    if expired and app[ROOMS].get(code) is room:
+                        del app[ROOMS][code]
+                        room.paused = True
+                    else:
+                        expired = False
+                if expired and room.ai:
+                    await room.ai.close()
     task = asyncio.create_task(prune())
     yield
     task.cancel()
@@ -543,13 +712,16 @@ async def health(request):
 def create_app(seed=None, dealer=Seat.EAST):
     app = web.Application(middlewares=[boundary], client_max_size=8192)
     app[ROOMS] = {}
+    app[NETWORK] = ConnectionRegistry()
     app[LOCAL] = LocalTable(seed=seed, dealer=dealer)
     app[LOCAL_LOCK] = asyncio.Lock()
     app[LOCAL_AI] = AutoRunner(app[LOCAL], app[LOCAL_LOCK])
     app.cleanup_ctx.append(cleanup)
     app.on_shutdown.append(shutdown)
     app.router.add_get('/api/health', health)
+    app.router.add_get('/api/rooms', list_rooms)
     app.router.add_post('/api/rooms', create_room)
+    app.router.add_post('/api/connections/reset', reset_player)
     app.router.add_post('/api/rooms/join', join_room)
     app.router.add_get('/ws/{code}', websocket)
     app.router.add_get('/api/table', local_api)
@@ -576,4 +748,66 @@ def run(args):
     print('按 Ctrl+C 停止；重启服务器会清除临时房间。', flush=True)
     if not args.no_browser:
         threading.Timer(0.6, lambda: webbrowser.open(url)).start()
-    web.run_app(create_app(args.seed, Seat(args.dealer)), host=args.host, port=args.port, access_log=None, keepalive_timeout=30)
+    async def serve():
+        app = create_app(args.seed, Seat(args.dealer))
+        runner = web.AppRunner(app, access_log=None, keepalive_timeout=30)
+        await runner.setup()
+        registry = app[NETWORK]
+        listener = GameListener(runner, registry, args.host, args.port)
+        restart = listener.restart
+
+        async def room_action(code, action, member_id=None):
+            room = app[ROOMS].get(code)
+            if room is None:
+                raise ValueError('房间不存在')
+            async with room.lock:
+                if action in ('remove', 'reset_member'):
+                    target = next((p for p in room.members.values() if p.member_id == member_id), None)
+                    if target is None:
+                        raise ValueError('玩家不存在')
+                    if action == 'reset_member':
+                        return await room.reset_member(target, registry)
+                    await room.release(target)
+                elif action in ('pause', 'resume'):
+                    room.paused = action == 'pause'
+                    room.touch()
+                    await room.broadcast()
+                    if room.ai:
+                        room.ai.kick()
+                elif action == 'delete':
+                    room.paused = True
+                    del app[ROOMS][code]
+                    for member in list(room.members.values()):
+                        await room.release(member)
+                else:
+                    raise ValueError('未知房间操作')
+            if action == 'delete' and room.ai:
+                await room.ai.close()
+
+        admin_runner = None
+        try:
+            await restart()
+            admin_port = args.admin_port if args.admin_port is not None else args.port + 1
+            if admin_port:
+                def admin_rooms():
+                    return [{**r.summary(), 'members': [
+                        {'member_id': p.member_id, 'nickname': p.name, 'seat': p.seat, 'online': p.connected}
+                        for p in r.members.values()]} for r in app[ROOMS].values()]
+                admin = create_admin_app(registry, admin_rooms, room_action, restart)
+                admin_runner = web.AppRunner(admin, access_log=None)
+                await admin_runner.setup()
+                try:
+                    await web.TCPSite(admin_runner, '127.0.0.1', admin_port).start()
+                    print(f'服务器管理后台：http://127.0.0.1:{admin_port}/', flush=True)
+                except OSError as exc:
+                    LOG.warning('管理端口不可用：%s', exc)
+            await asyncio.Event().wait()
+        finally:
+            if admin_runner is not None:
+                await admin_runner.cleanup()
+            await runner.cleanup()
+
+    try:
+        asyncio.run(serve())
+    except KeyboardInterrupt:
+        pass
