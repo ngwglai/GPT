@@ -71,6 +71,7 @@ class Room:
         self.table: LocalTable | None = None
         self.lock = asyncio.Lock()
         self.ai = None
+        self.ready_seats = set()
         self.version = 0
         self.touched = time.monotonic()
 
@@ -99,7 +100,19 @@ class Room:
         self.touch()
         await self.broadcast()
 
+    def ready_status(self):
+        if not self.table or self.table.engine.state.phase.name != "ROUND_END":
+            return set()
+        return {p.seat for p in self.members.values() if p.seat is not None and (
+            self.table.control[Seat(p.seat)] != "human" or (p.connected and p.seat in self.ready_seats))}
+
+    def advance_if_ready(self):
+        if len(self.ready_status()) == 4 and self.ready_seats:
+            self.table.next_round()
+            self.ready_seats.clear()
+
     def view(self, member):
+        ready_seats = self.ready_status()
         roster = [dict(member_id=p.member_id, nickname=p.name, seat=p.seat,
                        connected=p.connected, host=p.member_id == self.host_id)
                   for p in self.members.values()]
@@ -111,7 +124,7 @@ class Room:
             for seat, player in table['players'].items():
                 p = by_seat[seat]
                 player.pop('player_id', None)
-                player.update(nickname=p.name, connected=p.connected)
+                player.update(nickname=p.name, connected=p.connected, ready=seat in ready_seats)
             # Match metadata is public; omit all seeds, including historical seeds.
             def record(r):
                 return {k: r[k] for k in ('round_no', 'dealer', 'result')} if r else None
@@ -128,8 +141,9 @@ class Room:
                 'controls': {
                     'can_start': self.table is None and member.member_id == self.host_id and
                                  len(self.members) == 4 and all(p.seat is not None and p.connected for p in self.members.values()),
-                    'can_next_round': bool(self.table and member.member_id == self.host_id and
+                    'can_next_round': bool(self.table and member.seat is not None and
                                            self.table.engine.state.phase.name == 'ROUND_END'),
+                    'ready_seats': sorted(ready_seats),
                     'can_choose_seat': self.table is None,
                 }, 'player_view': table}
 
@@ -164,6 +178,15 @@ class Room:
             if not self.table or member.seat is None:
                 raise ClientError('牌局尚未开始。')
             self.table.set_control(seat=Seat(member.seat), round_id=data['round_id'], mode=data['mode'])
+            self.ready_seats.discard(member.seat)
+            self.advance_if_ready()
+        elif kind == 'auto_ting':
+            fields(data, ('type', 'round_id', 'enabled'))
+            if not self.table or member.seat is None:
+                raise ClientError('牌局尚未开始。')
+            self.table.set_auto_ting(seat=Seat(member.seat), round_id=data['round_id'], enabled=data['enabled'])
+            self.touch()
+            return False
         elif kind == 'orphan_pickup':
             fields(data, ('type', 'round_id', 'enabled'))
             if not self.table or member.seat is None:
@@ -172,14 +195,17 @@ class Room:
             self.table.update_orphan_pickup(seat=Seat(member.seat), round_id=data['round_id'], enabled=data['enabled'])
             if self.table.engine.state.revision == revision:
                 return False
-        elif kind == 'next_round':
-            fields(data, ('type', 'round_id', 'revision'))
+        elif kind == 'ready_next_round':
+            fields(data, ('type', 'round_id', 'enabled'))
             if not self.view(member)['controls']['can_next_round']:
-                raise ClientError('本局结束后由房主开始下一局。')
-            state = self.table.engine.state
-            if type(data['revision']) is not int or data['round_id'] != state.round_id or data['revision'] != state.revision:
-                raise ClientError('状态已更新，请根据最新画面重试。')
-            self.table.next_round()
+                raise ClientError('本局结束后才能准备下一局。')
+            if data['round_id'] != self.table.engine.state.round_id or type(data['enabled']) is not bool:
+                raise ClientError('准备状态已过期或无效。')
+            if data['enabled']:
+                self.ready_seats.add(member.seat)
+            else:
+                self.ready_seats.discard(member.seat)
+            self.advance_if_ready()
         elif kind == 'sync':
             fields(data, ('type',))
             return True
@@ -303,6 +329,7 @@ async def websocket(request):
                         fields(data, ('type',))
                         peers = tuple(member.sockets)
                         member.sockets.clear()
+                        room.ready_seats.discard(member.seat)
                         if not room.table:
                             del room.members[member.token]
                         if room.host_id == member.member_id:
@@ -321,7 +348,7 @@ async def websocket(request):
                     await room.broadcast(only=None if shared else member)
                     if command_id is not None:
                         await room.send(ws, {'type': 'command_ack', 'command_id': command_id})
-                    if room.ai and any(mode != 'human' for mode in room.table.control.values()):
+                    if room.ai:
                         room.ai.kick()
             except (ClientError, IllegalAction, ValueError, TypeError, KeyError) as exc:
                 await room.send(ws, {'type': 'error', 'error': str(exc)})
@@ -336,6 +363,8 @@ async def websocket(request):
         if member is not None:
             async with room.lock:
                 member.sockets.discard(ws)
+                if not member.connected:
+                    room.ready_seats.discard(member.seat)
                 room.touch()
                 await room.broadcast()
         await ws.close()
@@ -392,6 +421,13 @@ async def local_api(request):
                 if type(seat) is not int or seat not in range(4):
                     raise ClientError('seat must be 0..3')
                 result = table.set_orphan_pickup(seat=Seat(seat), round_id=data['round_id'], enabled=data['enabled'])
+            elif request.path == '/api/auto-ting':
+                fields(data, ('seat', 'round_id', 'enabled'))
+                seat = data['seat']
+                if type(seat) is not int or seat not in range(4):
+                    raise ClientError('seat must be 0..3')
+                table.set_auto_ting(seat=Seat(seat), round_id=data['round_id'], enabled=data['enabled'])
+                result = table.snapshot()
             elif request.path == '/api/control':
                 fields(data, ('seat', 'round_id', 'mode'))
                 seat = data['seat']
@@ -404,7 +440,7 @@ async def local_api(request):
                 result = table.timeout_responses(**data)
             else:
                 raise web.HTTPNotFound()
-        if request.method == 'POST' and any(mode != 'human' for mode in table.control.values()):
+        if request.method == 'POST':
             request.app[LOCAL_AI].kick()
     return web.json_response({'ok': True, 'table': result})
 
@@ -459,7 +495,7 @@ def create_app(seed=None, dealer=Seat.EAST):
     app.router.add_post('/api/rooms/join', join_room)
     app.router.add_get('/ws/{code}', websocket)
     app.router.add_get('/api/table', local_api)
-    for path in ('new-round', 'next-round', 'action', 'orphan-pickup', 'control', 'timeout-responses'):
+    for path in ('new-round', 'next-round', 'action', 'orphan-pickup', 'auto-ting', 'control', 'timeout-responses'):
         app.router.add_post('/api/' + path, local_api)
     app.router.add_get('/{path:.*}', static_file)
     return app

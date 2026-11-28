@@ -113,6 +113,15 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
             await self.room.broadcast()
         await self.all_states(lambda m: m['room_version'] == version)
 
+    async def ready_all(self, old):
+        for seat in range(4):
+            await self.clients[seat].send_json({'type':'ready_next_round', 'round_id':old['round_id'], 'enabled':True})
+            if seat < 3:
+                await self.all_states(lambda m: len(m['controls']['ready_seats']) == seat + 1)
+                self.assertTrue(all(m['player_view']['round_id'] == old['round_id'] for m in self.views.values()))
+        await self.all_states(lambda m: m['player_view']['round_id'] != old['round_id'])
+        self.assertTrue(all(not m['controls']['ready_seats'] for m in self.views.values()))
+
     def assert_private(self):
         public = []
         for viewer, state in self.views.items():
@@ -122,8 +131,8 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(p['concealed_count'], len(self.room.table.engine.state.players[Seat(seat)].concealed_tiles))
                 for key in ('concealed_tiles', 'current_waits', 'declared_waits', 'last_drawn_tile',
                             'orphan_pickup_enabled', 'wait_hint', 'ai_decisions'):
-                    self.assertEqual(key in p, seat == viewer, (seat, viewer, key))
-                if seat != viewer and p['ting_tile']:
+                    self.assertEqual(key in p, seat == viewer or (key == 'concealed_tiles' and view['phase'] == 'ROUND_END'), (seat, viewer, key))
+                if seat != viewer and p['ting_tile'] and view['phase'] != 'ROUND_END':
                     self.assertEqual(p['ting_tile'], {'hidden': True})
                 self.assertEqual(p['picked_orphans'], self.views[0]['player_view']['players'][str(seat)]['picked_orphans'])
             encoded = json.dumps(state)
@@ -168,8 +177,7 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(v['player_view']['result']['settlement']['items']['other_hu'], [2])
         self.assert_private()
         old = self.views[0]['player_view']
-        await self.clients[0].send_json({'type':'next_round','round_id':old['round_id'],'revision':old['revision']})
-        await self.all_states(lambda m: m['player_view']['round_id'] != old['round_id'])
+        await self.ready_all(old)
         for v in self.views.values():
             self.assertEqual(v['player_view']['match']['scoring']['totals'], expected)
             self.assertEqual(v['player_view']['match']['scoring']['base_score'], 5)
@@ -293,9 +301,12 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.views[0]['player_view']['result']['winner'], 3)
         self.assert_private()
         old = self.views[0]['player_view']
-        await self.reject(1, {'type': 'next_round', 'round_id': old['round_id'], 'revision': old['revision']})
-        await self.clients[0].send_json({'type':'next_round', 'round_id':old['round_id'], 'revision':old['revision']})
-        await self.all_states(lambda m: m['player_view']['round_id'] != old['round_id'])
+        await self.reject(1, {'type': 'ready_next_round', 'round_id': 'stale', 'enabled': True})
+        await self.clients[1].send_json({'type':'ready_next_round','round_id':old['round_id'],'enabled':True})
+        await self.all_states(lambda m: m['controls']['ready_seats'] == [1])
+        await self.clients[1].send_json({'type':'ready_next_round','round_id':old['round_id'],'enabled':False})
+        await self.all_states(lambda m: not m['controls']['ready_seats'])
+        await self.ready_all(old)
         for seat, msg in self.views.items():
             self.assertEqual(msg['room']['code'], self.code)
             self.assertEqual(msg['you']['seat'], seat)
@@ -490,8 +501,7 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(view['players']['1']['picked_orphans'], [0])
         self.assert_private()
         final = self.views[0]['player_view']
-        await self.clients[0].send_json({'type': 'next_round', 'round_id': final['round_id'], 'revision': final['revision']})
-        await self.all_states(lambda m: m['player_view']['round_id'] != final['round_id'])
+        await self.ready_all(final)
         for seat, state in self.views.items():
             players = state['player_view']['players']
             self.assertFalse(players[str(seat)]['orphan_pickup_enabled'])
@@ -501,6 +511,8 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         await self.setup_room()
         # A deterministic seed is injected on the server only, never via a route.
         self.room.table.new_round(seed=20260916)
+        for seat in Seat:
+            self.room.table.set_auto_ting(seat=seat, round_id=self.room.table.engine.state.round_id, enabled=False)
         async with self.room.lock:
             self.room.touch()
             version = self.room.version
@@ -520,8 +532,7 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(last['result']['type'], 'DRAW')
         self.assert_private()
         self.assertGreater(steps, 50)
-        await self.clients[0].send_json({'type':'next_round', 'round_id':last['round_id'], 'revision':last['revision']})
-        await self.all_states(lambda m: m['player_view']['round_id'] != last['round_id'])
+        await self.ready_all(last)
         for msg in self.views.values():
             self.assertEqual(msg['player_view']['dealer'], last['dealer'])
             self.assertEqual(msg['player_view']['match']['round_no'], 2)
@@ -538,8 +549,7 @@ class LanTests(unittest.IsolatedAsyncioTestCase):
         last = self.views[0]['player_view']
         self.assertEqual(last['result']['winner'], 0)
         self.assert_private()
-        await self.clients[0].send_json({'type':'next_round', 'round_id':last['round_id'], 'revision':last['revision']})
-        await self.all_states(lambda m: m['player_view']['round_id'] != last['round_id'])
+        await self.ready_all(last)
         self.assertTrue(all(m['player_view']['dealer'] == 0 for m in self.views.values()))
         self.assert_private()
 

@@ -615,17 +615,18 @@ class GameEngine:
             if p.ting_tile is not None:
                 # Never leak the declaration tile's type or physical ID to another seat.
                 data["ting_tile"] = ({"id": p.ting_tile.instance_id, "type": p.ting_tile.type_id}
-                                     if seat == viewer else {"hidden": True})
+                                     if seat == viewer or s.phase == P.ROUND_END else {"hidden": True})
             for m in p.melds:
-                hidden = self.rules.hide_an_gang and seat != viewer and m.type == MeldType.AN_GANG
+                hidden = self.rules.hide_an_gang and seat != viewer and s.phase != P.ROUND_END and m.type == MeldType.AN_GANG
                 data["melds"].append({"type": m.type.name, "tiles": None if hidden else [t.type_id for t in m.tiles],
                                       "count": len(m.tiles), "source": int(m.source_seat) if m.source_seat is not None else None})
-            if seat == viewer:
+            if seat == viewer or s.phase == P.ROUND_END:
                 data["concealed_tiles"] = [
                     {"id": t.instance_id, "type": t.type_id}
                     for t in p.concealed_tiles
                 ]
 
+            if seat == viewer:
                 data["declared_waits"] = sorted(p.declared_waits)
                 data["current_waits"] = sorted(p.current_waits)
                 data["has_completed_first_gold_shelf"] = p.has_completed_first_gold_shelf

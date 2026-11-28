@@ -39,7 +39,7 @@
         }
       });
     }
-    $('controlSettings').querySelectorAll('select').forEach(select => {
+    $('controlSettings').querySelectorAll('select, input[data-auto-ting]').forEach(select => {
       select.disabled = locked;
     });
     $('startGame').disabled = locked || !state?.controls.can_start;
@@ -56,6 +56,10 @@
     hide('gameTable', !state.player_view); hide('focusHand', !state.player_view);
     hide('waitingControls', room.started); hide('playingHint', !room.started);
     hide('nextRound', !controls.can_next_round);
+    const count = controls.ready_seats?.length || 0;
+    const mineReady = controls.ready_seats?.includes(you.seat);
+    const allManaged = count === 4;
+    $('nextRound').textContent = allManaged ? '开始下一局 (4/4)' : mineReady ? `取消准备 (${count}/4)` : `准备下一局 (${count}/4)`;
     $('roomTitle').textContent = room.code;
     $('roomScoreMode').textContent = `基础分：${room.base_score ?? 1} 分`;
     $('yourSeat').textContent = you.seat == null ? '请选择空位' : `你是${seatNames[you.seat]}家`;
@@ -163,6 +167,10 @@
   }
   window.LanGame = {
     decorate,
+    setAutoTing(enabled) {
+      if (!state?.player_view) return;
+      send({type:'auto_ting', round_id:state.player_view.round_id, enabled});
+    },
     setController(mode) {
       if (!state?.player_view) return;
       showNotice('');
@@ -185,7 +193,8 @@
   $('resumeRoom').addEventListener('click', () => { stopped = false; connect(); });
   $('startGame').addEventListener('click', () => send({type:'start'}));
   $('nextRound').addEventListener('click', () => {
-    if (state?.player_view) send({type:'next_round', round_id:state.player_view.round_id, revision:state.player_view.revision});
+    if (state?.player_view) send({type:'ready_next_round', round_id:state.player_view.round_id,
+      enabled:state.controls.ready_seats?.length === 4 || !state.controls.ready_seats?.includes(state.you.seat)});
   });
   $('leaveRoom').addEventListener('click', () => {
     if (state?.room.started && !confirm('离开后仍保留你的座位，牌局可能等待你回来。确定暂时离开吗？')) return;

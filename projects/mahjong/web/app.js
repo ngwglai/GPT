@@ -138,7 +138,7 @@ function scheduleTablePoll() {
   clearTimeout(tablePoll);
   if (window.LanGame || document.hidden) return;
   const aiRunning = table?.phase !== "ROUND_END" &&
-    Object.values(table?.players || {}).some(p => p.controller && p.controller !== "human");
+    Object.values(table?.players || {}).some(p => (p.controller && p.controller !== "human") || (p.declared_ting && p.auto_ting));
   if (!localRefreshRequested && !aiRunning) return;
   tablePoll = setTimeout(async () => {
     if (document.hidden) return;
@@ -172,6 +172,16 @@ async function changeController(seat, mode) {
     setBusy(false);
   }
 }
+async function changeAutoTing(seat, enabled) {
+  if (window.LanGame) return window.LanGame.setAutoTing(enabled);
+  if (!table || busy) return;
+  try {
+    setBusy(true);
+    acceptTable(await api("/api/auto-ting", {method:"POST", body:JSON.stringify({seat, round_id:table.round_id, enabled})}));
+    showNotice("");
+  } catch (error) { showNotice(error.message); }
+  finally { setBusy(false); }
+}
 function renderTableHud() {
   const hud = document.getElementById("tableHud");
   const menu = document.getElementById("controlMenu");
@@ -190,7 +200,8 @@ function renderTableHud() {
       `<option value="${mode}"${current === mode ? " selected" : ""}>${label}${mode === "human" ? "" : " AI"}</option>`).join("")}</select></label>`;
   }).join("");
   const batch = viewerSeat == null ? `<div class="all-controls"><button type="button" class="primary" data-ai-all="normal">四家自动对局</button><button type="button" class="ghost" data-ai-all="human">暂停托管</button></div>` : "";
-  const controls = `<h2>席位控制</h2>${rows}${batch}`;
+  const autoTingRows = seats.map(seat => `<label><span>${seatNames[seat]}家听牌自动出牌</span><input type="checkbox" data-auto-ting="${seat}" ${table.players[seat].auto_ting ? "checked" : ""}></label>`).join("");
+  const controls = `<h2>席位控制</h2>${rows}${autoTingRows}${batch}`;
   if (settings.renderedMarkup !== controls) {
     settings.innerHTML = controls;
     settings.renderedMarkup = controls;
@@ -419,6 +430,7 @@ function renderPlayer(seat) {
     managed ? badge(aiStatus, "ai-badge") : window.LanGame ? "" : badge("人工", "human-badge"),
     viewerSeat === seat ? badge("你", "self") : "",
     p.declared_ting ? badge("已听", "ting") : "",
+    window.LanGame && table.phase === "ROUND_END" ? badge(p.ready ? "已准备" : "未准备", p.ready ? "online" : "offline") : "",
     picked.length ? badge("十三幺·已锁定", "orphan-locked") :
       p.orphan_pickup_enabled ? badge("十三幺·待拾", "orphan-ready") : "",
     p.has_completed_first_gold_shelf || p.shelf_count > 0 ? badge("已上金", "gold-ok") : "",
@@ -717,6 +729,8 @@ bindTableEvents();
 document.getElementById("controlSettings").addEventListener("change", event => {
   const seat = event.target.dataset.controlSeat;
   if (seat != null) changeController(Number(seat), event.target.value);
+  const autoSeat = event.target.dataset.autoTing;
+  if (autoSeat != null) changeAutoTing(Number(autoSeat), event.target.checked);
 });
 document.getElementById("controlSettings").addEventListener("click", event => {
   const mode = event.target.closest("[data-ai-all]")?.dataset.aiAll;

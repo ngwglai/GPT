@@ -27,13 +27,16 @@ class AutoRunner:
         try:
             while True:
                 async with self.lock:
-                    ticket = self.table.ai_ticket()
-                    if ticket is None:
+                    ting = self.table.ting_ticket()
+                    ticket = self.table.ai_ticket() if ting is None else None
+                    if ting is None and ticket is None:
+                        self.task = None
                         return
-                await asyncio.sleep(self.delay)
-                decision = await asyncio.to_thread(decide, ticket)
+                await asyncio.sleep(0.4 if ting is not None else self.delay)
+                decision = await asyncio.to_thread(decide, ticket) if ting is None else None
                 async with self.lock:
-                    if self.table.apply_ai(ticket, decision) and self.publish:
+                    applied = self.table.apply_ting(ting) if ting is not None else self.table.apply_ai(ticket, decision)
+                    if applied and self.publish:
                         await self.publish()
         except asyncio.CancelledError:
             raise
@@ -41,7 +44,8 @@ class AutoRunner:
             # Avoid publishing private policy inputs or tracebacks.
             LOG.error("Mahjong controller stopped after an unexpected execution error")
         finally:
-            self.task = None
+            if self.task is asyncio.current_task():
+                self.task = None
 
     async def close(self):
         task = self.task

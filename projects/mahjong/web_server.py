@@ -35,6 +35,15 @@ class AITicket:
     quad_pairs: bool
 
 
+@dataclass(frozen=True)
+class TingDiscardTicket:
+    seat: Seat
+    round_id: str
+    revision: int
+    generation: int
+    tile_ids: tuple[int, ...]
+
+
 class LocalTable:
     """Owns one local match and exposes only TableService views/intents.
 
@@ -88,6 +97,7 @@ class LocalTable:
             self.total_scores = {seat: Decimal(0) for seat in Seat}
             self.score_pending = False
             self.control = {seat: "human" for seat in Seat}
+            self.auto_ting = {seat: True for seat in Seat}
             self.decisions = {seat: deque(maxlen=8) for seat in Seat}
             return self.snapshot()
 
@@ -155,6 +165,42 @@ class LocalTable:
                     self.control[target] = mode
                     self.control_generation[target] += 1
 
+    def set_auto_ting(self, *, seat: Seat, round_id: str, enabled: bool) -> None:
+        with self._lock:
+            if round_id != self.engine.state.round_id or type(enabled) is not bool:
+                raise IllegalAction("无效的听牌自动出牌设置")
+            if self.auto_ting[seat] != enabled:
+                self.auto_ting[seat] = enabled
+                self.control_generation[seat] += 1
+
+    def ting_ticket(self) -> TingDiscardTicket | None:
+        with self._lock:
+            state = self.engine.state
+            if state.phase.name != "TURN_ACTION":
+                return None
+            seat = state.current_player
+            player = state.players[seat]
+            if self.control[seat] != "human" or not self.auto_ting[seat] or not player.is_declared_ting:
+                return None
+            actions = self.engine.legal_actions(seat)
+            if len(actions) != 1 or actions[0].type.name != "DISCARD":
+                return None
+            tile = player.last_drawn_tile
+            if tile is None or actions[0].tile_ids != (tile.instance_id,):
+                return None
+            return TingDiscardTicket(seat, state.round_id, state.revision,
+                                     self.control_generation[seat], actions[0].tile_ids)
+
+    def apply_ting(self, ticket: TingDiscardTicket) -> bool:
+        with self._lock:
+            if ticket != self.ting_ticket():
+                return False
+            self.service.handle_intent(PLAYER_IDS[ticket.seat], {
+                "round_id": ticket.round_id, "revision": ticket.revision,
+                "type": "DISCARD", "tile_ids": list(ticket.tile_ids),
+            })
+            return True
+
     def view_for(self, seat: Seat) -> dict:
         with self._lock:
             view = self.service.view_for(PLAYER_IDS[seat])
@@ -172,6 +218,7 @@ class LocalTable:
                 ))
                 if position == seat:
                     player["ai_decisions"] = list(self.decisions[position])
+                    player["auto_ting"] = self.auto_ting[position]
             return view
 
     def ai_ticket(self) -> AITicket | None:

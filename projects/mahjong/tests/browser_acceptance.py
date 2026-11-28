@@ -522,7 +522,8 @@ async def lan_cases(browser, app, url, output, watch):
         for page in pages:
             await expect(page.locator(".result-box.win")).to_contain_text("北家荣胡")
         await capture(host, output, "08-lan-win")
-        await host.locator("#nextRound").click()
+        for page in pages:
+            await page.locator("#nextRound").click()
         await expect(action_button(pages[1], S, "ROLL_DICE")).to_be_visible()
         await expect(host.locator("#tableHud")).to_contain_text("第 2 局")
         await expect(host.locator(".previous-round")).to_contain_text("上局")
