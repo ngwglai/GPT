@@ -4,7 +4,7 @@
   "private": true,
   "description": "Optional development-only DOM integration tests for v1.0.0",
   "scripts": {
-    "test:ui": "node tests/ui_smoke.cjs"
+    "test:ui": "node tests/audio_regression.cjs && node tests/ui_smoke.cjs"
   },
   "devDependencies": {
     "jsdom": "30.0.1"

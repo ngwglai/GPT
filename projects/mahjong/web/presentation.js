@@ -48,6 +48,162 @@
       this.settings = this.loadSettings();
       this.bgm = null;
       this.currentBgmKey = null;
+      this.context = null;
+      this.gains = {};
+      this.buffers = new Map();
+      this.voiceQueue = [];
+      this.voiceBusy = false;
+      this.voiceSource = null;
+      this.voiceGeneration = 0;
+      this.gestureSeen = false;
+      this.preloadStarted = false;
+      this.Context = window.AudioContext || window.webkitAudioContext;
+    }
+
+    // Must be called synchronously in a trusted user gesture on mobile Safari.
+    unlock() {
+      this.gestureSeen = true;
+      if (!this.Context) return;
+      try {
+        if (!this.context) {
+          const ctx = this.context = new this.Context();
+          for (const kind of ["voice", "sfx"]) {
+            const gain = ctx.createGain();
+            gain.connect(ctx.destination);
+            this.gains[kind] = gain;
+            this.updateGain(kind);
+          }
+          ctx.addEventListener("statechange", () => {
+            if (ctx.state === "running") this.drainVoice();
+          });
+        }
+        this.resume();
+        this.preload();
+      } catch (error) {
+        console.warn("[audio] unlock failed", error);
+      }
+    }
+
+    resume() {
+      const ctx = this.context;
+      if (!ctx || document.hidden || ctx.state === "closed") return;
+      if (ctx.state === "running") { this.drainVoice(); return; }
+      ctx.resume().then(() => this.drainVoice()).catch(error => {
+        console.warn("[audio] resume failed", error);
+      });
+    }
+
+    updateGain(kind) {
+      const gain = this.gains[kind];
+      if (gain) gain.gain.value = this.settings[kind + "Enabled"] ? this.settings[kind + "Volume"] : 0;
+    }
+
+    buffer(url) {
+      if (!this.buffers.has(url)) {
+        const pending = fetch(url).then(response => {
+          if (!response.ok) throw new Error("HTTP " + response.status);
+          return response.arrayBuffer();
+        }).then(bytes => new Promise((resolve, reject) => {
+          // Callback form also works on older WebKit implementations.
+          this.context.decodeAudioData(bytes, resolve, reject);
+        })).catch(error => {
+          this.buffers.delete(url);
+          throw error;
+        });
+        this.buffers.set(url, pending);
+      }
+      return this.buffers.get(url);
+    }
+
+    preload() {
+      if (!this.context || this.preloadStarted) return;
+      const urls = new Set();
+      const collect = (node, path) => {
+        if (typeof node === "string") {
+          const url = this.assets.resolve(...path);
+          if (url) urls.add(url);
+        } else if (node && typeof node === "object") {
+          for (const [key, value] of Object.entries(node)) collect(value, [...path, key]);
+        }
+      };
+      collect(this.assets.manifest.voice, ["voice"]);
+      collect(this.assets.manifest.sfx, ["sfx"]);
+      if (!urls.size) return;
+      this.preloadStarted = true;
+      const queue = [...urls];
+      // Limit concurrent requests on phones; immediate playback shares the cache.
+      const worker = async () => {
+        while (queue.length) {
+          const url = queue.shift();
+          try { await this.buffer(url); }
+          catch (error) { console.warn("[audio] preload failed", url, error); }
+        }
+      };
+      for (let i = 0; i < Math.min(3, queue.length); i++) void worker();
+    }
+
+    resetVoice() {
+      this.voiceGeneration++;
+      this.voiceQueue.length = 0;
+      if (this.voiceSource) {
+        try { this.voiceSource.stop(); } catch (_) {}
+      }
+    }
+
+    enqueueVoice(url) {
+      if (!url || !this.settings.voiceEnabled || document.hidden) return;
+      if (!this.Context) { this.playOneShot(url, this.settings.voiceVolume); return; }
+      if (this.voiceQueue.length >= 16) this.voiceQueue.shift();
+      this.voiceQueue.push({url, time: Date.now()});
+      void this.drainVoice();
+    }
+
+    async drainVoice() {
+      if (this.voiceBusy || this.context?.state !== "running" || document.hidden) return;
+      this.voiceBusy = true;
+      const generation = this.voiceGeneration;
+      try {
+        while (this.voiceQueue.length && generation === this.voiceGeneration &&
+               this.context.state === "running" && !document.hidden && this.settings.voiceEnabled) {
+          const item = this.voiceQueue.shift();
+          if (Date.now() - item.time > 10000) continue;
+          try {
+            const buffer = await this.buffer(item.url);
+            if (generation !== this.voiceGeneration || document.hidden || !this.settings.voiceEnabled) break;
+            if (this.context.state !== "running") { this.voiceQueue.unshift(item); break; }
+            await new Promise((resolve, reject) => {
+              const source = this.context.createBufferSource();
+              source.buffer = buffer;
+              source.connect(this.gains.voice);
+              this.voiceSource = source;
+              source.onended = () => {
+                source.disconnect();
+                if (this.voiceSource === source) this.voiceSource = null;
+                resolve();
+              };
+              try { source.start(); }
+              catch (error) { this.voiceSource = null; source.disconnect(); reject(error); }
+            });
+          } catch (error) { console.warn("[audio] voice failed", item.url, error); }
+        }
+      } finally {
+        this.voiceBusy = false;
+        if (this.voiceQueue.length && this.context?.state === "running" &&
+            this.settings.voiceEnabled && !document.hidden) void this.drainVoice();
+      }
+    }
+
+    async playBufferedSfx(url) {
+      if (!url || this.context?.state !== "running" || document.hidden) return;
+      try {
+        const buffer = await this.buffer(url);
+        if (!this.settings.sfxEnabled || document.hidden || this.context.state !== "running") return;
+        const source = this.context.createBufferSource();
+        source.buffer = buffer;
+        source.connect(this.gains.sfx);
+        source.onended = () => source.disconnect();
+        source.start();
+      } catch (error) { console.warn("[audio] sfx failed", url, error); }
     }
 
     loadSettings() {
@@ -70,6 +226,9 @@
       this.settings[key] = value;
       if (key === "bgmVolume" && this.bgm) this.bgm.volume = value;
       if (key === "bgmEnabled" && !value) this.stopBgm();
+      this.updateGain("voice");
+      this.updateGain("sfx");
+      if (key === "voiceEnabled" && !value) this.resetVoice();
       this.saveSettings();
     }
 
@@ -78,7 +237,7 @@
       try {
         const audio = new Audio(url);
         audio.volume = volume;
-        audio.play().catch(() => {});
+        audio.play().catch(error => console.warn("[audio] fallback playback failed", url, error));
         return audio;
       } catch (_) {
         return null;
@@ -87,22 +246,24 @@
 
     playSfx(key) {
       if (!this.settings.sfxEnabled) return;
-      this.playOneShot(this.assets.resolve("sfx", key), this.settings.sfxVolume);
+      const url = this.assets.resolve("sfx", key);
+      if (this.Context) void this.playBufferedSfx(url);
+      else this.playOneShot(url, this.settings.sfxVolume);
     }
 
     playVoiceAction(key) {
       if (!this.settings.voiceEnabled) return;
-      this.playOneShot(this.assets.resolve("voice", "actions", key), this.settings.voiceVolume);
+      this.enqueueVoice(this.assets.resolve("voice", "actions", key));
     }
 
     playVoiceTile(type) {
       if (!this.settings.voiceEnabled) return;
-      this.playOneShot(this.assets.resolve("voice", "tiles", String(type)), this.settings.voiceVolume);
+      this.enqueueVoice(this.assets.resolve("voice", "tiles", String(type)));
     }
 
     playVoiceWin(key) {
       if (!this.settings.voiceEnabled) return;
-      this.playOneShot(this.assets.resolve("voice", "wins", key), this.settings.voiceVolume);
+      this.enqueueVoice(this.assets.resolve("voice", "wins", key));
     }
 
     playBgm(key) {
@@ -333,12 +494,27 @@
     }
   }
 
+  // Register before async manifest loading and before transport/action handlers.
+  for (const type of ["pointerup", "touchend", "click", "keydown"]) {
+    document.addEventListener(type, event => {
+      if (event.isTrusted) audio.unlock();
+    }, { capture: true, passive: true });
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) audio.resetVoice();
+    else if (audio.gestureSeen) audio.resume();
+  });
+  window.addEventListener("pageshow", () => {
+    if (audio.gestureSeen) audio.resume();
+  });
+
   let ready;
   function init() {
     ready ||= assets.load().then(() => {
       applyArt();
       bindAudioSettings();
       bindPanels();
+      audio.preload();
     });
     return ready;
   }

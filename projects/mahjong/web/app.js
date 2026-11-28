@@ -106,6 +106,7 @@ function acceptTable(nextTable, { initial = false } = {}) {
   const last = table;
   const sameRound = last?.round_id === nextTable.round_id;
   if (!sameRound) {
+    window.MahjongPresentation?.audio.resetVoice();
     selected = {seat:null,tileId:null};
     inspectedSeat = null;
   }

@@ -107,6 +107,7 @@
         hide('joinPanel', false); hide('roomPanel', true); hide('gameTable', true);
         hide('leaveRoom', true); hide('nextRound', true); hide('focusHand', true); hide('resumeRoom', !saved);
         hide('playingHint', true); hide('tableHud', true); hide('controlMenu', true); document.body.classList.remove('table-live');
+        window.MahjongPresentation?.audio.resetVoice();
         window.MahjongPresentation?.audio.stopBgm();
         status('已离开');
         showNotice(message.resumable ? '座位仍为你保留。点击“返回原房间”可以继续，其他玩家会看到你已断线。' : '已离开房间。');
